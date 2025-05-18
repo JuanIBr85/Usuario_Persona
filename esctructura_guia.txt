@@ -1,0 +1,163 @@
+proyecto-microservicios/
+│
+├── backend/
+│   ├── auth-service/            # Microservicio de autenticación y gestión de usuarios
+│   │   ├── app/
+│   │   │   ├── __init__.py      # Inicialización de Flask
+│   │   │   ├── config.py        # Configuraciones según entorno
+│   │   │   ├── extensions.py    # Extensiones Flask (SQLAlchemy, JWT, etc.)
+│   │   │   ├── models/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── user.py      # Modelo de usuario
+│   │   │   │   ├── role.py      # Modelo de roles
+│   │   │   │   ├── two_factor.py # Modelo para 2FA
+│   │   │   │   └── password_reset.py # Modelo para reset de contraseña
+│   │   │   ├── schemas/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── user_schema.py # Schemas para serialización
+│   │   │   │   └── auth_schema.py # Schemas para 2FA y reset contraseña
+│   │   │   ├── api/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── auth.py      # Endpoints de autenticación
+│   │   │   │   ├── users.py     # Endpoints de gestión de usuarios
+│   │   │   │   ├── two_factor.py # Endpoints para 2FA
+│   │   │   │   └── password_reset.py # Endpoints para reseteo
+│   │   │   ├── services/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── auth_service.py # Lógica de autenticación
+│   │   │   │   ├── two_factor_service.py # Lógica para 2FA
+│   │   │   │   ├── password_reset_service.py # Servicio de reset
+│   │   │   │   └── email_service.py # Servicio de envío de emails
+│   │   │   ├── templates/       # Plantillas para emails
+│   │   │   │   ├── email/
+│   │   │   │   │   ├── password_reset.html
+│   │   │   │   │   └── two_factor_code.html
+│   │   │   └── utils/
+│   │   │       ├── __init__.py
+│   │   │       ├── email.py     # Utilidades para emails
+│   │   │       ├── security.py  # Funciones de seguridad
+│   │   │       └── helpers.py   # Funciones de ayuda
+│   │   ├── migrations/          # Migraciones de base de datos
+│   │   ├── tests/               # Pruebas unitarias e integración
+│   │   ├── .env                 # Variables de entorno (no en git)
+│   │   ├── .env.example         # Ejemplo de variables de entorno
+│   │   ├── requirements.txt     # Dependencias del servicio
+│   │   └── run.py               # Punto de entrada para la aplicación
+│   │
+│   ├── person-service/          # Microservicio de gestión de personas
+│   │   ├── app/
+│   │   │   ├── __init__.py
+│   │   │   ├── config.py
+│   │   │   ├── extensions.py
+│   │   │   ├── models/
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── person.py    # Modelo de personas
+│   │   │   ├── schemas/
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── person_schema.py # Schemas para serialización
+│   │   │   ├── api/
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── persons.py   # Endpoints de personas
+│   │   │   ├── services/
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── person_service.py # Lógica de negocio
+│   │   │   └── utils/
+│   │   │       ├── __init__.py
+│   │   │       └── helpers.py
+│   │   ├── migrations/
+│   │   ├── tests/
+│   │   ├── .env
+│   │   ├── .env.example
+│   │   ├── requirements.txt
+│   │   └── run.py
+│   │
+│   ├── shared/                  # Código compartido entre servicios
+│       ├── __init__.py
+│       ├── database/            # Configuración de base de datos común
+│       │   ├── __init__.py
+│       │   └── models.py        # Modelos base
+│       ├── auth/                # Componentes de autenticación compartidos
+│       │   ├── __init__.py
+│       │   └── jwt_client.py    # Cliente JWT para servicios
+│       └── utils/
+│           ├── __init__.py
+│           └── common.py
+│
+├── frontend/
+│   ├── auth-client/             # Cliente para autenticación
+│   │   ├── public/              # Archivos estáticos
+│   │   ├── src/
+│   │   │   ├── assets/          # Imágenes, etc.
+│   │   │   ├── components/      # Componentes reutilizables
+│   │   │   │   ├── common/      # Botones, forms, etc.
+│   │   │   │   └── auth/        # Componentes específicos
+│   │   │   │       ├── Login.jsx
+│   │   │   │       ├── Register.jsx
+│   │   │   │       ├── TwoFactorForm.jsx
+│   │   │   │       ├── PasswordReset.jsx
+│   │   │   │       └── UserProfile.jsx
+│   │   │   ├── contexts/        # Contextos de React
+│   │   │   │   └── AuthContext.js
+│   │   │   ├── hooks/           # Hooks personalizados
+│   │   │   │   ├── useAuth.js
+│   │   │   │   └── useTwoFactor.js
+│   │   │   ├── pages/           # Páginas/rutas
+│   │   │   │   ├── LoginPage.js
+│   │   │   │   ├── RegisterPage.js
+│   │   │   │   ├── TwoFactorPage.js
+│   │   │   │   ├── ForgotPasswordPage.js
+│   │   │   │   ├── ResetPasswordPage.js
+│   │   │   │   ├── UserManagementPage.js
+│   │   │   │   └── ProfilePage.js
+│   │   │   ├── services/        # Servicios API
+│   │   │   │   ├── authService.js
+│   │   │   │   ├── userService.js
+│   │   │   │   └── twoFactorService.js
+│   │   │   ├── utils/           # Utilidades
+│   │   │   │   ├── validator.js
+│   │   │   │   └── securityUtils.js
+│   │   │   ├── App.js
+│   │   │   └── index.js
+│   │   ├── package.json
+│   │   └── .env
+│   │
+│   ├── person-client/           # Cliente para gestión de personas
+│   │   ├── public/
+│   │   ├── src/
+│   │   │   ├── assets/
+│   │   │   ├── components/
+│   │   │   │   ├── common/
+│   │   │   │   └── persons/     # Componentes específicos
+│   │   │   ├── contexts/
+│   │   │   ├── hooks/
+│   │   │   ├── pages/
+│   │   │   │   ├── PersonList.js
+│   │   │   │   ├── PersonDetail.js
+│   │   │   │   └── ...
+│   │   │   ├── services/
+│   │   │   │   └── personService.js
+│   │   │   ├── utils/
+│   │   │   ├── App.js
+│   │   │   └── index.js
+│   │   ├── package.json
+│   │   └── .env
+│   │
+│   └── shared-lib/              # Biblioteca compartida (opcional)
+│       ├── src/
+│       │   ├── components/      # Componentes comunes
+│       │   ├── hooks/           # Hooks comunes
+│       │   └── utils/           # Utilidades comunes
+│       └── package.json
+│
+├── docker/                      # Configuración de Docker
+│   ├── docker-compose.yml       # Para desarrollo local
+│   ├── docker-compose.prod.yml  # Para producción
+│   ├── auth-service/
+│   │   └── Dockerfile
+│   ├── person-service/
+│   │   └── Dockerfile
+│   └── nginx/                   # Configuración del servidor web
+│       └── nginx.conf
+│
+├── .gitignore
+└── README.md
