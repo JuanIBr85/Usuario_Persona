@@ -54,28 +54,28 @@ git clone https://github.com/tu-usuario/tu-repo.git
 cd tu-repo
 ```
 
-### 2.a 🔐 Equipo 1 – Auth Service (Backend)
+## 2.a 🔐 Equipo 1 – Auth Service (Backend)
 
-## 1. Ir a la carpeta del servicio
+### 1. Ir a la carpeta del servicio
 
 ```bash
 cd auth-service
 ```
 
-## 2. Crear entorno virtual local (solo para desarrollo)
+### 2. Crear entorno virtual local (solo para desarrollo)
 
 ```bash
 python -m venv venv
 .\venv\Scripts\activate     # En PowerShell
 ```
 
-## 3. Instalar dependencias
+### 3. Instalar dependencias
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## 4. Archivo .env
+### 4. Archivo .env
 - Crear un archivo .env con el siguiente contenido:
 
 FLASK_ENV=development
@@ -83,96 +83,94 @@ FLASK_APP=run.py
 SECRET_KEY=tu_clave_secreta
 JWT_SECRET_KEY=tu_clave_jwt
 
-## 5. Ejecutar en entorno local (sin Docker)
+### 5. Ejecutar en entorno local (sin Docker)
 
 ```bash
 python run.py
 ```
 
-## 6. O construir y levantar con Docker
+### 6. ir a la carpeta raiz y construir y levantar con Docker todos los servicios
 
 ```bash
+cd ..                                           # Ir a la carpeta donde esta el archivo docker-compose.yml con la consola.
 docker compose up --build
 ```
 
----
+### 7. O construir y levantar con docker solo el servicio auth-backend
+
+```bash
+docker compose build services
+docker compose up services
+```
 
 
-### 2.b 🧍 Equipo 2 – Persona Service (Backend)
 
-## 1. Ir a la carpeta del backend
+## 2.b 🧍 Equipo 2 – Persona Service (Backend)
+
+### 1. Ir a la carpeta del backend
 
 ```bash
 cd persona-service/backend
 ```
 
-## 2. Crear entorno virtual local (solo para desarrollo)
+### 2. Crear entorno virtual local (solo para desarrollo)
 
 ```bash
 python -m venv venv
 .\venv\Scripts\activate     # En PowerShell
 ```
 
-## 3. Instalar dependencias
+### 3. Instalar dependencias
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## 4. Archivo .env
+### 4. Archivo .env
 - Crear un archivo .env con el siguiente contenido:
 
 FLASK_ENV=development
 FLASK_APP=run.py
 
-## 5. Ejecutar en entorno local (sin Docker)
+### 5. Ejecutar en entorno local (sin Docker)
 
 ```bash
 python run.py
 ```
 
-## 6. O construir y levantar con Docker
+### 6. ir a la carpeta raiz y construir y levantar con Docker todos los servicios
 
 ```bash
+cd ..                                           # Ir a la carpeta donde esta el archivo docker-compose.yml con la consola.
 docker compose up --build
+```
+
+### 7. O construir y levantar con docker solo el servicio persona-backend
+
+```bash
+docker compose build persona-backend
+docker compose up persona-backend
 ```
 
 ---
 
 
-### 2.c 💻 Equipo 3 – Persona Service (Frontend)
+## 2.c 💻 Equipo 3 – Persona Service (Frontend)
 
-## 1. Ir a la carpeta del frontend
-
-```bash
-cd persona-service/frontend
-```
-
-## 2. Crear entorno virtual local (solo para desarrollo)
+### 1. Ir a la carpeta raiz
 
 ```bash
-npm install
+cd ..                                           # Ir a la carpeta donde esta el archivo docker-compose.yml con la consola.
 ```
 
-## 3. Instalar dependencias
+## 2. Construir y levantar con Docker todo el programa
 
 ```bash
-VITE_BACKEND_URL=http://localhost:5001
+docker compose build persona-frontend
+docker compose up persona-frontend
 ```
 
-## 4.
-
-```bash
-npm run dev
-```
-
-## 5. Ejecutar en entorno local (sin Docker)
-
-```bash
-python run.py
-```
-
-## 6. O construir y levantar con Docker
+## 3. Construir y levantar con Docker solo el frontend
 
 ```bash
 docker compose up --build
