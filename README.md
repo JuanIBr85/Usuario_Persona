@@ -68,6 +68,8 @@ cd auth-service
 python -m venv venv
 .\venv\Scripts\activate     # En PowerShell
 ```
+python3 -m venv venv
+source venv/bin/activate   # En lugar de .\venv\Scripts\activate de PowerShell
 
 ### 3. Instalar dependencias
 
@@ -76,6 +78,7 @@ pip install -r requirements.txt
 ```
 
 ### 4. Archivo .env
+nano .env
 - Crear un archivo .env con el siguiente contenido:
 
 FLASK_ENV=development
@@ -99,8 +102,8 @@ docker compose up --build
 ### 7. O construir y levantar con docker solo el servicio auth-backend
 
 ```bash
-docker compose build services
-docker compose up services
+docker compose build auth-service
+docker compose up auth-service
 ```
 
 

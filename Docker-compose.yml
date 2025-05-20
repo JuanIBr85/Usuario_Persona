@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+
   auth-service:
     build: ./auth-service
     ports:
