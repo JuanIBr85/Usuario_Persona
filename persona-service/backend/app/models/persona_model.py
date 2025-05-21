@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 
 class Persona(db.Model):
 
-    __tablename__='personas'
+    __tablename__ ='personas'
 
     id_persona = Column(Integer, primary_key=True)
     nombre_persona=Column(String(50), nullable=False)
@@ -13,9 +13,9 @@ class Persona(db.Model):
     num_doc_persona=Column(String(8), nullable=False)
 
     #Falta completar
-    domicilio_id=Column(Integer)
-    tipo_documento_id=Column(Integer)
-    contacto_id=Column(Integer)
+    domicilio_id=Column(Integer, ForeignKey(''))
+    tipo_documento_id=Column(Integer, ForeignKey(''))
+    contacto_id=Column(Integer, ForeignKey(''))
 
     created_at=Column(DateTime, default=datetime.now(timezone.utc))
     updated_at=Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
