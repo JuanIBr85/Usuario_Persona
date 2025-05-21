@@ -1,6 +1,6 @@
 from flask import Flask
 from dotenv import load_dotenv
-from app.routes.routes_usuarios import usuario_bp
+from app.routes.usuarios_blueprint import usuario_bp
 import os
 
 load_dotenv()
