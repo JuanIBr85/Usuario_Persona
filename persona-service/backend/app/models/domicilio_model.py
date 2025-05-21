@@ -8,7 +8,7 @@ class Domicilio(db.Model):
 
     id_domicilio=Column(Integer, primary_key=True)
     domicilio_calle=Column(String(50), nullable=False)
-    domicilio_numero=Column(String (8), nullable=True)
+    domicilio_numero=Column(String (10), nullable=True)
     domicilio_piso=Column(String(3), nullable=True)
     domicilio_dpto=Column(String(2), nullable=True)
 
