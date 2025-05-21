@@ -33,7 +33,7 @@ def registrar_usuario():
 
     nuevo_usuario = Usuario(
         nombre_usuario=data['nombre_usuario'],
-        email=data['email_usuario'],
+        email_usuario=data['email_usuario'],
         password=generate_password_hash(data['password'])
     )
 
