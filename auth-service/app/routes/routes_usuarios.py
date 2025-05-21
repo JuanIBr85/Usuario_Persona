@@ -1,13 +1,13 @@
 import json
-from flask import Flask, request, Response
+from flask import Flask, request, Response , Blueprint
 from werkzeug.security import generate_password_hash
 from app.database.session import SessionLocal
 from app.models.models_usuarios import Usuario
 from app.schemas.schemas_usuarios import UsuarioSchema
 
-app = Flask(__name__)
+usuario_bp = Blueprint("usuario", __name__)
 
-@app.route('/registro', methods=['POST'])
+@usuario_bp.route('/registro', methods=['POST'])
 def registrar_usuario():
     session = SessionLocal()
     data = request.get_json()
@@ -23,7 +23,7 @@ def registrar_usuario():
 
     # Verificar si el usuario ya existe
     if session.query(Usuario).filter(
-        (Usuario.username == data['username']) | (Usuario.email == data['email'])
+        (Usuario.nombre_usuario == data['nombre_usuario']) | (Usuario.email_usuario == data['email_usuario'])
     ).first():
         return Response(
             json.dumps({"error": "El nombre de usuario o el email ya están registrados"}),
@@ -32,9 +32,9 @@ def registrar_usuario():
         )
 
     nuevo_usuario = Usuario(
-        username=data['username'],
-        email=data['email'],
-        password_hash=generate_password_hash(data['password'])
+        nombre_usuario=data['nombre_usuario'],
+        email=data['email_usuario'],
+        password=generate_password_hash(data['password'])
     )
 
     session.add(nuevo_usuario)

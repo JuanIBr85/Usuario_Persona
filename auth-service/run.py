@@ -1,11 +1,13 @@
 from flask import Flask
 from dotenv import load_dotenv
+from app.routes.routes_usuarios import usuario_bp
 import os
 
 load_dotenv()
 
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
+app.register_blueprint(usuario_bp)
 
 @app.route('/')
 def index():
