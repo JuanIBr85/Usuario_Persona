@@ -3,7 +3,6 @@ from sqlalchemy.orm import relationship
 from app.database.session import Base
 from datetime import datetime, timezone
 
-
 class Permiso(Base):
     __tablename__ = 'permiso'
 
@@ -21,7 +20,7 @@ class RolPermiso(Base):
     __tablename__ = 'rol_permiso'
 
     id_rol_permiso = Column(Integer, primary_key=True)
-    rol_id = Column(Integer, ForeignKey('rol.id_rol'), nullable=False)
+    id_rol = Column(Integer, ForeignKey('rol.id_rol'), nullable=False)
     permiso_id = Column(Integer, ForeignKey('permiso.id_permiso'), nullable=False)
 
     created_at=Column(DateTime, default=datetime.now(timezone.utc))

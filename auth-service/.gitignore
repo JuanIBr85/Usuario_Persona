@@ -1,3 +1,20 @@
-venv/
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*.pyo
+*.pyd
+
+# Entorno virtual
+venv/
+env/
+
+# Archivos sensibles
+.env
+
+# Archivos de logs y bases temporales
+*.log
+*.sqlite3
+
+# IDEs
+.vscode/
+.idea/
