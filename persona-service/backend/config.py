@@ -16,6 +16,7 @@ database= os.environ['MYSQL_DATABASE']
 SQLALCHEMY_DATABASE_URI = f'mysql+pymysql://{user}:{password}@{host}/{database}'
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+
 #CONFIGURACIONES JWT
 
 JWT_SECRET_KEY=os.environ.get('JWT_SECRET_KEY')
