@@ -1,8 +1,9 @@
-from extensions import db
+from extensions import Base
 from sqlalchemy import ForeignKey, Integer, String, DateTime, Column, Date
+from sqlalchemy.orm import relationship
 from datetime import datetime, timezone
 
-class Persona(db.Model):
+class Persona(Base):
 
     __tablename__ ='personas'
 
@@ -11,17 +12,22 @@ class Persona(db.Model):
     apellido_persona=Column(String(50),nullable=False)
     fecha_nacimiento_persona = Column(Date,nullable=False)
     num_doc_persona=Column(String(8), nullable=False)
+    
+    usuario_id = Column(Integer, nullable=False)
 
-    #Falta completar
-    domicilio_id=Column(Integer, ForeignKey(''))
-    tipo_documento_id=Column(Integer, ForeignKey(''))
-    contacto_id=Column(Integer, ForeignKey(''))
+    domicilio_id=Column(Integer, ForeignKey('domicilios.id_domicilio'))
+    tipo_documento_id=Column(Integer, ForeignKey('tipo_documentos.id_tipo_documentos'))
+    contacto_id=Column(Integer, ForeignKey('contactos.id_contacto'))
+
+    domicilio = relationship("Domicilio")
+    tipo_documento = relationship("Tipo_Documento")
+    contacto = relationship("Contacto")
 
     created_at=Column(DateTime, default=datetime.now(timezone.utc))
     updated_at=Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
     deleted_at=Column(DateTime, nullable=True)
 
-    # Definir relaciones con tablas "Tipo_Documento", "Contacto", Domicilio.
+
 
 
 
