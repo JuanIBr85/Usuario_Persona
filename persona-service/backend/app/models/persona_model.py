@@ -1,4 +1,4 @@
-from extensions import Base
+from app.extensions import Base
 from sqlalchemy import ForeignKey, Integer, String, DateTime, Column, Date
 from sqlalchemy.orm import relationship
 from datetime import datetime, timezone
@@ -16,7 +16,7 @@ class Persona(Base):
     usuario_id = Column(Integer, nullable=False)
 
     domicilio_id=Column(Integer, ForeignKey('domicilios.id_domicilio'))
-    tipo_documento_id=Column(Integer, ForeignKey('tipo_documentos.id_tipo_documentos'))
+    tipo_documento_id=Column(Integer, ForeignKey('tipo_documentos.id_tipo_documento'))
     contacto_id=Column(Integer, ForeignKey('contactos.id_contacto'))
 
     domicilio = relationship("Domicilio")

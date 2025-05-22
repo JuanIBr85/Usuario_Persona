@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from extensions import Base
+from app.extensions import Base
 from sqlalchemy import DateTime, ForeignKey, Integer, String, Column
 from sqlalchemy.orm import relationship
 

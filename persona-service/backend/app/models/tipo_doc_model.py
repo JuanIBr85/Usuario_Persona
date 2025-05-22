@@ -1,4 +1,4 @@
-from extensions import Base
+from app.extensions import Base
 from sqlalchemy import Integer, String, DateTime, Column
 from datetime import datetime, timezone
 
