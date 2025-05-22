@@ -1,9 +1,12 @@
 import React from 'react'
+import Form from "@/components/ui/form"
 
 function Profile() {
   return (
-    <div>Profile</div>
+    <>
+      <Form></Form></>
   )
 }
+
 
 export default Profile
