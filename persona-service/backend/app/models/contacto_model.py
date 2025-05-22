@@ -1,11 +1,11 @@
-from extensions import db
+from extensions import Base
 from sqlalchemy import ForeignKey, Integer, String, DateTime, Column, Date
 from datetime import datetime, timezone
 
 
-class Contacto(db.Model):
+class Contacto(Base):
 
-    __tablename__ = "contacto"
+    __tablename__ = "contactos"
 
     id_contacto=Column(Integer, primary_key=True)
     telefono_fijo_=Column(String(15), nullable=True)
