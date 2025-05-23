@@ -84,7 +84,13 @@ def registrar_usuario():
         )
         session.add(usuario_log)
         session.commit()
-
+        session.commit()
+        return Response(
+            json.dumps({"mensaje": "Usuario registrado correctamente"}),
+            status=201,
+            mimetype='application/json'
+        )
+    
     except Exception as e:
         session.rollback()
         import traceback
