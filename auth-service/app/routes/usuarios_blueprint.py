@@ -1,8 +1,8 @@
 import json
 from flask import request, Response, Blueprint
 from werkzeug.security import generate_password_hash
-from app.database.session import SessionLocal
-from app.models.usuarios import Usuario, PasswordLog
+from app.database.session import SessionLocal,engine
+from app.models.usuarios import Usuario, PasswordLog,UsuarioLog
 from app.models.rol import RolUsuario,Rol
 from app.schemas.usuarios_schema import UsuarioSchema
 from datetime import datetime, timedelta, timezone
@@ -12,6 +12,7 @@ usuario_bp = Blueprint("usuario", __name__)
 
 @usuario_bp.route('/registro', methods=['POST'])
 def registrar_usuario():
+
     try:
         session = SessionLocal()
         data = request.get_json()
@@ -37,34 +38,36 @@ def registrar_usuario():
 
         password_hash = generate_password_hash(data['password'])
 
-        # Establecer expiración de contraseña --> pasar a models.usuarios
-        expiracion = datetime.now(timezone.utc) + timedelta(days=365)
-
 
         # Crear un nuevo usuario
         nuevo_usuario = Usuario(
             nombre_usuario=data['nombre_usuario'],
             email_usuario=data['email_usuario'],
             password=password_hash,
-            persona_id=data.get('persona_id', None),  
-            password_expira_en=expiracion,
-
+            persona_id=data.get('persona_id', None) 
         )
 
+          
         session.add(nuevo_usuario)
         session.flush()  
 
         #asigna un rol por defecto que es usuario
-        rol_por_defecto = get_rol_por_nombre("usuario")  
+        rol_por_defecto = get_rol_por_nombre(session,"usuario")  
         if not rol_por_defecto:
-            return json.dumps({"error": "Rol por defecto no encontrado"}), 500
+                session.rollback()
+                session.close()
+                return Response(
+                    json.dumps({"error": "Rol por defecto no encontrado"}),
+                    status=500,
+                    mimetype='application/json'
+                )
         
-        relacion_rol = RolUsuario(
-        id_usuario=nuevo_usuario.id_usuario,
-        id_rol=rol_por_defecto.id_rol
-)
-        session.add(relacion_rol)
-
+        roles = RolUsuario(
+            id_usuario=nuevo_usuario.id_usuario,
+            id_rol=rol_por_defecto.id_rol
+        )
+        session.add(roles)
+        
         # Registrar en PasswordLog
         password_log = PasswordLog(
             usuario_id=nuevo_usuario.id_usuario,
@@ -73,29 +76,19 @@ def registrar_usuario():
         )
         session.add(password_log)
 
+        # registra en el usuario log.
+        usuario_log = UsuarioLog(
+            usuario_id=nuevo_usuario.id_usuario,
+            accion= "registro",
+            detalles="El usuario se registro correctamente"
+        )
+        session.add(usuario_log)
         session.commit()
 
-
-        usuario_creado = {
-        "id_usuario": nuevo_usuario.id_usuario,
-        "nombre_usuario": nuevo_usuario.nombre_usuario,
-        "email_usuario": nuevo_usuario.email_usuario,
-        "persona_id": nuevo_usuario.persona_id,
-        "created_at": nuevo_usuario.created_at.isoformat() if nuevo_usuario.created_at else None,
-        }
-        return Response(
-            
-            json.dumps({
-
-                "mensaje": "Usuario registrado correctamente",
-                "usuario": usuario_creado
-                
-                }),
-            status=201,
-            mimetype='application/json'
-        )
     except Exception as e:
         session.rollback()
+        import traceback
+        traceback.print_exc()
         return Response(
             json.dumps({"error": f"Error al registrar usuario: {str(e)}"}),
             status=500,
@@ -104,9 +97,9 @@ def registrar_usuario():
     finally:
         session.close()
 
-@usuario_bp.route('/ver_usuario')
-def perfil():
-    return None
+@usuario_bp.route('/login', methods=['GET', 'POST'])
+def login_usuario():
+    return json.dumps("login")
 
 #para ver la tabla en sqlite3.
 #          C:\Users\Fabristein\Documents\Usuario_Persona\auth-service
