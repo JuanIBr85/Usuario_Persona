@@ -12,9 +12,9 @@ usuario_bp = Blueprint("usuario", __name__)
 
 @usuario_bp.route('/registro', methods=['POST'])
 def registrar_usuario():
+    
     try:
         session = SessionLocal()
-        print(f"Base de datos usada: {engine.url.database}")
         data = request.get_json()
 
         schema = UsuarioSchema()
@@ -38,9 +38,6 @@ def registrar_usuario():
 
         password_hash = generate_password_hash(data['password'])
 
-        # Establecer expiración de contraseña --> pasar a models.usuarios
-        #expiracion = datetime.now(timezone.utc) + timedelta(days=365)
-
 
         # Crear un nuevo usuario
         nuevo_usuario = Usuario(
@@ -53,7 +50,7 @@ def registrar_usuario():
           
         session.add(nuevo_usuario)
         session.flush()  
-        print("Nuevo usuario ID:", nuevo_usuario.id_usuario)
+
         #asigna un rol por defecto que es usuario
         rol_por_defecto = get_rol_por_nombre(session,"usuario")  
         if not rol_por_defecto:
@@ -79,6 +76,7 @@ def registrar_usuario():
         )
         session.add(password_log)
 
+        # registra en el usuario log.
         usuario_log = UsuarioLog(
             usuario_id=nuevo_usuario.id_usuario,
             accion= "registro",
@@ -87,26 +85,6 @@ def registrar_usuario():
         session.add(usuario_log)
         session.commit()
 
-
-        usuario_creado = {
-        "id_usuario": nuevo_usuario.id_usuario,
-        "nombre_usuario": nuevo_usuario.nombre_usuario,
-        "email_usuario": nuevo_usuario.email_usuario,
-        "persona_id": nuevo_usuario.persona_id,
-        "created_at": nuevo_usuario.created_at.isoformat() if nuevo_usuario.created_at else None, 
-        "password_expira_en": nuevo_usuario.password_expira_en.isoformat() if nuevo_usuario.password_expira_en else None
-        }#solo para comprobar que se crea el nuevo_usuario
-        return Response(
-            
-            json.dumps({
-
-                "mensaje": "Usuario registrado correctamente",
-                "usuario": usuario_creado
-                
-                }),
-            status=201,
-            mimetype='application/json'
-        )
     except Exception as e:
         session.rollback()
         import traceback
