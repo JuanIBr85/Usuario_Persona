@@ -1,8 +1,8 @@
 import json
 from flask import request, Response, Blueprint
 from werkzeug.security import generate_password_hash
-from app.database.session import SessionLocal
-from app.models.usuarios import Usuario, PasswordLog
+from app.database.session import SessionLocal,engine
+from app.models.usuarios import Usuario, PasswordLog,UsuarioLog
 from app.models.rol import RolUsuario,Rol
 from app.schemas.usuarios_schema import UsuarioSchema
 from datetime import datetime, timedelta, timezone
@@ -14,6 +14,7 @@ usuario_bp = Blueprint("usuario", __name__)
 def registrar_usuario():
     try:
         session = SessionLocal()
+        print(f"Base de datos usada: {engine.url.database}")
         data = request.get_json()
 
         schema = UsuarioSchema()
@@ -38,7 +39,7 @@ def registrar_usuario():
         password_hash = generate_password_hash(data['password'])
 
         # Establecer expiración de contraseña --> pasar a models.usuarios
-        expiracion = datetime.now(timezone.utc) + timedelta(days=365)
+        #expiracion = datetime.now(timezone.utc) + timedelta(days=365)
 
 
         # Crear un nuevo usuario
@@ -46,25 +47,30 @@ def registrar_usuario():
             nombre_usuario=data['nombre_usuario'],
             email_usuario=data['email_usuario'],
             password=password_hash,
-            persona_id=data.get('persona_id', None),  
-            password_expira_en=expiracion,
-
+            persona_id=data.get('persona_id', None) 
         )
 
+          
         session.add(nuevo_usuario)
         session.flush()  
-
+        print("Nuevo usuario ID:", nuevo_usuario.id_usuario)
         #asigna un rol por defecto que es usuario
-        rol_por_defecto = get_rol_por_nombre("usuario")  
+        rol_por_defecto = get_rol_por_nombre(session,"usuario")  
         if not rol_por_defecto:
-            return json.dumps({"error": "Rol por defecto no encontrado"}), 500
+                session.rollback()
+                session.close()
+                return Response(
+                    json.dumps({"error": "Rol por defecto no encontrado"}),
+                    status=500,
+                    mimetype='application/json'
+                )
         
-        relacion_rol = RolUsuario(
-        id_usuario=nuevo_usuario.id_usuario,
-        id_rol=rol_por_defecto.id_rol
-)
-        session.add(relacion_rol)
-
+        roles = RolUsuario(
+            id_usuario=nuevo_usuario.id_usuario,
+            id_rol=rol_por_defecto.id_rol
+        )
+        session.add(roles)
+        
         # Registrar en PasswordLog
         password_log = PasswordLog(
             usuario_id=nuevo_usuario.id_usuario,
@@ -73,6 +79,12 @@ def registrar_usuario():
         )
         session.add(password_log)
 
+        usuario_log = UsuarioLog(
+            usuario_id=nuevo_usuario.id_usuario,
+            accion= "registro",
+            detalles="El usuario se registro correctamente"
+        )
+        session.add(usuario_log)
         session.commit()
 
 
@@ -81,8 +93,9 @@ def registrar_usuario():
         "nombre_usuario": nuevo_usuario.nombre_usuario,
         "email_usuario": nuevo_usuario.email_usuario,
         "persona_id": nuevo_usuario.persona_id,
-        "created_at": nuevo_usuario.created_at.isoformat() if nuevo_usuario.created_at else None,
-        }
+        "created_at": nuevo_usuario.created_at.isoformat() if nuevo_usuario.created_at else None, 
+        "password_expira_en": nuevo_usuario.password_expira_en.isoformat() if nuevo_usuario.password_expira_en else None
+        }#solo para comprobar que se crea el nuevo_usuario
         return Response(
             
             json.dumps({
@@ -96,6 +109,8 @@ def registrar_usuario():
         )
     except Exception as e:
         session.rollback()
+        import traceback
+        traceback.print_exc()
         return Response(
             json.dumps({"error": f"Error al registrar usuario: {str(e)}"}),
             status=500,
@@ -104,9 +119,34 @@ def registrar_usuario():
     finally:
         session.close()
 
-@usuario_bp.route('/ver_usuario')
-def perfil():
-    return None
+@usuario_bp.route('/usuario/<int:id_usuario>', methods=['GET'])
+def obtener_usuario(id_usuario):
+    session = SessionLocal()
+    try:
+        usuario = session.query(Usuario).get(id_usuario)
+        
+        if not usuario:
+            return json.dumps({"error": "Usuario no encontrado"}), 404
+
+        # Obtener los roles asociados
+        relacion_rol = [roles.rol.nombre for relacion in usuario.roles]
+
+        # Construir la respuesta
+        usuario_data = {
+            "id_usuario": usuario.id_usuario,
+            "nombre": usuario.nombre,
+            "apellido": usuario.apellido,
+            "email": usuario.email,
+            "estado": usuario.estado,
+            "fecha_creacion": usuario.fecha_created_at.isoformat(),
+            "roles": relacion_rol
+        }
+
+        return json.dumps(usuario_data), 200
+
+    except Exception as e:
+        print("Error al obtener el usuario:", e)
+        return json.dumps({"error": "Error interno del servidor"}), 500
 
 #para ver la tabla en sqlite3.
 #          C:\Users\Fabristein\Documents\Usuario_Persona\auth-service

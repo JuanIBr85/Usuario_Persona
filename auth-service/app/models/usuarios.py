@@ -9,7 +9,7 @@ class Usuario(Base):
     __table_args__ = {'sqlite_autoincrement': True}  #---> buscar forma de hacerlo sobre id_usuario/ 
                                                      # esto solo hace que los integer y primary key se autoincrementen.
                                                      
-    id_usuario = Column(Integer, primary_key=True)
+    id_usuario = Column(Integer, primary_key=True,unique=True)
     nombre_usuario = Column(String, nullable=False)
     email_usuario = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
@@ -17,9 +17,9 @@ class Usuario(Base):
 
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
-    deleted_at = Column(DateTime, nullable=True)
+    deleted_at = Column(DateTime, nullable=True,default=None)
     password_changed_at = Column(DateTime, default=datetime.now(timezone.utc))    #este campo se actualiza cada vez q se cambia algo en las filas, cambiar a manual mas tarde
-    password_expira_en = Column(DateTime, default=lambda: datetime.now(timezone.utc) + timedelta(days=365)) #agregar fecha de expiracion predeterminada - datetime.now(timezone.utc) + timedelta(days=365)
+    password_expira_en = Column(DateTime, default=lambda: datetime.now(timezone.utc) + timedelta(days=365)) 
 
     # Definir las relaciones y acomodar los nombres segun la tabla Entidad-relacion
     #persona = relationship("Persona") ---> solo comentado para poder hacer desarrollo hasta que podamos usar la tabla persona.
