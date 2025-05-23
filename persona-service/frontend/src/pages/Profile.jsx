@@ -1,9 +1,9 @@
 import React from 'react'
 
-function Profile() {
+export default function Profile() {
   return (
-    <div>Profile</div>
+    <div className="text-lg font-semibold text-center">
+      Esta es la pagina Profile
+    </div>
   )
 }
-
-export default Profile

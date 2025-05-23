@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from extensions import Base
+from app.extensions import Base
 from sqlalchemy import DateTime, ForeignKey, Integer, String, Column
 from sqlalchemy.orm import relationship
 
@@ -9,7 +9,7 @@ class Domicilio(Base):
 
     id_domicilio=Column(Integer, primary_key=True)
     domicilio_calle=Column(String(50), nullable=False)
-    domicilio_numero=Column(String (10), nullable=True)
+    domicilio_numero=Column(String (10), nullable=False)
     domicilio_piso=Column(String(3), nullable=True)
     domicilio_dpto=Column(String(2), nullable=True)
 
