@@ -9,19 +9,18 @@ function Login() {
     return (
         <div className="bg-gray-100 h-screen flex items-center justify-center">
             <div className="flex w-full h-full sm:h-[520px] sm:max-w-md md:max-w-3xl shadow-md rounded-xl overflow-hidden">
-                <div className="w-full h-full bg-blue-600 hidden md:block">
-                    <Card className="w-full md:max-w-md h-full rounded-none bg-transparent">
-                        <CardHeader>
-                            <CardTitle className="text-2xl text-center">
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className=" h-full">
-                        </CardContent>
-                        <CardFooter className="flex justify-center">
-
-                        </CardFooter>
-                    </Card>
-                </div>
+                {/*Card informacion extra o algo para mostrar*/}
+                <Card className="w-full md:max-w-md h-full bg-blue-600 hidden md:block rounded-none">
+                    <CardHeader>
+                        <CardTitle className="text-2xl text-center">
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className=" h-full">
+                    </CardContent>
+                    <CardFooter className="flex justify-center">
+                    </CardFooter>
+                </Card>
+                {/*Card Login*/}
                 <Card className="w-full md:max-w-md h-full rounded-none">
                     <CardHeader>
                         <CardTitle className="text-2xl text-center">

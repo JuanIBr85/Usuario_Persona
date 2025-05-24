@@ -4,7 +4,7 @@ import AdminPanel from './pages/AdminPanel';
 import NotFound from './pages/NotFound'; 
 import Login from './pages/Login';
 import Sign from './pages/Sign';
-import { PruebaChart } from './pages/pruebaChart';
+import { PruebaChart } from './pages/PruebaChart';
 
 function App() {
   return (
