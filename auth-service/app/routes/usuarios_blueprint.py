@@ -1,12 +1,15 @@
 import json
 from flask import request, Response, Blueprint
-from werkzeug.security import generate_password_hash
-from app.database.session import SessionLocal,engine
+from werkzeug.security import generate_password_hash,check_password_hash
+from app.database.session import SessionLocal
 from app.models.usuarios import Usuario, PasswordLog,UsuarioLog
 from app.models.rol import RolUsuario,Rol
 from app.schemas.usuarios_schema import UsuarioSchema
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone,timedelta
 from app.services.rol import get_rol_por_nombre
+from flask_jwt_extended import (create_access_token, create_refresh_token,jwt_required, get_jwt_identity, create_access_token)
+import jwt
+from os import getenv
 
 usuario_bp = Blueprint("usuario", __name__)
 
@@ -103,13 +106,51 @@ def registrar_usuario():
     finally:
         session.close()
 
-@usuario_bp.route('/login', methods=['GET', 'POST'])
-def login_usuario():
-    return json.dumps("login")
+@usuario_bp.route('/login', methods=['POST'])
+def login():
+    try:
+        session = SessionLocal()
+        data = request.get_json()
+        email = data.get("email_usuario")
+        password = data.get("password")
 
-#para ver la tabla en sqlite3.
-#          C:\Users\Fabristein\Documents\Usuario_Persona\auth-service
-#      C:\Users\Fabristein\Documents\Sqlite3\Sqlite3.exe auth.db
+        if not email or not password:
+            return Response(json.dumps({"error": "Faltan credenciales"}), status=400, mimetype="application/json")
+
+        usuario = session.query(Usuario).filter_by(email_usuario=email).first()
+        if not usuario or not check_password_hash(usuario.password, password):
+            return Response(json.dumps({"error": "Credenciales inválidas"}), status=401, mimetype="application/json")
+
+        # rol principal de usuario
+        rol_usuario = session.query(Rol).join(RolUsuario).filter(RolUsuario.id_usuario == usuario.id_usuario).first()
+        rol_nombre = rol_usuario.nombre_rol if rol_usuario else "sin_rol"
+
+        # Crea el token
+        payload = {
+            "sub": usuario.id_usuario,
+            "email": usuario.email_usuario,
+            "rol": rol_nombre,
+            "exp": datetime.utcnow() + timedelta(hours=4)
+        }
+
+        token = jwt.encode(payload, getenv("JWT_SECRET_KEY", "clave_jwt_123"), algorithm="HS256")
+
+        return Response(json.dumps({
+            "mensaje": "Login exitoso",
+            "token": token,
+            "usuario": {
+                "id_usuario": usuario.id_usuario,
+                "nombre_usuario": usuario.nombre_usuario,
+                "email_usuario": usuario.email_usuario,
+                "rol": rol_nombre
+            }
+        }), status=200, mimetype="application/json")
+
+    except Exception as e:
+        return Response(json.dumps({"error": str(e)}), status=500, mimetype="application/json")
+    finally:
+        session.close()
+
 
 #para iniciar el seed
 #python -m app.script.seed_data

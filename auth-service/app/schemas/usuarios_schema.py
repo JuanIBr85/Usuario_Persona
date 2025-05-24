@@ -11,3 +11,9 @@ class UsuarioSchema(Schema):
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
     deleted_at = fields.DateTime(dump_only=True)
+
+
+class LoginSchema(Schema):
+    nombre_usuario = fields.Str(required=False)
+    email_usuario = fields.Email(required=False)
+    password = fields.Str(required=True, validate=validate.Length(min=6))
