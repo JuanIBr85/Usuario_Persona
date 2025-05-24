@@ -4,15 +4,18 @@ import AdminPanel from './pages/AdminPanel';
 import NotFound from './pages/NotFound'; 
 import Login from './pages/Login';
 import Sign from './pages/Sign';
+import { PruebaChart } from './pages/pruebaChart';
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Profile />} />
+      <Route path="/profile" element={<Profile />} />
       <Route path="/adminpanel" element={<AdminPanel />} />
       <Route path="/login" element={<Login />} />
       <Route path="/sign" element={<Sign />} />
       <Route path="*" element={<NotFound />} />
+      <Route path="/prueba" element={<PruebaChart />} />
+
     </Routes>
   );
 }
