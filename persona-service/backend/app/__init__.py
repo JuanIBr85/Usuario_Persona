@@ -18,12 +18,17 @@ def create_app():
     jwt.init_app(app)
     
     #Registro de blueprints
+    from app.routes.persona_routes import persona_bp
+    app.register_blueprint(persona_bp, url_prefix='/api')
+
 
 
     #Crear tablas si no existen
     
     with app.app_context():
         Base.metadata.create_all(bind=engine)
+
+    
 
     @app.route('/')
     def index():

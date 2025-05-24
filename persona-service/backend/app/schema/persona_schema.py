@@ -1,14 +1,14 @@
 from marshmallow import Schema, fields
 from app.schema.contacto_schema import ContactoSchema
-from app.schema.domicilio_schema import DomicilioShema
+from app.schema.domicilio_schema import DomicilioSchema
 from app.schema.tipo_documento_schema import TipoDocumentoSchema
 
 class PersonaSchema(Schema):
-    id=fields.Int(dump_only=True)
-    nombre=fields.Str(required=True)
-    apellido=fields.Str(required=True)
-    fecha_nacimiento=fields.Date(required=True)
-    numero_documento=fields.Str(required=True)
+    id_persona=fields.Int(dump_only=True)
+    nombre_persona=fields.Str(required=True)
+    apellido_persona=fields.Str(required=True)
+    fecha_nacimiento_persona=fields.Date(required=True)
+    num_doc_persona=fields.Str(required=True)
 
     usuario_id=fields.Int(required=True)
 
@@ -16,7 +16,7 @@ class PersonaSchema(Schema):
     tipo_documento_id=fields.Int(required=True)
     contacto_id=fields.Int(required=True)
 
-    domicilio=fields.Nested(DomicilioShema, dump_only=True)
+    domicilio=fields.Nested(DomicilioSchema, dump_only=True)
     tipo_documento=fields.Nested(TipoDocumentoSchema, dump_only=True)
     contacto=fields.Nested(ContactoSchema, dump_only=True)
 
