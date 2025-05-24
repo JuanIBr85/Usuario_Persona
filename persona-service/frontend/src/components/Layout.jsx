@@ -1,5 +1,6 @@
 import React from "react";
 import Header from "./Header";
+import Footer from "./Footer";
 import Main from "./Main";
 
 const Layout = ({ children }) => {
@@ -9,6 +10,7 @@ const Layout = ({ children }) => {
       <div className="flex flex-1">
         <Main>{children}</Main>
       </div>
+      <Footer />
     </div>
   );
 };

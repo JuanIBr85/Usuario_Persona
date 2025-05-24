@@ -76,6 +76,7 @@
   --sidebar-ring: oklch(0.708 0 0);
 
   --color-primario: #1c1364;
+  --color-fondo: #fff;
 }
 
 .dark {
