@@ -19,5 +19,5 @@ class IPersonaInterface(ABC):
         pass    
 
     @abstractmethod
-    def eliminar_persona(self):
+    def eliminar_persona(self, id):
         pass
