@@ -2,7 +2,7 @@ from app.models.persona_model import Persona
 from app.schema.persona_schema import PersonaSchema
 from app.interfaces.persona_interface import IPersonaInterface
 from app.extensions import Base
-
+from app.extensions import SessionLocal
 
 class PersonaService(IPersonaInterface):
 
@@ -19,8 +19,14 @@ class PersonaService(IPersonaInterface):
             session.close()
        
     def listar_persona_id(self, id):
-        #definir logica
-        return 
+        session = SessionLocal()
+        try:
+            persona = session.query(Persona).get(id)
+            if not persona:
+                return None  
+            return self.schema.dump(persona)
+        finally:
+            session.close() 
        
     def crear_persona(self, data):
         persona=self.schema.load(data)
