@@ -10,18 +10,23 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
     "@hookform/resolvers": "^5.0.1",
     "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-tabs": "^1.1.12",
     "@tailwindcss/vite": "^4.1.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "hamburger-react": "^2.5.2",
     "lucide-react": "^0.511.0",
     "react": "^19.1.0",
+    "react-awesome-reveal": "^4.3.1",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.56.4",
     "react-router": "^7.6.0",
     "react-router-dom": "^7.6.0",
+    "recharts": "^2.15.3",
     "tailwind-merge": "^3.3.0",
     "zod": "^3.25.20"
   },
