@@ -8,8 +8,9 @@ import { Fade } from "react-awesome-reveal";
 
 function Login() {
     return (
-        <div className="bg-gray-100 h-screen flex items-center justify-center">
-            <Fade duration={500} triggerOnce>
+        <Fade duration={500} triggerOnce>
+            <div className="h-screen flex items-center justify-center">
+
                 <div className="flex w-full h-full sm:h-[520px] sm:max-w-md md:max-w-3xl shadow-md rounded-xl overflow-hidden">
                     {/*Card informacion extra o algo para mostrar*/}
                     <Card className="w-full md:max-w-md h-full bg-blue-600 hidden md:block rounded-none">
@@ -60,8 +61,8 @@ function Login() {
                         </CardFooter>
                     </Card>
                 </div>
-            </Fade>
-        </div>
+            </div>
+        </Fade>
     );
 }
 
