@@ -17,6 +17,8 @@ class ServicioBase(IServicioBase):
     def get_all(self) -> dict | list[dict]:
         # Obtiene todos los registros del modelo
         model = self.model
+
+        #return self._run_with_session(lambda session: session.query(model).execution_options(skip_soft_delete_filter=True).all()) or []
         return self._run_with_session(lambda session: session.query(model).all()) or []
 
     def get_by_id(self, id: int) -> dict | None:
