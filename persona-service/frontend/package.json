@@ -9,6 +9,9 @@
     "lint": "eslint .",
     "preview": "vite preview"
   },
+  "overrides": {
+    "react-is": "^19.1.0"
+  },
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@hookform/resolvers": "^5.0.1",
