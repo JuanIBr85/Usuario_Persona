@@ -7,8 +7,8 @@ import { Fade } from "react-awesome-reveal";
 
 function Sign() {
   return (
-    <div className="bg-gray-100 h-screen flex items-center justify-center">
-      <Fade duration={500} triggerOnce>
+    <Fade duration={500} triggerOnce>
+      <div className="h-screen flex items-center justify-center">
 
         <div className="flex w-full h-full sm:h-[520px] sm:max-w-md md:max-w-3xl shadow-md rounded-xl overflow-hidden">
 
@@ -69,8 +69,8 @@ function Sign() {
             </CardFooter>
           </Card>
         </div>
-      </Fade>
-    </div>
+      </div>
+    </Fade>
   );
 }
 
