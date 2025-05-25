@@ -78,8 +78,8 @@ class PersonaService(IPersonaInterface):
             # Crea Contacto
             contacto_data = data_validada['contacto']
             contacto = Contacto(
-                telefono_fijo=contacto_data.get('telefono_fijo'),
-                telefono_movil=contacto_data['telefono_movil'],
+                telefono_fijo_=contacto_data.get('telefono_fijo'),
+                telefono_movil_=contacto_data['telefono_movil'],
                 red_social_contacto=contacto_data.get('red_social_contacto')
             )
             session.add(contacto)

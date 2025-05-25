@@ -27,15 +27,7 @@ def crear_persona():
     if not data:
         return jsonify({"error": "No se enviaron datos"}),400
     
-    resultado, errores = persona_service.crear_persona(data)
+    resultado, status = persona_service.crear_persona(data)
 
-    if errores:
-        # Si hay errores de validación, devolver 400
-        if "errores" in errores:
-            return jsonify(errores), 400
-        # Si es otro tipo de error, devolver 422  
-        return jsonify(errores), 422
-
-        # Si todo salió bien, devolver 201 (Created)
-    return jsonify(resultado), 201
+    return resultado, status
 
