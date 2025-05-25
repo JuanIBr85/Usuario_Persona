@@ -1,9 +1,11 @@
-from app.extensions import Base
+
 from sqlalchemy import ForeignKey, Integer, String, DateTime, Column, Date
 from datetime import datetime, timezone
 
+from app.models.base_model import BaseModel
 
-class Contacto(Base):
+
+class Contacto(BaseModel):
 
     __tablename__ = "contactos"
 
@@ -11,6 +13,3 @@ class Contacto(Base):
     telefono_fijo_=Column(String(15), nullable=True)
     telefono_movil_=Column(String(15), nullable=False)
     red_social_contacto=Column(String(50),nullable=True)
-
-    created_at=Column(DateTime, default=datetime.now(timezone.utc))
-    updated_at=Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))

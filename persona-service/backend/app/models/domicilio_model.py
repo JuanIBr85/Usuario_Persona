@@ -1,9 +1,11 @@
 from datetime import datetime, timezone
-from app.extensions import Base
+
 from sqlalchemy import DateTime, ForeignKey, Integer, String, Column
 from sqlalchemy.orm import relationship
 
-class Domicilio(Base):
+from app.models.base_model import BaseModel
+
+class Domicilio(BaseModel):
 
     __tablename__ = "domicilios"
 
@@ -17,10 +19,5 @@ class Domicilio(Base):
 
     codigo_postal=relationship("Domicilio_Postal")
 
-    created_at=Column(DateTime, default=datetime.now(timezone.utc))
-    updated_at=Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
-    deleted_at = Column(DateTime, nullable=True)
-    
-   
 
 

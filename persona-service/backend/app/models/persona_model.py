@@ -1,9 +1,10 @@
-from app.extensions import Base
 from sqlalchemy import ForeignKey, Integer, String, DateTime, Column, Date
 from sqlalchemy.orm import relationship
 from datetime import datetime, timezone
 
-class Persona(Base):
+from app.models.base_model import BaseModel
+
+class Persona(BaseModel):
 
     __tablename__ ='personas'
 
@@ -23,9 +24,7 @@ class Persona(Base):
     tipo_documento = relationship("Tipo_Documento")
     contacto = relationship("Contacto")
 
-    created_at=Column(DateTime, default=datetime.now(timezone.utc))
-    updated_at=Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
-    deleted_at=Column(DateTime, nullable=True)
+    
 
 
 

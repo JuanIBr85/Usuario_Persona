@@ -1,5 +1,6 @@
-from flask import Flask
-from app.extensions import jwt, engine, Base
+from flask import Flask, jsonify
+from app.extensions import jwt, engine
+from app.models.base_model import BaseModel
 from app.models.persona_model import Persona
 from app.models.contacto_model import Contacto
 from app.models.domicilio_model import Domicilio
@@ -26,13 +27,22 @@ def create_app():
     #Crear tablas si no existen
     
     with app.app_context():
-        Base.metadata.create_all(bind=engine)
+        BaseModel.metadata.create_all(bind=engine)
 
     
 
     @app.route('/')
     def index():
-        return {'msg': 'Persona Service Backend activo'}
+        output = []
+        for rule in app.url_map.iter_rules():
+            if rule.endpoint == 'static': continue
+            methods = sorted(rule.methods - {'HEAD', 'OPTIONS'})
+            output.append({
+                'endpoint': rule.endpoint,
+                'methods': methods,
+                'rule': str(rule)
+            })
+        return jsonify(output)
 
     return app
     

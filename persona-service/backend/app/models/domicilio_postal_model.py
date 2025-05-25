@@ -1,8 +1,10 @@
-from app.extensions import Base
+
 from sqlalchemy import ForeignKey, Integer, String, DateTime, Column, Date
 from datetime import datetime, timezone
 
-class Domicilio_Postal(Base):
+from app.models.base_model import BaseModel
+
+class Domicilio_Postal(BaseModel):
 
     __tablename__ = "domicilios_postales"
 
