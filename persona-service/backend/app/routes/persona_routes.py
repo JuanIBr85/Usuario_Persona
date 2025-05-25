@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.services.persona_service import PersonaService
 
 persona_bp = Blueprint('persona_bp', __name__)
@@ -17,4 +18,19 @@ def obtener_persona(id):
     if persona is None:
         return jsonify({"error": "Persona no encontrada"}), 404
     return jsonify(persona), 200
+
+# Modificar persona
+@persona_bp.route('/personas/<int:id>', methods=['PUT'])
+@jwt_required()
+def modificar_persona(id):
+    data = request.get_json()
+    # Verifica id del usuario y rol para autorizar que datos puede modificar
+    usuario_actual = get_jwt_identity() 
+
+    persona_actualizada = persona_service.modificar_persona(id, data, usuario_actual)
+
+    if not persona_actualizada:
+        return {"message": "Persona no encontrada o no autorizado"}, 403
+
+    return jsonify(persona_actualizada), 200
 
