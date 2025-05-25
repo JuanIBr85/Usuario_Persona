@@ -14,8 +14,8 @@ import { Fade } from 'react-awesome-reveal'
 
 function AdminUsers() {
   return (
-    <div className="max-w-7xl mx-auto p-4">
-      <Fade duration={500} triggerOnce>
+    <div className="max-w-full mx-auto p-4">
+      <Fade duration={300} triggerOnce>
         <Table>
           <TableCaption>Lista de usuarios registrados.</TableCaption>
           <TableHeader>

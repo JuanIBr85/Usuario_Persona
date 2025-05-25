@@ -53,7 +53,7 @@ function ProfileForm() {
 
   return (
     <div className="max-w-lg mx-auto my-5 bg-white shadow-lg rounded-2xl p-8 mt-10">
-      <Fade duration={500} triggerOnce>
+      <Fade duration={300} triggerOnce>
         <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">Mi Perfil</h1>
 
         <div className="flex flex-col items-center">
