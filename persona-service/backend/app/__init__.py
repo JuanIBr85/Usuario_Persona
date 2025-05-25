@@ -21,8 +21,6 @@ def create_app():
     from app.routes.persona_routes import persona_bp
     app.register_blueprint(persona_bp, url_prefix='/api')
 
-
-
     #Crear tablas si no existen
     
     with app.app_context():

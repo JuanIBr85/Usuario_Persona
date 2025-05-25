@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from app.services.persona_service import PersonaService
 
 persona_bp = Blueprint('persona_bp', __name__)
@@ -17,4 +17,25 @@ def obtener_persona(id):
     if persona is None:
         return jsonify({"error": "Persona no encontrada"}), 404
     return jsonify(persona), 200
+
+#crea una persona
+@persona_bp.route('/crear_persona', methods=['POST'])
+def crear_persona():
+
+    data= request.get_json()
+
+    if not data:
+        return jsonify({"error": "No se enviaron datos"}),400
+    
+    resultado, errores = persona_service.crear_persona(data)
+
+    if errores:
+        # Si hay errores de validación, devolver 400
+        if "errores" in errores:
+            return jsonify(errores), 400
+        # Si es otro tipo de error, devolver 422  
+        return jsonify(errores), 422
+
+        # Si todo salió bien, devolver 201 (Created)
+    return jsonify(resultado), 201
 

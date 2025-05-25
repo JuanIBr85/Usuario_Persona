@@ -12,13 +12,13 @@ class PersonaSchema(Schema):
 
     usuario_id=fields.Int(required=True)
 
-    domicilio_id=fields.Int(required=True)
-    tipo_documento_id=fields.Int(required=True)
-    contacto_id=fields.Int(required=True)
+    #domicilio_id=fields.Int(required=True)
+    #tipo_documento_id=fields.Int(required=True)
+    #contacto_id=fields.Int(required=True)
 
-    domicilio=fields.Nested(DomicilioSchema, dump_only=True)
-    tipo_documento=fields.Nested(TipoDocumentoSchema, dump_only=True)
-    contacto=fields.Nested(ContactoSchema, dump_only=True)
+    domicilio=fields.Nested(DomicilioSchema, required=True)
+    tipo_documento=fields.Nested(TipoDocumentoSchema, required=True)
+    contacto=fields.Nested(ContactoSchema, required=True)
 
     created_at=fields.DateTime(dump_only=True)
     updated_at=fields.DateTime(dump_only=True)
