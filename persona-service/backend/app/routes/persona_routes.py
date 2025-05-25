@@ -19,7 +19,8 @@ def obtener_persona(id):
         return jsonify({"error": "Persona no encontrada"}), 404
     return jsonify(persona), 200
 
-# Modificar persona
+# Modificar persona 
+# revisar
 @persona_bp.route('/personas/<int:id>', methods=['PUT'])
 @jwt_required()
 def modificar_persona(id):
