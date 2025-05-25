@@ -1,8 +1,14 @@
 import React from 'react'
+import { Fade } from "react-awesome-reveal";
+
 
 function AdminPanel() {
   return (
-    <div>AdminPanel</div>
+    <div>
+      <Fade duration={500} triggerOnce>
+        AdminPanel
+      </Fade>
+    </div>
   )
 }
 
