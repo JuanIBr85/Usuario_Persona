@@ -6,21 +6,12 @@ const AccessibilityMenu = () => {
     const [fontSize, setFontSize] = useState(100); // %
 
     useEffect(() => {
-        document.body.style.filter = isHighContrast ? 'contrast(150%) grayscale(100%)' : 'none';
+        document.documentElement.style.filter = isHighContrast ? 'contrast(150%) grayscale(100%)' : 'none';
         document.documentElement.style.fontSize = `${fontSize}%`;
     }, [isHighContrast, fontSize]);
 
     return (
         <div className="fixed bottom-4 right-4 z-50">
-            <button
-                className="bg-[var(--color-primario)] text-white px-2 py-2 rounded-full shadow"
-                onClick={() => setShowMenu(!showMenu)}
-                aria-expanded={showMenu}
-                aria-label="Activar menú de accesibilidad"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-person-standing-icon lucide-person-standing"><circle cx="12" cy="5" r="1" /><path d="m9 20 3-6 3 6" /><path d="m6 8 6 2 6-2" /><path d="M12 10v4" /></svg>
-            </button>
-
             {showMenu && (
                 <div className="mt-2 bg-white shadow-lg rounded p-4 w-64 text-black space-y-3">
                     <h2 className="font-bold text-lg">Accesibilidad</h2>
@@ -44,6 +35,14 @@ const AccessibilityMenu = () => {
                     </div>
                 </div>
             )}
+            <button
+                className="bg-[var(--color-primario)] text-white px-2 py-2 rounded-full shadow float-right"
+                onClick={() => setShowMenu(!showMenu)}
+                aria-expanded={showMenu}
+                aria-label="Activar menú de accesibilidad"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-person-standing-icon lucide-person-standing"><circle cx="12" cy="5" r="1" /><path d="m9 20 3-6 3 6" /><path d="m6 8 6 2 6-2" /><path d="M12 10v4" /></svg>
+            </button>
         </div>
     );
 };

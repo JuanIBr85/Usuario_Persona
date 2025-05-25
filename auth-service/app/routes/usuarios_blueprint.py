@@ -151,6 +151,31 @@ def login():
     finally:
         session.close()
 
+@usuario_bp.route('/ver_perfil')
+def perfil_usuario():
+    #Agregar logica
+    pass
+
+@usuario_bp.route('/modificar', methods=['GET', 'POST'])
+def modificar_perfil():
+    #Agregar logica
+    pass
+
+
+#endpoints para la recuperacion de la contraseña con un mail y token
+@usuario_bp.route('/cambiar_pass', methods=['POST'])
+def cambiar_password():
+    #Agregar logica
+    pass
+
+@app.route('/verificar_token', methods=['POST'])
+def verificar_token_nuevo_password():
+    #generar un token que se manda por mail.
+    pass
+
+@app.route('/recuperar_pass', methods=['POST'])
+def restablecer_password():
+    pass
 
 #para iniciar el seed
 #python -m app.script.seed_data

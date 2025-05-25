@@ -1,58 +1,71 @@
-import React from 'react'
-import { Fade } from "react-awesome-reveal";
+
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Users, ShieldCheck, FileText } from "lucide-react";
 
+const adminOptions = [
+  {
+    title: "Usuarios",
+    description: "Gestionar cuentas de usuario",
+    icon: <Users className="w-14 h-14 text-primary" />,
+    path: "/adminusers",
+  },
+  {
+    title: "Roles",
+    description: "Administrar permisos y roles",
+    icon: <ShieldCheck className="w-14 h-14 text-primary" />,
+    path: "/adminroles",
+  },
+  {
+    title: "Logs",
+    description: "Ver registros del sistema",
+    icon: <FileText className="w-14 h-14 text-primary" />,
+    path: "/logs",
+  },
+];
 
-function AdminPanel() {
+const AdminPanel = () => {
+  const navigate = useNavigate();
+
   return (
-    <div className="py-5 px-20">
-      <Fade duration={500} triggerOnce>
-        <Table>
-          <TableCaption>Lista de usuarios registrados.</TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nombre</TableHead>
-              <TableHead>Rol</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Acciones</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow>
-              <TableCell className="font-medium">Juan Pérez</TableCell>
-              <TableCell>Profesor</TableCell>
-              <TableCell>juan.perez@email.com</TableCell>
-              <TableCell>Activo</TableCell>
-              <TableCell className="text-right space-x-2">
-                <button className="text-blue-600 hover:underline">Editar</button>
-                <button className="text-red-600 hover:underline">Borrar</button>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="font-medium">Lucía Gómez</TableCell>
-              <TableCell>Alumno</TableCell>
-              <TableCell>lucia.gomez@email.com</TableCell>
-              <TableCell>Egresado</TableCell>
-              <TableCell className="text-right space-x-2">
-                <button className="text-blue-600 hover:underline">Editar</button>
-                <button className="text-red-600 hover:underline">Borrar</button>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
 
-      </Fade>
+    <div className="p-6 md:p-10">
+      <h2 className="text-3xl font-bold mb-10 text-center">Panel de Administración</h2>
+      <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3">
+        {adminOptions.map((option) => (
+          <Card
+            key={option.title}
+            className="text-center h-72 transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-2xl cursor-pointer"
+          >
+            <CardHeader className="flex flex-col items-center justify-center h-2/3">
+              {option.icon}
+              <CardTitle className="mt-4 text-2xl">{option.title}</CardTitle>
+              <CardDescription className="mt-1 text-sm">
+                {option.description}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex items-center justify-center">
+              <Button
+                variant="default"
+                onClick={() => navigate(option.path)}
+                className="mt-2"
+              >
+                Ir a {option.title}
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default AdminPanel
+export default AdminPanel;
