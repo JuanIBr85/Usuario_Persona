@@ -1,7 +1,7 @@
 from marshmallow import Schema, fields
 from app.schema.domicilio_postal_schema import DomicilioPostalSchema
 
-class DomicilioShema(Schema):
+class DomicilioSchema(Schema):
 
     id=fields.Int(dump_only=True)
     calle=fields.Str(required=True)
