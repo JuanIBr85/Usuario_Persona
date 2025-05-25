@@ -15,10 +15,9 @@ const Header = () => {
                 <div>
                     {/* Menú Escritorio */}
                     <ul className="hidden md:flex space-x-4">
-                        <li><Link to="/" className="hover:underline">Home</Link></li>
-                        <li><Link to="/about" className="hover:underline">About</Link></li>
-                        <li><Link to="/services" className="hover:underline">Services</Link></li>
-                        <li><Link to="/contact" className="hover:underline">Contact</Link></li>
+                        <li><Link to="/adminpanel">Panel de Administrador</Link></li>
+                        <li><Link to="/profile">Perfil</Link></li>
+                        <li><Link to="/logout">Cerrar Sesión</Link></li>
                     </ul>
                     <div className="md:hidden">
                         <Hamburger toggled={isOpen} toggle={setIsOpen} />
@@ -31,10 +30,9 @@ const Header = () => {
                     className={`transition-all duration-500 ease-in-out overflow-hidden md:hidden flex flex-col space-y-4 px-4
                 ${isOpen ? 'max-h-96 opacity-100 mt-4' : 'max-h-0 opacity-0 mt-0 pointer-events-none'}`}
                 >
-                    <li><Link to="/">Home</Link></li>
-                    <li><Link to="/about">About</Link></li>
-                    <li><Link to="/services">Services</Link></li>
-                    <li><Link to="/contact">Contact</Link></li>
+                    <li><Link to="/adminpanel">Panel de Administrador</Link></li>
+                    <li><Link to="/profile">Perfil</Link></li>
+                    <li><Link to="/logout">Cerrar Sesión</Link></li>
                 </ul>
 
             </div>

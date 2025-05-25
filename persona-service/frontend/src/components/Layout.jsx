@@ -2,6 +2,7 @@ import React from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import Main from "./Main";
+import AccessibilityMenu from './AccesibilityMenu';
 
 const Layout = ({ children }) => {
   return (
@@ -11,6 +12,7 @@ const Layout = ({ children }) => {
         <Main>{children}</Main>
       </div>
       <Footer />
+      <AccessibilityMenu />
     </div>
   );
 };

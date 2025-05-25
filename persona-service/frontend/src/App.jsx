@@ -7,7 +7,6 @@ function App() {
     <Layout>
       <AppRoutes />
     </Layout>
-
   );
 }
 
