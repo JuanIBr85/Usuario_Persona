@@ -22,15 +22,20 @@ def obtener_persona(id):
 @persona_bp.route('/crear_persona', methods=['POST'])
 def crear_persona():
 
-    data= request.json()
+    data= request.get_json()
 
     if not data:
-        return jsonify({"error": "Persona no encontrada"}),400
+        return jsonify({"error": "No se enviaron datos"}),400
     
-    persona, errores = persona_service.crear_persona(data)
+    resultado, errores = persona_service.crear_persona(data)
 
     if errores:
-        return jsonify(errores),422
+        # Si hay errores de validación, devolver 400
+        if "errores" in errores:
+            return jsonify(errores), 400
+        # Si es otro tipo de error, devolver 422  
+        return jsonify(errores), 422
 
-    return jsonify(persona),200
+        # Si todo salió bien, devolver 201 (Created)
+    return jsonify(resultado), 201
 
