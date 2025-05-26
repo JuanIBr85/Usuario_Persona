@@ -9,6 +9,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Fade } from "react-awesome-reveal";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+
 
 function AdminUsers() {
   const [users, setUsers] = useState([
@@ -39,44 +48,59 @@ function AdminUsers() {
   };
 
   return (
-    <div className="max-w-full mx-auto px-5 pt-25 pb-10 md:py-25 md:px-15">
+    <div className="max-w-full mx-auto px-5 pt-25 pb-10 md:py-25 md:px-15 flex flex-col flex-1">
       <Fade duration={300} triggerOnce>
-        <Table>
-          <TableCaption>Lista de usuarios registrados.</TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nombre</TableHead>
-              <TableHead>Rol</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Acciones</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {users.map(({ id, nombre, rol, email, status }) => (
-              <TableRow key={id}>
-                <TableCell className="font-medium">{nombre}</TableCell>
-                <TableCell>{rol}</TableCell>
-                <TableCell>{email}</TableCell>
-                <TableCell>{status}</TableCell>
-                <TableCell className="text-right space-x-2">
-                  <button
-                    onClick={() => handleEdit(id)}
-                    className="text-blue-600 hover:underline"
-                  >
-                    Editar
-                  </button>
-                  <button
-                    onClick={() => handleDelete(id)}
-                    className="text-red-600 hover:underline"
-                  >
-                    Borrar
-                  </button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <div className="flex flex-col flex-1">
+          <div className="flex-1 overflow-auto border p-3 rounded-md shadow-sm mb-8">
+            <Table>
+              <TableCaption>Lista de usuarios registrados.</TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nombre</TableHead>
+                  <TableHead>Rol</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {users.map(({ id, nombre, rol, email, status }) => (
+                  <TableRow key={id}>
+                    <TableCell className="font-medium">{nombre}</TableCell>
+                    <TableCell>{rol}</TableCell>
+                    <TableCell>{email}</TableCell>
+                    <TableCell>{status}</TableCell>
+                    <TableCell className="text-right space-x-2">
+                      <button
+                        onClick={() => handleEdit(id)}
+                        className="text-blue-600 hover:underline"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => handleDelete(id)}
+                        className="text-red-600 hover:underline"
+                      >
+                        Borrar
+                      </button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          <Breadcrumb className="mt-auto self-start">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/adminpanel">Panel De Administrador</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Usuarios</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
       </Fade>
     </div>
   );

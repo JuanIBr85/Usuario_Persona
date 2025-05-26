@@ -9,6 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Trash2, Plus } from "lucide-react";
 import { Fade } from 'react-awesome-reveal'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 
 const initialRoles = [
   { id: 1, name: "Administrador" },
@@ -114,6 +122,17 @@ export default function AdminRoles() {
             </div>
           </CardContent>
         </Card>
+           <Breadcrumb className="mt-auto self-start">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/adminpanel">Panel De Administrador</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Roles y Permisos</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
       </Fade>
     </div>
   );
