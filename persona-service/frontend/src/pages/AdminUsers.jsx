@@ -1,6 +1,4 @@
-import React from "react";
-
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -9,12 +7,39 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Fade } from 'react-awesome-reveal'
+} from "@/components/ui/table";
+import { Fade } from "react-awesome-reveal";
 
 function AdminUsers() {
+  const [users, setUsers] = useState([
+    {
+      id: 1,
+      nombre: "Juan Pérez",
+      rol: "Profesor",
+      email: "juan.perez@email.com",
+      status: "Activo",
+    },
+    {
+      id: 2,
+      nombre: "Lucía Gómez",
+      rol: "Alumno",
+      email: "lucia.gomez@email.com",
+      status: "Egresado",
+    },
+  ]);
+
+  const handleEdit = (id) => {
+    console.log("Editar usuario con id:", id);
+  };
+
+  const handleDelete = (id) => {
+    if (window.confirm("¿Estás seguro de que quieres borrar este usuario?")) {
+      setUsers(users.filter((user) => user.id !== id));
+    }
+  };
+
   return (
-    <div className="max-w-full mx-auto p-4">
+    <div className="max-w-full mx-auto px-5 pt-25 pb-10 md:py-25 md:px-15">
       <Fade duration={300} triggerOnce>
         <Table>
           <TableCaption>Lista de usuarios registrados.</TableCaption>
@@ -28,31 +53,33 @@ function AdminUsers() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow>
-              <TableCell className="font-medium">Juan Pérez</TableCell>
-              <TableCell>Profesor</TableCell>
-              <TableCell>juan.perez@email.com</TableCell>
-              <TableCell>Activo</TableCell>
-              <TableCell className="text-right space-x-2">
-                <button className="text-blue-600 hover:underline">Editar</button>
-                <button className="text-red-600 hover:underline">Borrar</button>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="font-medium">Lucía Gómez</TableCell>
-              <TableCell>Alumno</TableCell>
-              <TableCell>lucia.gomez@email.com</TableCell>
-              <TableCell>Egresado</TableCell>
-              <TableCell className="text-right space-x-2">
-                <button className="text-blue-600 hover:underline">Editar</button>
-                <button className="text-red-600 hover:underline">Borrar</button>
-              </TableCell>
-            </TableRow>
+            {users.map(({ id, nombre, rol, email, status }) => (
+              <TableRow key={id}>
+                <TableCell className="font-medium">{nombre}</TableCell>
+                <TableCell>{rol}</TableCell>
+                <TableCell>{email}</TableCell>
+                <TableCell>{status}</TableCell>
+                <TableCell className="text-right space-x-2">
+                  <button
+                    onClick={() => handleEdit(id)}
+                    className="text-blue-600 hover:underline"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    onClick={() => handleDelete(id)}
+                    className="text-red-600 hover:underline"
+                  >
+                    Borrar
+                  </button>
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </Fade>
     </div>
-  )
+  );
 }
 
-export default AdminUsers
+export default AdminUsers;

@@ -30,7 +30,7 @@ const chartConfig = {
 
 function Logs() {
   return (
-    <div className="p-5 md:px-60">
+    <div className="p-5 pt-40 px-3 md:py-25 md:px-60">
     <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
       <BarChart accessibilityLayer data={chartData}>
         <CartesianGrid vertical={false} />
