@@ -67,17 +67,22 @@ export default function AdminRoles() {
     resetForm();
   };
 
+  const handleDeleteRole = (id, name) => {
+    const confirmed = window.confirm(
+      `¿Estás seguro que deseas eliminar el rol "${name}"?`
+    );
+    if (confirmed) {
+      setRoles(roles.filter((role) => role.id !== id));
+      if (editRoleId === id) resetForm();
+    }
+  };
+
   const handlePermissionToggle = (permission) => {
     setSelectedPermissions((prev) =>
       prev.includes(permission)
         ? prev.filter((p) => p !== permission)
         : [...prev, permission]
     );
-  };
-
-  const handleDeleteRole = (id) => {
-    setRoles(roles.filter((role) => role.id !== id));
-    if (editRoleId === id) resetForm();
   };
 
   const resetForm = () => {
@@ -120,7 +125,7 @@ export default function AdminRoles() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => handleDeleteRole(role.id)}
+                    onClick={() => handleDeleteRole(role.id, role.name)}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
