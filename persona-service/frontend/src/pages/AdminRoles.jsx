@@ -7,8 +7,8 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2, Plus } from "lucide-react";
-import { Fade } from 'react-awesome-reveal'
+import { Trash2, Plus, Pencil } from "lucide-react";
+import { Fade } from "react-awesome-reveal";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -16,12 +16,12 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
+} from "@/components/ui/breadcrumb";
 
 const initialRoles = [
-  { id: 1, name: "Administrador" },
-  { id: 2, name: "Alumno" },
-  { id: 3, name: "Nombre Rol 3" },
+  { id: 1, name: "Administrador", permissions: ["Puede hacer X"] },
+  { id: 2, name: "Alumno", permissions: ["Puede hacer Y"] },
+  { id: 3, name: "Nombre Rol 3", permissions: [] },
 ];
 
 const availablePermissions = [
@@ -36,17 +36,35 @@ export default function AdminRoles() {
   const [showNewRoleForm, setShowNewRoleForm] = useState(false);
   const [newRoleName, setNewRoleName] = useState("");
   const [selectedPermissions, setSelectedPermissions] = useState([]);
+  const [editRoleId, setEditRoleId] = useState(null);
 
   const handleAddRole = () => {
     if (!newRoleName) return;
     const newRole = {
       id: Date.now(),
       name: newRoleName,
+      permissions: selectedPermissions,
     };
     setRoles([...roles, newRole]);
-    setNewRoleName("");
-    setSelectedPermissions([]);
-    setShowNewRoleForm(false);
+    resetForm();
+  };
+
+  const handleEditClick = (role) => {
+    setEditRoleId(role.id);
+    setNewRoleName(role.name);
+    setSelectedPermissions(role.permissions || []);
+    setShowNewRoleForm(true);
+  };
+
+  const handleSaveChanges = () => {
+    if (!newRoleName) return;
+    const updatedRoles = roles.map((role) =>
+      role.id === editRoleId
+        ? { ...role, name: newRoleName, permissions: selectedPermissions }
+        : role
+    );
+    setRoles(updatedRoles);
+    resetForm();
   };
 
   const handlePermissionToggle = (permission) => {
@@ -59,6 +77,14 @@ export default function AdminRoles() {
 
   const handleDeleteRole = (id) => {
     setRoles(roles.filter((role) => role.id !== id));
+    if (editRoleId === id) resetForm();
+  };
+
+  const resetForm = () => {
+    setNewRoleName("");
+    setSelectedPermissions([]);
+    setShowNewRoleForm(false);
+    setEditRoleId(null);
   };
 
   return (
@@ -76,7 +102,21 @@ export default function AdminRoles() {
                   key={role.id}
                   className="flex items-center gap-4 border p-3 rounded-md shadow-sm"
                 >
-                  <span className="flex-1">{role.name}</span>
+                  <span className="flex-1">
+                    {role.name}
+                    <div className="text-xs text-gray-500">
+                      {role.permissions?.length > 0
+                        ? role.permissions.join(", ")
+                        : "Sin permisos asignados"}
+                    </div>
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleEditClick(role)}
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </Button>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -91,16 +131,19 @@ export default function AdminRoles() {
               <Button
                 variant="outline"
                 className="w-fit mt-4"
-                onClick={() => setShowNewRoleForm(!showNewRoleForm)}
+                onClick={() => {
+                  resetForm();
+                  setShowNewRoleForm(true);
+                }}
               >
                 <Plus className="w-4 h-4 mr-2" /> Agregar otro rol
               </Button>
 
-              {/* Formulario nuevo rol */}
+              {/* Formulario nuevo rol o edición */}
               {showNewRoleForm && (
                 <div className="mt-6 space-y-4 border p-4 rounded-md">
                   <Input
-                    placeholder="Nombre del nuevo rol"
+                    placeholder="Nombre del rol"
                     value={newRoleName}
                     onChange={(e) => setNewRoleName(e.target.value)}
                   />
@@ -116,23 +159,33 @@ export default function AdminRoles() {
                       </label>
                     ))}
                   </div>
-                  <Button onClick={handleAddRole}>Agregar Rol</Button>
+                  <div className="flex gap-2">
+                    {editRoleId ? (
+                      <Button onClick={handleSaveChanges}>Guardar Cambios</Button>
+                    ) : (
+                      <Button onClick={handleAddRole}>Agregar Rol</Button>
+                    )}
+                    <Button variant="outline" onClick={resetForm}>
+                      Cancelar
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>
           </CardContent>
         </Card>
-           <Breadcrumb className="mt-auto self-start">
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/adminpanel">Panel De Administrador</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Roles y Permisos</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+
+        <Breadcrumb className="mt-auto self-start">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/adminpanel">Panel De Administrador</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Roles y Permisos</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
       </Fade>
     </div>
   );
