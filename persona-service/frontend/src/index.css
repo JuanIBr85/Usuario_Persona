@@ -77,6 +77,7 @@
 
   --color-primario: #1c1364;
   --color-fondo: #fff;
+
 }
 
 .dark {
@@ -111,6 +112,8 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+
+  --color-gray-800: oklch(0.85 0.01 256.848);
 }
 
 @layer base {
