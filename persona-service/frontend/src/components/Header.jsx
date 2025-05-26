@@ -6,6 +6,8 @@ const Header = () => {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
+        <>
+        <div id="FAKE_HEADER" className="top-0 p-8 w-full"></div>
         <header className="fixed top-0 z-50 bg-[var(--color-primario)] text-white p-4 md:px-20 w-full">
             <div className="flex flex-row justify-between items-center">
                 <div className="flex items-center" >
@@ -38,6 +40,7 @@ const Header = () => {
             </div>
 
         </header>
+        </>
     );
 };
 

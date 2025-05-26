@@ -34,7 +34,16 @@ export default function FormDatos({ handleSubmit, fixedData, editableData }) {
                     className="bg-gray-100 cursor-not-allowed w-full"
                     readOnly
                 />
-
+                <InputValidate
+                    id="tipo_documento"
+                    type="text"
+                    labelText="Tipo de documento"
+                    value="PLACEHOLDER DE UN SELECT"
+                    className="bg-gray-100 cursor-not-allowed w-full"
+                    readOnly
+                />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <InputValidate
                     id="fecha_nacimiento_persona"
                     type="date"
@@ -44,27 +53,16 @@ export default function FormDatos({ handleSubmit, fixedData, editableData }) {
                     validateMessage="La fecha de nacimiento es requerida"
                     required
                 />
+
+                <InputValidate
+                    id="email"
+                    type="email"
+                    labelText="Email"
+                    value={fixedData.email}
+                    className="bg-gray-100 cursor-not-allowed"
+                    readOnly
+                />
             </div>
-            {/* Datos editables con InputValidate */}
-            <InputValidate
-                id="direccion"
-                type="text"
-                placeholder="Ingresa tu dirección"
-                labelText="Dirección"
-                value={editableData.direccion}
-                validateMessage="La dirección es requerida"
-                required
-            />
-
-            <InputValidate
-                id="email"
-                type="email"
-                labelText="Email"
-                value={fixedData.email}
-                className="bg-gray-100 cursor-not-allowed"
-                readOnly
-            />
-
             <div className="flex flex-col gap-3 pt-4">
                 <Button type="submit" className="w-full">
                     Guardar Cambios
