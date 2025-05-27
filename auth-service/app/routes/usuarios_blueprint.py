@@ -50,7 +50,6 @@ def registrar_usuario():
             persona_id=data.get('persona_id', None) 
         )
 
-          
         session.add(nuevo_usuario)
         session.flush()  
 
@@ -87,7 +86,7 @@ def registrar_usuario():
         )
         session.add(usuario_log)
         session.commit()
-        session.commit()
+        
         return Response(
             json.dumps({"mensaje": "Usuario registrado correctamente"}),
             status=201,
@@ -168,12 +167,12 @@ def cambiar_password():
     #Agregar logica
     pass
 
-@app.route('/verificar_token', methods=['POST'])
+@usuario_bp.route('/verificar_token', methods=['POST'])
 def verificar_token_nuevo_password():
     #generar un token que se manda por mail.
     pass
 
-@app.route('/recuperar_pass', methods=['POST'])
+@usuario_bp.route('/recuperar_pass', methods=['POST'])
 def restablecer_password():
     pass
 
