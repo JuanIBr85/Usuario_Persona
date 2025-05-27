@@ -20,8 +20,16 @@ def create_app():
     
     #Registro de blueprints
     from app.routes.persona_routes import persona_bp
-    app.register_blueprint(persona_bp, url_prefix='/api')
+    from app.routes.contacto_routes import contacto_bp
+    from app.routes.domicilio_postal_routes import domicilio_postal_bp
+    from app.routes.domicilio_routes import domicilio_bp
+    from app.routes.tipo_documento_routes import tipo_documento_bp
 
+    app.register_blueprint(persona_bp, url_prefix='/api')
+    app.register_blueprint(contacto_bp, url_prefix='/api')
+    app.register_blueprint(domicilio_postal_bp, url_prefix='/api')
+    app.register_blueprint(domicilio_bp, url_prefix='/api')
+    app.register_blueprint(tipo_documento_bp, url_prefix='/api')
 
 
     #Crear tablas si no existen

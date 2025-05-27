@@ -1,0 +1,621 @@
+{
+	"info": {
+	  "name": "API Testing Collection - Updated",
+	  "description": "Colección completa para probar todos los endpoints de la API (Actualizada)",
+	  "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+	  {
+		"key": "base_url",
+		"value": "http://localhost:5001/api"
+	  },
+	  {
+		"key": "persona_id",
+		"value": "1"
+	  },
+	  {
+		"key": "contacto_id",
+		"value": "1"
+	  },
+	  {
+		"key": "domicilio_id",
+		"value": "1"
+	  },
+	  {
+		"key": "domicilio_postal_id",
+		"value": "1"
+	  },
+	  {
+		"key": "tipo_documento_id",
+		"value": "1"
+	  }
+	],
+	"item": [
+	  {
+		"name": "Tipos de Documento",
+		"item": [
+		  {
+			"name": "Listar Tipos de Documento",
+			"request": {
+			  "method": "GET",
+			  "header": [
+				{
+				  "key": "Content-Type",
+				  "value": "application/json"
+				}
+			  ],
+			  "url": {
+				"raw": "{{base_url}}/tipos_documento",
+				"host": ["{{base_url}}"],
+				"path": ["tipos_documento"]
+			  }
+			},
+			"response": []
+		  },
+		  {
+			"name": "Crear Tipo de Documento",
+			"request": {
+			  "method": "POST",
+			  "header": [
+				{
+				  "key": "Content-Type",
+				  "value": "application/json"
+				}
+			  ],
+			  "body": {
+				"mode": "raw",
+				"raw": "{\n  \"tipo_documento\": \"DNI\"\n}"
+			  },
+			  "url": {
+				"raw": "{{base_url}}/crear_tipo_documento",
+				"host": ["{{base_url}}"],
+				"path": ["crear_tipo_documento"]
+			  }
+			},
+			"response": []
+		  },
+		  {
+			"name": "Obtener Tipo de Documento por ID",
+			"request": {
+			  "method": "GET",
+			  "header": [
+				{
+				  "key": "Content-Type",
+				  "value": "application/json"
+				}
+			  ],
+			  "url": {
+				"raw": "{{base_url}}/tipos_documento/{{tipo_documento_id}}",
+				"host": ["{{base_url}}"],
+				"path": ["tipos_documento", "{{tipo_documento_id}}"]
+			  }
+			},
+			"response": []
+		  },
+		  {
+			"name": "Actualizar Tipo de Documento",
+			"request": {
+			  "method": "PUT",
+			  "header": [
+				{
+				  "key": "Content-Type",
+				  "value": "application/json"
+				}
+			  ],
+			  "body": {
+				"mode": "raw",
+				"raw": "{\n  \"tipo_documento\": \"Pasaporte\"\n}"
+			  },
+			  "url": {
+				"raw": "{{base_url}}/actualizar_tipo_documento/{{tipo_documento_id}}",
+				"host": ["{{base_url}}"],
+				"path": ["actualizar_tipo_documento", "{{tipo_documento_id}}"]
+			  }
+			},
+			"response": []
+		  },
+		  {
+			"name": "Eliminar Tipo de Documento",
+			"request": {
+			  "method": "DELETE",
+			  "header": [
+				{
+				  "key": "Content-Type",
+				  "value": "application/json"
+				}
+			  ],
+			  "url": {
+				"raw": "{{base_url}}/eliminar_tipo_documento/{{tipo_documento_id}}",
+				"host": ["{{base_url}}"],
+				"path": ["eliminar_tipo_documento", "{{tipo_documento_id}}"]
+			  }
+			},
+			"response": []
+		  }
+		]
+	  },
+	  {
+		"name": "Domicilios Postales",
+		"item": [
+		  {
+			"name": "Listar Domicilios Postales",
+			"request": {
+			  "method": "GET",
+			  "header": [
+				{
+				  "key": "Content-Type",
+				  "value": "application/json"
+				}
+			  ],
+			  "url": {
+				"raw": "{{base_url}}/domicilios_postales",
+				"host": ["{{base_url}}"],
+				"path": ["domicilios_postales"]
+			  }
+			},
+			"response": []
+		  },
+		  {
+			"name": "Crear Domicilio Postal",
+			"request": {
+			  "method": "POST",
+			  "header": [
+				{
+				  "key": "Content-Type",
+				  "value": "application/json"
+				}
+			  ],
+			  "body": {
+				"mode": "raw",
+				"raw": "{\n  \"codigo_postal\": \"7540\",\n  \"localidad\": \"Coronel Suárez\",\n  \"partido\": \"Coronel Suárez\",\n  \"provincia\": \"Buenos Aires\",\n  \"pais\": \"Argentina\"\n}"
+			  },
+			  "url": {
+				"raw": "{{base_url}}/crear_domicilio_postal",
+				"host": ["{{base_url}}"],
+				"path": ["crear_domicilio_postal"]
+			  }
+			},
+			"response": []
+		  },
+		  {
+			"name": "Obtener Domicilio Postal por ID",
+			"request": {
+			  "method": "GET",
+			  "header": [
+				{
+				  "key": "Content-Type",
+				  "value": "application/json"
+				}
+			  ],
+			  "url": {
+				"raw": "{{base_url}}/domicilios_postales/{{domicilio_postal_id}}",
+				"host": ["{{base_url}}"],
+				"path": ["domicilios_postales", "{{domicilio_postal_id}}"]
+			  }
+			},
+			"response": []
+		  },
+		  {
+			"name": "Actualizar Domicilio Postal",
+			"request": {
+			  "method": "PUT",
+			  "header": [
+				{
+				  "key": "Content-Type",
+				  "value": "application/json"
+				}
+			  ],
+			  "body": {
+				"mode": "raw",
+				"raw": "{\n  \"codigo_postal\": \"1000\",\n  \"localidad\": \"Buenos Aires\",\n  \"partido\": \"Buenos Aires\",\n  \"provincia\": \"Buenos Aires\",\n  \"pais\": \"Argentina\"\n}"
+			  },
+			  "url": {
+				"raw": "{{base_url}}/actualizar_domicilio_postal/{{domicilio_postal_id}}",
+				"host": ["{{base_url}}"],
+				"path": ["actualizar_domicilio_postal", "{{domicilio_postal_id}}"]
+			  }
+			},
+			"response": []
+		  },
+		  {
+			"name": "Eliminar Domicilio Postal",
+			"request": {
+			  "method": "DELETE",
+			  "header": [
+				{
+				  "key": "Content-Type",
+				  "value": "application/json"
+				}
+			  ],
+			  "url": {
+				"raw": "{{base_url}}/eliminar_domicilio_postal/{{domicilio_postal_id}}",
+				"host": ["{{base_url}}"],
+				"path": ["eliminar_domicilio_postal", "{{domicilio_postal_id}}"]
+			  }
+			},
+			"response": []
+		  }
+		]
+	  },
+	  {
+		"name": "Contactos",
+		"item": [
+		  {
+			"name": "Listar Contactos",
+			"request": {
+			  "method": "GET",
+			  "header": [
+				{
+				  "key": "Content-Type",
+				  "value": "application/json"
+				}
+			  ],
+			  "url": {
+				"raw": "{{base_url}}/contactos",
+				"host": ["{{base_url}}"],
+				"path": ["contactos"]
+			  }
+			},
+			"response": []
+		  },
+		  {
+			"name": "Crear Contacto",
+			"request": {
+			  "method": "POST",
+			  "header": [
+				{
+				  "key": "Content-Type",
+				  "value": "application/json"
+				}
+			  ],
+			  "body": {
+				"mode": "raw",
+				"raw": "{\n  \"telefono_fijo\": \"02926-422000\",\n  \"telefono_movil\": \"2926-123456\",\n  \"red_social_contacto\": \"@usuario_ejemplo\"\n}"
+			  },
+			  "url": {
+				"raw": "{{base_url}}/crear_contacto",
+				"host": ["{{base_url}}"],
+				"path": ["crear_contacto"]
+			  }
+			},
+			"response": []
+		  },
+		  {
+			"name": "Obtener Contacto por ID",
+			"request": {
+			  "method": "GET",
+			  "header": [
+				{
+				  "key": "Content-Type",
+				  "value": "application/json"
+				}
+			  ],
+			  "url": {
+				"raw": "{{base_url}}/contactos/{{contacto_id}}",
+				"host": ["{{base_url}}"],
+				"path": ["contactos", "{{contacto_id}}"]
+			  }
+			},
+			"response": []
+		  },
+		  {
+			"name": "Actualizar Contacto",
+			"request": {
+			  "method": "PUT",
+			  "header": [
+				{
+				  "key": "Content-Type",
+				  "value": "application/json"
+				}
+			  ],
+			  "body": {
+				"mode": "raw",
+				"raw": "{\n  \"telefono_fijo\": \"02926-422001\",\n  \"telefono_movil\": \"2926-654321\",\n  \"red_social_contacto\": \"@usuario_actualizado\"\n}"
+			  },
+			  "url": {
+				"raw": "{{base_url}}/actualizar_contacto/{{contacto_id}}",
+				"host": ["{{base_url}}"],
+				"path": ["actualizar_contacto", "{{contacto_id}}"]
+			  }
+			},
+			"response": []
+		  },
+		  {
+			"name": "Eliminar Contacto",
+			"request": {
+			  "method": "DELETE",
+			  "header": [
+				{
+				  "key": "Content-Type",
+				  "value": "application/json"
+				}
+			  ],
+			  "url": {
+				"raw": "{{base_url}}/eliminar_contacto/{{contacto_id}}",
+				"host": ["{{base_url}}"],
+				"path": ["eliminar_contacto", "{{contacto_id}}"]
+			  }
+			},
+			"response": []
+		  }
+		]
+	  },
+	  {
+		"name": "Domicilios",
+		"item": [
+		  {
+			"name": "Listar Domicilios",
+			"request": {
+			  "method": "GET",
+			  "header": [
+				{
+				  "key": "Content-Type",
+				  "value": "application/json"
+				}
+			  ],
+			  "url": {
+				"raw": "{{base_url}}/domicilios",
+				"host": ["{{base_url}}"],
+				"path": ["domicilios"]
+			  }
+			},
+			"response": []
+		  },
+		  {
+			"name": "Crear Domicilio",
+			"request": {
+			  "method": "POST",
+			  "header": [
+				{
+				  "key": "Content-Type",
+				  "value": "application/json"
+				}
+			  ],
+			  "body": {
+				"mode": "raw",
+				"raw": "{\n  \"domicilio_calle\": \"San Martín\",\n  \"domicilio_numero\": \"123\",\n  \"domicilio_piso\": \"2\",\n  \"domicilio_dpto\": \"A\",\n  \"codigo_postal_id\": 1\n}"
+			  },
+			  "url": {
+				"raw": "{{base_url}}/crear_domicilio",
+				"host": ["{{base_url}}"],
+				"path": ["crear_domicilio"]
+			  }
+			},
+			"response": []
+		  },
+		  {
+			"name": "Obtener Domicilio por ID",
+			"request": {
+			  "method": "GET",
+			  "header": [
+				{
+				  "key": "Content-Type",
+				  "value": "application/json"
+				}
+			  ],
+			  "url": {
+				"raw": "{{base_url}}/domicilios/{{domicilio_id}}",
+				"host": ["{{base_url}}"],
+				"path": ["domicilios", "{{domicilio_id}}"]
+			  }
+			},
+			"response": []
+		  },
+		  {
+			"name": "Actualizar Domicilio",
+			"request": {
+			  "method": "PUT",
+			  "header": [
+				{
+				  "key": "Content-Type",
+				  "value": "application/json"
+				}
+			  ],
+			  "body": {
+				"mode": "raw",
+				"raw": "{\n  \"domicilio_calle\": \"Rivadavia\",\n  \"domicilio_numero\": \"456\",\n  \"domicilio_piso\": \"1\",\n  \"domicilio_dpto\": \"B\",\n  \"codigo_postal_id\": 1\n}"
+			  },
+			  "url": {
+				"raw": "{{base_url}}/actualizar_domicilio/{{domicilio_id}}",
+				"host": ["{{base_url}}"],
+				"path": ["actualizar_domicilio", "{{domicilio_id}}"]
+			  }
+			},
+			"response": []
+		  },
+		  {
+			"name": "Eliminar Domicilio",
+			"request": {
+			  "method": "DELETE",
+			  "header": [
+				{
+				  "key": "Content-Type",
+				  "value": "application/json"
+				}
+			  ],
+			  "url": {
+				"raw": "{{base_url}}/eliminar_domicilio/{{domicilio_id}}",
+				"host": ["{{base_url}}"],
+				"path": ["eliminar_domicilio", "{{domicilio_id}}"]
+			  }
+			},
+			"response": []
+		  }
+		]
+	  },
+	  {
+		"name": "Personas",
+		"item": [
+		  {
+			"name": "Listar Personas",
+			"request": {
+			  "method": "GET",
+			  "header": [
+				{
+				  "key": "Content-Type",
+				  "value": "application/json"
+				}
+			  ],
+			  "url": {
+				"raw": "{{base_url}}/personas",
+				"host": ["{{base_url}}"],
+				"path": ["personas"]
+			  }
+			},
+			"response": []
+		  },
+		  {
+			"name": "Crear Persona",
+			"request": {
+			  "method": "POST",
+			  "header": [
+				{
+				  "key": "Content-Type",
+				  "value": "application/json"
+				}
+			  ],
+			  "body": {
+				"mode": "raw",
+				"raw": "{\n  \"nombre_persona\": \"Juan Carlos\",\n  \"apellido_persona\": \"Pérez\",\n  \"fecha_nacimiento_persona\": \"1990-05-15\",\n  \"num_doc_persona\": \"12345678\",\n  \"usuario_id\": 1,\n  \"domicilio_id\": 1,\n  \"tipo_documento_id\": 1,\n  \"contacto_id\": 1\n}"
+			  },
+			  "url": {
+				"raw": "{{base_url}}/crear_persona",
+				"host": ["{{base_url}}"],
+				"path": ["crear_persona"]
+			  }
+			},
+			"response": []
+		  },
+		  {
+			"name": "Obtener Persona por ID",
+			"request": {
+			  "method": "GET",
+			  "header": [
+				{
+				  "key": "Content-Type",
+				  "value": "application/json"
+				}
+			  ],
+			  "url": {
+				"raw": "{{base_url}}/personas/{{persona_id}}",
+				"host": ["{{base_url}}"],
+				"path": ["personas", "{{persona_id}}"]
+			  }
+			},
+			"response": []
+		  },
+		  {
+			"name": "Actualizar Persona",
+			"request": {
+			  "method": "PUT",
+			  "header": [
+				{
+				  "key": "Content-Type",
+				  "value": "application/json"
+				}
+			  ],
+			  "body": {
+				"mode": "raw",
+				"raw": "{\n  \"nombre_persona\": \"Juan Pablo\",\n  \"apellido_persona\": \"González\",\n  \"fecha_nacimiento_persona\": \"1990-05-15\",\n  \"num_doc_persona\": \"12345678\",\n  \"usuario_id\": 1,\n  \"domicilio_id\": 1,\n  \"tipo_documento_id\": 1,\n  \"contacto_id\": 1\n}"
+			  },
+			  "url": {
+				"raw": "{{base_url}}/actualizar_datos/{{persona_id}}",
+				"host": ["{{base_url}}"],
+				"path": ["actualizar_datos", "{{persona_id}}"]
+			  }
+			},
+			"response": []
+		  },
+		  {
+			"name": "Eliminar Persona",
+			"request": {
+			  "method": "DELETE",
+			  "header": [
+				{
+				  "key": "Content-Type",
+				  "value": "application/json"
+				}
+			  ],
+			  "url": {
+				"raw": "{{base_url}}/eliminar_persona/{{persona_id}}",
+				"host": ["{{base_url}}"],
+				"path": ["eliminar_persona", "{{persona_id}}"]
+			  }
+			},
+			"response": []
+		  }
+		]
+	  }
+	],
+	"event": [
+	  {
+		"listen": "prerequest",
+		"script": {
+		  "type": "text/javascript",
+		  "exec": [
+			"// Script para configurar variables globales antes de cada request",
+			"console.log('Configurando variables para:', pm.info.requestName);"
+		  ]
+		}
+	  },
+	  {
+		"listen": "test",
+		"script": {
+		  "type": "text/javascript",
+		  "exec": [
+			"pm.test('Status code is successful (200 or 201)', function () {",
+			"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+			"});",
+			"",
+			"pm.test('Response time is less than 5000ms', function () {",
+			"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+			"});",
+			"",
+			"if (pm.response.headers.get('Content-Type') && pm.response.headers.get('Content-Type').includes('application/json')) {",
+			"    pm.test('Response Content-Type header includes application/json', function () {",
+			"        pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+			"    });",
+			"",
+			"    pm.test('Response body is valid JSON', function () {",
+			"        pm.response.to.be.json;",
+			"    });",
+			"",
+			"    const jsonData = pm.response.json();",
+			"",
+			"    pm.test('Response body has \"status\" property', function () {",
+			"        pm.expect(jsonData).to.have.property('status');",
+			"    });",
+			"",
+			"    pm.test('Response body has \"message\" property', function () {",
+			"        pm.expect(jsonData).to.have.property('message');",
+			"    });",
+			"",
+			"    if (pm.request.method === 'DELETE') {",
+			"        pm.test('For DELETE, status is \"success\"', function() {",
+			"            pm.expect(jsonData.status).to.eql('success');",
+			"        });",
+			"        pm.test('For DELETE, message is \"Datos eliminados correctamente\"', function() {",
+			"            pm.expect(jsonData.message).to.eql('Datos eliminados correctamente');",
+			"        });",
+			"        pm.test('For DELETE, response body does not have \"data\" property', function () {",
+			"            pm.expect(jsonData).to.not.have.property('data');",
+			"        });",
+			"    } else {",
+			"        // For non-DELETE requests (GET, POST, PUT) that return JSON,",
+			"        // we expect a 'data' property.",
+			"        pm.test('Response body has \"data\" property (for non-DELETE requests)', function () {",
+			"            pm.expect(jsonData).to.have.property('data');",
+			"        });",
+			"    }",
+			"} else if (pm.response.code === 204) {",
+			"    pm.test('Status code is 204 (No Content)', function () {",
+			"        pm.expect(pm.response.code).to.equal(204);",
+			"    });",
+			"} else {",
+			"    console.warn('Response Content-Type is not application/json and status code is not 204. Response Code: ' + pm.response.code + '. Response Body: ' + pm.response.text());",
+			"}"
+		  ]
+		}
+	  }
+	]
+  }

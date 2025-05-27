@@ -1,6 +1,6 @@
 from typing import Any, Callable, List
 from marshmallow import Schema
-from sqlalchemy import exists
+from sqlalchemy import exists, and_
 from app.extensions import SessionLocal
 from sqlalchemy.orm import Session, Query
 
@@ -31,7 +31,7 @@ class ServicioBase(IServicioBase):
         # Obtenemos la columna de la clave primaria de forma dinámica.
         pk_column = list(model.__mapper__.primary_key)[0]
         return self._run_with_session(
-            lambda session: session.query(exists().where(pk_column == id)).scalar(),
+            lambda session: session.query(exists().where(and_(pk_column == id,model.deleted_at.is_(None)))).scalar(),
             is_scalar=True
         )
 
@@ -78,7 +78,7 @@ class ServicioBase(IServicioBase):
             else:
                 session.delete(entity)
             session.commit()
-
+            return True
         self._run_with_session(remove)
 
     def query(self, query_callback: Callable[[Query[Any]], Any]) -> Any:

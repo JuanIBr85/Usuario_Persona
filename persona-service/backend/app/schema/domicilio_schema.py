@@ -4,10 +4,10 @@ from app.schema.domicilio_postal_schema import DomicilioPostalSchema
 class DomicilioSchema(Schema):
 
     id=fields.Int(dump_only=True)
-    calle=fields.Str(required=True)
-    numero=fields.Str(required=True)
-    piso=fields.Str()
-    departamento=fields.Str()
+    domicilio_calle=fields.Str(required=True)
+    domicilio_numero=fields.Str(required=True)
+    domicilio_piso=fields.Str()
+    domicilio_dpto=fields.Str()
 
     codigo_postal_id=fields.Int(required=True)
 

@@ -11,3 +11,5 @@ class Tipo_Documento(BaseModel):
     id_tipo_documento=Column(Integer, primary_key=True)
     tipo_documento=Column(String(50), nullable=False)
 
+
+
