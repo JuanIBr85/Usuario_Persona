@@ -1,4 +1,5 @@
 import React from "react";
+import { useLogin } from '@/hooks/use-Login';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import InputValidate from "@/components/inputValidate/InputValidate";
@@ -7,6 +8,17 @@ import { Fade } from "react-awesome-reveal";
 
 
 function Login() {
+
+  const { login, loading, error, message } = useLogin();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const email = formData.get("email_usuario");
+    const password = formData.get("password");
+    await login(email, password);
+  };
+
     return (
         <Fade duration={500} triggerOnce>
             <div className="h-screen flex items-center justify-center">
@@ -31,7 +43,7 @@ function Login() {
                             </CardTitle>
                         </CardHeader>
                         <CardContent className=" h-full">
-                            <form onSubmit={(e) => e.preventDefault()} className="flex flex-col gap-4 h-full">
+                            <form onSubmit={handleSubmit} className="flex flex-col gap-4 h-full">
                                 <InputValidate
                                     id="email_usuario"
                                     type="email"
@@ -48,10 +60,17 @@ function Login() {
                                     validatePattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$"
                                     validateMessage="La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula, un número y un carácter especial."
                                     required
-                                />
+                                      />
+                                  
+                                  {error && <p className="text-red-500 text-sm">{error}</p>}
+                                  {message && <p className="text-green-500 text-sm">{message}</p>}
+
+
+                                <Button type="submit" disabled={loading}>
+                                  {loading ? "Iniciando sesión..." : "Iniciar sesión"}
+                                  </Button>
                                 <Button variant="link" asChild><Link to="*">¿Olvidaste la contraseña?</Link></Button>
                                 <Button variant="link" asChild><Link to="/sign">¿No tiene una cuenta?</Link></Button>
-                                <Button type="submit">Iniciar sesion</Button>
                             </form>
                         </CardContent>
                         <CardFooter className="justify-center flex">

@@ -4,8 +4,21 @@ import { Button } from "@/components/ui/button";
 import InputValidate from "@/components/inputValidate/InputValidate";
 import { Link } from 'react-router-dom';
 import { Fade } from "react-awesome-reveal";
+import { useRegister } from "@/hooks/use-Register"
 
 function Sign() {
+
+  const { register, loading, error } = useRegister();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const email = formData.get("email_usuario");
+    const nombre = formData.get("nombre_usuario");
+    const password = formData.get("password");
+    register(nombre, email, password);
+  };
+
   return (
     <Fade duration={500} triggerOnce>
       <div className="h-screen flex items-center justify-center">
@@ -32,7 +45,7 @@ function Sign() {
               </CardTitle>
             </CardHeader>
             <CardContent className=" h-full">
-              <form onSubmit={(e) => e.preventDefault()} className="flex flex-col gap-4 h-full">
+              <form onSubmit={handleSubmit} className="flex flex-col gap-4 h-full">
                 <InputValidate
                   id="email_usuario"
                   type="email"
@@ -58,8 +71,14 @@ function Sign() {
                   validateMessage="La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula, un número y un carácter especial."
                   required
                 />
+
+                {error && <p className="text-red-500 text-sm">{error}</p>}
+
                 <Button variant="link" asChild><Link to="/login">¿Ya tiene una cuenta? Inicie sesión</Link></Button>
-                <Button type="submit">Crear cuenta</Button>
+
+                <Button type="submit" disabled={loading}>
+                  {loading ? "Creando cuenta..." : "Crear cuenta"}
+                </Button>
               </form>
             </CardContent>
             <CardFooter className="justify-center flex">
