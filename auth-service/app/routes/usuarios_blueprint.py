@@ -11,7 +11,7 @@ from app.utils.jwt import crear_token_acceso
 from marshmallow import ValidationError
 from app.utils.response import ResponseStatus, make_response
 from app.services.usuario_service import UsuarioService
-from app.utils.auth_decoradores import jwt_required
+from app.utils.utils_decoradores import jwt_required , rol_requerido
 
 usuario_bp = Blueprint("usuario", __name__)
 usuario_service = UsuarioService()
@@ -256,7 +256,15 @@ def login1():
 @usuario_bp.route('/perfil', methods=['GET'])
 @jwt_required
 def perfil_usuario():
-    return json.dumps({"mensaje": "Accediste al perfil protegido"})
+    datos = request.jwt_payload
+    return json.dumps({"mensaje": "bienvenido al perfil"})
+
+
+@usuario_bp.route('/solo-superadmin', methods=['GET'])
+@rol_requerido('superadmin')
+def ruta_solo_superadmin():
+    return json.dumps({"mensaje": "Bienvenido, superadmin. Tienes acceso completo."})
+
 
 @usuario_bp.route('/modificar', methods=['GET', 'POST'])
 def modificar_perfil():
