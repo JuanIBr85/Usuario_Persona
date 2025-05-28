@@ -1,17 +1,17 @@
-from flask import jsonify, request
+from flask import jsonify
 from marshmallow import ValidationError
 
 #Se importan los modelos
 from app.models.persona_model import Persona
-from app.models.domicilio_model import Domicilio
-from app.models.domicilio_postal_model import Domicilio_Postal
-from app.models.contacto_model import Contacto
-from app.models.tipo_doc_model import Tipo_Documento
+
+#Se importan los servicios
+from app.services.contacto_service import ContactoService
+from app.services.domicilio_service import DomicilioService
+from app.services.tipo_documente_service import TipoDocumentoService
 
 #Otras importaciones
 from app.schema.persona_schema import PersonaSchema
 from app.interfaces.persona_interface import IPersonaInterface
-from app.extensions import Base
 from app.extensions import SessionLocal
 
 class PersonaService(IPersonaInterface):
@@ -19,6 +19,9 @@ class PersonaService(IPersonaInterface):
     def __init__(self):
         self.schema = PersonaSchema()
         self.varios_schemas = PersonaSchema(many=True)
+        self.contacto_service = ContactoService()
+        self.domicilio_service = DomicilioService()
+        self.tipo_documento_service = TipoDocumentoService()
 
     def listar_personas(self):
         session = SessionLocal()
@@ -26,7 +29,7 @@ class PersonaService(IPersonaInterface):
             personas = session.query(Persona).all()
             return self.varios_schemas.dump(personas)
         finally:
-            session.close()
+            session.close()    
        
     def listar_persona_id(self, id):
         session = SessionLocal()
@@ -38,11 +41,7 @@ class PersonaService(IPersonaInterface):
         finally:
             session.close() 
 
-
-#Se crea la persona 
-
     def crear_persona(self, data):
-
         session=SessionLocal()
 
         try:
@@ -51,71 +50,26 @@ class PersonaService(IPersonaInterface):
             
             data_validada=self.schema.load(data)
 
-            #se crea el domicilio postal
-            domicilio_postal_data = data_validada['domicilio']['codigo_postal']
-            domicilio_postal = Domicilio_Postal(
-                codigo_postal=domicilio_postal_data['codigo_postal'],
-                localidad=domicilio_postal_data['localidad'],
-                partido=domicilio_postal_data['partido'],
-                provincia=domicilio_postal_data['provincia'],
-                pais=domicilio_postal_data['pais']
-            )
-            session.add(domicilio_postal)
-            session.flush()
+            #Se crea el contacto, domicilio y documento
+            domicilio = self.domicilio_service.crear_domicilio(data_validada.pop('domicilio'), session=session)
+            contacto = self.contacto_service.crear_contacto(data_validada.pop('contacto'), session=session)
+            tipo_documento = self.tipo_documento_service.crear_tipo_documento(data_validada.pop('tipo_documento'), session=session)
 
-            # Crea Domicilio
-            domicilio_data = data_validada['domicilio']
-            domicilio = Domicilio(
-                domicilio_calle=domicilio_data['calle'],
-                domicilio_numero=domicilio_data['numero'],
-                domicilio_piso=domicilio_data.get('piso'),
-                domicilio_dpto=domicilio_data.get('departamento'),
-                codigo_postal_id=domicilio_postal.id_domicilio_postal
-            )
-            session.add(domicilio)
-            session.flush()
-
-            # Crea Contacto
-            contacto_data = data_validada['contacto']
-            contacto = Contacto(
-                telefono_fijo_=contacto_data.get('telefono_fijo'),
-                telefono_movil_=contacto_data['telefono_movil'],
-                red_social_contacto=contacto_data.get('red_social_contacto')
-            )
-            session.add(contacto)
-            session.flush()
-
-            #Se crea el tipo de documento
-
-            tipos_documento_data=data_validada['tipo_documento']
-            tipo_documento = Tipo_Documento(
-                tipo_documento = tipos_documento_data['tipo_documento']
-            )
-            session.add(tipo_documento)
-            session.flush()
+            data_validada['domicilio_id']=domicilio.id_domicilio
+            data_validada['contacto_id']=contacto.id_contacto
+            data_validada['tipo_documento_id']=tipo_documento.id_tipo_documento
 
             # Crear Persona
-            persona = Persona(
-                nombre_persona=data_validada['nombre_persona'],
-                apellido_persona=data_validada['apellido_persona'],
-                fecha_nacimiento_persona=data_validada['fecha_nacimiento_persona'],
-                num_doc_persona=data_validada['num_doc_persona'],
-                usuario_id=data_validada['usuario_id'],
-                tipo_documento_id=tipo_documento.id_tipo_documento,
-                domicilio_id=domicilio.id_domicilio,
-                contacto_id=contacto.id_contacto
-            )
-            session.add(persona)
+            persona_nueva=Persona(**data_validada)
+            session.add(persona_nueva)
             session.commit()
+            session.refresh(persona_nueva)
 
-            return jsonify({
-                "mensaje": "Persona creada exitosamente",
-                "persona": self.schema.dump(persona)
-            }), 201
+            return persona_nueva
 
-        except ValidationError as err:
+        except Exception as e:
             session.rollback()
-            return jsonify({"errores": err.messages}), 400
+            raise e
 
         finally:
             session.close()

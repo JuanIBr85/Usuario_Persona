@@ -20,7 +20,7 @@ class Persona(Base):
     contacto_id=Column(Integer, ForeignKey('contactos.id_contacto'))
 
     domicilio = relationship("Domicilio")
-    tipo_documento = relationship("Tipo_Documento")
+    tipo_documento = relationship("TipoDocumento")
     contacto = relationship("Contacto")
 
     created_at=Column(DateTime, default=datetime.now(timezone.utc))

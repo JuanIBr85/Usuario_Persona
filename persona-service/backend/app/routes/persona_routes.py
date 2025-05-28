@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+from marshmallow import ValidationError
 from app.services.persona_service import PersonaService
 
 persona_bp = Blueprint('persona_bp', __name__)
@@ -21,13 +22,36 @@ def obtener_persona(id):
 #crea una persona
 @persona_bp.route('/crear_persona', methods=['POST'])
 def crear_persona():
+    try:    
+        data= request.get_json()
 
-    data= request.get_json()
-
-    if not data:
-        return jsonify({"error": "No se enviaron datos"}),400
+        if not data:
+         return jsonify({"error": "No se enviaron datos"}),400
     
-    resultado, status = persona_service.crear_persona(data)
+        persona = persona_service.crear_persona(data)
 
-    return resultado, status
+        return jsonify({
+            "status": "success",
+            "message": "Recurso creado correctamente",
+            "data":{
+                "id": persona.id_persona
+            }
+        }),201
+    
+    except ValidationError as err:
+        return jsonify({
+            "status": "error",
+            "message": "Error de validación",
+            "errors": err.messages
+        }),400
+    
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": "Error interno del servidor",
+            "errors": {"server": str(e)}
+        }),500
+
+
+
 
