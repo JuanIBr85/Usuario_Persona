@@ -1,8 +1,8 @@
 from sqlalchemy import Column, Integer, String,DateTime,ForeignKey
 from sqlalchemy.orm import relationship
-from app.database.session import Base
 from datetime import datetime, timezone
 from app.models.permisos import RolPermiso
+from app.models.base_model import Base
 
 
 class Rol(Base):
