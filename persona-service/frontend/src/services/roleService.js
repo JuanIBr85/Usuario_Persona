@@ -1,66 +1,56 @@
-import { authHeader } from './authHeader';
-
-const API_URL = process.env.API_URL;
+import { fetchService, HttpMethod } from './fetchUtils';
 
 export async function getAllRoles() {
-    const response = await fetch(API_URL);
-    if (!response.ok) {
-        throw new Error('Error al obtener los roles');
-    }
-    return await response.json();
+  return await fetchService.useDefaultUrl({
+    url: "api/roles",
+    method: HttpMethod.GET,
+  }).catch(error => {
+    console.error("Error al obtener los roles:", error);
+    throw new Error('Error al obtener los roles');
+  });
 }
 
 export async function getRoleById(id) {
-    const response = await fetch(`${API_URL}/${id}`);
-    if (!response.ok) {
-        throw new Error('Rol no encontrado');
-    }
-    return await response.json();
+  return await fetchService.useDefaultUrl({
+    url: `api/roles/${id}`,
+    method: HttpMethod.GET,
+  }).catch(error => {
+    console.error("Error al obtener rol por ID:", error);
+    throw new Error('Rol no encontrado');
+  });
 }
 
 export async function createRole(roleData) {
-    const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-            headers: authHeader(),
-        },
-        body: JSON.stringify(roleData),
-    });
-
-    if (!response.ok) {
-        throw new Error('Error al crear el rol');
-    }
-
-    return await response.json();
+  return await fetchService.useDefaultUrl({
+    url: "api/crear_rol",
+    method: HttpMethod.POST,
+    body: roleData,
+    useToken: true,
+  }).catch(error => {
+    console.error("Error al crear el rol:", error);
+    throw new Error('Error al crear el rol');
+  });
 }
 
 export async function updateRole(id, updatedData) {
-    const response = await fetch(`${API_URL}/${id}`, {
-        method: 'PUT',
-        headers: {
-            headers: authHeader(),
-        },
-        body: JSON.stringify(updatedData),
-    });
-
-    if (!response.ok) {
-        throw new Error('Error al actualizar el rol');
-    }
-
-    return await response.json();
+  return await fetchService.useDefaultUrl({
+    url: `api/actualizar_rol/${id}`,
+    method: HttpMethod.PUT,
+    body: updatedData,
+    useToken: true,
+  }).catch(error => {
+    console.error("Error al actualizar el rol:", error);
+    throw new Error('Error al actualizar el rol');
+  });
 }
 
 export async function deleteRole(id) {
-    const response = await fetch(`${API_URL}/${id}`, {
-        method: 'DELETE',
-        headers: {
-            headers: authHeader(),
-        }
-    });
-
-    if (!response.ok) {
-        throw new Error('Error al eliminar el rol');
-    }
-
-    return true;
+  return await fetchService.useDefaultUrl({
+    url: `api/eliminar_rol/${id}`,
+    method: HttpMethod.DELETE,
+    useToken: true,
+  }).catch(error => {
+    console.error("Error al eliminar el rol:", error);
+    throw new Error('Error al eliminar el rol');
+  });
 }
