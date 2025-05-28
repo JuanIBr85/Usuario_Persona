@@ -260,10 +260,16 @@ def perfil_usuario():
     return json.dumps({"mensaje": "bienvenido al perfil"})
 
 
-@usuario_bp.route('/solo-superadmin', methods=['GET'])
+@usuario_bp.route('/superadmin', methods=['GET'])
 @rol_requerido('superadmin')
 def ruta_solo_superadmin():
     return json.dumps({"mensaje": "Bienvenido, superadmin. Tienes acceso completo."})
+
+
+@usuario_bp.route('/admin', methods=['GET'])
+@rol_requerido('admin','superadmin')
+def ruta_solo_admin():
+    return json.dumps({"mensaje": "Bienvenido, al acceso administrativo."})
 
 
 @usuario_bp.route('/modificar', methods=['GET', 'POST'])

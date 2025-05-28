@@ -37,15 +37,16 @@ def jwt_requerido(f):
     return funcion_decorada
 
 # Decorador avanzado: usa jwt_requerido + verifica rol
-def rol_requerido(rol_necesario):
+def rol_requerido(*roles_necesarios):
     def decorador(f):
-        @jwt_requerido 
+        @jwt_requerido  # Reutilizamos el decorador base
         @wraps(f)
         def funcion_decorada(*args, **kwargs):
-            payload = request.jwt_payload  
-            if rol_usuario != rol_necesario:
+            payload = request.jwt_payload
+            rol_usuario = payload.get("rol")
+            if rol_usuario not in roles_necesarios:
                 return Response(
-                    json.dumps({"error": f"Acceso denegado: se requiere rol '{rol_necesario}'"}),
+                    json.dumps({"error": f"Acceso denegado: se requiere uno de los roles {roles_necesarios}"}),
                     status=403,
                     mimetype="application/json"
                 )
