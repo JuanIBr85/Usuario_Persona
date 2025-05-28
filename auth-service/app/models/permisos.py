@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String,DateTime,ForeignKey
 from sqlalchemy.orm import relationship
-from app.database.session import Base
+from app.models.base_model import Base
 from datetime import datetime, timezone
 
 class Permiso(Base):
