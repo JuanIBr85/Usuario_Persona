@@ -10,6 +10,7 @@ from app.services.rol import get_rol_por_nombre
 from flask_jwt_extended import (create_access_token, create_refresh_token,jwt_required, get_jwt_identity, create_access_token)
 import jwt
 from os import getenv
+from app.utils.auth_decoradores import jwt_required
 
 usuario_bp = Blueprint("usuario", __name__)
 
@@ -150,10 +151,10 @@ def login():
     finally:
         session.close()
 
-@usuario_bp.route('/ver_perfil')
+@usuario_bp.route('/perfil', methods=['GET'])
+@jwt_required
 def perfil_usuario():
-    #Agregar logica
-    pass
+    return json.dumps({"mensaje": "Accediste al perfil protegido"})
 
 @usuario_bp.route('/modificar', methods=['GET', 'POST'])
 def modificar_perfil():
@@ -175,6 +176,9 @@ def verificar_token_nuevo_password():
 @usuario_bp.route('/recuperar_pass', methods=['POST'])
 def restablecer_password():
     pass
+
+
+
 
 #para iniciar el seed
 #python -m app.script.seed_data
