@@ -1,17 +1,21 @@
 import React from "react";
+import { useLocation } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
 import Main from "./Main";
 import AccessibilityMenu from './AccesibilityMenu';
 
 const Layout = ({ children }) => {
+  const location = useLocation();
+  const hideHeaderFooter = location.pathname === "/login" || location.pathname === "/sign";
+
   return (
     <div className="flex flex-col h-screen">
-      <Header />
+      {!hideHeaderFooter && <Header />}
       <div className="flex flex-1">
         <Main>{children}</Main>
       </div>
-      <Footer />
+      {!hideHeaderFooter && <Footer />}
       <AccessibilityMenu />
     </div>
   );

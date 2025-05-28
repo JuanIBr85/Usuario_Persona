@@ -3,6 +3,15 @@ import { ChartContainer } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 import { ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { ChartLegend, ChartLegendContent } from "@/components/ui/chart"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+
 
 const chartData = [
   { month: "Enero",  profesores: 34, alumnos: 80, admins: 5 },
@@ -30,7 +39,7 @@ const chartConfig = {
 
 function Logs() {
   return (
-    <div className="p-5 md:px-60">
+    <div className="p-5 pt-40 px-3 md:py-25 md:px-60">
     <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
       <BarChart accessibilityLayer data={chartData}>
         <CartesianGrid vertical={false} />
@@ -49,6 +58,17 @@ function Logs() {
         <Bar dataKey="admins" fill="var(--color-admins)" radius={4} />
       </BarChart>
     </ChartContainer>
+        <Breadcrumb className="mt-auto self-start">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/adminpanel">Panel De Administrador</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Logs</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
      </div>
   )
 }
