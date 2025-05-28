@@ -25,7 +25,7 @@ export const HttpMethod = Object.freeze({
 export const fetchService = {
     
     // Método simplificado que usa automáticamente nuestra URL base
-    useDefaultUrl: ({ url, method, headers = {}, body, useToken, returnJson = true, timeout = 1000 * 5 }) => {
+    useDefaultUrl: ({ url, method, headers = {}, body, useToken, returnJson = true, showError = true, timeout = 1000 * 5 }) => {
         // Simplemente llama al método fetch() pero agregando la URL base automáticamente
         return fetchService.fetch({
             url: `${API_URL}/${url}`, // Combina la URL base con la ruta específica
@@ -34,12 +34,13 @@ export const fetchService = {
             body, 
             useToken, 
             returnJson, 
-            timeout
+            timeout,
+            showError
         });
     },
 
     // Método principal que hace las peticiones Fetch
-    fetch: ({ url, method, headers = {}, body, useToken, returnJson = true, timeout = 1000 * 5 }) => {
+    fetch: ({ url, method, headers = {}, body, useToken, returnJson = true, showError = true, timeout = 1000 * 5 }) => {
         
         // Creamos un controlador para poder cancelar la petición si es necesario
         const controller = new AbortController();
@@ -50,7 +51,7 @@ export const fetchService = {
             console.warn(`Fetch [${url}] timeout.`); // Avisa que se canceló por timeout
         }, timeout);
 
-        // Hacemos la petición HTTP real
+        // Hacemos la petición Fetch
         return fetch(url, {
             signal: controller.signal, // Para poder cancelar la petición
             method: method,            // GET, POST, PUT, etc.
@@ -77,7 +78,7 @@ export const fetchService = {
             return returnJson ? response.json() : response;
         })
         .catch((error) => {
-            console.error("Fetch error:", error);
+            if(showError)console.error(`Fetch [${url}] error:`, error);
             throw error; 
         })
         .finally(() => {
