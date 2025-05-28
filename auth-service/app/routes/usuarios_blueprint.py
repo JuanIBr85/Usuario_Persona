@@ -7,17 +7,11 @@ from app.models.rol import RolUsuario,Rol
 from app.schemas.usuarios_schema import UsuarioInputSchema,LoginSchema
 from datetime import datetime, timezone
 from app.services.rol import get_rol_por_nombre
-<<<<<<< HEAD
 from app.utils.jwt import crear_token_acceso
 from marshmallow import ValidationError
 from app.utils.response import ResponseStatus, make_response
 from app.services.usuario_service import UsuarioService
-=======
-from flask_jwt_extended import (create_access_token, create_refresh_token,jwt_required, get_jwt_identity, create_access_token)
-import jwt
-from os import getenv
 from app.utils.auth_decoradores import jwt_required
->>>>>>> 72ef471862d3c0c89344c16128c2e254f30614c3
 
 usuario_bp = Blueprint("usuario", __name__)
 usuario_service = UsuarioService()
@@ -95,11 +89,7 @@ def registrar_usuario():
         )
         session.add(usuario_log)
         session.commit()
-<<<<<<< HEAD
 
-=======
-        
->>>>>>> 72ef471862d3c0c89344c16128c2e254f30614c3
         return Response(
             json.dumps({"mensaje": "Usuario registrado correctamente"}),
             status=201,
@@ -175,7 +165,6 @@ def login():
     finally:
         session.close()
 
-<<<<<<< HEAD
 
 @usuario_bp.route('/registro1', methods=['POST'])
 def registrar_usuario1():
@@ -263,11 +252,9 @@ def login1():
     finally:
         session.close()
 
-@usuario_bp.route('/ver_perfil')
-=======
+
 @usuario_bp.route('/perfil', methods=['GET'])
 @jwt_required
->>>>>>> 72ef471862d3c0c89344c16128c2e254f30614c3
 def perfil_usuario():
     return json.dumps({"mensaje": "Accediste al perfil protegido"})
 
