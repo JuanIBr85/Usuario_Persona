@@ -1,6 +1,7 @@
 from app.models.contacto_model import Contacto
 from app.schema.contacto_schema import ContactoSchema
 from app.interfaces.contacto_interface import IContactoInterface
+from datetime import datetime, timezone
 from app.extensions import SessionLocal
 
 class ContactoService(IContactoInterface):
@@ -17,10 +18,7 @@ class ContactoService(IContactoInterface):
 
         try: 
 
-            print("Datos recibidos para contacto:", data)
             data_validada=self.schema.load(data)
-            print("Contacto validado:", data_validada)
-
 
             contacto=Contacto(**data_validada)
             session.add(contacto)
@@ -40,5 +38,38 @@ class ContactoService(IContactoInterface):
 
     def modificar_contacto(self, id, data):
         return
+    
+
+    def borrar_contacto(self, id_contacto, session=None):
+
+        cerrar=False
+
+        if session is None:
+            session = SessionLocal()
+            cerrar = True
+
+        try:    
+
+            contacto = session.query(Contacto).get(id_contacto)
+            if contacto:
+                contacto.deleted_at = datetime.now(timezone.utc)
+
+                session.flush()
+            else:
+                raise ValueError(f"No se encontró el contacto con id {id_contacto}")    
+            
+        except Exception as e:
+            session.rollback()
+            raise e
+        
+        finally:
+            if cerrar:
+                session.close()
+                session.commit()
+
+
+   
+
+
     
         

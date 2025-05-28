@@ -114,6 +114,30 @@ def crear_persona():
             "errors": {"server": str(e)}
         }),500
 
+#borrar una persona
+@persona_bp.route('/borrar_persona/<int:id>', methods=['DELETE'])
+def borrar_persona(id):
 
+    try:
+
+        borrado_persona= persona_service.borrar_persona(id)
+        if borrar_persona:
+            return  jsonify({
+                "status": "success",
+                "message": "Persona eliminada correctamente"
+            }),200
+
+        else:
+            return jsonify({
+                "status": "error",
+                "message": "Persona no encontrada"
+            }),404
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": "Error al eliminar persona",
+            "errors": {"server": str(e)}
+        }),500       
 
 

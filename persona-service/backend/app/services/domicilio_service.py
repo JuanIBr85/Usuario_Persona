@@ -2,6 +2,7 @@ from app.models.domicilio_model import Domicilio
 from app.schema.domicilio_schema import DomicilioSchema
 from app.services.domicilio_postal_service import DomicilioPostalService
 from app.interfaces.domicilio_interface import IDomicilioInterface
+from datetime import datetime, timezone
 from app.extensions import SessionLocal
 
 
@@ -47,6 +48,35 @@ class DomicilioService(IDomicilioInterface):
     
     def modificar_domicilio(self, id):
         return
+    
+    def borrar_domicilio(self, id_domicilio, session=None):
+
+        cerrar= False
+
+        if session is None:
+            session = SessionLocal()
+            cerrar = True
+
+        try:
+            domicilio = session.query(Domicilio).get(id_domicilio)
+
+            if domicilio:
+                domicilio.deleted_at = datetime.now(timezone.utc)
+                session.flush()
+
+            else:
+                raise ValueError(f"No se encontró el contacto con id {id_domicilio}")    
+            
+        except Exception as e:
+            session.rollback()
+            raise e
+        
+        finally:
+            if cerrar:
+                session.commit()
+                session.close()
+
+         
     
     
 

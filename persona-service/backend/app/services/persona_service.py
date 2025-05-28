@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from flask import jsonify
 from marshmallow import ValidationError
 
@@ -78,9 +79,35 @@ class PersonaService(IPersonaInterface):
         #definir logica
         return
        
-    def eliminar_persona(self, id):
-        #definir logica
-        return
+    def borrar_persona(self, id_persona):
+        
+        session = SessionLocal()
+
+        try:
+
+            persona = session.query(Persona).get(id_persona)
+
+            if not persona:
+                return None
+            
+            if persona.contacto_id:
+            
+                self.contacto_service.borrar_contacto(persona.contacto_id , session)
+            if persona.domicilio_id:
+                self.domicilio_service.borrar_domicilio(persona.domicilio_id, session)
+
+            persona.deleted_at = datetime.now(timezone.utc)
+
+            session.commit()
+            return True
+
+        except Exception as e:
+            session.rollback()
+            raise e
+        
+        finally:
+            session.close()
+
        
        
         

@@ -14,3 +14,4 @@ class Contacto(Base):
 
     created_at=Column(DateTime, default=datetime.now(timezone.utc))
     updated_at=Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
+    deleted_at=Column(DateTime, nullable=True)
