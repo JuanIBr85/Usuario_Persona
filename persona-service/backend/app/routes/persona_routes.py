@@ -103,17 +103,18 @@ def borrar_persona(id):
     try:
 
         borrado_persona= persona_service.borrar_persona(id)
-        if borrar_persona:
-            return  jsonify({
-                "status": "success",
-                "message": "Persona eliminada correctamente"
-            }),200
 
-        else:
+        if borrado_persona is None:
             return jsonify({
                 "status": "error",
-                "message": "Persona no encontrada"
+                "message": "Persona no encontrada",
+                "errors": {"id": f"No existe persona con ID {id}"}
             }),404
+
+        return  jsonify({
+            "status": "success",
+            "message": "Persona eliminada correctamente"
+        }),200
 
     except Exception as e:
         return jsonify({

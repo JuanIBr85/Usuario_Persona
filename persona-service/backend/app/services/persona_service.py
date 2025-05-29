@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from flask import jsonify
 from marshmallow import ValidationError
+from sqlalchemy import and_
 
 #Se importan los modelos
 from app.models.persona_model import Persona
@@ -90,7 +91,12 @@ class PersonaService(IPersonaInterface):
 
         try:
 
-            persona = session.query(Persona).get(id_persona)
+            persona = session.query(Persona).filter(
+                and_(
+                    Persona.id_persona == id_persona,
+                    Persona.deleted_at.is_(None)
+                )
+            ).first()
 
             if not persona:
                 return None
