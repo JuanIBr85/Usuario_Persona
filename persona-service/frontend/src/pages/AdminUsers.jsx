@@ -9,6 +9,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Fade } from "react-awesome-reveal";
+import { useNavigate } from 'react-router-dom';
+
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -20,6 +23,7 @@ import {
 
 
 function AdminUsers() {
+  const navigate = useNavigate();
   const [users, setUsers] = useState([
     {
       id: 1,
@@ -47,6 +51,10 @@ function AdminUsers() {
     }
   };
 
+  const handleSeeDetails = (id) => {
+    navigate(`/userdetails/${id}`);
+  }
+
   return (
     <div className="max-w-full mx-auto px-5 pt-25 pb-10 md:py-25 md:px-15 flex flex-col flex-1">
       <Fade duration={300} triggerOnce>
@@ -72,6 +80,12 @@ function AdminUsers() {
                     <TableCell>{status}</TableCell>
                     <TableCell className="text-right space-x-2">
                       <button
+                        onClick={() => handleSeeDetails(id)}
+                        className="text-blue-600 hover:underline"
+                      >
+                        Ver
+                      </button>
+                      <button
                         onClick={() => handleEdit(id)}
                         className="text-blue-600 hover:underline"
                       >
@@ -95,8 +109,9 @@ function AdminUsers() {
                 <BreadcrumbLink href="/adminpanel">Panel De Administrador</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
+              
               <BreadcrumbItem>
-                <BreadcrumbPage>Usuarios</BreadcrumbPage>
+                <BreadcrumbPage>Panel de Usuarios</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
