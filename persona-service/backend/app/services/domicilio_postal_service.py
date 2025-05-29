@@ -1,7 +1,7 @@
 from app.models.domicilio_postal_model import Domicilio_Postal
 from app.schema.domicilio_postal_schema import DomicilioPostalSchema
 from app.interfaces.domicilio_postal_interface import IDomicilioPostalInterface
-from app.extensions import Base
+from app.extensions import SessionLocal
 
 class DomicilioPostalService(IDomicilioPostalInterface):
 
@@ -12,5 +12,23 @@ class DomicilioPostalService(IDomicilioPostalInterface):
     def listar_domicilio_postal_id(self, id):
         return
 
-    def crear_domicilio_postal(self, data):
-        return    
+    def crear_domicilio_postal(self, data, session=None):
+
+        cerrar = False
+        if session is None:    
+            session= SessionLocal()
+            cerrar=True
+
+        try:
+            data_validada=self.schema.load(data)
+            domicilio_postal = Domicilio_Postal(**data_validada)
+            session.add(domicilio_postal)
+            session.flush()
+
+            return domicilio_postal
+        except Exception as e:
+            session.rollback()
+            raise e
+        finally:
+            if cerrar:
+                session.close()

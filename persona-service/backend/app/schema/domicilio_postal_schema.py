@@ -2,7 +2,7 @@ from marshmallow import Schema, fields
 
 class DomicilioPostalSchema(Schema):
 
-    id=fields.Int(dump_only=True)
+    id_domicilio_postal=fields.Int(dump_only=True)
     codigo_postal = fields.Str(required=True)
     localidad = fields.Str(required=True)
     partido = fields.Str(required=True)
