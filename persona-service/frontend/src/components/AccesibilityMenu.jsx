@@ -60,6 +60,7 @@ const AccessibilityMenu = () => {
                     <div className="flex justify-between items-center">
                         <span>Tipo de fuente</span>
                         <select
+                            value={accessibilityData.fontType}
                             onChange={(e) => updateAccessibilityData({ fontType: e.target.value })}
                             className="px-2 py-1 border rounded cursor-pointer bg-card"
                         >
