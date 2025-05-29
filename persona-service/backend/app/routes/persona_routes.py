@@ -7,16 +7,8 @@ persona_bp = Blueprint('persona_bp', __name__)
 persona_service = PersonaService()
 persona_schema= PersonaSchema()
 
-
-# Listar personas
 @persona_bp.route('/personas', methods=['GET'])
 def listar_personas():
-    personas = persona_service.listar_personas()
-    return jsonify(personas), 200
-
-#Listar Todas las Personas, considerando formato JSON estandarizado por Rodrigo (Propuesta):
-@persona_bp.route('/todas_personas', methods=['GET'])
-def todas_personas():
     try:
         personas =persona_service.listar_personas()
 
@@ -42,10 +34,8 @@ def todas_personas():
             "errors": {"server": str(e)}
         }),500  
     
-#Listar persona, considerando formato JSON estandarizado por Rodrigo (Propuesta):
-
-@persona_bp.route('/persona/<int:id>', methods=['GET'])
-def obtener_persona_id(id):
+@persona_bp.route('/personas/<int:id>', methods=['GET'])
+def obtener_persona(id):
 
     try:
 
@@ -70,14 +60,6 @@ def obtener_persona_id(id):
             "message": "Error al obtener la persona",
             "errors": {"server": str(e)}
             }), 500
-
-# Buscar persona por ID
-@persona_bp.route('/personas/<int:id>', methods=['GET'])
-def obtener_persona(id):
-    persona = persona_service.listar_persona_id(id)
-    if persona is None:
-        return jsonify({"error": "Persona no encontrada"}), 404
-    return jsonify(persona), 200
 
 #crea una persona
 @persona_bp.route('/crear_persona', methods=['POST'])

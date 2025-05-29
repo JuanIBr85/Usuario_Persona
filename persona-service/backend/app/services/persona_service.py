@@ -27,7 +27,7 @@ class PersonaService(IPersonaInterface):
     def listar_personas(self):
         session = SessionLocal()
         try:
-            personas = session.query(Persona).all()
+            personas = session.query(Persona).filter(Persona.deleted_at.is_(None)).all()
             return self.varios_schemas.dump(personas)
         finally:
             session.close()    
@@ -35,7 +35,12 @@ class PersonaService(IPersonaInterface):
     def listar_persona_id(self, id):
         session = SessionLocal()
         try:
-            persona = session.query(Persona).get(id)
+            persona = (
+            session.query(Persona)
+            .filter(Persona.id_persona == id, Persona.deleted_at.is_(None))
+            .first()
+            )
+
             if not persona:
                 return None  
             return self.schema.dump(persona)
