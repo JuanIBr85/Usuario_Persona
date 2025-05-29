@@ -142,3 +142,11 @@
     --chart-5: 340 75% 55%;
   }
 }
+
+.font-dyslexia{
+  font-family: 'Lexend', Verdana, Arial, sans-serif ;
+}
+
+.font-low-vision{
+  font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
+}
