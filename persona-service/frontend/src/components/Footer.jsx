@@ -2,7 +2,7 @@ import React from "react";
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-100 px-4 pt-16 w-full mx-auto max-w-full px-lg:px-24  lg:px-8">
+    <footer className="bg-gray-100 dark:bg-card px-4 pt-16 w-full mx-auto max-w-full px-lg:px-24  lg:px-8">
       <div className="grid gap-10 row-gap-6 mb-8 sm:grid-cols-2 lg:grid-cols-4">
         <div className="sm:col-span-2">
           <a
@@ -21,7 +21,7 @@ const Footer = () => {
             </span>
           </a>
           <div className="mt-6 lg:max-w-sm">
-            <p className="text-sm text-gray-800">
+            <p className="text-sm text-gray-800 ">
               Sed ut perspiciatis unde omnis iste natus error sit voluptatem
               accusantium doloremque laudantium, totam rem aperiam.
             </p>
@@ -32,11 +32,11 @@ const Footer = () => {
           </div>
         </div>
         <div className="space-y-2 text-sm">
-          <p className="text-base font-bold tracking-wide text-gray-900">
+          <p className="text-base font-bold tracking-wide text-gray-900 dark:text-gray-400">
             Contactos
           </p>
           <div className="flex">
-            <p className="mr-1 text-gray-800">Teléfono:</p>
+            <p className="mr-1 text-gray-800 ">Teléfono:</p>
             <a
               href="tel:850-123-5021"
               aria-label="Nuestro teléfono"
@@ -72,7 +72,7 @@ const Footer = () => {
           </div>
         </div>
         <div>
-          <span className="text-base font-bold tracking-wide text-gray-900">
+          <span className="text-base font-bold tracking-wide text-gray-900 dark:text-gray-400">
             Redes sociales
           </span>
           <div className="flex items-center mt-1 space-x-3">

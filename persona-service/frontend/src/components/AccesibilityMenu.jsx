@@ -3,17 +3,19 @@ import React, { useState, useEffect } from 'react';
 const AccessibilityMenu = () => {
     const [showMenu, setShowMenu] = useState(false);
     const [isHighContrast, setIsHighContrast] = useState(false);
+    const [isDarkMode, setIsDarkMode] = useState(false);
     const [fontSize, setFontSize] = useState(100); // %
 
     useEffect(() => {
         document.documentElement.style.filter = isHighContrast ? 'contrast(150%) grayscale(100%)' : 'none';
         document.documentElement.style.fontSize = `${fontSize}%`;
-    }, [isHighContrast, fontSize]);
+        document.documentElement.classList.toggle('dark', isDarkMode);
+    }, [isHighContrast, fontSize, isDarkMode]);
 
     return (
         <div className="fixed bottom-4 right-4 z-50">
             {showMenu && (
-                <div className="mt-2 bg-white shadow-lg rounded p-4 w-64 text-black space-y-3">
+                <div className="mt-2 bg-card shadow-lg rounded p-4 w-64 space-y-3">
                     <h2 className="font-bold text-lg">Accesibilidad</h2>
 
                     <div className="flex justify-between items-center">
@@ -31,6 +33,16 @@ const AccessibilityMenu = () => {
                             className="px-2 py-1 border rounded"
                         >
                             {isHighContrast ? 'Desactivar' : 'Activar'}
+                        </button>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                        <span>Modo oscuro</span>
+                        <button
+                            onClick={() => setIsDarkMode(!isDarkMode)}
+                            className="px-2 py-1 border rounded"
+                        >
+                            {isDarkMode ? 'Desactivar' : 'Activar'}
                         </button>
                     </div>
                 </div>
