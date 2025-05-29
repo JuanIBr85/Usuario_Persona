@@ -15,7 +15,7 @@ const AccessibilityMenu = () => {
     return (
         <div className="fixed bottom-4 right-4 z-50">
             {showMenu && (
-                <div className="mt-2 bg-card shadow-lg rounded p-4 w-64 space-y-3">
+                <div className="mt-2 bg-card border shadow-lg rounded p-4 w-64 space-y-3">
                     <h2 className="font-bold text-lg">Accesibilidad</h2>
 
                     <div className="flex justify-between items-center">
