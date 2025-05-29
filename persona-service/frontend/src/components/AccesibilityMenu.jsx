@@ -1,16 +1,34 @@
 import React, { useState, useEffect } from 'react';
 
+//Carga los datos de accesibilidad desde localStorage o usa valores por defecto
+const data = localStorage.getItem('AccessibilityData');
+const accessibilityData = data? JSON.parse(data):{
+    isHighContrast: false,
+    isDarkMode: false,
+    fontSize: 100
+};
+
 const AccessibilityMenu = () => {
     const [showMenu, setShowMenu] = useState(false);
-    const [isHighContrast, setIsHighContrast] = useState(false);
-    const [isDarkMode, setIsDarkMode] = useState(false);
-    const [fontSize, setFontSize] = useState(100); // %
+    const [isHighContrast, setIsHighContrast] = useState(accessibilityData.isHighContrast);
+    const [isDarkMode, setIsDarkMode] = useState(accessibilityData.isDarkMode);
+    const [fontSize, setFontSize] = useState(accessibilityData.fontSize); // %
 
     useEffect(() => {
         document.documentElement.style.filter = isHighContrast ? 'contrast(150%) grayscale(100%)' : 'none';
         document.documentElement.style.fontSize = `${fontSize}%`;
         document.documentElement.classList.toggle('dark', isDarkMode);
+
+
+        // Save settings to localStorage
+        localStorage.setItem('AccessibilityData', JSON.stringify({
+            isHighContrast:isHighContrast,
+            isDarkMode:isDarkMode,
+            fontSize:fontSize
+        }));
+
     }, [isHighContrast, fontSize, isDarkMode]);
+
 
     return (
         <div className="fixed bottom-4 right-4 z-50">
