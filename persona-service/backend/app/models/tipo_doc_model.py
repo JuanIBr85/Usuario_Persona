@@ -2,7 +2,7 @@ from app.extensions import Base
 from sqlalchemy import Integer, String, DateTime, Column
 from datetime import datetime, timezone
 
-class Tipo_Documento(Base):
+class TipoDocumento(Base):
 
     __tablename__ = "tipo_documentos"
 

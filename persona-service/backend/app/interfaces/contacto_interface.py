@@ -13,3 +13,7 @@ class IContactoInterface(ABC):
     @abstractmethod
     def modificar_contacto(self, id, data):
         pass
+
+    @abstractmethod
+    def borrar_contacto(self, id):
+        pass
