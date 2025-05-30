@@ -33,3 +33,16 @@ class TipoDocumentoService(ITipoDocumentoInterface):
         finally:
             if cerrar:
                 session.close()
+
+    def modificar_tipo_documento(self, id_tipo_documento, data, session):
+        tipo_doc = session.query(TipoDocumento).get(id_tipo_documento)
+        if not tipo_doc:
+            raise ValueError("Tipo de documento no encontrado")
+
+        if 'tipo_documento' in data:
+            tipo_doc.tipo_documento = data['tipo_documento']
+
+        tipo_doc.updated_at = datetime.now(timezone.utc)
+        session.flush() 
+
+        return tipo_doc

@@ -81,8 +81,43 @@ class PersonaService(IPersonaInterface):
             session.close()
  
     def modificar_persona(self, id, data):
-        #definir logica
-        return
+        session = SessionLocal()
+
+        try:
+            persona = session.query(Persona).get(id)
+            if not persona:
+                return None 
+
+            data_validada = self.schema.load(data, partial=True) #permite que la modificacion sea parcial o total
+
+            ''' ejemplo de funcionamiento: si en el json recibe 'domicilio' llama a domiciolio_service
+             para modificar ese domicilio, pasa el id existente y los nuevos datos.
+              lo mismo con contacto y tipo_documento '''
+            
+            if 'domicilio' in data:
+                self.domicilio_service.modificar_domicilio(persona.domicilio_id, data['domicilio'], session)
+
+            if 'contacto' in data:
+                self.contacto_service.modificar_contacto(persona.contacto_id, data['contacto'], session)
+
+            if 'tipo_documento' in data:
+                self.tipo_documento_service.modificar_tipo_documento(persona.tipo_documento_id, data['tipo_documento'], session)
+
+            for field in ['nombre_persona', 'apellido_persona', 'fecha_nacimiento_persona', 'num_doc_persona', 'usuario_id']:
+                if field in data_validada:
+                    setattr(persona, field, data_validada[field])
+
+            persona.updated_at = datetime.now(timezone.utc)
+            session.commit()
+            return self.schema.dump(persona)
+
+        # si ocurre un error deshace los cambios 
+        except Exception as e:
+            session.rollback()
+            raise e
+
+        finally:
+            session.close()
        
     def borrar_persona(self, id_persona):
         

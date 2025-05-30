@@ -36,8 +36,21 @@ class ContactoService(IContactoInterface):
     def listar_contacto_id(self, id):
         return
 
-    def modificar_contacto(self, id, data):
-        return
+    def modificar_contacto(self, id_contacto, data, session):
+        contacto = session.query(Contacto).get(id_contacto)
+        if not contacto:
+            raise ValueError("Contacto no encontrado")
+
+        campos_editables = ['telefono_fijo', 'telefono_movil', 'red_social_contacto']
+
+        for campo in campos_editables:
+            if campo in data:
+                setattr(contacto, campo, data[campo])
+
+        contacto.updated_at = datetime.now(timezone.utc)
+        session.flush() 
+
+        return contacto
     
 
     def borrar_contacto(self, id_contacto, session=None):
