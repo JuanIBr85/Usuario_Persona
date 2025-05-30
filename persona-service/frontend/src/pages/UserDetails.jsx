@@ -42,7 +42,7 @@ function UserDetails() {
     return (
         <div className='px-6 d-flex flex-column m-5'>
             <Fade duration={300} triggerOnce>
-                <div className="bg-white overflow-hidden shadow rounded-lg border mb-5">
+                <div className="bg-card overflow-hidden shadow rounded-lg border mb-5">
                     <div className="px-4 py-5 sm:px-6">
                         <h3 className="text-lg leading-6 font-medium text-gray-900">
                             Perfil de Usuario

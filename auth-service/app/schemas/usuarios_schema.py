@@ -6,7 +6,7 @@ class UsuarioInputSchema(Schema):
     )
     nombre_usuario = fields.Str(
         required=True, 
-        validate=validate.Length(min=5, error="El nombre de usuario debe tener al menos 5 caracteres."),
+        validate=validate.Length(min=4, error="El nombre de usuario debe tener al menos 4 caracteres."),
         error_messages={"Requerimiento": "El nombre de usuario es obligatorio."}
     )
     email_usuario = fields.Email(

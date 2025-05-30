@@ -77,6 +77,7 @@
 
   --color-primario: #1c1364;
   --color-fondo: #fff;
+
 }
 
 .dark {
@@ -111,6 +112,13 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+
+
+  /*Esto es un fix temporal, las vistas deberian de estar diseñadas para el modo oscuro*/
+  --color-gray-800: var(--color-gray-50);
+  --color-gray-900: var(--color-gray-100);
+  --color-gray-500: var(--color-gray-400);
+  --color-gray-200: var(--color-gray-700);
 }
 
 @layer base {
@@ -138,4 +146,12 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
+}
+
+.font-dyslexia{
+  font-family: 'Lexend', Verdana, Arial, sans-serif ;
+}
+
+.font-low-vision{
+  font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
 }
