@@ -21,3 +21,7 @@ class IPersonaInterface(ABC):
     @abstractmethod
     def borrar_persona(self, id):
         pass
+
+    @abstractmethod
+    def restaurar_persona(self, id):
+        pass

@@ -17,3 +17,7 @@ class IContactoInterface(ABC):
     @abstractmethod
     def borrar_contacto(self, id):
         pass
+    
+    @abstractmethod
+    def restaurar_contacto(self, id):
+        pass
