@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from flask import jsonify
 from marshmallow import ValidationError
+from sqlalchemy import and_
 
 #Se importan los modelos
 from app.models.persona_model import Persona
@@ -84,25 +85,25 @@ class PersonaService(IPersonaInterface):
         #definir logica
         return
        
-    def borrar_persona(self, id_persona):
-        
+    def borrar_persona(self, id_persona): 
         session = SessionLocal()
 
         try:
-
-            persona = session.query(Persona).get(id_persona)
+            persona = session.query(Persona).filter(
+                and_(
+                    Persona.id_persona == id_persona,
+                    Persona.deleted_at.is_(None)
+                )
+            ).first()
 
             if not persona:
-                return None
-            
-            if persona.contacto_id:
-            
+                return None           
+            if persona.contacto_id:            
                 self.contacto_service.borrar_contacto(persona.contacto_id , session)
             if persona.domicilio_id:
                 self.domicilio_service.borrar_domicilio(persona.domicilio_id, session)
 
             persona.deleted_at = datetime.now(timezone.utc)
-
             session.commit()
             return True
 
@@ -113,6 +114,30 @@ class PersonaService(IPersonaInterface):
         finally:
             session.close()
 
-       
-       
-        
+    def restaurar_persona(self, id):
+        session = SessionLocal()
+        try:
+            persona = session.query(Persona).get(id)
+
+            if not persona:
+                return None
+            
+            if persona.deleted_at is None:
+                return False
+
+            persona.deleted_at = None
+
+            if persona.contacto_id:
+                self.contacto_service.restaurar_contacto(persona.contacto_id, session)
+            if persona.domicilio_id:
+                self.domicilio_service.restaurar_domicilio(persona.domicilio_id, session)
+
+            session.commit()
+            return True
+
+        except Exception as e:
+            session.rollback()
+            raise e
+
+        finally:
+            session.close()

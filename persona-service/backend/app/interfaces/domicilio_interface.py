@@ -17,3 +17,7 @@ class IDomicilioInterface(ABC):
     @abstractmethod
     def borrar_domicilio(self, id):
         pass
+
+    @abstractmethod
+    def restaurar_domicilio(self, id):
+        pass
