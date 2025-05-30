@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from app.extensions import jwt, engine, Base
 from app.models.persona_model import Persona
 from app.models.contacto_model import Contacto
@@ -14,6 +15,8 @@ def create_app():
     app.config.from_object("config")
 
 
+    CORS(app, supports_credentials=True)
+    
     #Inicializa de las exteniciones
     jwt.init_app(app)
     
