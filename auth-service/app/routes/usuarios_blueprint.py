@@ -58,7 +58,9 @@ def registrar_usuario1():
     
     finally:
         session.close()
-
+registrar_usuario1._security_metadata ={
+    "is_public":True
+}
 
 @usuario_bp.route('/login1', methods=['POST'])
 def login1():
@@ -73,7 +75,7 @@ def login1():
                 message="Error de Schema",
                 data=e.messages
             ), 400
-
+        
         resultado = usuario_service.login_usuario(
             session,
             email=data_validada["email_usuario"],
@@ -101,7 +103,9 @@ def login1():
         ), 500
     finally:
         session.close()
-
+login1._security_metadata ={
+    "is_public":True
+}
 
 @usuario_bp.route('/perfil', methods=['GET'])
 def perfil_usuario():
