@@ -5,8 +5,8 @@ import os
 from flask_jwt_extended import JWTManager
 from config import Config
 from app.utils.utils_authorization import verificar_permisos
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
+from app.extensions import limiter
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -20,11 +20,7 @@ jwt = JWTManager(app)
 def control_acceso():
     verificar_permisos(app)
 
-limiter = Limiter(
-    get_remote_address,
-    app=app,
-    default_limits=["100 per minute"], 
-)
-    
+limiter.init_app(app)
+
 if __name__ == '__main__':
     app.run(debug=True,host='0.0.0.0', port=5000)

@@ -11,7 +11,7 @@ from app.utils.jwt import crear_token_acceso
 from marshmallow import ValidationError
 from app.utils.response import ResponseStatus, make_response
 from app.services.usuario_service import UsuarioService
-from flask_limiter import Limiter
+from app.extensions import limiter
 
 
 usuario_bp = Blueprint("usuario", __name__)
