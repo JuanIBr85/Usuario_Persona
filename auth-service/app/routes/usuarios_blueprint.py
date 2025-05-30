@@ -111,12 +111,35 @@ login1._security_metadata ={
 def perfil_usuario():
     datos = request.jwt_payload
     return json.dumps({"mensaje": "bienvenido al perfil"})
-
+perfil_usuario._security_metadata = {
+    "is_public":False,
+    "access_permissions": ["ver_usuario"]
+}
 
 @usuario_bp.route('/superadmin', methods=['GET'])
 def ruta_solo_superadmin():
-    return json.dumps({"mensaje": "Bienvenido, superadmin. Tienes acceso completo."})
+    session=SessionLocal()
+    try:
+        return json.dumps({"mensaje": "Bienvenido, superadmin. Tienes acceso completo."})
+    except ValueError as e:
+        session.rollback()
+        return make_response(
+            status=ResponseStatus.UNAUTHORIZED,
+            message=str(e)
+        ),401
+    except Exception as e:
+        session.rollback()
+        return make_response(
+                status=ResponseStatus.ERROR,
+                message=f"Error inesperado: {str(e)}"
+        ), 500
+    finally:
+        session.close()
 
+ruta_solo_superadmin._security_metadata = {
+    "is_public":False,
+    "access_permissions": ["crear_usuario"]  # o solo uno como "admin_total"
+}
 
 @usuario_bp.route('/admin', methods=['GET'])
 def ruta_solo_admin():

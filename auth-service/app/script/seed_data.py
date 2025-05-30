@@ -1,52 +1,29 @@
-# ejecutar siempre con python -m app.script.seed_data
+# ejecutar con: python -m app.script.seed_data
 
 from app.database.session import SessionLocal
-from app.models.rol import Rol
+from app.models.rol import Rol, RolUsuario
 from app.models.permisos import Permiso, RolPermiso
-
-# Roles base
-roles_base = ["superadmin", "servicio_admin", "usuario", "invitado"]
-
-# Permisos base (ejemplo genérico)
-permisos_base = [
-    "crear_usuario",
-    "ver_usuario",
-    "modificar_usuario",
-    "eliminar_usuario",
-    "crear_rol",
-    "asignar_rol",
-    "ver_roles",
-    "ver_permisos"
-]
-
-# Permisos por rol
-permisos_por_rol = {
-    "superadmin": permisos_base,
-    "servicio_admin": [
-        "crear_usuario", "ver_usuario", "modificar_usuario", "asignar_rol", "ver_roles"
-    ],
-    "usuario": [
-        "ver_usuario"
-    ],
-    "invitado": []
-}
+from app.models.usuarios import Usuario
+from werkzeug.security import generate_password_hash
+from datetime import datetime, timezone
+from app.constantes.permisos_const import PERMISOS, PERMISOS_POR_ROL
 
 def seed():
     db = SessionLocal()
 
     # Crear permisos
     permisos_creados = {}
-    for nombre_permiso in permisos_base:
-        permiso = db.query(Permiso).filter_by(nombre_permiso=nombre_permiso).first()
+    for nombre in PERMISOS:
+        permiso = db.query(Permiso).filter_by(nombre_permiso=nombre).first()
         if not permiso:
-            permiso = Permiso(nombre_permiso=nombre_permiso)
+            permiso = Permiso(nombre_permiso=nombre)
             db.add(permiso)
             db.commit()
             db.refresh(permiso)
-        permisos_creados[nombre_permiso] = permiso
+        permisos_creados[nombre] = permiso
 
     # Crear roles y asignar permisos
-    for nombre_rol in roles_base:
+    for nombre_rol, permisos in PERMISOS_POR_ROL.items():
         rol = db.query(Rol).filter_by(nombre_rol=nombre_rol).first()
         if not rol:
             rol = Rol(nombre_rol=nombre_rol)
@@ -54,24 +31,34 @@ def seed():
             db.commit()
             db.refresh(rol)
 
-        # Asignar permisos correspondientes
-    for nombre_permiso in permisos_por_rol[nombre_rol]:
-        permiso = permisos_creados[nombre_permiso]
-        print("permiso:", permiso)
-        print("permiso.id_permiso:", getattr(permiso, 'id_permiso', 'NO ENCONTRADO'))
-        
-        existe_relacion = db.query(RolPermiso).filter_by(
-            id_rol=rol.id_rol,
-            permiso_id=permiso.id_permiso  
-        ).first()
-        
-        if not existe_relacion:
-            db.add(RolPermiso(id_rol=rol.id_rol, permiso_id=permiso.id_permiso))  
-
+        for nombre_permiso in permisos:
+            permiso = permisos_creados[nombre_permiso]
+            existe = db.query(RolPermiso).filter_by(id_rol=rol.id_rol, permiso_id=permiso.id_permiso).first()
+            if not existe:
+                db.add(RolPermiso(id_rol=rol.id_rol, permiso_id=permiso.id_permiso))
 
     db.commit()
+
+    # Crear superadmin
+    email = "superadmin@admin.com"
+    superadmin = db.query(Usuario).filter_by(email_usuario=email).first()
+    if not superadmin:
+        superadmin = Usuario(
+            nombre_usuario="superadmin",
+            email_usuario=email,
+            password=generate_password_hash("admin123!"),
+            persona_id=None  # Hasta que se conecte con persona-service
+        )
+        db.add(superadmin)
+        db.commit()
+        db.refresh(superadmin)
+
+        rol_superadmin = db.query(Rol).filter_by(nombre_rol="superadmin").first()
+        db.add(RolUsuario(id_rol=rol_superadmin.id_rol, id_usuario=superadmin.id_usuario))
+        db.commit()
+
     db.close()
-    print("Roles, permisos y relaciones cargados correctamente.")
+    print("Seed ejecutado correctamente.")
 
 if __name__ == "__main__":
     seed()
