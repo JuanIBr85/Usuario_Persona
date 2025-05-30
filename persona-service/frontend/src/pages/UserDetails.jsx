@@ -9,6 +9,9 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+
+import { User } from "lucide-react"
 
 function UserDetails() {
     const { id } = useParams()
@@ -40,55 +43,42 @@ function UserDetails() {
     }
 
     return (
-        <div className='px-6 d-flex flex-column m-5'>
+        <div className="p-6 space-y-6 py-30 px-3 md:py-25 md:px-15">
             <Fade duration={300} triggerOnce>
-                <div className="bg-card overflow-hidden shadow rounded-lg border mb-5">
-                    <div className="px-4 py-5 sm:px-6">
-                        <h3 className="text-lg leading-6 font-medium text-gray-900">
-                            Perfil de Usuario
-                        </h3>
-                        <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                            Esta es información sobre el usuario.
-                        </p>
-                    </div>
-                    <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
-                        <dl className="sm:divide-y sm:divide-gray-200">
-                            <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                <dt className="text-sm font-medium text-gray-500">
-                                    Nombre completo
-                                </dt>
-                                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                    {user.nombre}
-                                </dd>
+                <Card>
+                    <CardHeader>
+                        <CardTitle> <span className='inline-flex items-center gap-1'> <User />  Perfil de Usuario</span></CardTitle>
+                        <CardDescription>Esta es información sobre el usuario.</CardDescription>
+                    </CardHeader>
+
+                    <CardContent>
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-4 border-b pb-4">
+                                <span className="text-sm text-gray-500 font-medium">Nombre completo</span>
+                                <span className="sm:col-span-2 text-sm text-gray-900">{user.nombre}</span>
                             </div>
-                            <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                <dt className="text-sm font-medium text-gray-500">
-                                    Correo electrónico
-                                </dt>
-                                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                    {user.email}
-                                </dd>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-4 border-b pb-4">
+                                <span className="text-sm text-gray-500 font-medium">Correo electrónico</span>
+                                <span className="sm:col-span-2 text-sm text-gray-900">{user.email}</span>
                             </div>
-                            <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                <dt className="text-sm font-medium text-gray-500">
-                                    Teléfono
-                                </dt>
-                                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                    {user.telefono}
-                                </dd>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-4 border-b pb-4">
+                                <span className="text-sm text-gray-500 font-medium">Teléfono</span>
+                                <span className="sm:col-span-2 text-sm text-gray-900">{user.telefono}</span>
                             </div>
-                            <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                <dt className="text-sm font-medium text-gray-500">
-                                    Dirección
-                                </dt>
-                                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2" style={{ whiteSpace: 'pre-line' }}>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-4">
+                                <span className="text-sm text-gray-500 font-medium">Dirección</span>
+                                <span className="sm:col-span-2 text-sm text-gray-900 whitespace-pre-line">
                                     {user.direccion}
-                                </dd>
+                                </span>
                             </div>
-                        </dl>
-                    </div>
-                </div>
-                <Breadcrumb className="mb-4">
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Breadcrumb className="mt-4 self-start">
                     <BreadcrumbList>
                         <BreadcrumbItem>
                             <BreadcrumbLink href="/adminpanel">Panel De Administrador</BreadcrumbLink>

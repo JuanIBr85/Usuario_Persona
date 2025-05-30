@@ -8,7 +8,7 @@ const Footer = () => {
           <a
             href="/"
             aria-label="Ir a inicio"
-            title="Compañía"
+            title="CREUS"
             className="inline-flex items-center"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-graduation-cap-icon lucide-graduation-cap">
@@ -22,12 +22,10 @@ const Footer = () => {
           </a>
           <div className="mt-6 lg:max-w-sm">
             <p className="text-sm text-gray-800 ">
-              Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-              accusantium doloremque laudantium, totam rem aperiam.
+              Centro Regional De Estudios Universitarios Suarense
             </p>
             <p className="mt-4 text-sm text-gray-800">
-              Eaque ipsa quae ab illo inventore veritatis et quasi architecto
-              beatae vitae dicta sunt explicabo.
+
             </p>
           </div>
         </div>
@@ -38,36 +36,52 @@ const Footer = () => {
           <div className="flex">
             <p className="mr-1 text-gray-800 ">Teléfono:</p>
             <a
-              href="tel:850-123-5021"
+              href="tel:2926451146"
+              aria-label="Nuestro teléfono"
+              title="Nuestro teléfono"
+              className="transition-colors duration-300 text-deep-purple-accent-400 hover:text-deep-purple-800 mr-1"
+            >
+              +54 (2926) 451146
+            </a>
+             <a
+              href="tel:2926429371"
+              aria-label="Nuestro teléfono"
+              title="Nuestro teléfono"
+              className="transition-colors duration-300 text-deep-purple-accent-400 hover:text-deep-purple-800 mr-1"
+            >
+              +54 (2926) 429371
+            </a>
+             <a
+              href="tel:2926429372"
               aria-label="Nuestro teléfono"
               title="Nuestro teléfono"
               className="transition-colors duration-300 text-deep-purple-accent-400 hover:text-deep-purple-800"
             >
-              850-123-5021
+              +54 (2926) 429372
             </a>
           </div>
           <div className="flex">
             <p className="mr-1 text-gray-800">Correo electrónico:</p>
             <a
-              href="mailto:info@lorem.mail"
+              href="mailto:consultas@creus.edu.ar"
               aria-label="Nuestro correo"
               title="Nuestro correo"
               className="transition-colors duration-300 text-deep-purple-accent-400 hover:text-deep-purple-800"
             >
-              info@lorem.mail
+              consultas@creus.edu.ar
             </a>
           </div>
           <div className="flex">
             <p className="mr-1 text-gray-800">Dirección:</p>
             <a
-              href="https://www.google.com/maps"
+              href="https://www.openstreetmap.org/#map=20/-37.4445931/-61.9241133&layers=H"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Nuestra dirección"
               title="Nuestra dirección"
               className="transition-colors duration-300 text-deep-purple-accent-400 hover:text-deep-purple-800"
             >
-              312 Lovely Street, NY
+              Rodolfo Rey s/n, 7540 Coronel Suárez - Buenos Aires - Argentina
             </a>
           </div>
         </div>
@@ -77,15 +91,7 @@ const Footer = () => {
           </span>
           <div className="flex items-center mt-1 space-x-3">
             <a
-              href="/"
-              className="text-gray-500 transition-colors duration-300 hover:text-deep-purple-accent-400"
-            >
-              <svg viewBox="0 0 24 24" fill="currentColor" className="h-5">
-                <path d="M24,4.6c-0.9,0.4-1.8,0.7-2.8,0.8c1-0.6,1.8-1.6,2.2-2.7c-1,0.6-2,1-3.1,1.2c-0.9-1-2.2-1.6-3.6-1.6 c-2.7,0-4.9,2.2-4.9,4.9c0,0.4,0,0.8,0.1,1.1C7.7,8.1,4.1,6.1,1.7,3.1C1.2,3.9,1,4.7,1,5.6c0,1.7,0.9,3.2,2.2,4.1 C2.4,9.7,1.6,9.5,1,9.1c0,0,0,0,0,0.1c0,2.4,1.7,4.4,3.9,4.8c-0.4,0.1-0.8,0.2-1.3,0.2c-0.3,0-0.6,0-0.9-0.1c0.6,2,2.4,3.4,4.6,3.4 c-1.7,1.3-3.8,2.1-6.1,2.1c-0.4,0-0.8,0-1.2-0.1c2.2,1.4,4.8,2.2,7.5,2.2c9.1,0,14-7.5,14-14c0-0.2,0-0.4,0-0.6 C22.5,6.4,23.3,5.5,24,4.6z" />
-              </svg>
-            </a>
-            <a
-              href="/"
+              href="https://www.instagram.com/suarezcreus/"
               className="text-gray-500 transition-colors duration-300 hover:text-deep-purple-accent-400"
             >
               <svg viewBox="0 0 30 30" fill="currentColor" className="h-6">
@@ -94,7 +100,7 @@ const Footer = () => {
               </svg>
             </a>
             <a
-              href="/"
+              href="https://www.facebook.com/suarezcreus/"
               className="text-gray-500 transition-colors duration-300 hover:text-deep-purple-accent-400"
             >
               <svg viewBox="0 0 24 24" fill="currentColor" className="h-5">
@@ -103,8 +109,7 @@ const Footer = () => {
             </a>
           </div>
           <p className="mt-4 text-sm text-gray-500">
-            Bacon ipsum dolor amet short ribs pig sausage prosciutto chicken
-            spare ribs salami.
+            Los contenidos de creus.edu.ar están licenciados bajo Creative Commons Reconocimiento 2.5 Argentina Licenciada
           </p>
         </div>
       </div>
