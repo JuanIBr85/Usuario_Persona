@@ -123,4 +123,35 @@ def borrar_persona(id):
             "errors": {"server": str(e)}
         }),500       
 
+#Restaurar una persona
+@persona_bp.route('/restaurar_persona/<int:id>', methods=['PATCH'])
+def restaurar_persona(id):
 
+    try:
+        restaura_persona = persona_service.restaurar_persona(id)
+
+        if restaura_persona is None:
+            return jsonify({
+                "status": "error",
+                "message": "Persona no encontrada",
+                "errors": {"id": f"No existe persona con ID {id}"}
+            }),404
+        
+        if restaura_persona is False:
+            return jsonify({
+                "status": "error",
+                "message": "La persona no está eliminada",
+                "errors": {"id": f"La persona con ID {id} no está marcada como eliminada"}
+            }),400
+               
+        return jsonify({
+            "status": "success",
+            "message": "Persona restaurada correctamente"          
+        }),200
+    
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": "Error al restaurar persona",
+            "errors": {"server": str(e)}
+        }),500
