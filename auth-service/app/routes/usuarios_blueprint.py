@@ -11,6 +11,7 @@ from app.utils.jwt import crear_token_acceso
 from marshmallow import ValidationError
 from app.utils.response import ResponseStatus, make_response
 from app.services.usuario_service import UsuarioService
+from app.extensions import limiter
 
 
 usuario_bp = Blueprint("usuario", __name__)
@@ -63,6 +64,7 @@ registrar_usuario1._security_metadata ={
 }
 
 @usuario_bp.route('/login1', methods=['POST'])
+@limiter.limit("5 per minute")
 def login1():
     session = SessionLocal()
     try:
