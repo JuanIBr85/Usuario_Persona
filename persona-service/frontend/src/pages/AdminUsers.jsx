@@ -79,14 +79,14 @@ function AdminUsers() {
                       <TableCell className="text-right">
                         <div className="flex justify-end items-center gap-2">
                           <Button variant="outline" onClick={() => handleSeeDetails(user.id)}>
-                            <Eye className="mr-1" /> Ver
+                            <Eye className="mr-1" /> Ver Más
                           </Button>
 
                           <Button
                             variant="outline"
                             onClick={() => setEditingUser({ ...user })}
                           >
-                            <Pencil className="mr-1" /> Editar
+                            <Pencil className="mr-1" /> Edición Rapida
                           </Button>
 
                           <Dialog>
