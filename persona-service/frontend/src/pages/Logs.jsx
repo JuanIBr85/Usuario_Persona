@@ -38,10 +38,25 @@ const config = {
   admins: { label: "Admins", color: "#f87171" },
 }
 
+const totalPorRol = data.reduce(
+  (totals, entry) => {
+    totals.profesores += entry.profesores
+    totals.alumnos += entry.alumnos
+    totals.admins += entry.admins
+    return totals
+  },
+  { profesores: 0, alumnos: 0, admins: 0 }
+)
+
 export default function Logs() {
   return (
     <div className="p-6 space-y-6 py-30 px-3 md:pl-70 md:pr-70 md:pt-10">
       <Fade duration={300} triggerOnce>
+        <h2 className="text-2xl font-bold">Estadísticas Mensuales</h2>
+        <p className="text-muted-foreground mb-4">
+          Visualización de registros mensuales de usuarios por tipo de rol.
+        </p>
+
         <Card>
           <CardContent>
             <ChartContainer config={config} className="min-h-[200px] w-full">
@@ -63,6 +78,21 @@ export default function Logs() {
             </ChartContainer>
           </CardContent>
         </Card>
+
+        <div className="flex flex-col sm:flex-row gap-4 justify-around text-center mt-4">
+          <div>
+            <p className="text-blue-500 font-semibold text-lg">{totalPorRol.profesores}</p>
+            <p className="text-muted-foreground text-sm">Total Profesores</p>
+          </div>
+          <div>
+            <p className="text-yellow-500 font-semibold text-lg">{totalPorRol.alumnos}</p>
+            <p className="text-muted-foreground text-sm">Total Alumnos</p>
+          </div>
+          <div>
+            <p className="text-red-500 font-semibold text-lg">{totalPorRol.admins}</p>
+            <p className="text-muted-foreground text-sm">Total Admins</p>
+          </div>
+        </div>
 
         <Breadcrumb className="mt-auto self-start">
           <BreadcrumbList>
