@@ -1,23 +1,15 @@
 import React, { useState } from "react";
-import {
-  Table, TableBody, TableCaption, TableCell, TableHead,
-  TableHeader, TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
 import { Fade } from "react-awesome-reveal";
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Pencil, Eye, Trash2 } from "lucide-react";
-import {
-  Breadcrumb, BreadcrumbItem, BreadcrumbLink,
-  BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import {
-  Dialog, DialogClose, DialogContent, DialogDescription,
-  DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
-} from "@/components/ui/dialog";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, } from "@/components/ui/breadcrumb";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
 
 function AdminUsers() {
   const navigate = useNavigate();
@@ -154,7 +146,6 @@ function AdminUsers() {
               Modifica los datos del usuario. Guarda los cambios al finalizar.
             </DialogDescription>
           </DialogHeader>
-
           {editingUser && (
             <form onSubmit={handleEditSubmit}>
               <div className="grid gap-4 py-4">
@@ -168,11 +159,20 @@ function AdminUsers() {
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="rol">Rol</Label>
-                  <Input
-                    id="rol"
-                    value={editingUser.rol}
-                    onChange={(e) => setEditingUser({ ...editingUser, rol: e.target.value })}
-                  />
+                  <Select
+                    onValueChange={(value) => setEditingUser({ ...editingUser, rol: value })}
+                  >
+                    {console.log(editingUser.rol)}
+                    <SelectTrigger id="rol" className="w-full">
+                      <SelectValue placeholder="Selecciona un rol" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Alumno">Alumno</SelectItem>
+                      <SelectItem value="Profesor">Profesor</SelectItem>
+                      <SelectItem value="Admin">Admin</SelectItem>
+                      <SelectItem value="Invitado">Invitado</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
@@ -185,11 +185,19 @@ function AdminUsers() {
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="status">Status</Label>
-                  <Input
-                    id="status"
-                    value={editingUser.status}
-                    onChange={(e) => setEditingUser({ ...editingUser, status: e.target.value })}
-                  />
+                  <Select
+                    onValueChange={(value) => setEditingUser({ ...editingUser, status: value })}
+                  >
+                    {console.log(editingUser.rol)}
+                    <SelectTrigger id="status" className="w-full">
+                      <SelectValue placeholder="Selecciona un status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Activo">Activo</SelectItem>
+                      <SelectItem value="Egresado">Egresado</SelectItem>
+                      <SelectItem value="Despedido">Despedido</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               <DialogFooter>
