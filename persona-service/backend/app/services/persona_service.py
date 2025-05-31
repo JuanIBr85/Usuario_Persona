@@ -9,7 +9,7 @@ from app.models.persona_model import Persona
 #Se importan los servicios
 from app.services.contacto_service import ContactoService
 from app.services.domicilio_service import DomicilioService
-from app.services.tipo_documente_service import TipoDocumentoService
+
 
 #Otras importaciones
 from app.schema.persona_schema import PersonaSchema
@@ -23,7 +23,7 @@ class PersonaService(IPersonaInterface):
         self.varios_schemas = PersonaSchema(many=True)
         self.contacto_service = ContactoService()
         self.domicilio_service = DomicilioService()
-        self.tipo_documento_service = TipoDocumentoService()
+        
 
     def listar_personas(self):
         session = SessionLocal()
@@ -57,14 +57,14 @@ class PersonaService(IPersonaInterface):
             
             data_validada=self.schema.load(data)
 
-            #Se crea el contacto, domicilio y documento
+            #Se crea el contacto, domicilio
             domicilio = self.domicilio_service.crear_domicilio(data_validada.pop('domicilio'), session=session)
             contacto = self.contacto_service.crear_contacto(data_validada.pop('contacto'), session=session)
-            tipo_documento = self.tipo_documento_service.crear_tipo_documento(data_validada.pop('tipo_documento'), session=session)
 
             data_validada['domicilio_id']=domicilio.id_domicilio
             data_validada['contacto_id']=contacto.id_contacto
-            data_validada['tipo_documento_id']=tipo_documento.id_tipo_documento
+            data_validada['tipo_documento']=data_validada.pop('tipo_documento')
+            
 
             # Crear Persona
             persona_nueva=Persona(**data_validada)
