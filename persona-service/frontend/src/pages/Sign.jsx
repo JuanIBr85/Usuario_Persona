@@ -62,9 +62,8 @@ function Sign() {
               </form>
             </CardContent>
             <CardFooter className="justify-center flex">
-              <Button variant="link" asChild><Link to="*">Termino de uso</Link></Button>
-              |
-              <Button variant="link" asChild><Link to="*">Politica de privacidad</Link></Button>
+              <Button variant="link" ><Link to="/termsofservice">Terminos de uso</Link></Button>
+              <Button variant="link" ><Link to="/privacypolicy">Politica de privacidad</Link></Button>
             </CardFooter>
           </Card>
         </div>

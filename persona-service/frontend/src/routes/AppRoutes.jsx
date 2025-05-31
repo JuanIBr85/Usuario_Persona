@@ -11,8 +11,10 @@ import Logs from '../pages/Logs';
 import AdminUsers from '../pages/AdminUsers';
 import AdminRoles from '../pages/AdminRoles';
 import UserDetails from '../pages/UserDetails';
+import PrivacyPolicy from '../pages/PrivacyPolicy';
+import TermsOfService from '../pages/TermsOfService';
+import Faq from '../pages/Faq';
 
-import { PruebaChart } from '../pages/PruebaChart';
 function AppRoutes() {
   return (
     <Routes>
@@ -27,7 +29,9 @@ function AppRoutes() {
       <Route path="adminusers" element={<AdminUsers />} />
       <Route path="adminroles" element={<AdminRoles />} />
       <Route path="userdetails/:id" element={<UserDetails />} />
-      <Route path="/prueba" element={<PruebaChart />} />
+      <Route path="privacypolicy" element={<PrivacyPolicy />} />
+      <Route path="termsofservice" element={<TermsOfService />} />
+      <Route path="faq" element={<Faq />} />
     </Routes>
   )
 }

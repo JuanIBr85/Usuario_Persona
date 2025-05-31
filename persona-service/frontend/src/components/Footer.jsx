@@ -1,12 +1,14 @@
 import React from "react";
-import { Separator } from "@/components/ui/separator"
+import { Separator } from "@/components/ui/separator";
+import { Link } from "react-router-dom";
+
 const Footer = () => {
   return (
     <footer className="bg-gray-100 dark:bg-card px-4 pt-16 w-full mx-auto max-w-full px-lg:px-24  lg:px-8">
       <div className="grid gap-10 row-gap-6 mb-8 sm:grid-cols-2 lg:grid-cols-4">
         <div className="sm:col-span-2">
-          <a
-            href="/"
+          <Link
+            to="/"
             aria-label="Ir a inicio"
             title="CREUS"
             className="inline-flex items-center"
@@ -19,7 +21,7 @@ const Footer = () => {
             <span className="ml-2 text-xl font-bold tracking-wide text-gray-800 uppercase">
               CREUS
             </span>
-          </a>
+          </Link>
           <div className="mt-6 lg:max-w-sm">
             <p className="text-sm text-gray-800 ">
               Centro Regional De Estudios Universitarios Suarense
@@ -117,28 +119,28 @@ const Footer = () => {
       <div className="flex flex-col-reverse justify-between pt-5 pb-10 border-t lg:flex-row">
         <ul className="flex flex-col mb-3 space-y-2 lg:mb-0 sm:space-y-0 sm:space-x-5 sm:flex-row">
           <li>
-            <a
-              href="/"
+            <Link
+              to="/faq"
               className="text-sm text-gray-600 transition-colors duration-300 hover:text-deep-purple-accent-400"
             >
               Preguntas frecuentes
-            </a>
+            </Link>
           </li>
           <li>
-            <a
-              href="/"
+            <Link
+              to="/privacypolicy"
               className="text-sm text-gray-600 transition-colors duration-300 hover:text-deep-purple-accent-400"
             >
               Política de privacidad
-            </a>
+            </Link>
           </li>
           <li>
-            <a
-              href="/"
+            <Link
+              to="/termsofservice"
               className="text-sm text-gray-600 transition-colors duration-300 hover:text-deep-purple-accent-400"
             >
               Términos y condiciones
-            </a>
+            </Link>
           </li>
         </ul>
       </div>

@@ -18,7 +18,7 @@ function Login() {
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="flex items-center justify-center h-full ">
-                            <KeyRound className="text-white w-42 h-42"  />
+                            <KeyRound className="text-white w-42 h-42" />
                         </CardContent>
                         <CardFooter className="flex justify-center">
                         </CardFooter>
@@ -55,9 +55,8 @@ function Login() {
                             </form>
                         </CardContent>
                         <CardFooter className="justify-center flex">
-                            <Button variant="link" asChild><Link to="*">Termino de uso</Link></Button>
-                            |
-                            <Button variant="link" asChild><Link to="*">Politica de privacidad</Link></Button>
+                            <Button variant="link" ><Link to="/termsofservice">Terminos de uso</Link></Button>
+                            <Button variant="link" ><Link to="/privacypolicy">Politica de privacidad</Link></Button>
                         </CardFooter>
                     </Card>
                 </div>
