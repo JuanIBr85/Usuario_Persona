@@ -18,7 +18,19 @@ import {
     CardTitle
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { User, Pencil } from "lucide-react";
+
+import {
+    User,
+    Pencil,
+    Mail,
+    Phone,
+    MapPin,
+    BadgeCheck,
+    Calendar,
+    IdCard,
+    DollarSign
+} from "lucide-react";
+
 import {
     Dialog,
     DialogClose,
@@ -98,51 +110,71 @@ function UserDetails() {
 
                     <CardContent className="space-y-4">
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-4 border-b pb-4">
-                            <span className="text-sm text-gray-500 font-medium">Nombre completo</span>
+                            <span className="text-sm text-gray-500 font-medium inline-flex items-center gap-1">
+                                <User className="w-4 h-4" /> Nombre completo
+                            </span>
                             <span className="sm:col-span-2 text-sm text-gray-900">{user.nombre}</span>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-4 border-b pb-4">
-                            <span className="text-sm text-gray-500 font-medium">Correo electrónico</span>
+                            <span className="text-sm text-gray-500 font-medium inline-flex items-center gap-1">
+                                <Mail className="w-4 h-4" /> Correo electrónico
+                            </span>
                             <span className="sm:col-span-2 text-sm text-gray-900">{user.email}</span>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-4 border-b pb-4">
-                            <span className="text-sm text-gray-500 font-medium">Teléfono</span>
+                            <span className="text-sm text-gray-500 font-medium inline-flex items-center gap-1">
+                                <Phone className="w-4 h-4" /> Teléfono
+                            </span>
                             <span className="sm:col-span-2 text-sm text-gray-900">{user.telefono}</span>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-4 border-b pb-4">
-                            <span className="text-sm text-gray-500 font-medium">Dirección</span>
+                            <span className="text-sm text-gray-500 font-medium inline-flex items-center gap-1">
+                                <MapPin className="w-4 h-4" /> Dirección
+                            </span>
                             <span className="sm:col-span-2 text-sm text-gray-900 whitespace-pre-line">{user.direccion}</span>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-4">
-                            <span className="text-sm text-gray-500 font-medium">Rol</span>
+                            <span className="text-sm text-gray-500 font-medium inline-flex items-center gap-1">
+                                <BadgeCheck className="w-4 h-4" /> Rol
+                            </span>
                             <span className="sm:col-span-2 text-sm text-gray-900">{user.rol}</span>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-4">
-                            <span className="text-sm text-gray-500 font-medium">Status</span>
+                            <span className="text-sm text-gray-500 font-medium inline-flex items-center gap-1">
+                                <BadgeCheck className="w-4 h-4" /> Status
+                            </span>
                             <span className="sm:col-span-2 text-sm text-gray-900">{user.status}</span>
                         </div>
+
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-4 border-b pb-4">
-                            <span className="text-sm text-gray-500 font-medium">Fecha de Registro</span>
+                            <span className="text-sm text-gray-500 font-medium inline-flex items-center gap-1">
+                                <Calendar className="w-4 h-4" /> Fecha de Registro
+                            </span>
                             <span className="sm:col-span-2 text-sm text-gray-900">{user.fechaRegistro}</span>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-4 border-b pb-4">
-                            <span className="text-sm text-gray-500 font-medium">DNI</span>
+                            <span className="text-sm text-gray-500 font-medium inline-flex items-center gap-1">
+                                <IdCard className="w-4 h-4" /> DNI
+                            </span>
                             <span className="sm:col-span-2 text-sm text-gray-900">{user.dni}</span>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-4">
-                            <span className="text-sm text-gray-500 font-medium">¿Cobra beca?</span>
+                            <span className="text-sm text-gray-500 font-medium inline-flex items-center gap-1">
+                                <DollarSign className="w-4 h-4" /> ¿Cobra beca?
+                            </span>
                             <span className="sm:col-span-2 text-sm text-gray-900">{user.beca}</span>
                         </div>
+
                     </CardContent>
 
-                    <CardFooter className="justify-end">
+                    <CardFooter className="justify-start">
                         <Button
                             variant="outline"
                             onClick={() => setEditingUser({ ...user })}
