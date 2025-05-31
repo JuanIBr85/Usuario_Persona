@@ -25,7 +25,7 @@ const AccessibilityMenu = () => {
         document.documentElement.classList.toggle('font-dyslexia', accessibilityData.fontType === 'font-dyslexia');
         document.documentElement.classList.toggle('font-low-vision', accessibilityData.fontType === 'low-vision');
 
-        // Save settings to localStorage
+        // Carga los datos de accesibilidad al localStorage
         localStorage.setItem('AccessibilityData', JSON.stringify(accessibilityData));
     }, [accessibilityData]);
 
@@ -64,7 +64,7 @@ const AccessibilityMenu = () => {
                             onChange={(e) => updateAccessibilityData({ fontType: e.target.value })}
                             className="px-2 py-1 border rounded cursor-pointer bg-card"
                         >
-                            <option value="" selected>Por defecto</option>
+                            <option value="">Por defecto</option>
                             <option value="font-dyslexia">Para dislexia</option>
                             <option value="low-vision">Baja visión</option>
                         </select>
