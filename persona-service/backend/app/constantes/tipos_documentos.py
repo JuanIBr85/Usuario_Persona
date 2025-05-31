@@ -4,5 +4,6 @@ TIPOS_DOCUMENTO_VALIDOS = [
     "LC",
     "CI",
     "Pasaporte",
-    "Otro"
+    "CUIT",
+    "CUIL"
 ]

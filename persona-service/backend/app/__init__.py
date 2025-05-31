@@ -4,7 +4,6 @@ from app.extensions import jwt, engine, Base
 from app.models.persona_model import Persona
 from app.models.contacto_model import Contacto
 from app.models.domicilio_model import Domicilio
-from app.models.tipo_doc_model import TipoDocumento
 from app.models.domicilio_postal_model import Domicilio_Postal
 
 
@@ -22,7 +21,9 @@ def create_app():
     
     #Registro de blueprints
     from app.routes.persona_routes import persona_bp
+    from app.routes.opciones_routes import opciones_bp
     app.register_blueprint(persona_bp, url_prefix='/api')
+    app.register_blueprint(opciones_bp, url_prefix='/api')
 
     #Crear tablas si no existen
     
