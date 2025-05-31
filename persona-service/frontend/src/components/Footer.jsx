@@ -1,5 +1,5 @@
 import React from "react";
-
+import { Separator } from "@/components/ui/separator"
 const Footer = () => {
   return (
     <footer className="bg-gray-100 dark:bg-card px-4 pt-16 w-full mx-auto max-w-full px-lg:px-24  lg:px-8">
@@ -25,7 +25,7 @@ const Footer = () => {
               Centro Regional De Estudios Universitarios Suarense
             </p>
             <p className="mt-4 text-sm text-gray-800">
-
+              Lorem, ipsum dolor.
             </p>
           </div>
         </div>
@@ -43,7 +43,7 @@ const Footer = () => {
             >
               +54 (2926) 451146
             </a>
-             <a
+            <a
               href="tel:2926429371"
               aria-label="Nuestro teléfono"
               title="Nuestro teléfono"
@@ -51,7 +51,7 @@ const Footer = () => {
             >
               +54 (2926) 429371
             </a>
-             <a
+            <a
               href="tel:2926429372"
               aria-label="Nuestro teléfono"
               title="Nuestro teléfono"
@@ -108,6 +108,7 @@ const Footer = () => {
               </svg>
             </a>
           </div>
+          <Separator className="my-4" />
           <p className="mt-4 text-sm text-gray-500">
             Los contenidos de creus.edu.ar están licenciados bajo Creative Commons Reconocimiento 2.5 Argentina Licenciada
           </p>

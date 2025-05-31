@@ -1,19 +1,29 @@
-import React from 'react'
-import { ChartContainer } from "@/components/ui/chart"
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
-import { ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { ChartLegend, ChartLegendContent } from "@/components/ui/chart"
+import React from "react"
+import { Fade } from "react-awesome-reveal"
+import {
+  BarChart,
+  CartesianGrid,
+  XAxis,
+  Bar,
+} from "recharts"
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+} from "@/components/ui/chart"
 import {
   Breadcrumb,
+  BreadcrumbList,
   BreadcrumbItem,
   BreadcrumbLink,
-  BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import { Card, CardContent } from "@/components/ui/card"
 
-
-const chartData = [
+const data = [
   { month: "Enero", profesores: 34, alumnos: 80, admins: 5 },
   { month: "Febrero", profesores: 40, alumnos: 100, admins: 4 },
   { month: "Marzo", profesores: 30, alumnos: 90, admins: 6 },
@@ -21,39 +31,28 @@ const chartData = [
   { month: "Mayo", profesores: 35, alumnos: 85, admins: 7 },
   { month: "Junio", profesores: 32, alumnos: 88, admins: 5 },
 ]
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Fade } from "react-awesome-reveal";
 
-const chartConfig = {
-  profesores: {
-    label: "Profesores",
-    color: "#60a5fa",
-  },
-  alumnos: {
-    label: "Alumnos",
-    color: "#fbbf24",
-  },
-  admins: {
-    label: "Admins",
-    color: "#f87171",
-  },
+const config = {
+  profesores: { label: "Profesores", color: "#60a5fa" },
+  alumnos: { label: "Alumnos", color: "#fbbf24" },
+  admins: { label: "Admins", color: "#f87171" },
 }
 
-function Logs() {
+export default function Logs() {
   return (
-    <div className="p-6 space-y-6 py-30 px-3 md:py-25 md:px-15">
+    <div className="p-6 space-y-6 py-30 px-3 md:pl-70 md:pr-70 md:pt-10">
       <Fade duration={300} triggerOnce>
         <Card>
           <CardContent>
-            <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-              <BarChart accessibilityLayer data={chartData}>
+            <ChartContainer config={config} className="min-h-[200px] w-full">
+              <BarChart accessibilityLayer data={data}>
                 <CartesianGrid vertical={false} />
                 <XAxis
                   dataKey="month"
                   tickLine={false}
                   tickMargin={10}
                   axisLine={false}
-                  tickFormatter={(value) => value.slice(0, 3)}
+                  tickFormatter={val => val.slice(0, 3)}
                 />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <ChartLegend content={<ChartLegendContent />} />
@@ -80,5 +79,3 @@ function Logs() {
     </div>
   )
 }
-
-export default Logs

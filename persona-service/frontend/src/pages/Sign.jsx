@@ -4,26 +4,25 @@ import { Button } from "@/components/ui/button";
 import InputValidate from "@/components/inputValidate/InputValidate";
 import { Link } from 'react-router-dom';
 import { Fade } from "react-awesome-reveal";
+import { UserPlus } from "lucide-react";
 
 function Sign() {
   return (
     <Fade duration={500} triggerOnce>
       <div className="h-screen flex items-center justify-center">
-
         <div className="flex w-full h-full sm:h-[520px] sm:max-w-md md:max-w-3xl shadow-md rounded-xl overflow-hidden">
-
           {/*Card informacion extra o algo para mostrar*/}
-          <Card className="w-full md:max-w-md h-full bg-blue-600 hidden md:block rounded-none">
+          <Card className="w-full md:max-w-md h-full bg-[var(--color-primario)] hidden md:block rounded-none">
             <CardHeader>
               <CardTitle className="text-2xl text-center">
               </CardTitle>
             </CardHeader>
-            <CardContent className=" h-full">
+            <CardContent className="flex items-center justify-center h-full ">
+              <UserPlus className="text-white w-42 h-42" />
             </CardContent>
             <CardFooter className="flex justify-center">
             </CardFooter>
           </Card>
-
           {/*Card registro*/}
           <Card className="w-full md:max-w-md h-full rounded-none">
             <CardHeader>
