@@ -159,6 +159,10 @@ function UserDetails() {
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />
                         <BreadcrumbItem>
+                            <BreadcrumbLink href="/adminusers">Panel De Usuarios</BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
                             <BreadcrumbPage>Detalles del Usuario</BreadcrumbPage>
                         </BreadcrumbItem>
                     </BreadcrumbList>
