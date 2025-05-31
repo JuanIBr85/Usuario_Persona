@@ -1,19 +1,19 @@
 import { Routes, Route } from 'react-router-dom';
 
 import React from 'react'
-import Profile from '../pages/Profile';
-import AdminPanel from '../pages/AdminPanel';
-import NotFound from '../pages/NotFound';
-import Login from '../pages/Login';
-import Logout from '../pages/Logout';
-import Sign from '../pages/Sign';
-import Logs from '../pages/Logs';
-import AdminUsers from '../pages/AdminUsers';
-import AdminRoles from '../pages/AdminRoles';
-import UserDetails from '../pages/UserDetails';
-import PrivacyPolicy from '../pages/PrivacyPolicy';
-import TermsOfService from '../pages/TermsOfService';
-import Faq from '../pages/Faq';
+import Profile from '@/pages/Profile';
+import AdminPanel from '@/pages/AdminPanel';
+import NotFound from '@/pages/NotFound';
+import Login from '@/pages/Login';
+import Logout from '@/pages/Logout';
+import Sign from '@/pages/Sign';
+import Logs from '@/pages/Logs';
+import AdminUsers from '@/pages/AdminUsers';
+import AdminRoles from '@/pages/AdminRoles';
+import UserDetails from '@/pages/UserDetails';
+import TermsOfService from '@/pages/TermsOfService';
+import AboutPrivacyPolicy from '@/pages/AboutPrivacyPolicy';
+import Faq from '@/pages/Faq';
 
 function AppRoutes() {
   return (
@@ -29,7 +29,7 @@ function AppRoutes() {
       <Route path="adminusers" element={<AdminUsers />} />
       <Route path="adminroles" element={<AdminRoles />} />
       <Route path="userdetails/:id" element={<UserDetails />} />
-      <Route path="privacypolicy" element={<PrivacyPolicy />} />
+      <Route path="privacypolicy" element={<AboutPrivacyPolicy />} />
       <Route path="termsofservice" element={<TermsOfService />} />
       <Route path="faq" element={<Faq />} />
     </Routes>

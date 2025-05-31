@@ -1,7 +1,7 @@
 import React from 'react';
 import { Fade } from "react-awesome-reveal";
 
-function PrivacyPolicy() {
+function AboutPrivacyPolicy() {
     return (
         <Fade duration={500} triggerOnce>
 
@@ -64,4 +64,4 @@ function PrivacyPolicy() {
     );
 }
 
-export default PrivacyPolicy;
+export default AboutPrivacyPolicy;
