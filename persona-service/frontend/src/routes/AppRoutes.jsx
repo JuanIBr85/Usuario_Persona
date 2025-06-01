@@ -18,12 +18,15 @@ import Faq from '@/pages/Faq';
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="*" element={<NotFound />} />
       <Route path="/" element={<AdminPanel />} />
       <Route path="profile" element={<Profile />} />
       <Route path="adminpanel" element={<AdminPanel />} />
       <Route path="login" element={<Login />} />
+      <Route path="login/termsofservice" element={<TermsOfService />} />
+      <Route path="login/privacypolicy" element={<AboutPrivacyPolicy />} />
       <Route path="sign" element={<Sign />} />
+      <Route path="sign/termsofservice" element={<TermsOfService />} />
+      <Route path="sign/privacypolicy" element={<AboutPrivacyPolicy />} />
       <Route path="logout" element={<Logout />} />
       <Route path="logs" element={<Logs />} />
       <Route path="adminusers" element={<AdminUsers />} />
@@ -32,6 +35,7 @@ function AppRoutes() {
       <Route path="privacypolicy" element={<AboutPrivacyPolicy />} />
       <Route path="termsofservice" element={<TermsOfService />} />
       <Route path="faq" element={<Faq />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   )
 }

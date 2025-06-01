@@ -7,7 +7,7 @@ import AccessibilityMenu from './AccesibilityMenu';
 
 const Layout = ({ children }) => {
   const location = useLocation();
-  const hideHeaderFooter = location.pathname === "/login" || location.pathname === "/sign";
+  const hideHeaderFooter = location.pathname.startsWith("/login") || location.pathname.startsWith("/sign");
 
   return (
     <div className="flex flex-col h-screen">
