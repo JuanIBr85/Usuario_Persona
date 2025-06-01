@@ -95,6 +95,32 @@ def crear_persona():
             "message": "Error interno del servidor",
             "errors": {"server": str(e)}
         }),500
+    
+# modificar persona, siguiendo el formato json sugerido    
+@persona_bp.route('/modificar_persona/<int:id>', methods=['PUT'])
+def modificar_persona(id):
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No se enviaron datos"}), 400
+
+        persona = persona_service.modificar_persona(id, data)
+        if persona is None:
+            return jsonify({"error": "Persona no encontrada"}), 404
+
+        return jsonify({
+            "status": "success",
+            "message": "Persona modificada correctamente",
+            "data": persona
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": "Error al modificar persona",
+            "errors": {"server": str(e)}
+        }), 500
+
 
 #borrar una persona
 @persona_bp.route('/borrar_persona/<int:id>', methods=['DELETE'])

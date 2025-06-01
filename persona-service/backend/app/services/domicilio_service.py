@@ -46,8 +46,28 @@ class DomicilioService(IDomicilioInterface):
               if cerrar:
                 session.close()         
     
-    def modificar_domicilio(self, id):
-        return
+    def modificar_domicilio(self, id_domicilio, data, session):
+        domicilio = session.query(Domicilio).get(id_domicilio)
+        if not domicilio:
+            raise ValueError("Domicilio no encontrado")
+
+        campos_modificables = ['domicilio_calle', 'domicilio_numero', 'domicilio_piso', 'domicilio_dpto']
+
+        for campo in campos_modificables:
+            if campo in data:
+                setattr(domicilio, campo, data[campo])
+
+        ''' esta parte permite cambiar el id del codigo postal si se incluye
+        codigo_postal es dump_only por lo que no se lo espera en edicion'''
+
+        if 'codigo_postal_id' in data:
+            domicilio.codigo_postal_id = data['codigo_postal_id']
+
+        domicilio.updated_at = datetime.now(timezone.utc)
+
+        session.flush() 
+        return domicilio
+        
     
     def borrar_domicilio(self, id_domicilio, session=None):
         cerrar= False
