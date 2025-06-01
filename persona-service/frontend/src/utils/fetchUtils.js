@@ -1,4 +1,8 @@
-export const API_URL = "http://127.0.0.1:5001";
+
+export const ServiceURL = Object.freeze({
+    auth: "http://localhost:5000",
+    persona: "http://localhost:5001",
+});
 
 // Lista de métodos HTTP que podemos usar para comunicarnos con el servidor
 export const HttpMethod = Object.freeze({
@@ -11,6 +15,14 @@ export const HttpMethod = Object.freeze({
     HEAD: "HEAD",      // Para obtener solo los headers (sin contenido)
 });
 
+export class FetchError extends Error {
+  constructor(mensaje, isJson, statusCode, data) {
+    super(mensaje); 
+    this.isJson = isJson; 
+    this.statusCode = statusCode; 
+    this.data = data; 
+  }
+}
 
 // PARÁMETROS:
 // - url: string - Ruta específica de la API a la que queremos hacer la petición
@@ -28,7 +40,7 @@ export const fetchService = {
     useDefaultUrl: ({ url, method, headers = {}, body, useToken, returnJson = true, showError = true, timeout = 1000 * 5 }) => {
         // Simplemente llama al método fetch() pero agregando la URL base automáticamente
         return fetchService.fetch({
-            url: `${API_URL}/${url}`, // Combina la URL base con la ruta específica
+            url: `${ServiceURL.persona}/${url}`, // Combina la URL base con la ruta específica
             method, 
             headers, 
             body, 
@@ -70,8 +82,23 @@ export const fetchService = {
         .then(async (response) => {
             // Si la respuesta no es exitosa (status 200-299), lanzamos un error
             if (!response.ok) {
-                const errorText = await response.text(); // Obtenemos el mensaje de error
-                throw new Error(`Error: ${response.status} - ${errorText}`);
+                let errorData = undefined;
+                let isJson = false;
+                try{
+                    errorData = await response.json();
+                    isJson = true;
+                }catch(e){
+                    errorData = await response.text();
+                }
+
+
+                 // Obtenemos el mensaje de error
+                throw new FetchError(
+                    `Fetch [${url}] error: ${response.status} ${response.statusText}`, 
+                    isJson, 
+                    response.status, 
+                    errorData
+                );
             }
             
             // Si returnJson es true, convertimos la respuesta a JSON; si no, devolvemos la respuesta tal como está
@@ -79,7 +106,18 @@ export const fetchService = {
         })
         .catch((error) => {
             if(showError)console.error(`Fetch [${url}] error:`, error);
-            throw error; 
+            
+            if(error instanceof FetchError) {
+                // Si ya es un FetchError, lo volvemos a lanzar
+                throw error;
+            }
+
+            throw FetchError(
+                `Fetch [${url}] error: ${error.message}`, 
+                false, 
+                error.statusCode || 500, 
+                error.data || null
+            ); 
         })
         .finally(() => {
             // Limpia el temporizador, sin importar si la petición fue exitosa o no

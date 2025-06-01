@@ -5,10 +5,50 @@ import InputValidate from "@/components/inputValidate/InputValidate";
 import { Link } from 'react-router-dom';
 import { Fade } from "react-awesome-reveal";
 import { UserPlus } from "lucide-react";
+import { formSubmitJson } from "@/utils/formUtils";
+import { fetchService, HttpMethod, ServiceURL } from "@/utils/fetchUtils";
+import {SimpleDialog, FetchErrorMessage} from "@/components/SimpleDialog";
 
 function Sign() {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [dialogMessage, setMessage] = React.useState("");
+
+  const handleSubmit = async (event) => {
+    const formData = await formSubmitJson(event);
+    fetchService.fetch({
+      url: `${ServiceURL.auth}/registro1`,
+      method: HttpMethod.POST,
+      body: formData,
+      showError: false
+    }).then((json) => {
+      console.log(json);
+      setMessage(`La cuenta ha sido creada correctamente. Por favor, verifique su correo electrónico para activar su cuenta.`);
+      setIsOpen(true);
+    }).catch((error) => {
+      if (error.isJson) {
+        if(error.data.error){
+          setMessage(FetchErrorMessage(error));
+        }else{
+          setMessage(error.data.message || "Error desconocido");
+        }
+      } else {
+        setMessage(error.message);
+      }
+
+      setIsOpen(true);
+    });
+  }
+
   return (
     <Fade duration={500} triggerOnce>
+      <SimpleDialog
+        title="Registro"
+        description={dialogMessage}
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+      />
+
+
       <div className="h-screen flex items-center justify-center">
         <div className="flex w-full h-full sm:h-[520px] sm:max-w-md md:max-w-3xl shadow-md rounded-xl overflow-hidden">
           {/*Card informacion extra o algo para mostrar*/}
@@ -31,7 +71,7 @@ function Sign() {
               </CardTitle>
             </CardHeader>
             <CardContent className=" h-full">
-              <form onSubmit={(e) => e.preventDefault()} className="flex flex-col gap-4 h-full">
+              <form onSubmit={handleSubmit} className="flex flex-col gap-4 h-full">
                 <InputValidate
                   id="email_usuario"
                   type="email"

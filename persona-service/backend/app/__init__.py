@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_cors import CORS
 from app.extensions import jwt, engine, Base
 from app.models.persona_model import Persona
@@ -33,7 +33,16 @@ def create_app():
     
     @app.route('/')
     def index():
-        return {'msg': 'Persona Service Backend activo'}
+        output = []
+        for rule in app.url_map.iter_rules():
+            if rule.endpoint == 'static': continue
+            methods = sorted(rule.methods - {'HEAD', 'OPTIONS'})
+            output.append({
+                'endpoint': rule.endpoint,
+                'methods': ", ".join(methods),
+                'rule': str(rule)
+            })
+        return jsonify(output)
 
     return app
     

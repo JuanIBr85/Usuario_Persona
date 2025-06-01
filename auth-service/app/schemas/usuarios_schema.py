@@ -16,17 +16,18 @@ class UsuarioInputSchema(Schema):
             "invalid": "Debe ser un email válido."}
     )
     password = fields.Str(
-        load_only=True, 
-        required=True, 
-        validate=[
-            validate.Length(min=6, error="La contraseña debe tener al menos 6 caracteres."),
-            validate.Regexp(
-                regex=r"^(?=.*[0-9])(?=.*[!@#$%^&*(),.?\":{}|<>]).+$",
-                error="La contraseña debe contener al menos un número y un símbolo."
-            )
-        ],
-        error_messages={"Requerido": "La contraseña es obligatoria."}
-    )
+    load_only=True, 
+    required=True, 
+    validate=[
+        validate.Length(min=6, error="La contraseña debe tener al menos 6 caracteres."),
+        validate.Regexp(
+            regex=r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$",
+            error="La contraseña debe contener al menos una letra minúscula, una letra mayúscula, un número y un símbolo."
+        )
+    ],
+    error_messages={"Requerido": "La contraseña es obligatoria."}
+)
+
     
     persona_id = fields.Int(
         required=False, 
