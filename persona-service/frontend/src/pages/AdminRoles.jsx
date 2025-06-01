@@ -164,19 +164,24 @@ export default function AdminRoles() {
                       </div>
                     </div>
                   </span>
+                  {/*Botón de editar*/}
                   <Button
-                    variant="ghost"
-                    size="icon"
+                    variant="outline"
+                    
                     onClick={() => handleEditClick(role)}
                   >
                     <Pencil className="w-4 h-4" />
+                    Editar
                   </Button>
+
+                  {/*Botón de borrar*/}
                   <Button
-                    variant="ghost"
-                    size="icon"
+                    variant="outline"
+                   
                     onClick={() => openDeleteConfirmDialog(role)}
                   >
                     <Trash2 className="w-4 h-4" />
+                    Borrar
                   </Button>
                 </div>
               ))}
