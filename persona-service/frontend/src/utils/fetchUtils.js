@@ -112,7 +112,7 @@ export const fetchService = {
                 throw error;
             }
 
-            throw FetchError(
+            throw new FetchError(
                 `Fetch [${url}] error: ${error.message}`, 
                 false, 
                 error.statusCode || 500, 
