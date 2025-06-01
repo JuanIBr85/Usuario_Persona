@@ -23,6 +23,13 @@ import {
 } from "@/components/ui/breadcrumb"
 import { Card, CardContent } from "@/components/ui/card"
 
+import {
+  Home,
+  ChartArea
+} from "lucide-react";
+
+import { Link } from "react-router-dom";
+
 const data = [
   { month: "Enero", profesores: 34, alumnos: 80, admins: 5 },
   { month: "Febrero", profesores: 40, alumnos: 100, admins: 4 },
@@ -97,11 +104,16 @@ export default function Logs() {
         <Breadcrumb className="mt-auto self-start">
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/adminpanel">Panel De Administrador</BreadcrumbLink>
+              <BreadcrumbLink asChild>
+                <Link to="/adminpanel" className="flex items-center gap-1">
+                  <Home className="w-4 h-4" />
+                  Panel De Administrador
+                </Link>
+              </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Logs</BreadcrumbPage>
+              <BreadcrumbPage className="flex items-center gap-1"> <ChartArea className="w-4 h-4" /> Logs</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Fade } from "react-awesome-reveal";
-import { useParams } from 'react-router-dom';
+import { useParams,Link } from 'react-router-dom';
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -28,7 +28,10 @@ import {
     BadgeCheck,
     Calendar,
     IdCard,
-    DollarSign
+    DollarSign,
+    Home,
+    ChevronRight,
+    BookUser
 } from "lucide-react";
 
 import {
@@ -187,14 +190,29 @@ function UserDetails() {
                 <Breadcrumb className="mt-auto self-start">
                     <BreadcrumbList>
                         <BreadcrumbItem>
-                            <BreadcrumbLink href="/adminpanel">Panel De Administrador</BreadcrumbLink>
+                            <BreadcrumbLink asChild>
+                                <Link to="/adminpanel" className="flex items-center gap-1">
+                                    <Home className="w-4 h-4" />
+                                    Panel De Administrador
+                                </Link>
+                            </BreadcrumbLink>
                         </BreadcrumbItem>
-                        <BreadcrumbSeparator />
+                        <BreadcrumbSeparator>
+                            <ChevronRight className="w-4 h-4" />
+                        </BreadcrumbSeparator>
                         <BreadcrumbItem>
-                            <BreadcrumbLink href="/adminusers">Panel De Usuarios</BreadcrumbLink>
+                            <BreadcrumbLink className="flex items-center gap-1">
+                                <Link to="/adminusers" className="flex items-center gap-1">
+                                    <User className="w-4 h-4" />
+                                    Panel de Usuarios
+                                </Link>
+                            </BreadcrumbLink>
                         </BreadcrumbItem>
-                        <BreadcrumbSeparator />
-                        <BreadcrumbItem>
+                        <BreadcrumbSeparator>
+                            <ChevronRight className="w-4 h-4" />
+                        </BreadcrumbSeparator>
+                        <BreadcrumbItem className="flex items-center gap-1">
+                            <BookUser className="w-4 h-4" />
                             <BreadcrumbPage>Detalles del Usuario</BreadcrumbPage>
                         </BreadcrumbItem>
                     </BreadcrumbList>

@@ -36,6 +36,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { Link } from "react-router-dom";
 
 const initialRoles = [
   { id: 1, name: "Administrador", permissions: ["Puede hacer X"] },
@@ -278,15 +279,17 @@ export default function AdminRoles() {
         <Breadcrumb className="mt-auto self-start">
           <BreadcrumbList>
             <BreadcrumbItem>
-
-              <BreadcrumbLink href="/adminpanel" className="flex items-center gap-1">
-                <Home className="w-4 h-4" />
-                Panel De Administrador</BreadcrumbLink>
+              <BreadcrumbLink asChild>
+                <Link to="/adminpanel" className="flex items-center gap-1">
+                  <Home className="w-4 h-4" />
+                  Panel De Administrador
+                </Link>
+              </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbPage className="flex items-center gap-1">
-                <ShieldUser  className="w-4 h-4" />
+                <ShieldUser className="w-4 h-4" />
                 Roles y Permisos</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
