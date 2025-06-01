@@ -5,7 +5,7 @@ from os import getenv
 
 def crear_token_acceso(usuario_id, email, rol, permisos):
     payload = {
-        "sub": usuario_id,
+        "sub": str(usuario_id),
         "email": email,
         "rol": rol,
         "perms": permisos,  # Aquí metemos la lista

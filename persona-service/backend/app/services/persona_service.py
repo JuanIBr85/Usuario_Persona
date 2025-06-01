@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from flask import jsonify
 from marshmallow import ValidationError
+from sqlalchemy import and_
 
 #Se importan los modelos
 from app.models.persona_model import Persona
@@ -8,7 +9,7 @@ from app.models.persona_model import Persona
 #Se importan los servicios
 from app.services.contacto_service import ContactoService
 from app.services.domicilio_service import DomicilioService
-from app.services.tipo_documente_service import TipoDocumentoService
+
 
 #Otras importaciones
 from app.schema.persona_schema import PersonaSchema
@@ -22,7 +23,7 @@ class PersonaService(IPersonaInterface):
         self.varios_schemas = PersonaSchema(many=True)
         self.contacto_service = ContactoService()
         self.domicilio_service = DomicilioService()
-        self.tipo_documento_service = TipoDocumentoService()
+        
 
     def listar_personas(self):
         session = SessionLocal()
@@ -56,14 +57,14 @@ class PersonaService(IPersonaInterface):
             
             data_validada=self.schema.load(data)
 
-            #Se crea el contacto, domicilio y documento
+            #Se crea el contacto, domicilio
             domicilio = self.domicilio_service.crear_domicilio(data_validada.pop('domicilio'), session=session)
             contacto = self.contacto_service.crear_contacto(data_validada.pop('contacto'), session=session)
-            tipo_documento = self.tipo_documento_service.crear_tipo_documento(data_validada.pop('tipo_documento'), session=session)
 
             data_validada['domicilio_id']=domicilio.id_domicilio
             data_validada['contacto_id']=contacto.id_contacto
-            data_validada['tipo_documento_id']=tipo_documento.id_tipo_documento
+            data_validada['tipo_documento']=data_validada.pop('tipo_documento')
+            
 
             # Crear Persona
             persona_nueva=Persona(**data_validada)
@@ -119,25 +120,25 @@ class PersonaService(IPersonaInterface):
         finally:
             session.close()
        
-    def borrar_persona(self, id_persona):
-        
+    def borrar_persona(self, id_persona): 
         session = SessionLocal()
 
         try:
-
-            persona = session.query(Persona).get(id_persona)
+            persona = session.query(Persona).filter(
+                and_(
+                    Persona.id_persona == id_persona,
+                    Persona.deleted_at.is_(None)
+                )
+            ).first()
 
             if not persona:
-                return None
-            
-            if persona.contacto_id:
-            
+                return None           
+            if persona.contacto_id:            
                 self.contacto_service.borrar_contacto(persona.contacto_id , session)
             if persona.domicilio_id:
                 self.domicilio_service.borrar_domicilio(persona.domicilio_id, session)
 
             persona.deleted_at = datetime.now(timezone.utc)
-
             session.commit()
             return True
 
@@ -148,6 +149,30 @@ class PersonaService(IPersonaInterface):
         finally:
             session.close()
 
-       
-       
-        
+    def restaurar_persona(self, id):
+        session = SessionLocal()
+        try:
+            persona = session.query(Persona).get(id)
+
+            if not persona:
+                return None
+            
+            if persona.deleted_at is None:
+                return False
+
+            persona.deleted_at = None
+
+            if persona.contacto_id:
+                self.contacto_service.restaurar_contacto(persona.contacto_id, session)
+            if persona.domicilio_id:
+                self.domicilio_service.restaurar_domicilio(persona.domicilio_id, session)
+
+            session.commit()
+            return True
+
+        except Exception as e:
+            session.rollback()
+            raise e
+
+        finally:
+            session.close()

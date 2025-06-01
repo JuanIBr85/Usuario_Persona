@@ -68,45 +68,46 @@ class UsuarioService(ServicioBase):
         return {"mensaje": "Usuario registrado correctamente"}
 
 
-def login_usuario(self, session: Session, email: str, password: str) -> dict:
-    usuario = session.query(Usuario).filter_by(email_usuario=email).first()
-    if not usuario:
-        raise ValueError("El email no está registrado.")
+    def login_usuario(self, session: Session, email: str, password: str) -> dict:
 
-    if not check_password_hash(usuario.password, password):
-        raise ValueError("La contraseña es incorrecta.")
+        usuario = session.query(Usuario).filter_by(email_usuario=email).first()
+        if not usuario:
+            raise ValueError("El email no está registrado.")
 
-    # Obtener el rol del usuario
-    rol_usuario = session.query(Rol).join(RolUsuario).filter(RolUsuario.id_usuario == usuario.id_usuario).first()
-    rol_nombre = rol_usuario.nombre_rol if rol_usuario else "sin_rol"
+        if not check_password_hash(usuario.password, password):
+            raise ValueError("La contraseña es incorrecta.")
 
-    # Obtener los permisos asociados al rol
-    permisos_query = (
-        session.query(Permiso.nombre_permiso)
-        .join(RolPermiso, Permiso.id_permiso == RolPermiso.permiso_id)
-        .filter(RolPermiso.id_rol == rol_usuario.id_rol)
-        .all()
-    )
-    permisos_lista = [p.nombre_permiso for p in permisos_query]
+        # Obtener el rol del usuario
+        rol_usuario = session.query(Rol).join(RolUsuario).filter(RolUsuario.id_usuario == usuario.id_usuario).first()
+        rol_nombre = rol_usuario.nombre_rol if rol_usuario else "sin_rol"
 
-    # Crear token con permisos incluidos
-    token = crear_token_acceso(usuario.id_usuario, email, rol_nombre, permisos_lista)
+        # Obtener los permisos asociados al rol
+        permisos_query = (
+            session.query(Permiso.nombre_permiso)
+            .join(RolPermiso, Permiso.id_permiso == RolPermiso.permiso_id)
+            .filter(RolPermiso.id_rol == rol_usuario.id_rol)
+            .all()
+        )
+        permisos_lista = [p.nombre_permiso for p in permisos_query]
 
-    # Registrar log de login
-    session.add(UsuarioLog(
-        usuario_id=usuario.id_usuario,
-        accion="login",
-        detalles="El usuario se logueó correctamente"
-    ))
+        # Crear token con permisos incluidos
+        token = crear_token_acceso(usuario.id_usuario, email, rol_nombre, permisos_lista)
 
-    return {
-        "mensaje": "Login exitoso",
-        "token": token,
-        "usuario": {
-            "id_usuario": usuario.id_usuario,
-            "nombre_usuario": usuario.nombre_usuario,
-            "email_usuario": usuario.email_usuario,
-            "rol": rol_nombre,
-            "permisos": permisos_lista
+        # Registrar log de login
+        session.add(UsuarioLog(
+            usuario_id=usuario.id_usuario,
+            accion="login",
+            detalles="El usuario se logueó correctamente"
+        ))
+
+        return {
+            "mensaje": "Login exitoso",
+            "token": token,
+            "usuario": {
+                "id_usuario": usuario.id_usuario,
+                "nombre_usuario": usuario.nombre_usuario,
+                "email_usuario": usuario.email_usuario,
+                "rol": rol_nombre,
+                "permisos": permisos_lista
+            }
         }
-    }

@@ -70,7 +70,6 @@ class DomicilioService(IDomicilioInterface):
         
     
     def borrar_domicilio(self, id_domicilio, session=None):
-
         cerrar= False
 
         if session is None:
@@ -96,7 +95,30 @@ class DomicilioService(IDomicilioInterface):
                 session.commit()
                 session.close()
 
-         
+    def restaurar_domicilio(self, id, session=None):
+        cerrar=False
+
+        if session is None:
+            session=SessionLocal()
+            cerrar=True
+
+        try:
+            domicilio = session.query(Domicilio).get(id) 
+            if domicilio:
+                domicilio.deleted_at = None
+                session.flush()
+            else:
+                raise ValueError(f"No se encontró el contacto con id {id}")
+
+        except Exception as e:
+            session.rollback()
+            raise e
+        
+        finally:
+            if cerrar:
+                session.commit()
+                session.close()
+
     
     
 

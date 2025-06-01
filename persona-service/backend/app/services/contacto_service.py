@@ -80,6 +80,36 @@ class ContactoService(IContactoInterface):
                 session.close()
                 session.commit()
 
+    def restaurar_contacto(self, id, session=None):
+        cerrar = False
+
+        if session is  None:
+            session=SessionLocal()
+            cerrar=True
+
+        try:
+            contacto=session.query(Contacto).get(id)
+            if contacto:
+                contacto.deleted_at = None 
+                session.flush()
+            else: 
+                raise ValueError(f"No se encontró el contacto con id {id}")  
+
+        except Exception as e:
+            session.rollback()
+            raise e
+
+        finally:
+            if cerrar:
+                session.commit()      
+                session.close()
+
+    
+
+
+
+
+
 
    
 

@@ -5,6 +5,8 @@ import os
 from flask_jwt_extended import JWTManager
 from config import Config
 from app.utils.utils_authorization import verificar_permisos
+from app.extensions import limiter
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -17,6 +19,8 @@ jwt = JWTManager(app)
 @app.before_request
 def control_acceso():
     verificar_permisos(app)
-    
+
+limiter.init_app(app)
+
 if __name__ == '__main__':
     app.run(debug=True,host='0.0.0.0', port=5000)
