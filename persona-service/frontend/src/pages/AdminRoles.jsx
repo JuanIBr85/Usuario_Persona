@@ -17,6 +17,15 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 const initialRoles = [
   { id: 1, name: "Administrador", permissions: ["Puede hacer X"] },
@@ -37,17 +46,33 @@ export default function AdminRoles() {
   const [newRoleName, setNewRoleName] = useState("");
   const [selectedPermissions, setSelectedPermissions] = useState([]);
   const [editRoleId, setEditRoleId] = useState(null);
+  const [errorDialog, setErrorDialog] = useState({ open: false, message: "" });
+
+  // controla el dialogo de confirmacion
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [roleToDelete, setRoleToDelete] = useState(null);
 
   const handleAddRole = () => {
-    if (!newRoleName) return;
+    if (!newRoleName.trim()) return showError("El nombre del rol no puede estar vacío");
+    const exists = roles.some(
+      (role) => role.name.toLowerCase() === newRoleName.trim().toLowerCase()
+    );
+    if (exists) return showError("Ya existe un rol con ese nombre");
+
+
     const newRole = {
       id: Date.now(),
-      name: newRoleName,
+      name: newRoleName.trim(),
       permissions: selectedPermissions,
     };
     setRoles([...roles, newRole]);
     resetForm();
   };
+
+  const showError = (message) => {
+    setErrorDialog({ open: true, message });
+  };
+
 
   const handleEditClick = (role) => {
     setEditRoleId(role.id);
@@ -57,23 +82,37 @@ export default function AdminRoles() {
   };
 
   const handleSaveChanges = () => {
-    if (!newRoleName) return;
+    if (!newRoleName.trim()) return showError("El nombre del rol no puede estar vacío");
+
+    const exists = roles.some(
+      (role) =>
+        role.id !== editRoleId &&
+        role.name.toLowerCase() === newRoleName.trim().toLowerCase()
+    );
+    if (exists) return showError("Ya existe otro rol con ese nombre");
+
     const updatedRoles = roles.map((role) =>
       role.id === editRoleId
-        ? { ...role, name: newRoleName, permissions: selectedPermissions }
+        ? { ...role, name: newRoleName.trim(), permissions: selectedPermissions }
         : role
     );
     setRoles(updatedRoles);
     resetForm();
   };
 
-  const handleDeleteRole = (id, name) => {
-    const confirmed = window.confirm(
-      `¿Estás seguro que deseas eliminar el rol "${name}"?`
-    );
-    if (confirmed) {
-      setRoles(roles.filter((role) => role.id !== id));
-      if (editRoleId === id) resetForm();
+  // Abrir diálogo con el rol que se quiere eliminar
+  const openDeleteConfirmDialog = (role) => {
+    setRoleToDelete(role);
+    setOpenDeleteDialog(true);
+  };
+
+  // Confirmar eliminación
+  const confirmDeleteRole = () => {
+    if (roleToDelete) {
+      setRoles(roles.filter((role) => role.id !== roleToDelete.id));
+      if (editRoleId === roleToDelete.id) resetForm();
+      setRoleToDelete(null);
+      setOpenDeleteDialog(false);
     }
   };
 
@@ -125,7 +164,7 @@ export default function AdminRoles() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => handleDeleteRole(role.id, role.name)}
+                    onClick={() => openDeleteConfirmDialog(role)}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -146,40 +185,79 @@ export default function AdminRoles() {
 
               {/* Formulario nuevo rol o edición */}
               {showNewRoleForm && (
-                <div className="mt-6 space-y-4 border p-4 rounded-md">
-                  <Input
-                    placeholder="Nombre del rol"
-                    value={newRoleName}
-                    onChange={(e) => setNewRoleName(e.target.value)}
-                  />
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {availablePermissions.map((permission) => (
-                      <label key={permission} className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          checked={selectedPermissions.includes(permission)}
-                          onChange={() => handlePermissionToggle(permission)}
-                        />
-                        <span className="text-sm">{permission}</span>
-                      </label>
-                    ))}
+                <Fade duration={300} triggerOnce>
+                  <div className="mt-6 space-y-4 border p-4 rounded-md">
+                    <Input
+                      placeholder="Nombre del rol"
+                      value={newRoleName}
+                      onChange={(e) => setNewRoleName(e.target.value)}
+                    />
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {availablePermissions.map((permission) => (
+                        <label key={permission} className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={selectedPermissions.includes(permission)}
+                            onChange={() => handlePermissionToggle(permission)}
+                          />
+                          <span className="text-sm">{permission}</span>
+                        </label>
+                      ))}
+                    </div>
+                    <div className="flex gap-2">
+                      {editRoleId ? (
+                        <Button onClick={handleSaveChanges}>Guardar Cambios</Button>
+                      ) : (
+                        <Button onClick={handleAddRole}>Agregar Rol</Button>
+                      )}
+                      <Button variant="outline" onClick={resetForm}>
+                        Cancelar
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    {editRoleId ? (
-                      <Button onClick={handleSaveChanges}>Guardar Cambios</Button>
-                    ) : (
-                      <Button onClick={handleAddRole}>Agregar Rol</Button>
-                    )}
-                    <Button variant="outline" onClick={resetForm}>
-                      Cancelar
-                    </Button>
-                  </div>
-                </div>
+                </Fade>
               )}
             </div>
           </CardContent>
         </Card>
 
+        {/* Dialogo de confirmación para borrar rol */}
+        <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>¿Estás seguro?</DialogTitle>
+              <DialogDescription>
+                Esta acción no se puede deshacer. Se eliminará el rol{" "}
+                <strong>{roleToDelete?.name}</strong>.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setOpenDeleteDialog(false)}>
+                Cancelar
+              </Button>
+              <Button variant="destructive" onClick={confirmDeleteRole}>
+                Eliminar
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Dialogo de error */}
+        <Dialog open={errorDialog.open} onOpenChange={(open) => setErrorDialog({ ...errorDialog, open })}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Error</DialogTitle>
+              <DialogDescription>{errorDialog.message}</DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="flex justify-end">
+              <Button onClick={() => setErrorDialog({ ...errorDialog, open: false })}>
+                Cerrar
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* El bradcrumb para ubicarse en la página */}
         <Breadcrumb className="mt-auto self-start">
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -191,6 +269,10 @@ export default function AdminRoles() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
+
+
+
+
       </Fade>
     </div>
   );
