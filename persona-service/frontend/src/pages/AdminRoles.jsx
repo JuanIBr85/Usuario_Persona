@@ -7,7 +7,17 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2, Plus, Pencil } from "lucide-react";
+import {
+  Trash2,
+  Plus,
+  Pencil,
+  ShieldCheck,
+  Users,
+  AlertTriangle,
+  Settings2,
+  Home,
+  ShieldUser
+} from "lucide-react";
 import { Fade } from "react-awesome-reveal";
 import {
   Breadcrumb,
@@ -47,32 +57,45 @@ export default function AdminRoles() {
   const [selectedPermissions, setSelectedPermissions] = useState([]);
   const [editRoleId, setEditRoleId] = useState(null);
   const [errorDialog, setErrorDialog] = useState({ open: false, message: "" });
-
-  // controla el dialogo de confirmacion
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [roleToDelete, setRoleToDelete] = useState(null);
 
+  const showError = (message) => {
+    setErrorDialog({ open: true, message });
+  };
+
+  const resetForm = () => {
+    setNewRoleName("");
+    setSelectedPermissions([]);
+    setShowNewRoleForm(false);
+    setEditRoleId(null);
+  };
+
+  const handlePermissionToggle = (permission) => {
+    setSelectedPermissions((prev) =>
+      prev.includes(permission)
+        ? prev.filter((p) => p !== permission)
+        : [...prev, permission]
+    );
+  };
+
   const handleAddRole = () => {
     if (!newRoleName.trim()) return showError("El nombre del rol no puede estar vacío");
+
     const exists = roles.some(
       (role) => role.name.toLowerCase() === newRoleName.trim().toLowerCase()
     );
     if (exists) return showError("Ya existe un rol con ese nombre");
-
 
     const newRole = {
       id: Date.now(),
       name: newRoleName.trim(),
       permissions: selectedPermissions,
     };
+
     setRoles([...roles, newRole]);
     resetForm();
   };
-
-  const showError = (message) => {
-    setErrorDialog({ open: true, message });
-  };
-
 
   const handleEditClick = (role) => {
     setEditRoleId(role.id);
@@ -100,13 +123,11 @@ export default function AdminRoles() {
     resetForm();
   };
 
-  // Abrir diálogo con el rol que se quiere eliminar
   const openDeleteConfirmDialog = (role) => {
     setRoleToDelete(role);
     setOpenDeleteDialog(true);
   };
 
-  // Confirmar eliminación
   const confirmDeleteRole = () => {
     if (roleToDelete) {
       setRoles(roles.filter((role) => role.id !== roleToDelete.id));
@@ -116,42 +137,30 @@ export default function AdminRoles() {
     }
   };
 
-  const handlePermissionToggle = (permission) => {
-    setSelectedPermissions((prev) =>
-      prev.includes(permission)
-        ? prev.filter((p) => p !== permission)
-        : [...prev, permission]
-    );
-  };
-
-  const resetForm = () => {
-    setNewRoleName("");
-    setSelectedPermissions([]);
-    setShowNewRoleForm(false);
-    setEditRoleId(null);
-  };
-
   return (
     <div className="p-6 space-y-6 py-30 px-3 md:py-25 md:px-15">
       <Fade duration={300} triggerOnce>
         <Card>
-          <CardHeader>
+          <CardHeader className="flex items-center gap-2">
+            <ShieldCheck className="w-5 h-5 " />
             <CardTitle>Roles y Permisos</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col gap-4">
-              {/* Lista de roles */}
               {roles.map((role) => (
                 <div
                   key={role.id}
                   className="flex items-center gap-4 border p-3 rounded-md shadow-sm"
                 >
-                  <span className="flex-1">
-                    {role.name}
-                    <div className="text-xs text-gray-500">
-                      {role.permissions?.length > 0
-                        ? role.permissions.join(", ")
-                        : "Sin permisos asignados"}
+                  <span className="flex-1 flex items-start gap-2">
+                    <Users className="w-4 h-4 mt-1 text-muted-foreground" />
+                    <div>
+                      {role.name}
+                      <div className="text-xs text-gray-500">
+                        {role.permissions?.length > 0
+                          ? role.permissions.join(", ")
+                          : "Sin permisos asignados"}
+                      </div>
                     </div>
                   </span>
                   <Button
@@ -171,7 +180,6 @@ export default function AdminRoles() {
                 </div>
               ))}
 
-              {/* Botón para agregar nuevo rol */}
               <Button
                 variant="outline"
                 className="w-fit mt-4"
@@ -183,7 +191,6 @@ export default function AdminRoles() {
                 <Plus className="w-4 h-4 mr-2" /> Agregar otro rol
               </Button>
 
-              {/* Formulario nuevo rol o edición */}
               {showNewRoleForm && (
                 <Fade duration={300} triggerOnce>
                   <div className="mt-6 space-y-4 border p-4 rounded-md">
@@ -221,11 +228,13 @@ export default function AdminRoles() {
           </CardContent>
         </Card>
 
-        {/* Dialogo de confirmación para borrar rol */}
         <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>¿Estás seguro?</DialogTitle>
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="text-yellow-500 w-5 h-5" />
+                <DialogTitle>¿Estás seguro?</DialogTitle>
+              </div>
               <DialogDescription>
                 Esta acción no se puede deshacer. Se eliminará el rol{" "}
                 <strong>{roleToDelete?.name}</strong>.
@@ -242,37 +251,46 @@ export default function AdminRoles() {
           </DialogContent>
         </Dialog>
 
-        {/* Dialogo de error */}
-        <Dialog open={errorDialog.open} onOpenChange={(open) => setErrorDialog({ ...errorDialog, open })}>
+        <Dialog
+          open={errorDialog.open}
+          onOpenChange={(open) => setErrorDialog({ ...errorDialog, open })}
+        >
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Error</DialogTitle>
+              <div className="flex items-center gap-2">
+                <Settings2 className="text-red-500 w-5 h-5" />
+                <DialogTitle>Error</DialogTitle>
+              </div>
               <DialogDescription>{errorDialog.message}</DialogDescription>
             </DialogHeader>
             <DialogFooter className="flex justify-end">
-              <Button onClick={() => setErrorDialog({ ...errorDialog, open: false })}>
+              <Button
+                onClick={() =>
+                  setErrorDialog({ ...errorDialog, open: false })
+                }
+              >
                 Cerrar
               </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
 
-        {/* El bradcrumb para ubicarse en la página */}
         <Breadcrumb className="mt-auto self-start">
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/adminpanel">Panel De Administrador</BreadcrumbLink>
+
+              <BreadcrumbLink href="/adminpanel" className="flex items-center gap-1">
+                <Home className="w-4 h-4" />
+                Panel De Administrador</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Roles y Permisos</BreadcrumbPage>
+              <BreadcrumbPage className="flex items-center gap-1">
+                <ShieldUser  className="w-4 h-4" />
+                Roles y Permisos</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-
-
-
-
       </Fade>
     </div>
   );

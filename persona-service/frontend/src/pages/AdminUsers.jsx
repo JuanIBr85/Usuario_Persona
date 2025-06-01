@@ -3,7 +3,9 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import { Fade } from "react-awesome-reveal";
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Pencil, Eye, Trash2 } from "lucide-react";
+
+import { Pencil, Eye, Trash2, User, Users, Home, ChevronRight } from "lucide-react";
+
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, } from "@/components/ui/breadcrumb";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -53,7 +55,11 @@ function AdminUsers() {
       <Fade duration={300} triggerOnce>
         <Card>
           <CardHeader>
-            <CardTitle>Usuarios Registrados</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-5 h-5 text-primary" />
+              Usuarios Registrados
+            </CardTitle>
+
           </CardHeader>
 
           <CardContent>
@@ -128,14 +134,23 @@ function AdminUsers() {
         <Breadcrumb className="mt-auto self-start">
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/adminpanel">Panel De Administrador</BreadcrumbLink>
+              <BreadcrumbLink href="/adminpanel" className="flex items-center gap-1">
+                <Home className="w-4 h-4" />
+                Panel De Administrador
+              </BreadcrumbLink>
             </BreadcrumbItem>
-            <BreadcrumbSeparator />
+            <BreadcrumbSeparator>
+              <ChevronRight className="w-4 h-4" />
+            </BreadcrumbSeparator>
             <BreadcrumbItem>
-              <BreadcrumbPage>Panel de Usuarios</BreadcrumbPage>
+              <BreadcrumbPage className="flex items-center gap-1">
+                <User className="w-4 h-4" />
+                Panel de Usuarios
+              </BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
+
       </Fade>
 
       <Dialog open={!!editingUser} onOpenChange={(open) => !open && setEditingUser(null)}>
