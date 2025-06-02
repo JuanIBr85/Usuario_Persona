@@ -9,7 +9,7 @@
         - ./auth-service/.env
       volumes:
         - ./auth-service:/app
-        - auth-db-data:/app/auth_data
+        - ./auth-service/auth_data:/app/auth_data
 
     persona-backend:
       build: ./persona-service/backend
@@ -27,5 +27,4 @@
       env_file:
         - ./persona-service/frontend/.env
 
-  volumes:
-    auth-db-data:
+

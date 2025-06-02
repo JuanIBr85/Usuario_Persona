@@ -47,7 +47,7 @@ def seed():
             nombre_usuario="superadmin",
             email_usuario=email,
             email_verificado=1,
-            password=generate_password_hash("admin123!"),
+            password=generate_password_hash("Admin123!"),
             persona_id=None  # Hasta que se conecte con persona-service
         )
         db.add(superadmin)

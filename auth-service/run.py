@@ -58,9 +58,9 @@ def init_app():
         seed()
     else:
         print("[✓] Base de datos ya existente. No se reinicia.")
+    # Evitar ejecutar init_app() dos veces cuando el reloader está activo
+#if os.environ.get("WERKZEUG_RUN_MAIN") != "true":
+init_app()
 
 if __name__ == '__main__':
-    # Evitar ejecutar init_app() dos veces cuando el reloader está activo
-    if os.environ.get("WERKZEUG_RUN_MAIN") != "true":
-        init_app()
     app.run(debug=True, use_reloader=False, host='0.0.0.0', port=5000)
