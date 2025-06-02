@@ -10,6 +10,8 @@ from app.routes.superadmin_blueprint import superadmin_bp
 from app.routes.admin_microservicios_blueprint import admin_micro_bp
 from app.script.reset_db import crear_base, eliminar_base
 from app.script.seed_data import seed
+from flask_cors import CORS
+
 
 load_dotenv()
 
@@ -19,6 +21,7 @@ app.register_blueprint(admin_micro_bp, url_prefix='/admin-micro')
 app.register_blueprint(usuario_bp)
 app.config.from_object(Config)
 jwt = JWTManager(app)
+CORS(app, supports_credentials=True)
 mail.init_app(app)
 
 @app.before_request
@@ -26,6 +29,24 @@ def control_acceso():
     verificar_permisos(app)
 
 limiter.init_app(app)
+
+@app.route('/')
+def index():
+    output = []
+    for rule in app.url_map.iter_rules():
+        if rule.endpoint == 'static': continue
+        methods = sorted(rule.methods - {'HEAD', 'OPTIONS'})
+        output.append({
+            'endpoint': rule.endpoint,
+            'methods': ", ".join(methods),
+            'rule': str(rule)
+        })
+    return jsonify(output)
+
+index._security_metadata ={
+    "is_public":True
+}
+
 
 def init_app():
     FORZAR_RESET = True  # poner True para resetear cada vez que se cree (solo para desarrollo)
