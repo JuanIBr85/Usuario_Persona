@@ -14,6 +14,7 @@ import UserDetails from '@/pages/UserDetails';
 import TermsOfService from '@/pages/TermsOfService';
 import AboutPrivacyPolicy from '@/pages/AboutPrivacyPolicy';
 import Faq from '@/pages/Faq';
+import ForgotPassword from '@/pages/ForgotPassword';
 
 function AppRoutes() {
   return (
@@ -36,6 +37,7 @@ function AppRoutes() {
       <Route path="termsofservice" element={<TermsOfService />} />
       <Route path="faq" element={<Faq />} />
       <Route path="*" element={<NotFound />} />
+      <Route path="forgotpassword" element={<ForgotPassword />} />
     </Routes>
   )
 }
