@@ -1,5 +1,6 @@
 # auth-service/Dockerfile
-FROM python:3.13.3
+#FROM python:3.13.3
+FROM python:3.10-slim
 
 WORKDIR /app
 

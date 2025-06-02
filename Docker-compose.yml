@@ -1,32 +1,31 @@
-version: '3.8'
 
-services:
+  services:
 
-  auth-service:
-    build: ./auth-service
-    ports:
-      - "5000:5000"
-    env_file:
-      - ./auth-service/.env
-    volumes:
-      - ./auth-service:/app
-      - auth-db-data:/app/auth_data
+    auth-service:
+      build: ./auth-service
+      ports:
+        - "5000:5000"
+      env_file:
+        - ./auth-service/.env
+      volumes:
+        - ./auth-service:/app
+        - auth-db-data:/app/auth_data
 
-  persona-backend:
-    build: ./persona-service/backend
-    ports:
-      - "5001:5001"
-    #env_file:
-     # - ./persona-service/backend/.env
-    volumes:
-      - ./persona-service/backend:/app
+    persona-backend:
+      build: ./persona-service/backend
+      ports:
+        - "5001:5001"
+      #env_file:
+      # - ./persona-service/backend/.env
+      volumes:
+        - ./persona-service/backend:/app
 
-  persona-frontend:
-    build: ./persona-service/frontend
-    ports:
-      - "5173:5173"
-    env_file:
-      - ./persona-service/frontend/.env
+    persona-frontend:
+      build: ./persona-service/frontend
+      ports:
+        - "5173:5173"
+      env_file:
+        - ./persona-service/frontend/.env
 
-volumes:
-  auth-db-data:
+  volumes:
+    auth-db-data:
