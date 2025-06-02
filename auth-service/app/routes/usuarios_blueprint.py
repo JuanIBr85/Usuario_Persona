@@ -12,7 +12,7 @@ from marshmallow import ValidationError
 from app.utils.response import ResponseStatus, make_response
 from app.services.usuario_service import UsuarioService
 from app.extensions import limiter
-
+from app.utils.jwt import decodificar_token_verificacion
 
 usuario_bp = Blueprint("usuario", __name__)
 usuario_service = UsuarioService()
@@ -60,6 +60,44 @@ def registrar_usuario1():
     finally:
         session.close()
 registrar_usuario1._security_metadata ={
+    "is_public":True
+}
+
+
+@usuario_bp.route('/verificar-email', methods=['GET'])
+def verificar_email():
+    from jwt import decode, ExpiredSignatureError, InvalidTokenError
+    token = request.args.get('token', None)
+    if not token:
+        return make_response(
+            status=ResponseStatus.ERROR,
+            message="Token faltante."
+        ), 400
+
+    try:
+        datos = decodificar_token_verificacion(token)
+        session = SessionLocal()
+        usuario = session.query(Usuario).filter_by(email_usuario=datos['email']).first()
+        if not usuario:
+            return make_response(
+                status=ResponseStatus.ERROR, 
+                message="Usuario no encontrado"
+            ), 404
+
+        usuario.email_verificado = 1
+        session.commit()
+
+        return make_response(
+            status=ResponseStatus.SUCCESS,
+            message="Email verificado correctamente."
+        ), 200
+    except ExpiredSignatureError:
+        return make_response(status=ResponseStatus.ERROR, message="Token expirado."), 400
+    except InvalidTokenError:
+        return make_response(status=ResponseStatus.ERROR, message="Token inválido."), 400
+    finally:
+        session.close()
+verificar_email._security_metadata ={
     "is_public":True
 }
 

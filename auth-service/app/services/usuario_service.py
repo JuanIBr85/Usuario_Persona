@@ -10,19 +10,18 @@ from marshmallow import ValidationError
 from app.services.servicio_base import ServicioBase
 from app.models.permisos import Permiso
 from app.models.rol import RolPermiso
-
+from app.utils.email import enviar_email_verificacion
 
 class UsuarioService(ServicioBase):
     def __init__(self):
-        super().__init__(model=Usuario,schema=UsuarioInputSchema())
+        super().__init__(model=Usuario, schema=UsuarioInputSchema())
 
     def registrar_usuario(self, session: Session, data: dict) -> dict:
-
         try:
             data_validada = self.schema.load(data)
         except ValidationError as e:
             raise ValueError(f"Datos inválidos: {e.messages}")
-        
+
         if session.query(Usuario).filter(
             (Usuario.nombre_usuario == data_validada['nombre_usuario']) |
             (Usuario.email_usuario == data_validada['email_usuario'])
@@ -32,35 +31,27 @@ class UsuarioService(ServicioBase):
         password_hash = generate_password_hash(data_validada['password'])
         data_validada["password"] = password_hash
 
-        nuevo_usuario = self.create(data_validada) # Esto seria lo q hay comentado debajo con el servicio_base implementado
-
-        """nuevo_usuario = Usuario(
-            nombre_usuario=data_validada['nombre_usuario'],
-            email_usuario=data_validada['email_usuario'],
-            password=password_hash,
-            persona_id=data_validada.get('persona_id', None)
-        )
-
-        session.add(nuevo_usuario)
-        session.flush()"""
+        nuevo_usuario = self.create(session, data_validada)
+        session.flush()
+        enviar_email_verificacion(nuevo_usuario)
 
         rol_por_defecto = get_rol_por_nombre(session, "usuario")
         if not rol_por_defecto:
             raise ValueError("Rol por defecto no encontrado")
 
         session.add(RolUsuario(
-            id_usuario=nuevo_usuario["id_usuario"],
+            id_usuario=nuevo_usuario.id_usuario,
             id_rol=rol_por_defecto.id_rol
         ))
 
         session.add(PasswordLog(
-            usuario_id=nuevo_usuario["id_usuario"],
+            usuario_id=nuevo_usuario.id_usuario,
             password=password_hash,
             updated_at=datetime.now(timezone.utc)
         ))
 
         session.add(UsuarioLog(
-            usuario_id=nuevo_usuario["id_usuario"],
+            usuario_id=nuevo_usuario.id_usuario,
             accion="registro",
             detalles="El usuario se registró correctamente"
         ))
@@ -70,10 +61,15 @@ class UsuarioService(ServicioBase):
 
     def login_usuario(self, session: Session, email: str, password: str) -> dict:
 
+
+
         usuario = session.query(Usuario).filter_by(email_usuario=email).first()
         if not usuario:
             raise ValueError("El email no está registrado.")
 
+        if not usuario.email_verificado:
+            raise ValueError("Debe verificar su correo electrónico para poder iniciar sesión.")
+        
         if not check_password_hash(usuario.password, password):
             raise ValueError("La contraseña es incorrecta.")
 

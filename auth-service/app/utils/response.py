@@ -40,3 +40,7 @@ def make_response(status:ResponseStatus, message:str, data:Any = None)->Dict:
 
 
     return jsonify(response)
+
+
+#considerar también retornar un 
+#code estandarizado por mensaje para facilitar su interpretación en frontend, aunque no es urgente.

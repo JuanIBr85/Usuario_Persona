@@ -17,7 +17,7 @@ class UsuarioInputSchema(Schema):
     )
     password = fields.Str(
         load_only=True, 
-        required=True, 
+        required=False, 
         validate=[
             validate.Length(min=6, error="La contraseña debe tener al menos 6 caracteres."),
             validate.Regexp(
@@ -38,14 +38,14 @@ class UsuarioInputSchema(Schema):
     updated_at = fields.DateTime(dump_only=True)
     deleted_at = fields.DateTime(dump_only=True)
 
-"""class UsuarioOutputSchema(Schema):
+class UsuarioOutputSchema(Schema):
     id_usuario = fields.Int()
     nombre_usuario = fields.Str()
     email_usuario = fields.Email()
     persona_id = fields.Int()
     created_at = fields.DateTime()
     updated_at = fields.DateTime()
-    deleted_at = fields.DateTime()"""
+    deleted_at = fields.DateTime()
 
 class LoginSchema(Schema):
 

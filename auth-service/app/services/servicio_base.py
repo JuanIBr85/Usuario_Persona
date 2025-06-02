@@ -1,4 +1,4 @@
-from typing import Any, Callable, List
+from typing import Any, Callable, List, Optional, Union
 from marshmallow import Schema
 from sqlalchemy import exists, and_
 from app.database.session import SessionLocal
@@ -8,113 +8,102 @@ from app.interfaces.service_base_interface import IServicioBase
 from app.models.base_model import Base
 
 
-#Servicio generico, permite manipular un CRUD basico de cualquier tabla de la base de datos
 class ServicioBase(IServicioBase):
     def __init__(self, model: Any, schema: Schema):
-        # Guarda el modelo y el esquema (schema) para usarlos en los métodos
         self.schema: Schema = schema
         self.model = model
-        
-    def get_all(self) -> dict | list[dict]:
-        # Obtiene todos los registros del modelo
-        model = self.model
 
-        #return self._run_with_session(lambda session: session.query(model).execution_options(skip_soft_delete_filter=True).all()) or []
-        return self._run_with_session(lambda session: session.query(model).all()) or []
+    def get_all(self, session: Optional[Session] = None) -> Union[dict, list[dict]]:
+        model = self.model
+        return self._run_with_session(lambda s: s.query(model).all(), session) or []
 
-    def get_by_id(self, id: int) -> dict | None:
-        # Busca un registro por su ID
+    def get_by_id(self, id: int, session: Optional[Session] = None) -> Union[dict, None]:
         model = self.model
-        return self._run_with_session(lambda session: session.query(model).get(id))
-    
-    def exist(self, id: int) -> bool:
+        return self._run_with_session(lambda s: s.query(model).get(id), session)
+
+    def exist(self, id: int, session: Optional[Session] = None) -> bool:
         model = self.model
-        # Obtenemos la columna de la clave primaria de forma dinámica.
         pk_column = list(model.__mapper__.primary_key)[0]
         return self._run_with_session(
-            lambda session: session.query(exists().where(and_(pk_column == id,model.deleted_at.is_(None)))).scalar(),
+            lambda s: s.query(exists().where(and_(pk_column == id, model.deleted_at.is_(None)))).scalar(),
+            session,
             is_scalar=True
         )
 
-    def create(self, data: Any) -> dict | None:
-        # Crea un nuevo registro con los datos recibidos
-        schema = self.schema.load(data)
-        model = self.model(**schema)
+    def create(self, session: Optional[Session], data: Any) -> Any:
+        schema_data = self.schema.load(data)
+        model_instance = self.model(**schema_data)
 
-        def add(session: Session) -> Any:
-            session.add(model)
-            session.commit()  # Guarda los cambios en la base de datos
-            session.refresh(model)  # Actualiza el modelo con los datos de la BD
-            return model
+        def add(s: Session):
+            s.add(model_instance)
+            s.flush()  # flush para que tenga id antes del commit
+            return model_instance
 
-        return self._run_with_session(add)
+        return self._run_with_session(add, session=session, is_scalar=True)
 
-    def update(self, id:int, data: Any) -> dict | None:
-        # Actualiza un registro existente
-        schema = self.schema.load(data, partial=True)
+    def update(self, id: int, data: Any, session: Optional[Session] = None) -> Union[dict, None]:
+        schema_data = self.schema.load(data, partial=True)
 
-        def merge(session: Session) -> Any:
-            # Buscar el registro existente
-            instance = session.get(self.model, id)
+        def merge(s: Session):
+            instance = s.get(self.model, id)
             if not instance:
                 return None
-            
-            # Actualizar sólo los campos que vienen en data
-            for key, value in schema.items():
+            for key, value in schema_data.items():
                 setattr(instance, key, value)
-
-            session.commit()
-            session.refresh(instance)
+            s.commit()
+            s.refresh(instance)
             return instance
 
-        return self._run_with_session(merge)
+        return self._run_with_session(merge, session=session)
 
-    def delete(self, id: int, soft:bool = True) -> None:
-        # Elimina un registro por su ID
+    def delete(self, id: int, soft: bool = True, session: Optional[Session] = None) -> None:
         model = self.model
-        def remove(session: Session) -> None:
-            entity:Base = session.query(model).get(id)
+
+        def remove(s: Session):
+            entity: Base = s.query(model).get(id)
             if soft:
                 entity.set_delete()
             else:
-                session.delete(entity)
-            session.commit()
+                s.delete(entity)
+            s.commit()
             return True
-        self._run_with_session(remove)
 
-    def query(self, query_callback: Callable[[Query[Any]], Any]) -> Any:
-        # Permite realizar consultas personalizadas usando un callback
+        self._run_with_session(remove, session=session)
+
+    def query(self, query_callback: Callable[[Query[Any]], Any], session: Optional[Session] = None) -> Any:
         model = self.model
-        def _query(session: Session):
-            return query_callback(session.query(model))
-            
-        return self._run_with_session(_query)
 
-    def validate(self, data: Any, partial:bool=False) -> tuple[bool, List]:
-        # Valida los datos contra el esquema
+        def _query(s: Session):
+            return query_callback(s.query(model))
+
+        return self._run_with_session(_query, session=session)
+
+    def validate(self, data: Any, partial: bool = False) -> tuple[bool, List]:
         errors = self.schema.validate(data=data, many=isinstance(data, List), partial=partial)
-
         if errors:
             return False, errors
-        
         return True, []
 
-    def _run_with_session(self, session_callback: Callable[[Session], Any], is_scalar=False) -> dict | list[dict] | None:
-        # Maneja la sesión de base de datos, ejecuta una operación y la convierte a dict
-        session = SessionLocal()
-        try:
-            enitites = session_callback(session)
-            
-            if not enitites: return None
-            
+    def _run_with_session(self, session_callback: Callable[[Session], Any], session: Optional[Session] = None, is_scalar=False) -> Union[dict, list[dict], None]:
+        if session is not None:
+            entities = session_callback(session)
+            if not entities:
+                return None
             if is_scalar:
-                return enitites
+                return entities
             else:
-                return self.schema.dump(enitites, many=isinstance(enitites, (list, set, tuple)))
-        
-        except Exception as error:
-            #El error es manejado por el controlador
-            raise error
-            
-        finally:
-            session.close()
+                return self.schema.dump(entities, many=isinstance(entities, (list, set, tuple)))
+        else:
+            session_local = SessionLocal()
+            try:
+                entities = session_callback(session_local)
+                if not entities:
+                    return None
+                if is_scalar:
+                    return entities
+                else:
+                    return self.schema.dump(entities, many=isinstance(entities, (list, set, tuple)))
+            except Exception as error:
+                raise error
+            finally:
+                session_local.close()

@@ -12,6 +12,8 @@ class Usuario(Base):
     id_usuario = Column(Integer, primary_key=True)
     nombre_usuario = Column(String, nullable=False)
     email_usuario = Column(String, unique=True, nullable=False)
+    email_verificado = Column(Integer, default=0)
+    
     password = Column(String, nullable=False)
     persona_id = Column(Integer, nullable=True,default=None) # se le quito --> , ForeignKey('persona_model.id_persona') --> solo para desarrollo, agregar cuanto este la tabla persona
 
@@ -27,7 +29,8 @@ class Usuario(Base):
     logs = relationship("UsuarioLog", back_populates="usuario")
     password_logs = relationship("PasswordLog", back_populates="usuario")
 
-
+    def marcar_email_verificado(self):
+        self.email_verificado = True
 
 class UsuarioLog(Base):
     __tablename__ = 'usuario_logs'

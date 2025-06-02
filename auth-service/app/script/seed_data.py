@@ -46,6 +46,7 @@ def seed():
         superadmin = Usuario(
             nombre_usuario="superadmin",
             email_usuario=email,
+            email_verificado=1,
             password=generate_password_hash("admin123!"),
             persona_id=None  # Hasta que se conecte con persona-service
         )
