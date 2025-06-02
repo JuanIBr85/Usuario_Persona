@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from dotenv import load_dotenv
 from app.routes.usuarios_blueprint import usuario_bp
 import os
