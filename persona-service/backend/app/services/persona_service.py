@@ -76,6 +76,10 @@ class PersonaService(IPersonaInterface):
 
         except Exception as e:
             session.rollback()
+
+            if "UNIQUE constraint failed: personas.usuario_id" in str(e):
+                raise Exception ("Usuario ya tiene una persona asociada, no se puede crear más de un perfil de persona por usuario")
+
             raise e
 
         finally:
@@ -107,9 +111,6 @@ class PersonaService(IPersonaInterface):
 
             if 'contacto' in data:
                 self.contacto_service.modificar_contacto(persona.contacto_id, data['contacto'], session)
-
-            #if 'tipo_documento' in data:
-             #   self.tipo_documento_service.modificar_tipo_documento(persona.tipo_documento_id, data['tipo_documento'], session)
 
             for field in ['nombre_persona', 'apellido_persona', 'fecha_nacimiento_persona', 'num_doc_persona', 'usuario_id']:
                 if field in data_validada:
