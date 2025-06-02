@@ -28,15 +28,21 @@ def make_response(status:ResponseStatus, message:str, data:Any = None)->Dict:
         Dict: Diccionario JSON serializado con la estructura estándar de respuesta.
               Contiene los campos 'status', 'message', y opcionalmente 'data' o 'error' y 'total'.
     """
-    response ={
-        "status": status.value,
-        "message": message or ""
+    # Crear la estructura básica de la respuesta
+    response = {
+        "status": status.value,  # Valor del estado (success, error, etc.)
+        "message": message or ""  # Mensaje descriptivo o cadena vacía
     }
 
+    # Si hay datos para incluir en la respuesta
     if data is not None:
-        response["data" if status!=ResponseStatus.ERROR else "error"]=data
+        # Usar 'data' para respuestas exitosas o 'error' para errores
+        response["data" if status != ResponseStatus.ERROR else "error"] = data
+        
+        # Si los datos son una colección
         if isinstance(data, (list, set, tuple)):
+            # Agrega el total de elementos
             response["total"] = len(data)
 
-
+    # Convertir el diccionario a formato JSON
     return jsonify(response)
