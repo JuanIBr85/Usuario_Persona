@@ -1,0 +1,138 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    "name": "Persona Service API",
+    "description": "Colección de Postman para probar el microservicio de Personas",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Personas",
+      "description": "Endpoints para el manejo de personas",
+      "item": [
+        {
+          "name": "Listar todas las personas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/personas",
+              "host": ["{{base_url}}"],
+              "path": ["personas"]
+            },
+            "description": "Obtiene un listado de todas las personas en el sistema"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener persona por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/personas/1",
+              "host": ["{{base_url}}"],
+              "path": ["personas", "1"]
+            },
+            "description": "Obtiene los detalles de una persona específica por su ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Crear nueva persona",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nombre_persona\": \"Juan\",\n    \"apellido_persona\": \"Pérez\",\n    \"fecha_nacimiento_persona\": \"1990-01-01\",\n    \"tipo_documento\": \"DNI\",\n    \"num_doc_persona\": \"40123456\",\n    \"usuario_id\": 1,\n    \"domicilio\": {\n        \"domicilio_calle\": \"Av. Siempre Viva\",\n        \"domicilio_numero\": \"1234\",\n        \"domicilio_piso\": \"2\",\n        \"domicilio_dpto\": \"A\",\n        \"codigo_postal\": {\n            \"codigo_postal\": \"C1406\",\n            \"localidad\": \"CABA\",\n            \"partido\": \"CABA\",\n            \"provincia\": \"CABA\",\n            \"pais\": \"Argentina\"\n        }\n    },\n    \"contacto\": {\n        \"telefono_fijo\": \"011-1234-5678\",\n        \"telefono_movil\": \"11-1234-5678\",\n        \"red_social_contacto\": \"juan.perez\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/crear_persona",
+              "host": ["{{base_url}}"],
+              "path": ["crear_persona"]
+            },
+            "description": "Crea una nueva persona en el sistema"
+          },
+          "response": []
+        },
+        {
+          "name": "Modificar persona existente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nombre_persona\": \"Juan Carlos\",\n    \"apellido_persona\": \"Pérez Gómez\",\n    \"fecha_nacimiento_persona\": \"1990-01-01\",\n    \"tipo_documento\": \"DNI\",\n    \"num_doc_persona\": \"40123456\",\n    \"usuario_id\": 1,\n    \"domicilio\": {\n        \"domicilio_calle\": \"Av. Siempre Viva\",\n        \"domicilio_numero\": \"1234\",\n        \"domicilio_piso\": \"2\",\n        \"domicilio_dpto\": \"A\",\n        \"codigo_postal\": {\n            \"codigo_postal\": \"C1406\",\n            \"localidad\": \"CABA\",\n            \"partido\": \"CABA\",\n            \"provincia\": \"CABA\",\n            \"pais\": \"Argentina\"\n        }\n    },\n    \"contacto\": {\n        \"telefono_fijo\": \"011-1234-5678\",\n        \"telefono_movil\": \"11-1234-5678\",\n        \"red_social_contacto\": \"juan.c.perez\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/modificar_persona/1",
+              "host": ["{{base_url}}"],
+              "path": ["modificar_persona", "1"]
+            },
+            "description": "Modifica los datos de una persona existente"
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar persona",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/borrar_persona/1",
+              "host": ["{{base_url}}"],
+              "path": ["borrar_persona", "1"]
+            },
+            "description": "Elimina lógicamente una persona del sistema"
+          },
+          "response": []
+        },
+        {
+          "name": "Restaurar persona eliminada",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/restaurar_persona/1",
+              "host": ["{{base_url}}"],
+              "path": ["restaurar_persona", "1"]
+            },
+            "description": "Restaura una persona que fue eliminada lógicamente"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "exec": [
+          "pm.test(\"Status code is 200\", function () {",
+          "    pm.response.to.have.status(200);",
+          "});"
+        ],
+        "type": "text/javascript"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5001",
+      "type": "string"
+    }
+  ]
+}

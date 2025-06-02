@@ -14,7 +14,7 @@ class Persona(Base):
     tipo_documento = Column(String(20), nullable=False) 
     num_doc_persona=Column(String(8), nullable=False)
     
-    usuario_id = Column(Integer, nullable=False)
+    usuario_id = Column(Integer, nullable=False, unique=True)
 
     domicilio_id=Column(Integer, ForeignKey('domicilios.id_domicilio'))
     contacto_id=Column(Integer, ForeignKey('contactos.id_contacto'))

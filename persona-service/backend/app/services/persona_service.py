@@ -52,22 +52,18 @@ class PersonaService(IPersonaInterface):
         session=SessionLocal()
 
         try:
-            if not data:
-                return jsonify({"error": "No hay datos"}),400
+            data_validada = self.schema.load(data)
             
-            data_validada=self.schema.load(data)
-
-            #Se crea el contacto, domicilio
+            # Crear el contacto y domicilio
             domicilio = self.domicilio_service.crear_domicilio(data_validada.pop('domicilio'), session=session)
             contacto = self.contacto_service.crear_contacto(data_validada.pop('contacto'), session=session)
 
-            data_validada['domicilio_id']=domicilio.id_domicilio
-            data_validada['contacto_id']=contacto.id_contacto
-            data_validada['tipo_documento']=data_validada.pop('tipo_documento')
+            data_validada['domicilio_id'] = domicilio.id_domicilio
+            data_validada['contacto_id'] = contacto.id_contacto
+            data_validada['tipo_documento'] = data_validada.pop('tipo_documento')
             
-
             # Crear Persona
-            persona_nueva=Persona(**data_validada)
+            persona_nueva = Persona(**data_validada)
             session.add(persona_nueva)
             session.commit()
             session.refresh(persona_nueva)
@@ -76,6 +72,11 @@ class PersonaService(IPersonaInterface):
 
         except Exception as e:
             session.rollback()
+
+            #Si se intenta crear una persona con un usuario_id que ya tiene una persona asociada, se lanza una excepcion
+            if "UNIQUE constraint failed: personas.usuario_id" in str(e):
+                raise Exception("Usuario ya tiene una persona asociada, no se puede crear más de un perfil de persona por usuario")
+
             raise e
 
         finally:
