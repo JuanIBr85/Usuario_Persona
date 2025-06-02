@@ -12,9 +12,9 @@ class Persona(Base):
     apellido_persona=Column(String(50),nullable=False)
     fecha_nacimiento_persona = Column(Date,nullable=False)
     tipo_documento = Column(String(20), nullable=False) 
-    num_doc_persona=Column(String(8), nullable=False)
+    num_doc_persona=Column(String(11), nullable=False)
     
-    usuario_id = Column(Integer, nullable=False)
+    usuario_id = Column(Integer, nullable=False, unique=True)
 
     domicilio_id=Column(Integer, ForeignKey('domicilios.id_domicilio'))
     contacto_id=Column(Integer, ForeignKey('contactos.id_contacto'))

@@ -6,8 +6,9 @@ import { Link } from 'react-router-dom';
 import { Fade } from "react-awesome-reveal";
 import { KeyRound } from "lucide-react";
 import { formSubmitJson } from "@/utils/formUtils";
-import { fetchService, HttpMethod, ServiceURL } from "@/utils/fetchUtils";
-import {SimpleDialog, FetchErrorMessage} from "@/components/SimpleDialog";
+import { SimpleDialog, FetchErrorMessage } from "@/components/SimpleDialog";
+import { AuthService } from "@/services/authService";
+
 
 function Login() {
     const [isOpen, setIsOpen] = React.useState(false);
@@ -15,29 +16,25 @@ function Login() {
 
     const handleSubmit = async (event) => {
         const formData = await formSubmitJson(event);
-        fetchService.fetch({
-            url: `${ServiceURL.auth}/login1`,
-            method: HttpMethod.POST,
-            body: formData,
-            showError: true
-        }).then((json) => {
-            console.log(json);
-            setMessage(`Login exitoso. Bienvenido ${json.data.usuario.nombre_usuario}!`);
-            localStorage.setItem("token", json.data.token);
-            setIsOpen(true);
-        }).catch((error) => {
-            if (error.isJson) {
-                if (error.data.error) {
-                    setMessage(FetchErrorMessage(error));
+        AuthService
+            .login(formData)
+            .then((json) => {
+                console.log(json);
+                setMessage(`Login exitoso. Bienvenido ${json.data.usuario.nombre_usuario}!`);
+                localStorage.setItem("token", json.data.token);
+                setIsOpen(true);
+            }).catch((error) => {
+                if (error.isJson) {
+                    if (error.data.error) {
+                        setMessage(FetchErrorMessage(error));
+                    } else {
+                        setMessage(error.data.message || "Error desconocido");
+                    }
                 } else {
-                    setMessage(error.data.message || "Error desconocido");
+                    setMessage(error.message);
                 }
-            } else {
-                setMessage(error.message);
-            }
-
-            setIsOpen(true);
-        });
+                setIsOpen(true);
+            });
     }
     return (
         <Fade duration={500} triggerOnce>

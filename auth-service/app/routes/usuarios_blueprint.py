@@ -66,7 +66,7 @@ registrar_usuario1._security_metadata ={
 
 @usuario_bp.route('/verificar-email', methods=['GET'])
 def verificar_email():
-    from jwt import decode, ExpiredSignatureError, InvalidTokenError
+    from jwt import ExpiredSignatureError, InvalidTokenError
     token = request.args.get('token', None)
     if not token:
         return make_response(
@@ -91,10 +91,19 @@ def verificar_email():
             status=ResponseStatus.SUCCESS,
             message="Email verificado correctamente."
         ), 200
+    
     except ExpiredSignatureError:
-        return make_response(status=ResponseStatus.ERROR, message="Token expirado."), 400
+        return make_response(
+            status=ResponseStatus.ERROR, 
+            message="Token expirado."
+        ), 400
+    
     except InvalidTokenError:
-        return make_response(status=ResponseStatus.ERROR, message="Token inválido."), 400
+        return make_response(
+            status=ResponseStatus.ERROR, 
+            message="Token inválido."
+        ), 400
+    
     finally:
         session.close()
 verificar_email._security_metadata ={
@@ -178,7 +187,7 @@ def ruta_solo_superadmin():
 
 ruta_solo_superadmin._security_metadata = {
     "is_public":False,
-    "access_permissions": ["crear_usuario"]  # o solo uno como "admin_total"
+    "access_permissions": ["crear_usuario"]  #  o solo uno como "admin_total"
 }
 
 @usuario_bp.route('/admin', methods=['GET'])
