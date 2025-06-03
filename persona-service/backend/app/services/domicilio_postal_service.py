@@ -1,4 +1,4 @@
-from app.models.domicilio_postal_model import Domicilio_Postal
+from app.models.domicilio_postal_model import DomicilioPostal
 from app.schema.domicilio_postal_schema import DomicilioPostalSchema
 from app.interfaces.domicilio_postal_interface import IDomicilioPostalInterface
 from app.extensions import SessionLocal
@@ -21,7 +21,7 @@ class DomicilioPostalService(IDomicilioPostalInterface):
 
         try:
             data_validada=self.schema.load(data)
-            domicilio_postal = Domicilio_Postal(**data_validada)
+            domicilio_postal = DomicilioPostal(**data_validada)
             session.add(domicilio_postal)
             session.flush()
 

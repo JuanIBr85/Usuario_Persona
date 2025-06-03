@@ -2,7 +2,7 @@ from app.extensions import Base
 from sqlalchemy import ForeignKey, Integer, String, DateTime, Column, Date
 from datetime import datetime, timezone
 
-class Domicilio_Postal(Base):
+class DomicilioPostal(Base):
 
     __tablename__ = "domicilios_postales"
 
@@ -11,4 +11,3 @@ class Domicilio_Postal(Base):
     localidad = Column(String(100), nullable=False)
     partido = Column(String(100), nullable=False)
     provincia = Column(String(100), nullable=False)
-    pais = Column(String(100), nullable=False)

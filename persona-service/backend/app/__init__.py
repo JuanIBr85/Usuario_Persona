@@ -1,10 +1,12 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
+import os
 from app.extensions import jwt, engine, Base
 from app.models.persona_model import Persona
 from app.models.contacto_model import Contacto
 from app.models.domicilio_model import Domicilio
-from app.models.domicilio_postal_model import Domicilio_Postal
+from app.models.domicilio_postal_model import DomicilioPostal
+from app.utils.carga_domicilio_postal import cargar_domicilios_postales_csv
 
 
 def create_app():
@@ -29,6 +31,21 @@ def create_app():
     
     with app.app_context():
         Base.metadata.create_all(bind=engine)
+
+        from app.extensions import SessionLocal
+        session = SessionLocal()
+
+        if session.query(DomicilioPostal).count() == 0:
+            base_dir = os.path.abspath(os.path.dirname(__file__))
+            csv_path = os.path.join(base_dir, 'seeds', 'domicilio_postal_ba2.csv')
+            
+
+            if os.path.exists(csv_path):
+                cargar_domicilios_postales_csv(csv_path)
+            else:
+                print(f"Archivo CSV no encontrado: {csv_path}")    
+
+        session.close()
 
     
     @app.route('/')
