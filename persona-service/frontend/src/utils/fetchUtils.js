@@ -52,7 +52,7 @@ export const fetchService = {
     },
 
     // Método principal que hace las peticiones Fetch
-    fetch: ({ url, method, headers = {}, body, useToken, returnJson = true, showError = true, timeout = 1000 * 5 }) => {
+    fetch: ({ url, method, headers = {}, body, useToken, returnJson = true, showError = true, timeout = 1000 * 20 }) => {
         
         // Creamos un controlador para poder cancelar la petición si es necesario
         const controller = new AbortController();

@@ -8,11 +8,16 @@ import { KeyRound } from "lucide-react";
 import { formSubmitJson } from "@/utils/formUtils";
 import { SimpleDialog, FetchErrorMessage } from "@/components/SimpleDialog";
 import { AuthService } from "@/services/authService";
-
+import { useAuthContext } from "@/context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
+  const navigate = useNavigate()
   const [isOpen, setIsOpen] = React.useState(false);
   const [dialogMessage, setMessage] = React.useState("");
+  const [isLogin, setIsLogin] = React.useState(false);
+
+  const {updateData} = useAuthContext();
 
   const handleSubmit = async (event) => {
     const formData = await formSubmitJson(event);
@@ -21,7 +26,11 @@ function Login() {
       .then((json) => {
         console.log(json);
         setMessage(`Login exitoso. Bienvenido ${json.data.usuario.nombre_usuario}!`);
-        localStorage.setItem("token", json.data.token);
+        setIsLogin(true);
+        updateData({
+          token: json.data.token,
+          user: json.data.usuario
+        });
         setIsOpen(true);
       }).catch((error) => {
         if (error.isJson) {
@@ -43,6 +52,7 @@ function Login() {
         description={dialogMessage}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
+        actionHandle={isLogin ? ()=>setTimeout(()=>navigate('/profile'), 200) : undefined}
       />
       <div className="h-screen flex items-center justify-center">
         <div className="flex w-full h-full sm:h-[520px] sm:max-w-md md:max-w-3xl shadow-md rounded-xl overflow-hidden">
