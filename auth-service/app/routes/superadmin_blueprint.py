@@ -1,33 +1,191 @@
-from flask import Blueprint
+from flask import Blueprint , Response , request
+import json
+from app.database.session import SessionLocal
+from app.services.superadmin_service import SuperAdminService
 
 superadmin_bp = Blueprint('admin', __name__)
 
+superadmin_service = SuperAdminService()
+
+@superadmin_bp.route('/admins', methods=['POST'])
+def crear_admin():
+    session = SessionLocal()
+    try:
+        data = request.get_json()
+        nombre = data.get("nombre_usuario")
+        email = data.get("email_usuario")
+        password = data.get("password")
+
+        if not nombre or not email or not password:
+            return Response(
+                json.dumps({"error": "Faltan campos requeridos."}),
+                status=400,
+                mimetype='application/json'
+            )
+
+        resultado = superadmin_service.crear_admin(session, nombre, email, password)
+
+        return Response(
+            json.dumps(resultado),
+            status=201,
+            mimetype='application/json'
+        )
+
+    except ValueError as e:
+        session.rollback()
+        return Response(
+            json.dumps({"error": str(e)}),
+            status=400,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        session.rollback()
+        return Response(
+            json.dumps({"error": f"Error inesperado: {str(e)}"}),
+            status=500,
+            mimetype='application/json'
+        )
+    finally:
+        session.close()
+        asignar_permisos_admin._security_metadata = {
+    "is_public": False,
+    "access_permissions": ["crear_admin"]
+}
+
+# Asignar permisos a admin
+@superadmin_bp.route('/admins/<int:id>/permisos', methods=['POST'])
+def asignar_permisos_admin(id):
+    session = SessionLocal()
+    try: 
+        data = request.get_json()
+        permisos = data.get("permisos")
+        if not permisos or not isinstance(permisos, list):
+            return Response(
+                json.dumps({"error": "Se requiere una lista de permisos."}),
+                status=400,
+                mimetype='application/json'
+            )
+
+        resultado = superadmin_service.asignar_permisos_admin(session, id, permisos)
+
+        return Response(
+            json.dumps(resultado),
+            status=200,
+            mimetype='application/json'
+        )
+
+    except ValueError as e:
+        session.rollback()
+        return Response(
+            json.dumps({"error": str(e)}),
+            status=400,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        session.rollback()
+        return Response(
+            json.dumps({"error": f"Error inesperado: {str(e)}"}),
+            status=500,
+            mimetype='application/json'
+        )
+    finally:
+        session.close()
+asignar_permisos_admin._security_metadata = {
+    "is_public": False,
+    "access_permissions": ["asignar_permisos_admin"]
+}
+
+# Modificar admin
+@superadmin_bp.route('/admins/<int:id>', methods=['PUT'])
+def modificar_admin(id):
+    session = SessionLocal()
+    try:
+        data = request.get_json()
+        permisos = data.get("permisos")
+        if not permisos or not isinstance(permisos, list):
+            return Response(
+                json.dumps({"error": "Se requiere una lista de permisos."}),
+                status=400,
+                mimetype='application/json'
+            )
+
+        resultado = superadmin_service.asignar_permisos_admin(session, id, permisos)
+
+        return Response(
+            json.dumps(resultado),
+            status=200,
+            mimetype='application/json'
+        )
+
+    except ValueError as e:
+        session.rollback()
+        return Response(
+            json.dumps({"error": str(e)}),
+            status=400,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        session.rollback()
+        return Response(
+            json.dumps({"error": f"Error inesperado: {str(e)}"}),
+            status=500,
+            mimetype='application/json'
+        )
+    finally:
+        session.close()
+modificar_admin._security_metadata = {
+    "is_public": False,
+    "access_permissions": ["modificar_admin"]
+}
+
+# Crear rol
 @superadmin_bp.route('/roles', methods=['POST'])
 def crear_rol():
-    # Crear un nuevo rol (solo superadmin)
-    pass
+    return Response(
+        json.dumps({"mensaje": "Rol creado "}),
+        status=201,
+        mimetype='application/json'
+    )
+crear_rol._security_metadata = {
+    "is_public": False,
+    "access_permissions": ["crear_rol"]
+}
 
+# Modificar rol
 @superadmin_bp.route('/roles/<int:rol_id>', methods=['PUT'])
 def modificar_rol(rol_id):
-    # Modificar rol existente
-    pass
+    return Response(
+        json.dumps({"mensaje": f"Rol {rol_id} modificado "}),
+        status=200,
+        mimetype='application/json'
+    )
+modificar_rol._security_metadata = {
+    "is_public": False,
+    "access_permissions": ["modificar_rol"]
+}
 
+# Crear permiso
 @superadmin_bp.route('/permisos', methods=['POST'])
 def crear_permiso():
-    # Crear nuevo permiso
-    pass
+    return Response(
+        json.dumps({"mensaje": "Permiso creado "}),
+        status=201,
+        mimetype='application/json'
+    )
+crear_permiso._security_metadata = {
+    "is_public": False,
+    "access_permissions": ["crear_permiso"]
+}
 
+# Asignar permisos a rol
 @superadmin_bp.route('/roles/<int:rol_id>/permisos', methods=['POST'])
 def asignar_permisos_a_rol(rol_id):
-    # Asignar permisos a un rol
-    pass
-
-@superadmin_bp.route('/usuarios', methods=['POST'])
-def crear_usuario_global():
-    # Crear usuario desde contexto global (sin estar atado a un microservicio)
-    pass
-
-@superadmin_bp.route('/usuarios/<int:usuario_id>/roles', methods=['POST'])
-def asignar_roles_a_usuario(usuario_id):
-    # Asignar roles a un usuario (superadmin)
-    pass
+    return Response(
+        json.dumps({"mensaje": f"Permisos asignados al rol {rol_id} "}),
+        status=200,
+        mimetype='application/json'
+    )
+asignar_permisos_a_rol._security_metadata = {
+    "is_public": False,
+    "access_permissions": ["asignar_permisos_a_rol"]
+}
