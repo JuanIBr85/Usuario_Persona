@@ -1,7 +1,6 @@
 from sqlalchemy import Column, Integer, String,DateTime,ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime, timezone,timedelta
-from app.models.rol import RolUsuario
 from app.models.base_model import Base
 
 class Usuario(Base):
