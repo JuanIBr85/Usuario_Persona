@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Fade } from 'react-awesome-reveal'
@@ -14,28 +14,73 @@ import FormServicios from "@/components/profile/FormServicios"
 import FormContacto from "@/components/profile/FormContacto"
 import FormDomicillio from "@/components/profile/FormDomicillio"
 
+import { useAuthContext } from "@/context/AuthContext";
+import { PersonaService } from '@/services/personaService'
+
 function ProfileForm() {
   const navigate = useNavigate()
+  const {updateData, authData} = useAuthContext();
 
-  const fixedData = {
-    dni: '12345678',
-    nombre: 'Franco',
-    apellido: 'Pérez',
-    email: 'franco.perez@email.com'
-  }
+  useEffect(() => {
+    if (!authData.token) {
+      navigate('/login')
+    } else {
+      console.log(authData)
+      PersonaService
+        .get_by_usuario(authData.user.id_usuario)
+        .then(response => {
+          if (response.data) {
+            setPersonaData({
+              ...response.data,
+              contacto: response.data.contacto || {},
+              domicilio: response.data.domicilio || {}
+            })
+          }
+        })
+        .catch((error) => {
+          console.error("Error al obtener los datos de la persona:", error);
+        });
+    }
+  }, [authData, navigate]);
 
-  const [editableData, setEditableData] = useState({
-    telefono: '',
-    direccion: '',
-    fecha_nacimiento_persona: "1994-07-04"
+  const [personaData, setPersonaData] = useState({
+    nombre_persona: '',
+    apellido_persona: '',
+    tipo_documento: 'DNI',
+    num_doc_persona: '',
+    fecha_nacimiento_persona: '',
+    contacto: {
+      telefono_movil: '',
+      telefono_fijo: '',
+      red_social_contacto: ''
+    },
+    domicilio: {
+      domicilio_calle: '',
+      domicilio_numero: '',
+      domicilio_piso: '',
+      domicilio_dpto: '',
+      codigo_postal: {
+        codigo_postal: '',
+        localidad: '',
+        partido: '',
+        provincia: ''
+      }
+    }
   })
+
+  const fixedData = React.useMemo(() => ({
+    tipo_documento: personaData.tipo_documento,
+    num_doc_persona: personaData.num_doc_persona,
+    nombre: personaData.nombre_persona,
+    apellido: personaData.apellido_persona,
+    email: authData.user?.email_usuario || ''
+  }), [personaData, authData.user?.email_usuario])
 
   const [photoUrl, setPhotoUrl] = useState('https://i.pravatar.cc/150?img=69')
   const subscribedServices = ['Residencia', 'Becas', 'Oferta educativa']
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setEditableData((prev) => ({ ...prev, [name]: value }))
+  const handleChange = (field, value) => {
+      
   }
 
   const handlePhotoChange = (e) => {
@@ -96,15 +141,28 @@ function ProfileForm() {
                 </TabsList>
 
                 <TabsContent value="datos">
-                  <FormDatos handleSubmit={handleSubmit} fixedData={fixedData} editableData={editableData} />
+                  <FormDatos 
+                    handleSubmit={handleSubmit} 
+                    fixedData={fixedData} 
+                    personaData={personaData}
+                    handleChange={handleChange} 
+                  />
                 </TabsContent>
 
                 <TabsContent value="contacto">
-                 <FormContacto  handleSubmit={handleSubmit} fixedData={fixedData} editableData={editableData}  />
+                  <FormContacto  
+                    handleSubmit={handleSubmit} 
+                    contacto={personaData.contacto} 
+                    handleChange={handleChange}
+                  />
                 </TabsContent>
 
                 <TabsContent value="domicillio">
-                 <FormDomicillio  handleSubmit={handleSubmit} fixedData={fixedData} editableData={editableData}  />
+                  <FormDomicillio  
+                    handleSubmit={handleSubmit} 
+                    domicilio={personaData.domicilio} 
+                    handleChange={handleChange}
+                  />
                 </TabsContent>
 
                 <TabsContent value="servicios">

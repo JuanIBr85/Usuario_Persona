@@ -23,7 +23,7 @@ import {
  * @param {Function} setIsOpen - Función para actualizar el estado de apertura del diálogo
  * @returns {JSX.Element} Un diálogo modal con título, descripción y botones de acción
  */
-function SimpleDialog({ title, description, action = "Aceptar", cancel = "", cancelHandle, isOpen, setIsOpen }) {
+function SimpleDialog({ title, description, action = "Aceptar", cancel = "", actionHandle, cancelHandle, isOpen, setIsOpen }) {
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogContent>
@@ -35,7 +35,7 @@ function SimpleDialog({ title, description, action = "Aceptar", cancel = "", can
         </AlertDialogHeader>
         <AlertDialogFooter>
           {(cancel) && <AlertDialogCancel onClick={cancelHandle}>{cancel}</AlertDialogCancel>}
-          <AlertDialogAction>{action}</AlertDialogAction>
+          <AlertDialogAction onClick={actionHandle}>{action}</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

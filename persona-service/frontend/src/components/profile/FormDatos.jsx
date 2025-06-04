@@ -1,8 +1,24 @@
 import InputValidate from "@/components/inputValidate/InputValidate"
 import { Button } from "@/components/ui/button"
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem
+} from "@/components/ui/select"
+import { Label } from '@/components/ui/label'
 
+const TIPOS_DOCUMENTO = [
+  { value: 'DNI', label: 'DNI' },
+  { value: 'LE', label: 'Libreta de Enrolamiento' },
+  { value: 'LC', label: 'Libreta Cívica' },
+  { value: 'PASAPORTE', label: 'Pasaporte' },
+  { value: 'CI', label: 'Cédula de Identidad' }
+]
 
-export default function FormDatos({ handleSubmit, fixedData, editableData }) {
+export default function FormDatos({ handleSubmit, fixedData, personaData, handleChange }) {
+  console.log(fixedData)  
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Datos fijos */}
@@ -13,34 +29,41 @@ export default function FormDatos({ handleSubmit, fixedData, editableData }) {
           type="text"
           labelText="Nombre"
           value={fixedData.nombre}
-          className="bg-gray-100 cursor-not-allowed"
-          readOnly
         />
         <InputValidate
           id="apellido"
           type="text"
           labelText="Apellido"
           value={fixedData.apellido}
-          className="bg-gray-100 cursor-not-allowed"
-          readOnly
         />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
+        <div className="grid w-full items-center gap-1.5">
+          <Label htmlFor="tipo_documento">Tipo de documento</Label>
+          <div className="relative">
+            <Select
+              value={personaData.tipo_documento}
+              onChange={(e) => handleChange('tipo_documento', e.target.value)}
+              id="tipo_documento"
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Selecciona un tipo de documento" />
+              </SelectTrigger>
+              <SelectContent>
+                {TIPOS_DOCUMENTO.map((tipo) => (
+                  <SelectItem key={tipo.value} value={tipo.value}>
+                    {tipo.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
         <InputValidate
-          id="tipo_documento"
-          type="text"
-          labelText="Tipo de documento"
-          value="PLACEHOLDER DE UN SELECT"
-          className="bg-gray-100 cursor-not-allowed w-full"
-          readOnly
-        />
-        <InputValidate
-          id="numero_documento"
+          id="num_doc_persona"
           type="text"
           labelText="Nº de documento"
-          value={fixedData.dni}
-          className="bg-gray-100 cursor-not-allowed w-full"
-          readOnly
+          value={fixedData.num_doc_persona}
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -49,7 +72,8 @@ export default function FormDatos({ handleSubmit, fixedData, editableData }) {
           type="date"
           placeholder="Ingresa tu fecha de nacimiento"
           labelText="Fecha de nacimiento"
-          value={editableData.fecha_nacimiento_persona}
+          value={personaData.fecha_nacimiento_persona || ''}
+          onChange={(e) => handleChange('fecha_nacimiento_persona', e.target.value)}
           validateMessage="La fecha de nacimiento es requerida"
           required
         />
@@ -59,7 +83,7 @@ export default function FormDatos({ handleSubmit, fixedData, editableData }) {
           type="email"
           labelText="Email"
           value={fixedData.email}
-          className="bg-gray-100 cursor-not-allowed"
+          className="bg-gray-100 cursor-not-allowed w-full"
           readOnly
         />
       </div>
@@ -71,7 +95,7 @@ export default function FormDatos({ handleSubmit, fixedData, editableData }) {
           type="button"
           variant="secondary"
           className="w-full"
-          onClick={() => navigate('/Login')}
+          onClick={() => window.history.back()}
         >
           Volver
         </Button>
