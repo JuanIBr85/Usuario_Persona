@@ -2,19 +2,22 @@ from flask import Blueprint , Response , request
 import json
 from app.database.session import SessionLocal
 from app.services.superadmin_service import SuperAdminService
+from flask_jwt_extended import jwt_required
 
 superadmin_bp = Blueprint('admin', __name__)
 
 superadmin_service = SuperAdminService()
 
 @superadmin_bp.route('/admins', methods=['POST'])
-def crear_admin():
+@jwt_required()
+def crear_usuario_con_rol():
     session = SessionLocal()
     try:
         data = request.get_json()
         nombre = data.get("nombre_usuario")
         email = data.get("email_usuario")
         password = data.get("password")
+        nombre_rol = data["rol"] 
 
         if not nombre or not email or not password:
             return Response(
@@ -23,7 +26,49 @@ def crear_admin():
                 mimetype='application/json'
             )
 
-        resultado = superadmin_service.crear_admin(session, nombre, email, password)
+        resultado = superadmin_service.crear_usuario_con_rol(session, nombre, email, password,nombre_rol)
+
+        return Response(
+            json.dumps(resultado),
+            status=201,
+            mimetype='application/json'
+        )
+
+    except ValueError as e:
+        session.rollback()
+        return Response(
+            json.dumps({"error": str(e)}),
+            status=400,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        session.rollback()
+        return Response(
+            json.dumps({"error": f"Error inesperado: {str(e)}"}),
+            status=500,
+            mimetype='application/json'
+        )
+    finally:
+
+        session.close()
+
+crear_usuario_con_rol._security_metadata = {
+    "is_public": False,
+    "access_permissions": ["crear_usuario_con_rol"]
+}
+
+# Crear rol
+@superadmin_bp.route('/roles', methods=['POST'])
+def crear_rol():
+    session = SessionLocal()
+    try:
+        data = request.get_json()
+        nombre_rol = data.get("nombre_rol")
+
+        if not nombre_rol:
+            raise ValueError("Debe proporcionar un nombre para el rol.")
+
+        resultado = superadmin_service.crear_rol(session, nombre_rol)
 
         return Response(
             json.dumps(resultado),
@@ -47,14 +92,15 @@ def crear_admin():
         )
     finally:
         session.close()
-        asignar_permisos_admin._security_metadata = {
+crear_rol._security_metadata = {
     "is_public": False,
-    "access_permissions": ["crear_admin"]
+    "access_permissions": ["crear_rol"]
 }
 
-# Asignar permisos a admin
+
+# Asignar permisos a rol
 @superadmin_bp.route('/admins/<int:id>/permisos', methods=['POST'])
-def asignar_permisos_admin(id):
+def asignar_permisos_rol(id):
     session = SessionLocal()
     try: 
         data = request.get_json()
@@ -66,7 +112,7 @@ def asignar_permisos_admin(id):
                 mimetype='application/json'
             )
 
-        resultado = superadmin_service.asignar_permisos_admin(session, id, permisos)
+        resultado = superadmin_service.asignar_permisos_rol(session, id, permisos)
 
         return Response(
             json.dumps(resultado),
@@ -90,14 +136,14 @@ def asignar_permisos_admin(id):
         )
     finally:
         session.close()
-asignar_permisos_admin._security_metadata = {
+asignar_permisos_rol._security_metadata = {
     "is_public": False,
-    "access_permissions": ["asignar_permisos_admin"]
+    "access_permissions": ["asignar_permisos_rol"]
 }
 
-# Modificar admin
+# Modificar usuarios con rol
 @superadmin_bp.route('/admins/<int:id>', methods=['PUT'])
-def modificar_admin(id):
+def modificar_usuario_con_rol(id):
     session = SessionLocal()
     try:
         data = request.get_json()
@@ -133,22 +179,9 @@ def modificar_admin(id):
         )
     finally:
         session.close()
-modificar_admin._security_metadata = {
+modificar_usuario_con_rol._security_metadata = {
     "is_public": False,
     "access_permissions": ["modificar_admin"]
-}
-
-# Crear rol
-@superadmin_bp.route('/roles', methods=['POST'])
-def crear_rol():
-    return Response(
-        json.dumps({"mensaje": "Rol creado "}),
-        status=201,
-        mimetype='application/json'
-    )
-crear_rol._security_metadata = {
-    "is_public": False,
-    "access_permissions": ["crear_rol"]
 }
 
 # Modificar rol
@@ -159,6 +192,7 @@ def modificar_rol(rol_id):
         status=200,
         mimetype='application/json'
     )
+
 modificar_rol._security_metadata = {
     "is_public": False,
     "access_permissions": ["modificar_rol"]
@@ -175,17 +209,4 @@ def crear_permiso():
 crear_permiso._security_metadata = {
     "is_public": False,
     "access_permissions": ["crear_permiso"]
-}
-
-# Asignar permisos a rol
-@superadmin_bp.route('/roles/<int:rol_id>/permisos', methods=['POST'])
-def asignar_permisos_a_rol(rol_id):
-    return Response(
-        json.dumps({"mensaje": f"Permisos asignados al rol {rol_id} "}),
-        status=200,
-        mimetype='application/json'
-    )
-asignar_permisos_a_rol._security_metadata = {
-    "is_public": False,
-    "access_permissions": ["asignar_permisos_a_rol"]
 }

@@ -1,5 +1,5 @@
-from marshmallow import Schema, fields, validate
-#
+from marshmallow import Schema, fields, validate,ValidationError,validates_schema
+
 class UsuarioInputSchema(Schema):
     id_usuario = fields.Int(
         dump_only=True
@@ -22,7 +22,8 @@ class UsuarioInputSchema(Schema):
             validate.Length(min=6, error="La contraseña debe tener al menos 6 caracteres."),
             validate.Regexp(
                     regex=r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$",
-                        error="La contraseña debe contener al menos una letra minúscula, una letra mayúscula, un número y un símbolo."
+                        error="La contraseña debe contener al menos una letra minúscula, " \
+                        "una letra mayúscula, un número y un símbolo."
             )
         ],
         error_messages={"Requerido": "La contraseña es obligatoria."}
@@ -43,9 +44,9 @@ class UsuarioOutputSchema(Schema):
     nombre_usuario = fields.Str()
     email_usuario = fields.Email()
     persona_id = fields.Int()
-    created_at = fields.DateTime()
-    updated_at = fields.DateTime()
-    deleted_at = fields.DateTime()
+    token = fields.Str(
+        required=True
+    )
 
 class LoginSchema(Schema):
 
@@ -61,3 +62,35 @@ class LoginSchema(Schema):
         error_messages={"Requerido": "La contraseña es obligatoria."}
     )
 
+class RecuperarPasswordSchema(Schema):
+    email = fields.Email(required=True)
+
+class ResetPasswordSchema(Schema):
+
+    token = fields.Str(
+        required=True
+    )
+
+    password = fields.Str(
+        load_only=True, 
+        required=False, 
+        validate=[
+            validate.Length(min=6, error="La contraseña debe tener al menos 6 caracteres."),
+            validate.Regexp(
+                    regex=r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$",
+                    error="La contraseña debe contener al menos una letra minúscula, una letra mayúscula, " \
+                    "un número y un símbolo."
+            )
+        ],
+        error_messages={"Requerido": "La contraseña es obligatoria."}
+    )
+    confirm_password = fields.Str(
+        load_only=True,
+        required=True,
+        error_messages={"required": "Debe repetir la contraseña."}
+    )
+
+    @validates_schema
+    def validate_passwords_match(self, data, **kwargs):
+        if data.get("password") != data.get("confirm_password"):
+            raise ValidationError("Las contraseñas no coinciden.", field_name="confirm_password")

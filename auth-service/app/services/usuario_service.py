@@ -5,16 +5,21 @@ from app.models.usuarios import Usuario, PasswordLog, UsuarioLog
 from app.models.rol import RolUsuario,Rol
 from app.services.rol import get_rol_por_nombre
 from app.utils.jwt import crear_token_acceso
-from app.schemas.usuarios_schema import UsuarioInputSchema
+from app.schemas.usuarios_schema import UsuarioInputSchema,UsuarioOutputSchema,ResetPasswordSchema
 from marshmallow import ValidationError
 from app.services.servicio_base import ServicioBase
 from app.models.permisos import Permiso
 from app.models.rol import RolPermiso
-from app.utils.email import enviar_email_verificacion
+from app.utils.email import enviar_email_verificacion,enviar_email_recuperacion,generar_token_reset_password,verificar_token_reset
+import json
+from app.utils.response import ResponseStatus, make_response
+
 
 class UsuarioService(ServicioBase):
     def __init__(self):
-        super().__init__(model=Usuario, schema=UsuarioInputSchema())
+        super().__init__(model=Usuario, schema=UsuarioInputSchema()),
+        self.schema_out=UsuarioOutputSchema()
+        self.schema_reset = ResetPasswordSchema()
 
     def registrar_usuario(self, session: Session, data: dict) -> dict:
         try:
@@ -55,24 +60,21 @@ class UsuarioService(ServicioBase):
             accion="registro",
             detalles="El usuario se registró correctamente"
         ))
-
-        return {"mensaje": "Usuario registrado correctamente"}
+        return self.schema_out.dump(nuevo_usuario)
 
 
     def login_usuario(self, session: Session, email: str, password: str) -> dict:
 
-
-
         usuario = session.query(Usuario).filter_by(email_usuario=email).first()
         if not usuario:
             raise ValueError("El email no está registrado.")
-
-        if not usuario.email_verificado:
-            raise ValueError("Debe verificar su correo electrónico para poder iniciar sesión.")
         
         if not check_password_hash(usuario.password, password):
             raise ValueError("La contraseña es incorrecta.")
 
+        if not usuario.email_verificado:
+            raise ValueError("Debe verificar su correo electrónico para poder iniciar sesión.")
+        
         # Obtener el rol del usuario
         rol_usuario = session.query(Rol).join(RolUsuario).filter(RolUsuario.id_usuario == usuario.id_usuario).first()
         rol_nombre = rol_usuario.nombre_rol if rol_usuario else "sin_rol"
@@ -107,3 +109,64 @@ class UsuarioService(ServicioBase):
                 "permisos": permisos_lista
             }
         }
+
+    def recuperacion_password(self, session:Session, email: str)->dict:
+        #verifica que el email existe
+        usuario = session.query(Usuario).filter_by(email_usuario=email).first()
+        if not usuario:
+            raise ValueError("El email no está registrado.")
+        
+        token = generar_token_reset_password(usuario.email_usuario)
+        enviar_email_recuperacion(usuario,token)
+        
+        return {
+            "mensaje": "Se envio un mail para la recuperacion de contraseña",
+            "token":token
+            }
+    
+    def cambiar_password(self, session:Session,token:str, password_nuevo:str,password_confirm:str)->dict:
+        try:
+            self.schema_reset.load({
+                "token": token,
+                "password": password_nuevo,
+                "confirm_password": password_confirm
+            })
+            email = verificar_token_reset(token)
+            if not email:
+                return (
+                    ResponseStatus.UNAUTHORIZED,
+                    "Token inválido o expirado",
+                    None
+                ), 401
+            
+            usuario = session.query(Usuario).filter_by(email_usuario=email).first()
+            if not usuario:
+                return (
+                    ResponseStatus.NOT_FOUND,
+                    "Usuario no encontrado",
+                    None
+                ), 404
+            
+            if check_password_hash(usuario.password,password_nuevo):
+                return (
+                    ResponseStatus.FAIL,
+                    "La contraseña debe ser diferente a la anterior",
+                    None
+                ), 400
+                
+
+            hashed_password = generate_password_hash(password_nuevo)
+            usuario.password = hashed_password
+            session.add(usuario)
+            session.commit()
+
+            return (
+                ResponseStatus.SUCCESS, 
+                "Contraseña actualizada correctamente", 
+                {"usuario_id": usuario.id_usuario}
+            ),200
+
+        except ValidationError as err:
+            return (ResponseStatus.ERROR, "Error de validación", err.messages), 400
+        except ValueError as err:
+            return (ResponseStatus.ERROR, "Error de valor", str(err)), 400

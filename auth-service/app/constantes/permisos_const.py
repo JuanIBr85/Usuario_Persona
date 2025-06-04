@@ -9,6 +9,9 @@ PERMISOS = [
     "ver_permisos",
     "crear_permiso",
     "asignar_permiso",
+    "crear_usuario_con_rol",
+    "asignar_permisos_rol",
+    "modificar_admin"
 ]
 
 # Permisos por rol

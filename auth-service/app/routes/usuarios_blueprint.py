@@ -1,18 +1,13 @@
 import json
-from flask import request, Response, Blueprint
-from werkzeug.security import generate_password_hash,check_password_hash
+from flask import request, Blueprint
 from app.database.session import SessionLocal
-from app.models.usuarios import Usuario, PasswordLog,UsuarioLog
-from app.models.rol import RolUsuario,Rol
-from app.schemas.usuarios_schema import UsuarioInputSchema,LoginSchema
-from datetime import datetime, timezone
-from app.services.rol import get_rol_por_nombre
-from app.utils.jwt import crear_token_acceso
+from app.models.usuarios import Usuario
+from app.schemas.usuarios_schema import LoginSchema
 from marshmallow import ValidationError
 from app.utils.response import ResponseStatus, make_response
 from app.services.usuario_service import UsuarioService
 from app.extensions import limiter
-from app.utils.jwt import decodificar_token_verificacion
+from app.utils.email import decodificar_token_verificacion,verificar_token_reset
 
 usuario_bp = Blueprint("usuario", __name__)
 usuario_service = UsuarioService()
@@ -64,7 +59,7 @@ registrar_usuario1._security_metadata ={
 }
 
 
-@usuario_bp.route('/verificar-email', methods=['GET'])
+@usuario_bp.route('/verificar-email', methods=['GET']) #endpoint q manda y verifica el mail de registro
 def verificar_email():
     from jwt import ExpiredSignatureError, InvalidTokenError
     token = request.args.get('token', None)
@@ -164,6 +159,78 @@ perfil_usuario._security_metadata = {
     "is_public":False,
     "access_permissions": ["ver_usuario"]
 }
+
+
+@usuario_bp.route('/recuperar-password', methods=['POST']) # endpoint de recuperacion de contraseña envia token por mail y lo codifica
+def recuperar_password():   
+    session=SessionLocal()
+    email = request.json.get('email')
+    if not email:
+        return make_response(
+            status=ResponseStatus.NOT_FOUND,
+            message="debe introducir un email",
+        ), 404
+
+
+    data = usuario_service.recuperacion_password(session,email)
+    return make_response(
+            status=ResponseStatus.SUCCESS,
+            message="Correo de recuperación enviado",
+            data=data
+        ),200
+
+recuperar_password._security_metadata ={
+    "is_public":True
+}
+
+@usuario_bp.route('/verificar-token-password', methods=['GET'])
+def verificar_token_password():
+    token = request.args.get('token')
+    if not token:
+        return {"status": "error", "message": "Token no proporcionado"}, 400
+    try:
+        email = verificar_token_reset(token)
+        return {"status": "success", "message": "Token válido", "email": email}, 200
+    except ValueError as e:
+        return {"status": "error", "message": str(e)}, 400
+verificar_token_password._security_metadata ={
+    "is_public":True
+
+}
+
+@usuario_bp.route('/reset-password', methods=['POST'])
+def reset_password():
+    try:
+        session = SessionLocal()
+        data = request.get_json()
+        token = data.get('token')
+        nueva_password = data.get('password')
+        nueva_password_rep = data.get('confirm_password')
+
+        if not token or not nueva_password or not nueva_password_rep:
+            return make_response(
+                {"error": "Token y contraseñas son requeridos"}
+            ), 400
+
+        resultado = usuario_service.cambiar_password(session,token, nueva_password, nueva_password_rep)
+
+        if isinstance(resultado, tuple):
+            (status, message, data), code = resultado
+            return make_response(status, message, data), code
+        return make_response(resultado), 200
+
+
+    except Exception as e:
+        return make_response({"error": "Error interno del servidor", "detalle": str(e)}), 500
+    
+    finally:
+        session.close()
+
+reset_password._security_metadata ={
+    "is_public":True
+
+}
+
 
 @usuario_bp.route('/superadmin', methods=['GET'])
 def ruta_solo_superadmin():
