@@ -47,5 +47,5 @@ def respuesta_estandar(status:RespuestaStatus, message:str, data:Any = None)->Di
         if isinstance (data, (list, set, tuple)):  
             respuesta["total"] = len(data)
 
-    return jsonify(respuesta)        
+    return respuesta        
 
