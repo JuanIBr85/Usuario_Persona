@@ -16,7 +16,7 @@ def create_app():
     app.config.from_object("config")
 
 
-    CORS(app, supports_credentials=True)
+    CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
     
     #Inicializa de las exteniciones
     jwt.init_app(app)

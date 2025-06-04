@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
 import { Fade } from "react-awesome-reveal";
 import { useNavigate } from 'react-router-dom';
@@ -13,28 +13,41 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
 
+// Import de services
+import { PersonaService } from "@/services/personaService";
+
 function AdminUsers() {
   const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      nombre: "Juan Pérez",
-      rol: "Profesor",
-      email: "juan.perez@email.com",
-      status: "Activo",
-    },
-    {
-      id: 2,
-      nombre: "Lucía Gómez",
-      rol: "Alumno",
-      email: "lucia.gomez@email.com",
-      status: "Egresado",
-    },
-  ]);
-
   const [editingUser, setEditingUser] = useState(null);
+
+  const [users, setUsers] = useState([]);
+  useEffect(() => {
+    PersonaService.get()
+      .then(res => {
+        console.log("Respuesta completa:", res);
+
+        if (res && res.data) {
+          const personas = res.data;
+
+          const mappedUsers = personas.map(persona => ({
+            id: persona.id_persona,
+            nombre: `${persona.nombre_persona} ${persona.apellido_persona}`,
+            rol: "No definido",
+            email: persona.email || "sin email",
+            status: "Activo",
+          }));
+
+          setUsers(mappedUsers);
+        } else {
+          console.error("La respuesta no contiene el campo esperado 'data'");
+        }
+      })
+      .catch(err => {
+        console.error("Error obteniendo usuarios:", err);
+      });
+  }, []);
 
   const handleDelete = (id) => {
     setUsers(users.filter((user) => user.id !== id));
