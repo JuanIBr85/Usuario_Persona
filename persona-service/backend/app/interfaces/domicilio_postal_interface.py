@@ -9,3 +9,7 @@ class IDomicilioPostalInterface(ABC):
     @abstractmethod    
     def crear_domicilio_postal(self, data):
         pass
+
+    @abstractmethod
+    def obtener_id_por_cod_postal_localidad(self, codigo_postal, localidad):
+        pass 

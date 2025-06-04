@@ -1,7 +1,7 @@
 import InputValidate from "@/components/inputValidate/InputValidate"
 import { Button } from "@/components/ui/button"
 
-export default function FormDomicillio({ handleSubmit, fixedData, editableData }) {
+export default function FormDomicillio({ handleSubmit, domicilio, handleChange }) {
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             {/* Campo Calle */}
@@ -10,7 +10,8 @@ export default function FormDomicillio({ handleSubmit, fixedData, editableData }
                 type="text"
                 placeholder="Ingresa el nombre de la calle"
                 labelText="Calle"
-                value={editableData.domicilio_calle}
+                value={domicilio?.domicilio_calle || ''}
+          onChange={(e) => handleChange('domicilio.domicilio_calle', e.target.value)}
                 validatePattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{2,50}$"
                 validateMessage="Ingresa un nombre de calle válido (2-50 caracteres, solo letras y espacios)"
                 required
@@ -22,7 +23,8 @@ export default function FormDomicillio({ handleSubmit, fixedData, editableData }
                 type="text"
                 placeholder="Número de domicilio"
                 labelText="Número"
-                value={editableData.domicilio_numero}
+                value={domicilio?.domicilio_numero || ''}
+          onChange={(e) => handleChange('domicilio.domicilio_numero', e.target.value)}
                 validatePattern="^[0-9]{1,4}[a-zA-Z]?$"
                 validateMessage="Ingresa un número válido (ej: 1234, 123A)"
                 required
@@ -34,7 +36,8 @@ export default function FormDomicillio({ handleSubmit, fixedData, editableData }
                 type="text"
                 placeholder="Piso (opcional)"
                 labelText="Piso"
-                value={editableData.domicilio_piso}
+                value={domicilio?.domicilio_piso || ''}
+          onChange={(e) => handleChange('domicilio.domicilio_piso', e.target.value)}
                 validatePattern="^[0-9]{1,3}$|^$"
                 validateMessage="Ingresa un piso válido (máximo 3 dígitos)"
             />
@@ -45,7 +48,8 @@ export default function FormDomicillio({ handleSubmit, fixedData, editableData }
                 type="text"
                 placeholder="Departamento (opcional)"
                 labelText="Departamento"
-                value={editableData.domicilio_dpto}
+                value={domicilio?.domicilio_dpto || ''}
+          onChange={(e) => handleChange('domicilio.domicilio_dpto', e.target.value)}
                 validatePattern="^[a-zA-Z0-9]{1,2}$|^$"
                 validateMessage="Ingresa un departamento válido (máximo 2 caracteres)"
             />
@@ -56,7 +60,8 @@ export default function FormDomicillio({ handleSubmit, fixedData, editableData }
                 type="number"
                 placeholder="Código postal"
                 labelText="Código Postal"
-                value={editableData.codigo_postal}
+                value={domicilio?.codigo_postal?.codigo_postal || ''}
+          onChange={(e) => handleChange('domicilio.codigo_postal.codigo_postal', e.target.value)}
                 validatePattern="^[0-9]{4,8}$"
                 validateMessage="Ingresa un código postal válido (4-8 dígitos)"
                 required
@@ -70,7 +75,7 @@ export default function FormDomicillio({ handleSubmit, fixedData, editableData }
                     type="button"
                     variant="secondary"
                     className="w-full"
-                    onClick={() => navigate('/Login')}
+                    onClick={() => window.history.back()}
                 >
                     Volver
                 </Button>

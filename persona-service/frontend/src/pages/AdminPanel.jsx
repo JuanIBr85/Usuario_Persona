@@ -12,6 +12,16 @@ import { Button } from "@/components/ui/button";
 import { Users, ShieldCheck, FileText } from "lucide-react";
 import { Fade } from 'react-awesome-reveal'
 
+/**
+ * Lista de opciones disponibles en el panel de administración.
+ * Cada opción incluye un título, una descripción, un ícono y la ruta correspondiente.
+ * @typedef {Object} AdminOption
+ * @property {string} title - Título de la opción del panel.
+ * @property {string} description - Breve descripción de lo que hace la opción.
+ * @property {JSX.Element} icon - Ícono representativo de la opción.
+ * @property {string} path - Ruta a la que navegará al hacer clic.
+ */
+
 const adminOptions = [
   {
     title: "Usuarios",
@@ -32,6 +42,15 @@ const adminOptions = [
     path: "/logs",
   },
 ];
+
+/**
+ * Componente `AdminPanel`.
+ * Muestra un panel de administración con tarjetas para gestionar usuarios, roles y logs del sistema.
+ *
+ * @component
+ * @returns {JSX.Element} Componente que renderiza el panel de administración.
+ *
+ */
 
 const AdminPanel = () => {
   const navigate = useNavigate();

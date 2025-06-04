@@ -13,6 +13,18 @@ const defaultData = Object.freeze({
 
 const _accessibilityData = data ? JSON.parse(data) : { ...defaultData };
 
+/**
+ * AccessibilityMenu
+ *
+ * Un componente de menú de accesibilidad que permite a los usuarios personalizar la experiencia visual de la aplicación.
+ * Proporciona opciones para ajustar el tamaño de fuente, tipo de fuente (incluyendo opciones para dislexia y baja visión),
+ * activar/desactivar contraste alto y modo oscuro. Los cambios se aplican globalmente al documento y se guardan en localStorage.
+ *
+ * @component
+ *
+ * @returns {JSX.Element} Un botón flotante que despliega el menú de accesibilidad con varias opciones de personalización.
+ */
+
 const AccessibilityMenu = () => {
     const [showMenu, setShowMenu] = useState(false);
     const [accessibilityData, setAccessibilityData] = useState(_accessibilityData);

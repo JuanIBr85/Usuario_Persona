@@ -1,5 +1,15 @@
 import React from 'react'
 
+/**
+ * Loading
+ *
+ * Componente funcional de React que muestra un spinner de carga centrado en pantalla.
+ * Utiliza clases de Tailwind CSS para el diseño y animación.
+ *
+ * @component
+ * @returns {JSX.Element} Un overlay de pantalla completa con un spinner animado y un texto accesible "Cargando...".
+ */
+
 function Loading() {
     return (
         <div class="relative h-screen w-screen">

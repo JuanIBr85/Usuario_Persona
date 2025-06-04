@@ -7,6 +7,5 @@ class DomicilioPostalSchema(Schema):
     localidad = fields.Str(required=True)
     partido = fields.Str(required=True)
     provincia = fields.Str(required=True)
-    pais = fields.Str(required=True)
 
     

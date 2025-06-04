@@ -14,8 +14,8 @@ class Domicilio(Base):
     domicilio_dpto=Column(String(2), nullable=True)
 
     codigo_postal_id=Column(Integer, ForeignKey('domicilios_postales.id_domicilio_postal'))
-
-    codigo_postal=relationship("Domicilio_Postal")
+    
+    codigo_postal=relationship("DomicilioPostal")
 
     created_at=Column(DateTime, default=datetime.now(timezone.utc))
     updated_at=Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))

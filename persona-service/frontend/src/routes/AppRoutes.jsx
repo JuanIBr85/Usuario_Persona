@@ -14,6 +14,14 @@ import UserDetails from '@/pages/UserDetails';
 import TermsOfService from '@/pages/TermsOfService';
 import AboutPrivacyPolicy from '@/pages/AboutPrivacyPolicy';
 import Faq from '@/pages/Faq';
+import ForgotPassword from '@/pages/ForgotPassword';
+
+/**
+ * Componente que define todas las rutas de la aplicación utilizando react-router-dom.
+ * Cada ruta se asocia con un componente de página específico para renderizar.
+ *
+ * @returns {JSX.Element} Conjunto de rutas para la navegación del sitio.
+ */
 
 function AppRoutes() {
   return (
@@ -36,6 +44,7 @@ function AppRoutes() {
       <Route path="termsofservice" element={<TermsOfService />} />
       <Route path="faq" element={<Faq />} />
       <Route path="*" element={<NotFound />} />
+      <Route path="forgotpassword" element={<ForgotPassword />} />
     </Routes>
   )
 }

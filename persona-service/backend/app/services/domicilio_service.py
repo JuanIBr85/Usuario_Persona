@@ -1,4 +1,5 @@
 from app.models.domicilio_model import Domicilio
+from app.models.domicilio_postal_model import DomicilioPostal
 from app.schema.domicilio_schema import DomicilioSchema
 from app.services.domicilio_postal_service import DomicilioPostalService
 from app.interfaces.domicilio_interface import IDomicilioInterface
@@ -22,21 +23,28 @@ class DomicilioService(IDomicilioInterface):
           if session is None:
               session=SessionLocal()
               cerrar=True
-          
-
+              
           try:
               data_validada=self.schema.load(data)
 
-              #Se crea domicilio postal
-
               datos_postales = data_validada.pop('codigo_postal')
-              domicilio_postal = self.domicilio_postal_service.crear_domicilio_postal(datos_postales, session=session)
+              codigo_postal = datos_postales.get('codigo_postal')
+              localidad = datos_postales.get('localidad')
 
-              data_validada['codigo_postal_id']=domicilio_postal.id_domicilio_postal
+              domicilio_postal=session.query(DomicilioPostal).filter_by(
+                  codigo_postal=codigo_postal,
+                  localidad=localidad
+              ).first()
+
+              if not domicilio_postal:
+                  raise ValueError(f"No se encontró un domicilio postal con código postal '{codigo_postal}' y localidad '{localidad}'")
+              
+              data_validada['codigo_postal_id'] = domicilio_postal.id_domicilio_postal
 
               domicilio = Domicilio(**data_validada)
               session.add(domicilio)
               session.flush()
+
               return domicilio
           
           except Exception as e:
@@ -60,8 +68,21 @@ class DomicilioService(IDomicilioInterface):
         ''' esta parte permite cambiar el id del codigo postal si se incluye
         codigo_postal es dump_only por lo que no se lo espera en edicion'''
 
-        if 'codigo_postal_id' in data:
-            domicilio.codigo_postal_id = data['codigo_postal_id']
+        if 'codigo_postal' in data:
+            cp_data = data['codigo_postal']
+            codigo_postal = cp_data.get('codigo_postal')
+            localidad = cp_data.get('localidad')
+
+        if codigo_postal and localidad:
+            
+            dom_postal = session.query(DomicilioPostal).filter_by(
+                codigo_postal=codigo_postal.strip(),
+                localidad=localidad.strip()
+            ).first()
+
+            if not dom_postal:
+                raise ValueError("No se encontró el domicilio postal")
+            domicilio.codigo_postal_id = dom_postal.id_domicilio_postal
 
         domicilio.updated_at = datetime.now(timezone.utc)
 
