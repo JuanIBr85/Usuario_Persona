@@ -3,6 +3,13 @@ import { Button } from "@/components/ui/button"
 import { useNavigate } from 'react-router-dom'
 import { Fade } from "react-awesome-reveal";
 
+/**
+ * Componente de error 404.
+ * Muestra un mensaje de "Página no encontrada" y un botón para volver a la página de inicio.
+ *
+ * @returns {JSX.Element} Página de error 404.
+ */
+
 function NotFound() {
   const navigate = useNavigate()
 

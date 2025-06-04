@@ -16,6 +16,13 @@ import AboutPrivacyPolicy from '@/pages/AboutPrivacyPolicy';
 import Faq from '@/pages/Faq';
 import ForgotPassword from '@/pages/ForgotPassword';
 
+/**
+ * Componente que define todas las rutas de la aplicación utilizando react-router-dom.
+ * Cada ruta se asocia con un componente de página específico para renderizar.
+ *
+ * @returns {JSX.Element} Conjunto de rutas para la navegación del sitio.
+ */
+
 function AppRoutes() {
   return (
     <Routes>

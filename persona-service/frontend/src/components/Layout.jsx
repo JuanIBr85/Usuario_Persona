@@ -5,8 +5,19 @@ import Footer from "./Footer";
 import Main from "./Main";
 import AccessibilityMenu from './AccesibilityMenu';
 
+/**
+ * Componente de diseño principal que envuelve el contenido de las páginas.
+ * Controla la visibilidad del Header y Footer según la ruta actual.
+ *
+ * @param {object} props
+ * @param {React.ReactNode} props.children - Contenido a renderizar dentro del layout.
+ * @returns {JSX.Element} Estructura de la página con Header, Footer, Main y menú de accesibilidad.
+ */
+
 const Layout = ({ children }) => {
   const location = useLocation();
+
+  // Oculta Header y Footer en rutas específicas (login, sign, forgotpassword)
   const hideHeaderFooter = location.pathname.startsWith("/login") || location.pathname.startsWith("/sign") || location.pathname.startsWith("/forgotpassword");
 
   return (
