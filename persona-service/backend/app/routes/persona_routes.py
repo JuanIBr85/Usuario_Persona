@@ -77,7 +77,7 @@ def crear_persona():
     
         persona = persona_service.crear_persona(data)
 
-        return RespuestaStatus(
+        return respuesta_estandar(
             status= RespuestaStatus.SUCCESS,
             message="Recurso creado correctamente",
             data={"id": persona.id_persona}

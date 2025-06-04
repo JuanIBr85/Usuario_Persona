@@ -339,7 +339,6 @@
 2804,CAMPANA,Campana,Buenos Aires
 2805,CANAL LEANDRO N. ALEM. 1A. SECCION,Campana,Buenos Aires
 2805,CANAL LEANDRO N. ALEM. 2A. SECCION,Campana,Buenos Aires
-2812,CAPILLA,Campana,Buenos Aires
 2804,EL FENIX,Campana,Buenos Aires
 2804,KILOMETRO 88 (DESVIO PARTICULAR FCGM) (CAMPANA-PDO. CAMPANA),Campana,Buenos Aires
 2805,LA HORQUETA (PDO. CAMPANA),Campana,Buenos Aires
@@ -463,7 +462,6 @@
 7509,ORIENTE,Cnel. Dorrego,Buenos Aires
 8158,PARAJE LA AURORA,Cnel. Dorrego,Buenos Aires
 8154,SAN ROMAN,Cnel. Dorrego,Buenos Aires
-8153,SAUCE GRANDE,Cnel. Dorrego,Buenos Aires
 8151,ZUBIAURRE,Cnel. Dorrego,Buenos Aires
 7530,CORONEL PRINGLES,Cnel. Pringles,Buenos Aires
 7531,DESPE#ADEROS,Cnel. Pringles,Buenos Aires
@@ -611,7 +609,6 @@
 1776,VILLA TRANSRADIO,E. Echeverria,Buenos Aires
 2812,ARROYO DE LA CRUZ,Ex.de la Cruz,Buenos Aires
 2764,CAMPO LA NENA,Ex.de la Cruz,Buenos Aires
-2812,CAPILLA,Ex.de la Cruz,Buenos Aires
 2812,CAPILLA DEL SE#OR,Ex.de la Cruz,Buenos Aires
 2812,CARLOS LEMEE,Ex.de la Cruz,Buenos Aires
 2764,CHENAUT,Ex.de la Cruz,Buenos Aires
@@ -901,33 +898,23 @@
 1748,LA FRATERNIDAD,Gral. Rodriguez,Buenos Aires
 1748,LAS MALVINAS (PARADA FCDFS),Gral. Rodriguez,Buenos Aires
 1748,PUEBLO NUEVO (GRAL. RODRIGUEZ-PDO. GRAL. RODRIGUEZ),Gral. Rodriguez,Buenos Aires
-1657,BARRIO CHURRUCA,San Martin,Buenos Aires
 1655,BARRIO LIBERTADOR,San Martin,Buenos Aires
-1657,BARRIO MARTIN FIERRO (VILLA LOMA HERMOSA-PDO. SAN MARTIN),San Martin,Buenos Aires
 1650,BARRIO PARA JEFES Y OFICIALES GENERAL SAN MARTIN,San Martin,Buenos Aires
 1651,BARRIO SAN IGNACIO DE LOYOLA,San Martin,Buenos Aires
-1657,BARRIO VILLA MARIA DE LOS REMEDIOS DE ESCALADA,San Martin,Buenos Aires
 1650,CIUDAD DEL LIBERTADOR GRAL. SAN MARTIN,San Martin,Buenos Aires
 1672,CORONEL FRANCISCO LYNCH,San Martin,Buenos Aires
 1655,JOSE LEON SUAREZ,San Martin,Buenos Aires
 1650,MIGUELETE (PARADA FCGM),San Martin,Buenos Aires
-1657,PABLO PODESTA,San Martin,Buenos Aires
-1657,RUTA 8 KILOMETRO 19,500 AL 22,800,San Martin,Buenos Aires
 1651,SAN ANDRES,San Martin,Buenos Aires
 1650,SAN MARTIN,San Martin,Buenos Aires
-1657,UNION TRANVIARIOS,San Martin,Buenos Aires
-1657,VILLA 11 DE SEPTIEMBRE,San Martin,Buenos Aires
 1653,VILLA BALLESTER,San Martin,Buenos Aires
 1650,VILLA BILLINGHURST,San Martin,Buenos Aires
-1657,VILLA CIUDAD JARDIN EL LIBERTADOR,San Martin,Buenos Aires
 1651,VILLA CONCEPCION,San Martin,Buenos Aires
 1655,VILLA HIDALGO,San Martin,Buenos Aires
 1655,VILLA JOSE LEON SUAREZ,San Martin,Buenos Aires
 1655,VILLA LANZONI,San Martin,Buenos Aires
-1657,VILLA LOMA HERMOSA,San Martin,Buenos Aires
 1672,VILLA LYNCH (PDO. GRAL. SAN MARTIN),San Martin,Buenos Aires
 1650,VILLA MAIPU,San Martin,Buenos Aires
-1657,VILLA MARIA DE LOS REMEDIOS DE ESCALADA,San Martin,Buenos Aires
 1651,VILLA SAN ANDRES,San Martin,Buenos Aires
 1651,VILLA ZAGALA,San Martin,Buenos Aires
 6013,BAIGORRITA,Gral. Viamonte,Buenos Aires
@@ -1026,7 +1013,6 @@
 6000,BARRIO U.O.C.R.A.,Junin,Buenos Aires
 6000,BARRIO VILLA ORTEGA,Junin,Buenos Aires
 6001,FORTIN TIBURCIO,Junin,Buenos Aires
-6013,IRALA,Junin,Buenos Aires
 6000,JUNIN,Junin,Buenos Aires
 6022,LA ORIENTAL,Junin,Buenos Aires
 6001,LAGUNA DE GOMEZ,Junin,Buenos Aires
@@ -1787,38 +1773,26 @@
 7116,PILA,Pila,Buenos Aires
 7116,SAN DANIEL,Pila,Buenos Aires
 1629,ALMIRANTE IRIZAR,Pilar,Buenos Aires
-1667,BARRIO CHELITO,Pilar,Buenos Aires
-1667,BARRIO LA GRANJA,Pilar,Buenos Aires
-1667,BARRIO LA QUERENCIA,Pilar,Buenos Aires
 1669,BARRIO LOS CACHORROS,Pilar,Buenos Aires
-1667,BARRIO LOS GALLITOS,Pilar,Buenos Aires
-1667,BARRIO PARQUE KANMAR,Pilar,Buenos Aires
 1669,BARRIO PARQUE PERO,Pilar,Buenos Aires
 1669,BARRIO PINAZO,Pilar,Buenos Aires
 1629,BARRIO SAN ALEJO,Pilar,Buenos Aires
 1667,BARRIO YEI-PORA,Pilar,Buenos Aires
 1669,DEL VISO,Pilar,Buenos Aires
-1667,EL CALLAO,Pilar,Buenos Aires
-1667,EL PALENQUE,Pilar,Buenos Aires
 1633,EMPALME,Pilar,Buenos Aires
 1629,ESTABLECIMIENTO SAN MIGUEL,Pilar,Buenos Aires
 1633,FATIMA,Pilar,Buenos Aires
-1667,KILOMETRO 40 (TORTUGUITAS-PDO. PILAR),Pilar,Buenos Aires
 1635,KILOMETRO 45 (APEADERO FCGU) (PTE. DERQUI-PDO. PILAR),Pilar,Buenos Aires
 1629,KILOMETRO 61 (APEADERO FCGB),Pilar,Buenos Aires
 1669,LA LOMA (DEL VISO-PDO. GRAL. SARMIENTO),Pilar,Buenos Aires
 1669,LA LONJA,Pilar,Buenos Aires
-1667,LOS PERALES,Pilar,Buenos Aires
-1667,MANUEL ALBERTI (APEADERO FCGB),Pilar,Buenos Aires
 1629,MANZANARES,Pilar,Buenos Aires
 1633,MANZONE,Pilar,Buenos Aires
 1629,PILAR,Pilar,Buenos Aires
 1635,PRESIDENTE DERQUI,Pilar,Buenos Aires
-1667,RUTA 8 KILOMETRO 37,500 AL 41,Pilar,Buenos Aires
 1669,RUTA 8 KILOMETRO 41,100 AL 46,Pilar,Buenos Aires
 1669,RUTA 8 KILOMETRO 47,Pilar,Buenos Aires
 1635,TORO,Pilar,Buenos Aires
-1667,TORTUGUITAS,Pilar,Buenos Aires
 1629,VILLA AGUEDA,Pilar,Buenos Aires
 1633,VILLA ASTOLFI,Pilar,Buenos Aires
 1629,VILLA BUIDE,Pilar,Buenos Aires

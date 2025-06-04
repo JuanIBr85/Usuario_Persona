@@ -112,7 +112,7 @@ class PersonaService(IPersonaInterface):
             if 'contacto' in data:
                 self.contacto_service.modificar_contacto(persona.contacto_id, data['contacto'], session)
 
-            for field in ['nombre_persona', 'apellido_persona', 'fecha_nacimiento_persona', 'num_doc_persona', 'usuario_id']:
+            for field in ['nombre_persona', 'apellido_persona', 'fecha_nacimiento_persona', 'num_doc_persona']: 
                 if field in data_validada:
                     setattr(persona, field, data_validada[field])
 
