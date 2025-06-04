@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 
 class SuperAdminService:
 
-    def crear_admin(self, session: Session, nombre: str, email: str, password: str) -> dict:
+    def crear_usuario_con_rol(self, session: Session, nombre: str, email: str, password: str,nombre_rol: str) -> dict:
         if session.query(Usuario).filter_by(email_usuario=email).first():
             raise ValueError("Ya existe un usuario con ese email.")
 
@@ -20,13 +20,13 @@ class SuperAdminService:
         session.add(nuevo_usuario)
         session.flush()  # obtener id
 
-        rol_admin = session.query(Rol).filter_by(nombre_rol="admin").first()
-        if not rol_admin:
-            raise ValueError("No se encontró el rol admin en la base.")
-
+        rol = session.query(Rol).filter_by(nombre_rol=nombre_rol).first()
+        if not rol:
+             raise ValueError(f"No se encontró el rol '{nombre_rol}' en la base.")
+       
         relacion_rol = RolUsuario(
             id_usuario=nuevo_usuario.id_usuario,
-            id_rol=rol_admin.id_rol
+            id_rol=rol.id_rol
         )
         session.add(relacion_rol)
 
@@ -37,35 +37,29 @@ class SuperAdminService:
             "id_usuario": nuevo_usuario.id_usuario
         }
     
-    def asignar_permisos_admin(self, session: Session, usuario_id: int, permisos: list) -> dict:
-        usuario = session.query(Usuario).filter_by(id_usuario=usuario_id).first()
-
-        if not usuario:
-            raise ValueError("No se encontró el admin.")
-        rol_admin = session.query(Rol).join(RolUsuario).filter(
-            RolUsuario.id_usuario == usuario_id,
-            Rol.nombre_rol == "admin"
-        ).first()
-        if not rol_admin:
-            raise ValueError("El usuario no tiene rol admin asignado.")
+    def asignar_permisos_rol(self, session: Session, rol_id: int, permisos: list) -> dict:
+        rol = session.query(Rol).filter_by(id_rol=rol_id).first()
+        if not rol:
+           raise ValueError("No se encontró el rol.")
 
         for nombre_permiso in permisos:
             permiso = session.query(Permiso).filter_by(nombre_permiso=nombre_permiso).first()
-            if not permiso:
-                raise ValueError(f"Permiso '{nombre_permiso}' no encontrado.")
-            # Verificar si ya existe la relación
-            existe = session.query(RolPermiso).filter_by(
-                id_rol=rol_admin.id_rol,
-                permiso_id=permiso.id_permiso
-            ).first()
-            if not existe:
-                session.add(RolPermiso(id_rol=rol_admin.id_rol, permiso_id=permiso.id_permiso))
+        if not permiso:
+            raise ValueError(f"Permiso '{nombre_permiso}' no encontrado.")
+        
+        existe = session.query(RolPermiso).filter_by(
+            id_rol=rol.id_rol,
+            permiso_id=permiso.id_permiso
+        ).first()
+        if not existe:
+            session.add(RolPermiso(id_rol=rol.id_rol, permiso_id=permiso.id_permiso))
 
         session.commit()
 
         return {
-            "mensaje": f"Permisos asignados al admin {usuario.nombre_usuario} exitosamente."
+            "mensaje": f"Permisos asignados al rol {rol.nombre_rol} exitosamente."
         }
+
 
     def modificar_admin(self, session: Session, usuario_id: int, datos: dict) -> dict:
         usuario = session.query(Usuario).filter_by(id_usuario=usuario_id).first()
@@ -81,4 +75,18 @@ class SuperAdminService:
 
         return {
             "mensaje": f"Admin {usuario.nombre_usuario} modificado exitosamente."
+        }
+    
+    def crear_rol(self, session: Session, nombre_rol: str) -> dict:
+        rol_existente = session.query(Rol).filter_by(nombre_rol=nombre_rol).first()
+        if rol_existente:
+            raise ValueError(f"Ya existe un rol con el nombre '{nombre_rol}'.")
+
+        nuevo_rol = Rol(nombre_rol=nombre_rol)
+        session.add(nuevo_rol)
+        session.commit()
+
+        return {
+            "mensaje": f"Rol '{nombre_rol}' creado correctamente.",
+            "id_rol": nuevo_rol.id_rol
         }
