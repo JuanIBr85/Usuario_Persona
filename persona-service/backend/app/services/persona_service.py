@@ -32,7 +32,22 @@ class PersonaService(IPersonaInterface):
             return self.varios_schemas.dump(personas)
         finally:
             session.close()    
-       
+            
+    def listar_persona_usuario_id(self, id):
+        session = SessionLocal()
+        try:
+            persona = (
+            session.query(Persona)
+            .filter(Persona.usuario_id == id, Persona.deleted_at.is_(None))
+            .first()
+            )
+
+            if not persona:
+                return None  
+            return self.schema.dump(persona)
+        finally:
+            session.close() 
+
     def listar_persona_id(self, id):
         session = SessionLocal()
         try:
