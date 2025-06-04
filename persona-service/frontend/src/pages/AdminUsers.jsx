@@ -13,6 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
 
+import Loading from '../components/Loading'
+
 // Import de services
 import { PersonaService } from "@/services/personaService";
 
@@ -62,6 +64,11 @@ function AdminUsers() {
     setUsers(users.map(u => u.id === editingUser.id ? editingUser : u));
     setEditingUser(null);
   };
+
+
+  if (!users) {
+    return <Loading></Loading>;
+  }
 
   return (
     <div className="p-6 space-y-6 py-30 px-3 md:py-25 md:px-15">
