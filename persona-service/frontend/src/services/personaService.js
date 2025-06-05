@@ -21,6 +21,22 @@ export const PersonaService = {
     });
   },
 
+  get_all: async () => {
+    return fetchService.fetch({
+      url: `${ServiceURL.persona}/api/personas`,
+      method: HttpMethod.GET,
+      showError: PersonaService.showError
+    });
+  },
+
+  get_by_id: async () => {
+    return fetchService.fetch({
+      url: `${ServiceURL.persona}/api/personas${id}`,
+      method: HttpMethod.GET,
+      showError: PersonaService.showError
+    });
+  },
+
   get_by_usuario: async (id) => {
     return fetchService.fetch({
       url: `${ServiceURL.persona}/api/personas_by_usuario/${id}`,
