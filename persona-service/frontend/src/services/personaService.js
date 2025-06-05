@@ -13,9 +13,19 @@ export const PersonaService = {
     });
   },
 
+  // Esto sirve para ver los datos de todos los usuarios en AdminUsers.jsx 
   get: async () => {
     return fetchService.fetch({
       url: `${ServiceURL.persona}/api/personas`,
+      method: HttpMethod.GET,
+      showError: PersonaService.showError
+    });
+  },
+
+  // Esto sirve para ver los datos completos de un usuario en UserDetails.jsx 
+  get_by_id: async (id) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.persona}/api/personas/${id}`,
       method: HttpMethod.GET,
       showError: PersonaService.showError
     });
@@ -29,6 +39,7 @@ export const PersonaService = {
     });
   },
 
+  // Esto sirve para ver editar datos de un usuario en AdminUsers.jsx 
   editar: async (id, body) => {
     return fetchService.fetch({
       url: `${ServiceURL.persona}/api/modificar_persona/${id}`,
@@ -38,6 +49,7 @@ export const PersonaService = {
     });
   },
 
+  // Esto sirve para borrar los datos de un usuario en AdminUsers.jsx 
   borrar: async (id) => {
     return fetchService.fetch({
       url: `${ServiceURL.persona}/api/borrar_persona/${id}`,
