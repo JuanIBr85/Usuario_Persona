@@ -1,38 +1,54 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone,timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import Session
 from app.models.usuarios import Usuario, PasswordLog, UsuarioLog
-from app.models.rol import RolUsuario,Rol
+from app.models.rol import RolUsuario,Rol,RolPermiso
 from app.services.rol import get_rol_por_nombre
 from app.utils.jwt import crear_token_acceso
-from app.schemas.usuarios_schema import UsuarioInputSchema,UsuarioOutputSchema,ResetPasswordSchema
+from app.schemas.usuarios_schema import LoginSchema,UsuarioInputSchema,UsuarioOutputSchema,ResetPasswordSchema,RecuperarPasswordSchema
 from marshmallow import ValidationError
 from app.services.servicio_base import ServicioBase
 from app.models.permisos import Permiso
-from app.models.rol import RolPermiso
-from app.utils.email import enviar_email_verificacion,enviar_email_recuperacion,generar_token_reset_password,verificar_token_reset
+from app.models.otp_reset_password_model import OtpResetPassword
+from app.utils.email import enviar_email_verificacion,generar_codigo_otp,enviar_codigo_por_email,decodificar_token_verificacion
 import json
 from app.utils.response import ResponseStatus, make_response
 
 
 class UsuarioService(ServicioBase):
     def __init__(self):
-        super().__init__(model=Usuario, schema=UsuarioInputSchema()),
+        super().__init__(model=Usuario, schema=UsuarioInputSchema())
         self.schema_out=UsuarioOutputSchema()
+        self.schema_recuperar=RecuperarPasswordSchema()
         self.schema_reset = ResetPasswordSchema()
+        self.schema_login = LoginSchema()
+
+#-----------------------------------------------------------------------------------------------------------------------------
+#REGISTRO Y VERIFICACIÓN
+#-----------------------------------------------------------------------------------------------------------------------------
 
     def registrar_usuario(self, session: Session, data: dict) -> dict:
         try:
             data_validada = self.schema.load(data)
-        except ValidationError as e:
-            raise ValueError(f"Datos inválidos: {e.messages}")
-
+        except ValidationError as error:
+            return (
+                        ResponseStatus.FAIL,
+                        "Error de schema / Bad Request",
+                        error.messages,
+                        400
+                    )
+        
         if session.query(Usuario).filter(
             (Usuario.nombre_usuario == data_validada['nombre_usuario']) |
             (Usuario.email_usuario == data_validada['email_usuario'])
         ).first():
-            raise ValueError("El nombre de usuario o el email ya están registrados")
-
+            return (
+                        ResponseStatus.ERROR,
+                        "El nombre de usuario o el email ya están registrados",
+                        None,
+                        400
+                    )
+        
         password_hash = generate_password_hash(data_validada['password'])
         data_validada["password"] = password_hash
 
@@ -42,7 +58,12 @@ class UsuarioService(ServicioBase):
 
         rol_por_defecto = get_rol_por_nombre(session, "usuario")
         if not rol_por_defecto:
-            raise ValueError("Rol por defecto no encontrado")
+            return (
+                        ResponseStatus.NOT_FOUND,
+                        "Rol no encontrado.",
+                        None,
+                        404
+                    )
 
         session.add(RolUsuario(
             id_usuario=nuevo_usuario.id_usuario,
@@ -60,20 +81,97 @@ class UsuarioService(ServicioBase):
             accion="registro",
             detalles="El usuario se registró correctamente"
         ))
-        return self.schema_out.dump(nuevo_usuario)
+
+        session.commit()
+        return (
+                    ResponseStatus.SUCCESS,
+                    "Usuario se registrado con exito, se ha enviado un mail de verificación.",
+                    self.schema_out.dump(nuevo_usuario), 
+                    200
+                )
+#-----------------------------------------------------------------------------------------------------------------------------
+    def verificar_email(self,session:Session,token:str)->dict:
+        from jwt import ExpiredSignatureError, InvalidTokenError
+        if not token:
+            return (
+                        ResponseStatus.NOT_FOUND,
+                        "Token no encontrado.",
+                        None,
+                        404
+                    )
+        try:
+            datos = decodificar_token_verificacion(token)
+            usuario = session.query(Usuario).filter_by(email_usuario=datos['email']).first()
+            if not usuario:
+                return (
+                            ResponseStatus.NOT_FOUND,
+                            "Email no encontrado",
+                            None,
+                            404
+                        )
+            usuario.email_verificado = 1
+            session.commit()
+        except ExpiredSignatureError as error:
+            return (
+                        ResponseStatus.UNAUTHORIZED,
+                        "El token ha expirado.",
+                        error, 
+                        401
+                    )
+        except InvalidTokenError as error:
+            return (
+                        ResponseStatus.UNAUTHORIZED,
+                        "El token es invalido.",
+                        error, 
+                        401
+                    )
+        return (
+                    ResponseStatus.SUCCESS,
+                    "Email verificado correctamente.",
+                    None, 
+                    200
+                )
+    
+#-----------------------------------------------------------------------------------------------------------------------------
+#LOGIN Y LOGOUT
+#-----------------------------------------------------------------------------------------------------------------------------
+
+    def login_usuario(self, session: Session, data:dict) -> dict:
+        try:
+            data_validada = self.schema_login.load(data)
+        except ValidationError as error:
+            return (
+                        ResponseStatus.FAIL,
+                        "Error de schema / Bad Request",
+                        error.messages,
+                        400
+                    )
 
 
-    def login_usuario(self, session: Session, email: str, password: str) -> dict:
-
-        usuario = session.query(Usuario).filter_by(email_usuario=email).first()
+        usuario = session.query(Usuario).filter_by(email_usuario=data_validada['email_usuario']).first()
         if not usuario:
-            raise ValueError("El email no está registrado.")
+            return (
+                        ResponseStatus.UNAUTHORIZED,
+                        "Email o contraseña incorrecta",
+                        None,
+                        401
+                    )
         
-        if not check_password_hash(usuario.password, password):
-            raise ValueError("La contraseña es incorrecta.")
+        if not check_password_hash(usuario.password, data_validada["password"]):
+            return (
+                        ResponseStatus.UNAUTHORIZED,
+                        "Email o contraseña incorrecta",
+                        None,
+                        401
+                    )
 
         if not usuario.email_verificado:
-            raise ValueError("Debe verificar su correo electrónico para poder iniciar sesión.")
+            return (
+                        ResponseStatus.UNAUTHORIZED,
+                        "Debe verificar el email antes de loguearse.",
+                        None, 
+                        401
+                    )
         
         # Obtener el rol del usuario
         rol_usuario = session.query(Rol).join(RolUsuario).filter(RolUsuario.id_usuario == usuario.id_usuario).first()
@@ -89,84 +187,198 @@ class UsuarioService(ServicioBase):
         permisos_lista = [p.nombre_permiso for p in permisos_query]
 
         # Crear token con permisos incluidos
-        token = crear_token_acceso(usuario.id_usuario, email, rol_nombre, permisos_lista)
-
+        token = crear_token_acceso(
+                                    usuario.id_usuario, 
+                                    usuario.email_usuario, 
+                                    rol_nombre, 
+                                    permisos_lista
+                                )
         # Registrar log de login
         session.add(UsuarioLog(
             usuario_id=usuario.id_usuario,
             accion="login",
             detalles="El usuario se logueó correctamente"
         ))
+        session.commit()
 
-        return {
-            "mensaje": "Login exitoso",
-            "token": token,
-            "usuario": {
-                "id_usuario": usuario.id_usuario,
-                "nombre_usuario": usuario.nombre_usuario,
-                "email_usuario": usuario.email_usuario,
-                "rol": rol_nombre,
-                "permisos": permisos_lista
-            }
-        }
+        usuario_data = self.schema_out.dump(usuario)
+        usuario_data["token"] = token
 
-    def recuperacion_password(self, session:Session, email: str)->dict:
-        #verifica que el email existe
+        return (
+                    ResponseStatus.SUCCESS,
+                    "Login exitoso.",
+                    usuario_data, 
+                    200
+                )
+#-----------------------------------------------------------------------------------------------------------------------------
+    def logout_usuario(self, session: Session, usuario_id: int) -> dict:
+
+        usuario = session.query(Usuario).filter_by(id_usuario=usuario_id).first()
+        if not usuario:
+            return (
+                ResponseStatus.NOT_FOUND,
+                "Usuario no encontrado",
+                None,
+                404
+            )
+
+        # Agregar log de logout
+        log = UsuarioLog(
+            usuario_id=usuario.id_usuario,
+            accion="logout",
+            detalles="El usuario cerró sesión correctamente."
+        )
+        session.add(log)
+        session.commit()
+
+        return (
+            ResponseStatus.SUCCESS,
+            "Logout exitoso.",
+            None,
+            200
+        )
+
+#-----------------------------------------------------------------------------------------------------------------------------
+#RECUPERACION DE PASSWORD CON CODIGO OTP VIA MAIL
+#-----------------------------------------------------------------------------------------------------------------------------
+
+#crea el codigo de 6 digitos y expiracion y lo envia por mail. 
+#y en la base de datos se guarda todos los datos para su verificacion dsp.
+    def solicitar_codigo_reset(self, session: Session, email: str) -> dict:
+        try:
+            self.schema_recuperar.load({"email": email})
+        except ValidationError as error:
+            return (
+                ResponseStatus.FAIL,
+                "Error de schema / Bad Request",
+                error.messages,
+                400
+            )
+        
         usuario = session.query(Usuario).filter_by(email_usuario=email).first()
         if not usuario:
-            raise ValueError("El email no está registrado.")
-        
-        token = generar_token_reset_password(usuario.email_usuario)
-        enviar_email_recuperacion(usuario,token)
-        
-        return {
-            "mensaje": "Se envio un mail para la recuperacion de contraseña",
-            "token":token
-            }
-    
-    def cambiar_password(self, session:Session,token:str, password_nuevo:str,password_confirm:str)->dict:
-        try:
-            self.schema_reset.load({
-                "token": token,
-                "password": password_nuevo,
-                "confirm_password": password_confirm
-            })
-            email = verificar_token_reset(token)
-            if not email:
-                return (
-                    ResponseStatus.UNAUTHORIZED,
-                    "Token inválido o expirado",
-                    None
-                ), 401
-            
-            usuario = session.query(Usuario).filter_by(email_usuario=email).first()
-            if not usuario:
-                return (
-                    ResponseStatus.NOT_FOUND,
-                    "Usuario no encontrado",
-                    None
-                ), 404
-            
-            if check_password_hash(usuario.password,password_nuevo):
-                return (
-                    ResponseStatus.FAIL,
-                    "La contraseña debe ser diferente a la anterior",
-                    None
-                ), 400
-                
-
-            hashed_password = generate_password_hash(password_nuevo)
-            usuario.password = hashed_password
-            session.add(usuario)
-            session.commit()
-
             return (
-                ResponseStatus.SUCCESS, 
-                "Contraseña actualizada correctamente", 
-                {"usuario_id": usuario.id_usuario}
-            ),200
+                        ResponseStatus.NOT_FOUND,
+                        "Usuario no fue encontrado",
+                        None, 
+                        404
+                    )
+        
+        codigo = generar_codigo_otp()
 
-        except ValidationError as err:
-            return (ResponseStatus.ERROR, "Error de validación", err.messages), 400
-        except ValueError as err:
-            return (ResponseStatus.ERROR, "Error de valor", str(err)), 400
+        otp_entry = OtpResetPassword(
+            usuario_id=usuario.id_usuario,
+            codigo_otp=codigo,
+            expira_en=datetime.now(timezone.utc) + timedelta(minutes=15)
+        )
+        session.add(otp_entry)
+        session.commit()
+
+        enviar_codigo_por_email(usuario, codigo)
+
+        return (
+                        ResponseStatus.SUCCESS, 
+                        "Codigo enviado al mail", 
+                        None, 
+                        200
+                        )
+#-----------------------------------------------------------------------------------------------------------------------------
+    #recibe el codigo del usuario, e email y hace una busqueda del ultimo codigo generado del usuario
+    #valida que sea
+    def verificar_otp(self, session: Session, email: str, otp: str) -> dict:
+        usuario = session.query(Usuario).filter_by(email_usuario=email).first()
+        if not usuario:
+            return (
+                        ResponseStatus.NOT_FOUND,
+                        "Usuario no fue encontrado",
+                        None, 
+                        404
+                    )
+        
+        otp_entry = (
+            session.query(OtpResetPassword)
+            .filter_by(usuario_id=usuario.id_usuario, codigo_otp=otp, usado=False)
+            .order_by(OtpResetPassword.creado_en.desc())
+            .first()
+        )
+        
+        if not otp_entry:
+            return (
+                        ResponseStatus.UNAUTHORIZED,
+                        "El codigo es inválido o ha expirado.",
+                        None, 
+                        401
+                    )
+        
+        if  datetime.now(timezone.utc) > otp_entry.expira_en.replace(tzinfo=timezone.utc):
+            return (
+                        ResponseStatus.UNAUTHORIZED,
+                        "El codigo es inválido o ha expirado.",
+                        None, 
+                        401
+                    )
+        
+        otp_entry.usado = True
+        session.commit()
+        return (
+                        ResponseStatus.SUCCESS,
+                        "codigo verificado",
+                        None, 
+                        200
+                )
+
+#-----------------------------------------------------------------------------------------------------------------------------
+    def cambiar_password_con_codigo(self, session: Session, data :dict)->dict:
+        
+        try:
+            data_validad = self.schema_reset.load(data)
+        except ValidationError as error:
+            return (
+                        ResponseStatus.FAIL,
+                        "Error de schema/Bad Request",
+                        error.messages, 
+                        400
+                    )
+        
+        
+        usuario = session.query(Usuario).filter(Usuario.email_usuario==data_validad["email"]).first()
+        if not usuario:
+            return (
+                        ResponseStatus.NOT_FOUND,
+                        "Usuario no fue encontrado",
+                        None, 
+                        404
+                    )
+        
+        if check_password_hash(usuario.password, data_validad["password"]):
+            return (
+                        ResponseStatus.FAIL,
+                        "La nueva contraseña debe ser diferente a la anterior",
+                        None, 
+                        400
+                    )
+        
+        hashed_password = generate_password_hash(data_validad["password"])
+        usuario.password = hashed_password
+        usuario.password_changed_at = datetime.now(timezone.utc)
+        
+        session.add(PasswordLog(
+                usuario_id=usuario.id_usuario,
+                password=hashed_password,
+                updated_at=datetime.now(timezone.utc)
+            ))
+
+        session.add(UsuarioLog(
+                usuario_id=usuario.id_usuario,
+                accion="Cambio de password.",
+                detalles="Se cambio el password."
+            ))
+
+        session.commit()
+
+        return (
+                    ResponseStatus.SUCCESS,
+                    "Contraseña actualizada con éxito.",
+                    {"usuario_id": usuario.id_usuario}, 
+                    200
+                )

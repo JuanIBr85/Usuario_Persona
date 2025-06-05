@@ -13,5 +13,5 @@ def crear_token_acceso(usuario_id, email, rol, permisos):
     }
     return jwt.encode(payload, getenv("JWT_SECRET_KEY", "clave_jwt_123"), algorithm="HS256")
 
-
-
+# para mejorar se podrian crear decoradores q requieran token para el 2fa y token requerido
+# para seguridad explicita o diferenciada en las rutas

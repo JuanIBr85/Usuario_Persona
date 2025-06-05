@@ -4,7 +4,7 @@ from app.extensions import mail
 import jwt
 from datetime import datetime, timedelta,timezone
 from jwt import decode, ExpiredSignatureError, InvalidTokenError
-
+import random
 
 def enviar_email_verificacion(usuario):
     token = generar_token_verificacion(usuario.email_usuario)
@@ -32,32 +32,16 @@ def decodificar_token_verificacion(token: str) -> dict:
     except InvalidTokenError:
         raise ValueError("Token inválido.")
     
-
-def enviar_email_recuperacion(usuario,token):
     
-    enlace = f"{current_app.config['PASSWORD_RESET_URL']}?token={token}"
 
+
+def generar_codigo_otp():
+    return "{:06d}".format(random.randint(0, 999999))
+
+def enviar_codigo_por_email(usuario, codigo_otp):
     msg = Message(
-        subject="Recuperación de contraseña",
+        subject="Código para recuperación de contraseña",
         recipients=[usuario.email_usuario],
-        body=f"Hola {usuario.nombre_usuario},\n\nHaz clic en el siguiente enlace para restablecer tu contraseña:\n\n{enlace}\n\nEste enlace expirará en 60 minutos."
+        body=f"Hola {usuario.nombre_usuario},\n\nTu código para recuperar tu contraseña es: {codigo_otp}\n\nEste código expirará en 15 minutos."
     )
     mail.send(msg)
-
-def generar_token_reset_password(email):
-    payload = {
-        "email": email,
-        "sub": "reset_password",  # para distinguir propósito
-        "exp":datetime.now(timezone.utc) + timedelta(minutes=60)
-    }
-    return jwt.encode(payload, current_app.config['JWT_SECRET_KEY'], algorithm='HS256')
-
-
-def verificar_token_reset(token):
-    try:
-        payload = jwt.decode(token, current_app.config['JWT_SECRET_KEY'], algorithms=['HS256'])
-        return payload['email']
-    except ExpiredSignatureError:
-        raise ValueError("Token expirado.")
-    except InvalidTokenError:
-        raise ValueError("Token inválido.")

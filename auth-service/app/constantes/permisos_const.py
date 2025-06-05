@@ -11,13 +11,15 @@ PERMISOS = [
     "asignar_permiso",
     "crear_usuario_con_rol",
     "asignar_permisos_rol",
-    "modificar_admin"
+    "modificar_admin",
+    "logout"
 ]
 
 # Permisos por rol
 PERMISOS_POR_ROL = {
     "superadmin": PERMISOS,
     "usuario": [
-        "ver_usuario"
+        "ver_usuario",
+        "logout"
     ],
 }

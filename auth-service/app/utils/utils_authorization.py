@@ -1,4 +1,5 @@
 import json
+from functools import wraps
 from flask import request, abort
 import jwt
 from os import getenv
@@ -38,4 +39,3 @@ def verificar_permisos(app):
         abort(401, description="Token expirado")
     except jwt.InvalidTokenError:
         abort(401, description="Token inválido")
-

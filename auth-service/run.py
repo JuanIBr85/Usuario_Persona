@@ -11,7 +11,7 @@ from app.routes.admin_microservicios_blueprint import admin_micro_bp
 from app.script.reset_db import crear_base, eliminar_base
 from app.script.seed_data import seed
 from flask_cors import CORS
-
+from app.utils.response import register_error_handlers
 
 load_dotenv()
 
@@ -23,6 +23,7 @@ app.config.from_object(Config)
 jwt = JWTManager(app)
 CORS(app, supports_credentials=True)
 mail.init_app(app)
+register_error_handlers(app) # maneja los errores y excepciones globales y las convierte a un formato con build_response
 
 @app.before_request
 def control_acceso():

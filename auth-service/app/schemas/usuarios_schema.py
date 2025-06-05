@@ -67,7 +67,7 @@ class RecuperarPasswordSchema(Schema):
 
 class ResetPasswordSchema(Schema):
 
-    token = fields.Str(
+    email = fields.Email(
         required=True
     )
 
