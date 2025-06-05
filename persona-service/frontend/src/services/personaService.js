@@ -13,9 +13,9 @@ export const PersonaService = {
     });
   },
 
-  get: async (id) => {
+  get: async () => {
     return fetchService.fetch({
-      url: `${ServiceURL.persona}/api/personas/${id}`,
+      url: `${ServiceURL.persona}/api/personas`,
       method: HttpMethod.GET,
       showError: PersonaService.showError
     });
