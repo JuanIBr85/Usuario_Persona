@@ -10,21 +10,23 @@ import { SimpleDialog, FetchErrorMessage } from "@/components/SimpleDialog";
 import { AuthService } from "@/services/authService";
 import { useAuthContext } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import Loading from "@/components/loading/Loading";
 
 function Login() {
   const navigate = useNavigate()
   const [isOpen, setIsOpen] = React.useState(false);
   const [dialogMessage, setMessage] = React.useState("");
   const [isLogin, setIsLogin] = React.useState(false);
-
+  const [isLoading, setIsLoading] = React.useState(false);  
   const {updateData} = useAuthContext();
 
   const handleSubmit = async (event) => {
     const formData = await formSubmitJson(event);
+    document.activeElement.blur();
+    setIsLoading(true);
     AuthService
       .login(formData)
       .then((json) => {
-        console.log(json);
         setMessage(`Login exitoso. Bienvenido ${json.data.usuario.nombre_usuario}!`);
         setIsLogin(true);
         updateData({
@@ -33,6 +35,7 @@ function Login() {
         });
         setIsOpen(true);
       }).catch((error) => {
+
         if (error.isJson) {
           if (error.data.error) {
             setMessage(FetchErrorMessage(error));
@@ -43,10 +46,13 @@ function Login() {
           setMessage(error.message);
         }
         setIsOpen(true);
-      });
+      }).finally(()=>setIsLoading(false));
   }
   return (
+    <>
+    {isLoading && <Loading isFixed={true}/>}
     <Fade duration={500} triggerOnce>
+      
       <SimpleDialog
         title="Login"
         description={dialogMessage}
@@ -107,6 +113,8 @@ function Login() {
         </div>
       </div>
     </Fade>
+    </>
+    
   );
 }
 

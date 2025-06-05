@@ -17,7 +17,7 @@ import FormDomicillio from "@/components/profile/FormDomicillio"
 import { useAuthContext } from "@/context/AuthContext";
 import { PersonaService } from '@/services/personaService'
 
-import Loading from '@/components/Loading'
+import Loading from '@/components/loading/Loading'
 
 function tiempoTranscurrido(fechaStr) {
   const ahora = new Date();
@@ -99,6 +99,8 @@ function ProfileForm() {
               contacto: response.data.contacto || {},
               domicilio: response.data.domicilio || {}
             })
+
+            console.log(response)
           }
         })
         .catch((error) => {
@@ -115,7 +117,7 @@ function ProfileForm() {
         });
 
       Promise.all([profile, tiposDocumento]).finally(() => {
-        //setIsLoading(false);
+        setIsLoading(false);
       });
     }
   }, []);
