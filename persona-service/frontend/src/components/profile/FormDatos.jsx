@@ -9,7 +9,16 @@ import {
 } from "@/components/ui/select"
 import { Label } from '@/components/ui/label'
 
-export default function FormDatos({ handleSubmit, tipoDocumento, personaData, handleChange }) {
+const TIPOS_DOCUMENTO = [
+  { value: 'DNI', label: 'DNI' },
+  { value: 'LE', label: 'Libreta de Enrolamiento' },
+  { value: 'LC', label: 'Libreta Cívica' },
+  { value: 'PASAPORTE', label: 'Pasaporte' },
+  { value: 'CI', label: 'Cédula de Identidad' }
+]
+
+export default function FormDatos({ handleSubmit, fixedData, personaData, handleChange }) {
+  console.log(fixedData)  
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Datos fijos */}
@@ -19,13 +28,13 @@ export default function FormDatos({ handleSubmit, tipoDocumento, personaData, ha
           id="nombre"
           type="text"
           labelText="Nombre"
-          value={personaData.nombre_persona || ''}
+          value={fixedData.nombre}
         />
         <InputValidate
           id="apellido"
           type="text"
           labelText="Apellido"
-          value={personaData.apellido_persona || ''}
+          value={fixedData.apellido}
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
@@ -41,9 +50,9 @@ export default function FormDatos({ handleSubmit, tipoDocumento, personaData, ha
                 <SelectValue placeholder="Selecciona un tipo de documento" />
               </SelectTrigger>
               <SelectContent>
-                {tipoDocumento.map((tipo) => (
-                  <SelectItem key={tipo} value={tipo}>
-                    {tipo}
+                {TIPOS_DOCUMENTO.map((tipo) => (
+                  <SelectItem key={tipo.value} value={tipo.value}>
+                    {tipo.label}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -54,7 +63,7 @@ export default function FormDatos({ handleSubmit, tipoDocumento, personaData, ha
           id="num_doc_persona"
           type="text"
           labelText="Nº de documento"
-          value={personaData.num_doc_persona || ''}
+          value={fixedData.num_doc_persona}
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -73,7 +82,7 @@ export default function FormDatos({ handleSubmit, tipoDocumento, personaData, ha
           id="email"
           type="email"
           labelText="Email"
-          value={personaData.email || ''}
+          value={fixedData.email}
           className="bg-gray-100 cursor-not-allowed w-full"
           readOnly
         />

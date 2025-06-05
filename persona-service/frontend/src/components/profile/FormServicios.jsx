@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button"
 
-export default function FormServicios({ servicios }) {
+export default function FormServicios({ subscribedServices }) {
     return (
         <div className="mt-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-4">Servicios Suscritos</h2>
             <ul className="space-y-2">
-                {servicios.map((service) => (
+                {subscribedServices.map((service) => (
                     <li
                         key={service}
                         className="flex items-center justify-between bg-gray-100 dark:bg-[var(--muted)]  rounded-lg px-4 py-2"

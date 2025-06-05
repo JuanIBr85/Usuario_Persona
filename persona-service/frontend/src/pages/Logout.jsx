@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Loading from '../components/loading/Loading';
+import Loading from '../components/Loading';
 
 const Logout = () => {
     const navigate = useNavigate();
