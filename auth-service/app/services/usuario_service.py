@@ -211,6 +211,49 @@ class UsuarioService(ServicioBase):
                     200
                 )
 #-----------------------------------------------------------------------------------------------------------------------------
+#terminar de modificar con persona-service
+    def ver_perfil(self, session: Session, usuario_id: int) -> dict:
+        usuario = session.query(Usuario).filter_by(id_usuario=usuario_id).first()
+
+        if not usuario:
+            return (
+                ResponseStatus.NOT_FOUND,
+                "Usuario no encontrado.",
+                None,
+                404
+            )
+
+        perfil = {
+            "id_usuario": usuario.id_usuario,
+            "email": usuario.email,
+            "fecha_creacion": usuario.fecha_creacion.isoformat() if usuario.fecha_creacion else None,
+            "activo": usuario.activo,
+            "rol": [r.rol.nombre for r in usuario.roles]  # si tenés relación con RolUsuario
+        }
+
+        # Si tiene persona asociada, llamamos al microservicio persona-service
+        if usuario.persona_id:
+            try:
+                import requests
+                url = f"{getenv('PERSONA_SERVICE_URL', 'http://localhost:5001')}/personas/{usuario.persona_id}"
+                response = requests.get(url, timeout=5)
+                if response.status_code == 200:
+                    perfil["persona"] = response.json()
+                else:
+                    perfil["persona"] = f"Error al consultar persona ({response.status_code})"
+            except Exception as e:
+                perfil["persona"] = f"Error al conectar con persona-service: {str(e)}"
+        else:
+            perfil["persona"] = "Sin persona asociada"
+
+        return (
+            ResponseStatus.SUCCESS,
+            "Perfil obtenido correctamente.",
+            perfil,
+            200
+        )
+
+#-----------------------------------------------------------------------------------------------------------------------------
     def logout_usuario(self, session: Session, usuario_id: int) -> dict:
 
         usuario = session.query(Usuario).filter_by(id_usuario=usuario_id).first()

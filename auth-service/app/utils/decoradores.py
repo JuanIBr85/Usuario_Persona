@@ -18,3 +18,5 @@ def ruta_publica(func):
         "is_public": True
     }
     return func
+
+#crear decorador para la 2fa.
