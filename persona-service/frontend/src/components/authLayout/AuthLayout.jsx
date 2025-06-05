@@ -23,11 +23,12 @@ const AuthLayout = ({
 }) => {
   return (
     <Fade duration={500} triggerOnce>
-      <div className={cn("h-screen flex items-center justify-center p-4", className)}>
+      {/* COLOR DE FONDO TEMPORAL, SOLO PARA DIFERENCIAR DEL FONDO */}
+      <div className={cn("h-screen flex items-center bg-blue-500 justify-center", className)}>
         <div className="flex w-full h-full sm:h-[520px] sm:max-w-md md:max-w-3xl shadow-md rounded-xl overflow-hidden">
           {/* Sección visual (se oculta en móviles) */}
           {visualContent && (
-            <Card className="w-full md:max-w-md h-full bg-[var(--color-primario)] hidden md:block rounded-none">
+            <Card className="w-full md:max-w-md h-full bg-[var(--color-primario)] hidden md:block rounded-none border-none">
               <CardHeader>
                 <CardTitle className="text-2xl text-center text-white">
                   {title}
@@ -46,7 +47,7 @@ const AuthLayout = ({
           )}
 
           {/* Contenido principal */}
-          <Card className="w-full md:max-w-md h-full rounded-none">
+          <Card className="w-full md:max-w-md h-full rounded-none border-none">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl">
                 {title}
@@ -59,8 +60,8 @@ const AuthLayout = ({
               {children}
             </CardContent>
             <CardFooter className="justify-center flex gap-2">
-                <Button variant="link" asChild><Link to="termsofservice">Términos de uso</Link></Button>
-                <Button variant="link" asChild><Link to="privacypolicy">Política de privacidad</Link></Button>
+              <Button variant="link" asChild><Link to="termsofservice">Términos de uso</Link></Button>
+              <Button variant="link" asChild><Link to="privacypolicy">Política de privacidad</Link></Button>
             </CardFooter>
           </Card>
         </div>
