@@ -21,11 +21,28 @@ export const PersonaService = {
       showError: PersonaService.showError
     });
   },
-  
+
   get_by_usuario: async (id) => {
     return fetchService.fetch({
       url: `${ServiceURL.persona}/api/personas/${id}`,
       method: HttpMethod.GET,
+      showError: PersonaService.showError
+    });
+  },
+
+  editar: async (id, body) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.persona}/api/modificar_persona/${id}`,
+      method: HttpMethod.PUT,
+      body: body,
+      showError: PersonaService.showError
+    });
+  },
+
+  borrar: async (id) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.persona}/api/borrar_persona/${id}`,
+      method: HttpMethod.DELETE,
       showError: PersonaService.showError
     });
   }

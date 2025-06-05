@@ -35,9 +35,10 @@ function AdminUsers() {
 
           const mappedUsers = personas.map(persona => ({
             id: persona.id_persona,
-            nombre: `${persona.nombre_persona} ${persona.apellido_persona}`,
+            nombre: persona.nombre_persona,
+            apellido: persona.apellido_persona,
             rol: "No definido",
-            email: persona.email || "sin email",
+            email: persona.email || "sin@email.com",
             status: "Activo",
           }));
 
@@ -52,7 +53,15 @@ function AdminUsers() {
   }, []);
 
   const handleDelete = (id) => {
-    setUsers(users.filter((user) => user.id !== id));
+    PersonaService.borrar(id)
+      .then(res => {
+        console.log("Usuario eliminado:", res);
+        setUsers(users.filter((user) => user.id !== id));
+
+      })
+      .catch(err => {
+        console.error("Error eliminando usuario:", err);
+      });
   };
 
   const handleSeeDetails = (id) => {
@@ -62,7 +71,28 @@ function AdminUsers() {
   const handleEditSubmit = (e) => {
     e.preventDefault();
     setUsers(users.map(u => u.id === editingUser.id ? editingUser : u));
+
+    console.log(editingUser)
+
+    const body = {
+      nombre_persona: editingUser.nombre || '',
+      apellido_persona: editingUser.apellido || '',
+      //email: editingUser.email,
+      //rol: editingUser.rol,
+      //status: editingUser.status
+    };
+    console.log("Apellido persona actualizado:", body.apellido_persona);
+
+    PersonaService.editar(editingUser.id, body)
+      .then(res => {
+        console.log("Respuesta completa:", res);
+      })
+      .catch(err => {
+        console.error("Error obteniendo usuarios:", err);
+      });
+
     setEditingUser(null);
+
   };
 
 
@@ -98,7 +128,7 @@ function AdminUsers() {
                 <TableBody>
                   {users.map((user) => (
                     <TableRow key={user.id}>
-                      <TableCell className="font-medium">{user.nombre}</TableCell>
+                      <TableCell className="font-medium">{user.nombre} {user.apellido}</TableCell>
                       <TableCell>{user.rol}</TableCell>
                       <TableCell>{user.email}</TableCell>
                       <TableCell>{user.status}</TableCell>
@@ -125,7 +155,7 @@ function AdminUsers() {
                               <DialogHeader>
                                 <DialogTitle>¿Eliminar usuario?</DialogTitle>
                                 <DialogDescription>
-                                  Esta acción no se puede deshacer. ¿Deseas eliminar a <strong>{user.nombre}</strong>?
+                                  Esta acción no se puede deshacer. ¿Deseas eliminar a <strong>{user.nombre} {user.apellido}</strong>?
                                 </DialogDescription>
                               </DialogHeader>
                               <DialogFooter className="mt-4">
@@ -193,11 +223,18 @@ function AdminUsers() {
                   />
                 </div>
                 <div className="grid gap-2">
+                  <Label htmlFor="apellido">apellido</Label>
+                  <Input
+                    id="apellido"
+                    value={editingUser.apellido}
+                    onChange={(e) => setEditingUser({ ...editingUser, apellido: e.target.value })}
+                  />
+                </div>
+                <div className="grid gap-2">
                   <Label htmlFor="rol">Rol</Label>
                   <Select
                     onValueChange={(value) => setEditingUser({ ...editingUser, rol: value })}
                   >
-                    {console.log(editingUser.rol)}
                     <SelectTrigger id="rol" className="w-full">
                       <SelectValue placeholder="Selecciona un rol" />
                     </SelectTrigger>
@@ -223,7 +260,6 @@ function AdminUsers() {
                   <Select
                     onValueChange={(value) => setEditingUser({ ...editingUser, status: value })}
                   >
-                    {console.log(editingUser.rol)}
                     <SelectTrigger id="status" className="w-full">
                       <SelectValue placeholder="Selecciona un status" />
                     </SelectTrigger>
