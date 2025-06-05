@@ -11,7 +11,7 @@ export default function FormDomicillio({ handleSubmit, domicilio, handleChange }
                 placeholder="Ingresa el nombre de la calle"
                 labelText="Calle"
                 value={domicilio?.domicilio_calle || ''}
-          onChange={(e) => handleChange('domicilio.domicilio_calle', e.target.value)}
+                onChange={(e) => handleChange('domicilio.domicilio_calle', e.target.value)}
                 validatePattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{2,50}$"
                 validateMessage="Ingresa un nombre de calle válido (2-50 caracteres, solo letras y espacios)"
                 required
@@ -24,7 +24,7 @@ export default function FormDomicillio({ handleSubmit, domicilio, handleChange }
                 placeholder="Número de domicilio"
                 labelText="Número"
                 value={domicilio?.domicilio_numero || ''}
-          onChange={(e) => handleChange('domicilio.domicilio_numero', e.target.value)}
+                onChange={(e) => handleChange('domicilio.domicilio_numero', e.target.value)}
                 validatePattern="^[0-9]{1,4}[a-zA-Z]?$"
                 validateMessage="Ingresa un número válido (ej: 1234, 123A)"
                 required
@@ -37,7 +37,7 @@ export default function FormDomicillio({ handleSubmit, domicilio, handleChange }
                 placeholder="Piso (opcional)"
                 labelText="Piso"
                 value={domicilio?.domicilio_piso || ''}
-          onChange={(e) => handleChange('domicilio.domicilio_piso', e.target.value)}
+                onChange={(e) => handleChange('domicilio.domicilio_piso', e.target.value)}
                 validatePattern="^[0-9]{1,3}$|^$"
                 validateMessage="Ingresa un piso válido (máximo 3 dígitos)"
             />
@@ -49,7 +49,7 @@ export default function FormDomicillio({ handleSubmit, domicilio, handleChange }
                 placeholder="Departamento (opcional)"
                 labelText="Departamento"
                 value={domicilio?.domicilio_dpto || ''}
-          onChange={(e) => handleChange('domicilio.domicilio_dpto', e.target.value)}
+                onChange={(e) => handleChange('domicilio.domicilio_dpto', e.target.value)}
                 validatePattern="^[a-zA-Z0-9]{1,2}$|^$"
                 validateMessage="Ingresa un departamento válido (máximo 2 caracteres)"
             />
@@ -61,7 +61,7 @@ export default function FormDomicillio({ handleSubmit, domicilio, handleChange }
                 placeholder="Código postal"
                 labelText="Código Postal"
                 value={domicilio?.codigo_postal?.codigo_postal || ''}
-          onChange={(e) => handleChange('domicilio.codigo_postal.codigo_postal', e.target.value)}
+                onChange={(e) => handleChange('domicilio.codigo_postal.codigo_postal', e.target.value)}
                 validatePattern="^[0-9]{4,8}$"
                 validateMessage="Ingresa un código postal válido (4-8 dígitos)"
                 required

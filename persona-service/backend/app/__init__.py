@@ -15,7 +15,6 @@ def create_app():
 
     app.config.from_object("config")
 
-
     CORS(app, supports_credentials=True)
     
     #Inicializa de las exteniciones

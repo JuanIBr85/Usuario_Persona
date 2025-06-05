@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
 import { Fade } from "react-awesome-reveal";
 import { useNavigate } from 'react-router-dom';
@@ -13,31 +13,55 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
 
+import Loading from '../components/loading/Loading'
+
+// Import de services
+import { PersonaService } from "@/services/personaService";
+
 function AdminUsers() {
   const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      nombre: "Juan Pérez",
-      rol: "Profesor",
-      email: "juan.perez@email.com",
-      status: "Activo",
-    },
-    {
-      id: 2,
-      nombre: "Lucía Gómez",
-      rol: "Alumno",
-      email: "lucia.gomez@email.com",
-      status: "Egresado",
-    },
-  ]);
-
   const [editingUser, setEditingUser] = useState(null);
 
+  const [users, setUsers] = useState([]);
+  useEffect(() => {
+    PersonaService.get()
+      .then(res => {
+        console.log("Respuesta completa:", res);
+
+        if (res && res.data) {
+          const personas = res.data;
+
+          const mappedUsers = personas.map(persona => ({
+            id: persona.id_persona,
+            nombre: persona.nombre_persona,
+            apellido: persona.apellido_persona,
+            rol: "No definido",
+            email: persona.email || "sin@email.com",
+            status: "Activo",
+          }));
+
+          setUsers(mappedUsers);
+        } else {
+          console.error("La respuesta no contiene el campo esperado 'data'");
+        }
+      })
+      .catch(err => {
+        console.error("Error obteniendo usuarios:", err);
+      });
+  }, []);
+
   const handleDelete = (id) => {
-    setUsers(users.filter((user) => user.id !== id));
+    PersonaService.borrar(id)
+      .then(res => {
+        console.log("Usuario eliminado:", res);
+        setUsers(users.filter((user) => user.id !== id));
+
+      })
+      .catch(err => {
+        console.error("Error eliminando usuario:", err);
+      });
   };
 
   const handleSeeDetails = (id) => {
@@ -47,8 +71,34 @@ function AdminUsers() {
   const handleEditSubmit = (e) => {
     e.preventDefault();
     setUsers(users.map(u => u.id === editingUser.id ? editingUser : u));
+
+    console.log(editingUser)
+
+    const body = {
+      nombre_persona: editingUser.nombre || '',
+      apellido_persona: editingUser.apellido || '',
+      //email: editingUser.email,
+      //rol: editingUser.rol,
+      //status: editingUser.status
+    };
+    console.log("Apellido persona actualizado:", body.apellido_persona);
+
+    PersonaService.editar(editingUser.id, body)
+      .then(res => {
+        console.log("Respuesta completa:", res);
+      })
+      .catch(err => {
+        console.error("Error obteniendo usuarios:", err);
+      });
+
     setEditingUser(null);
+
   };
+
+
+  if (!users) {
+    return <Loading></Loading>;
+  }
 
   return (
     <div className="p-6 space-y-6 py-30 px-3 md:py-25 md:px-15">
@@ -78,7 +128,7 @@ function AdminUsers() {
                 <TableBody>
                   {users.map((user) => (
                     <TableRow key={user.id}>
-                      <TableCell className="font-medium">{user.nombre}</TableCell>
+                      <TableCell className="font-medium">{user.nombre} {user.apellido}</TableCell>
                       <TableCell>{user.rol}</TableCell>
                       <TableCell>{user.email}</TableCell>
                       <TableCell>{user.status}</TableCell>
@@ -105,7 +155,7 @@ function AdminUsers() {
                               <DialogHeader>
                                 <DialogTitle>¿Eliminar usuario?</DialogTitle>
                                 <DialogDescription>
-                                  Esta acción no se puede deshacer. ¿Deseas eliminar a <strong>{user.nombre}</strong>?
+                                  Esta acción no se puede deshacer. ¿Deseas eliminar a <strong>{user.nombre} {user.apellido}</strong>?
                                 </DialogDescription>
                               </DialogHeader>
                               <DialogFooter className="mt-4">
@@ -173,11 +223,18 @@ function AdminUsers() {
                   />
                 </div>
                 <div className="grid gap-2">
+                  <Label htmlFor="apellido">apellido</Label>
+                  <Input
+                    id="apellido"
+                    value={editingUser.apellido}
+                    onChange={(e) => setEditingUser({ ...editingUser, apellido: e.target.value })}
+                  />
+                </div>
+                <div className="grid gap-2">
                   <Label htmlFor="rol">Rol</Label>
                   <Select
                     onValueChange={(value) => setEditingUser({ ...editingUser, rol: value })}
                   >
-                    {console.log(editingUser.rol)}
                     <SelectTrigger id="rol" className="w-full">
                       <SelectValue placeholder="Selecciona un rol" />
                     </SelectTrigger>
@@ -203,7 +260,6 @@ function AdminUsers() {
                   <Select
                     onValueChange={(value) => setEditingUser({ ...editingUser, status: value })}
                   >
-                    {console.log(editingUser.rol)}
                     <SelectTrigger id="status" className="w-full">
                       <SelectValue placeholder="Selecciona un status" />
                     </SelectTrigger>

@@ -62,7 +62,7 @@ export const fetchService = {
             controller.abort(); // Cancela la petición
             console.warn(`Fetch [${url}] timeout.`); // Avisa que se canceló por timeout
         }, timeout);
-
+        
         // Hacemos la petición Fetch
         return fetch(url, {
             signal: controller.signal, // Para poder cancelar la petición
@@ -84,11 +84,12 @@ export const fetchService = {
             if (!response.ok) {
                 let errorData = undefined;
                 let isJson = false;
-                try{
+                const responseClone = response.clone();
+                try {
                     errorData = await response.json();
                     isJson = true;
-                }catch(e){
-                    errorData = await response.text();
+                } catch(e) {
+                    errorData = await responseClone.text();
                 }
 
 
