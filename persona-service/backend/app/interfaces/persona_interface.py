@@ -25,3 +25,7 @@ class IPersonaInterface(ABC):
     @abstractmethod
     def restaurar_persona(self, id):
         pass
+    
+    @abstractmethod
+    def listar_persona_usuario_id(self, id):
+        pass
