@@ -15,6 +15,7 @@ import TermsOfService from '@/pages/TermsOfService';
 import AboutPrivacyPolicy from '@/pages/AboutPrivacyPolicy';
 import Faq from '@/pages/Faq';
 import ForgotPassword from '@/pages/ForgotPassword';
+import OTPValidation from '@/pages/OTPValidation';
 
 /**
  * Componente que define todas las rutas de la aplicación utilizando react-router-dom.
@@ -30,12 +31,9 @@ function AppRoutes() {
       <Route path="profile" element={<Profile />} />
       <Route path="adminpanel" element={<AdminPanel />} />
       <Route path="login" element={<Login />} />
-      <Route path="login/termsofservice" element={<TermsOfService />} />
-      <Route path="login/privacypolicy" element={<AboutPrivacyPolicy />} />
       <Route path="sign" element={<Sign />} />
-      <Route path="sign/termsofservice" element={<TermsOfService />} />
-      <Route path="sign/privacypolicy" element={<AboutPrivacyPolicy />} />
       <Route path="logout" element={<Logout />} />
+      <Route path="otpvalidation" element={<OTPValidation />} />
       <Route path="logs" element={<Logs />} />
       <Route path="adminusers" element={<AdminUsers />} />
       <Route path="adminroles" element={<AdminRoles />} />

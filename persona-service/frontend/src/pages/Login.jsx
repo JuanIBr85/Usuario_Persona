@@ -47,9 +47,11 @@ function Login() {
         setIsOpen(true);
       }).finally(()=>setIsLoading(false));
   }
+
+  if(isLoading)return <Loading isFixed={true}/>
+
   return (
     <>
-      {isLoading && <Loading isFixed={true}/>}
       <SimpleDialog
         title="Login"
         description={dialogMessage}

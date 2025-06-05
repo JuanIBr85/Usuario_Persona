@@ -30,7 +30,7 @@ const AuthLayout = ({
           {visualContent && (
             <Card className="w-full md:max-w-md h-full bg-[var(--color-primario)] hidden md:block rounded-none border-none">
               <CardHeader>
-                <CardTitle className="text-2xl text-center text-white">
+                <CardTitle className="text-2xl text-center text-white select-none">
                   {title}
                 </CardTitle>
                 {description && (
@@ -49,7 +49,7 @@ const AuthLayout = ({
           {/* Contenido principal */}
           <Card className="w-full md:max-w-md h-full rounded-none border-none">
             <CardHeader className="text-center">
-              <CardTitle className="text-2xl">
+              <CardTitle className="text-2xl select-none">
                 {title}
               </CardTitle>
               {description && (
@@ -60,8 +60,8 @@ const AuthLayout = ({
               {children}
             </CardContent>
             <CardFooter className="justify-center flex gap-2">
-              <Button variant="link" asChild><Link to="termsofservice">Términos de uso</Link></Button>
-              <Button variant="link" asChild><Link to="privacypolicy">Política de privacidad</Link></Button>
+              <Button variant="link" asChild><Link to="/termsofservice">Términos de uso</Link></Button>
+              <Button variant="link" asChild><Link to="/privacypolicy">Política de privacidad</Link></Button>
             </CardFooter>
           </Card>
         </div>
