@@ -59,7 +59,8 @@ class DomicilioService(IDomicilioInterface):
         if not domicilio:
             raise ValueError("Domicilio no encontrado")
 
-        campos_modificables = ['domicilio_calle', 'domicilio_numero', 'domicilio_piso', 'domicilio_dpto']
+        campos_modificables = ['domicilio_calle', 'domicilio_numero', 'domicilio_piso', 'domicilio_dpto',
+                               'domicilio_referencia']
 
         for campo in campos_modificables:
             if campo in data:

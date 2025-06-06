@@ -1,4 +1,5 @@
 from marshmallow import Schema, fields
+from marshmallow.validate import Length
 from app.schema.domicilio_postal_schema import DomicilioPostalSchema
 
 class DomicilioSchema(Schema):
@@ -8,6 +9,7 @@ class DomicilioSchema(Schema):
     domicilio_numero=fields.Str(required=True)
     domicilio_piso=fields.Str()
     domicilio_dpto=fields.Str()
+    domicilio_referencia=fields.Str(validate=Length(max=1000))
 
     codigo_postal = fields.Dict(required=True, load_only=True)
 

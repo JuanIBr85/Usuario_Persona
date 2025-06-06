@@ -42,6 +42,8 @@ export const AuthService = {
    * @returns {Promise<Object>} Promesa que resuelve con la respuesta del servidor.
    */
   register: async (body) => {
+    console.log("Datos enviados:", body);
+
     return fetchService.fetch({
       url: `${ServiceURL.auth}/registro1`,
       method: HttpMethod.POST,

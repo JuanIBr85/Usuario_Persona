@@ -4,6 +4,7 @@ const AuthContext = createContext();
 
 const defaultData = Object.freeze({
     token: "",
+    otp_code: "",
     user: {
         id_usuario: 0,
         nombre_usuario: "",

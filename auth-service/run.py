@@ -20,6 +20,19 @@ app.register_blueprint(superadmin_bp, url_prefix='/super-admin')
 app.register_blueprint(admin_micro_bp, url_prefix='/admin-micro')
 app.register_blueprint(usuario_bp)
 app.config.from_object(Config)
+
+# ==========================
+# DEBUGGING
+# ==========================
+print("MAIL_SERVER:", app.config.get("MAIL_SERVER"))
+print("MAIL_PORT:", app.config.get("MAIL_PORT"))
+print("MAIL_USERNAME:", app.config.get("MAIL_USERNAME"))
+print("MAIL_PASSWORD:", app.config.get("MAIL_PASSWORD")[:3] + "***") 
+# ==========================
+# ==========================
+
+mail.init_app(app)
+
 jwt = JWTManager(app)
 CORS(app, supports_credentials=True)
 mail.init_app(app)

@@ -1,5 +1,5 @@
 from app.extensions import Base
-from sqlalchemy import ForeignKey, Integer, String, DateTime, Column, Date
+from sqlalchemy import ForeignKey, Integer, String, DateTime, Column, Date, Text
 from datetime import datetime, timezone
 
 
@@ -11,6 +11,9 @@ class Contacto(Base):
     telefono_fijo=Column(String(15), nullable=True)
     telefono_movil=Column(String(15), nullable=False)
     red_social_contacto=Column(String(50),nullable=True)
+    red_social_nombre=Column(String(20), nullable=True)
+    email_contacto=Column(String(50), nullable=False)
+    observacion_contacto=Column(Text, nullable=True)
 
     created_at=Column(DateTime, default=datetime.now(timezone.utc))
     updated_at=Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))

@@ -51,7 +51,7 @@ def obtener_persona(id):
             status=RespuestaStatus.ERROR,
             message="Error al obtener persona",
             data={"server": str(e)}
-        )),500
+        )),500    
 
 #crea una persona
 @persona_bp.route('/crear_persona', methods=['POST'])
@@ -181,3 +181,30 @@ def restaurar_persona(id):
             message="Error al restaurar persona", 
             data={"server": str(e)}
         )),500
+
+@persona_bp.route('/personas_by_usuario/<int:id>', methods=['GET'])
+def obtener_persona_usuario(id):
+    try:
+
+        persona = persona_service.listar_persona_usuario_id(id)
+
+        if persona is None:
+             
+             return respuesta_estandar(
+                 status=RespuestaStatus.ERROR,
+                 message="Persona no encontrada",
+                 data={"id": f"No existe persona con ID {id}"}
+             ), 404
+        
+        return respuesta_estandar(
+            status=RespuestaStatus.SUCCESS,
+            message="Persona obtenida correctamente",
+            data=persona
+        ), 200
+    
+    except Exception as e:
+        return respuesta_estandar(
+            status=RespuestaStatus.ERROR,
+            message="Error al obtener persona",
+            data={"server": str(e)}
+        ),500

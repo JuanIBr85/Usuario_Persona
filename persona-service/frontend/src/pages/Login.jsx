@@ -26,11 +26,11 @@ function Login() {
     AuthService
       .login(formData)
       .then((json) => {
-        setMessage(`Login exitoso. Bienvenido ${json.data.usuario.nombre_usuario}!`);
+        setMessage(`Login exitoso. Bienvenido ${json.data.nombre_usuario}!`);
         setIsLogin(true);
         updateData({
           token: json.data.token,
-          user: json.data.usuario
+          user: json.data
         });
         setIsOpen(true);
       }).catch((error) => {
@@ -47,9 +47,11 @@ function Login() {
         setIsOpen(true);
       }).finally(()=>setIsLoading(false));
   }
+
+  if(isLoading)return <Loading isFixed={true}/>
+
   return (
     <>
-      {isLoading && <Loading isFixed={true}/>}
       <SimpleDialog
         title="Login"
         description={dialogMessage}

@@ -23,14 +23,13 @@ const AuthLayout = ({
 }) => {
   return (
     <Fade duration={500} triggerOnce>
-      {/* COLOR DE FONDO TEMPORAL, SOLO PARA DIFERENCIAR DEL FONDO */}
-      <div className={cn("h-screen flex items-center bg-blue-500 justify-center", className)}>
-        <div className="flex w-full h-full sm:h-[520px] sm:max-w-md md:max-w-3xl shadow-md rounded-xl overflow-hidden">
+      <div className={cn("h-screen flex items-center justify-center", className)}>
+        <div className="flex w-full h-full sm:h-[520px] sm:max-w-md md:max-w-3xl shadow-2xl border-1 border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden">
           {/* Sección visual (se oculta en móviles) */}
           {visualContent && (
             <Card className="w-full md:max-w-md h-full bg-[var(--color-primario)] hidden md:block rounded-none border-none">
               <CardHeader>
-                <CardTitle className="text-2xl text-center text-white">
+                <CardTitle className="text-2xl text-center text-white select-none">
                   {title}
                 </CardTitle>
                 {description && (
@@ -49,7 +48,7 @@ const AuthLayout = ({
           {/* Contenido principal */}
           <Card className="w-full md:max-w-md h-full rounded-none border-none">
             <CardHeader className="text-center">
-              <CardTitle className="text-2xl">
+              <CardTitle className="text-2xl select-none">
                 {title}
               </CardTitle>
               {description && (
@@ -60,8 +59,8 @@ const AuthLayout = ({
               {children}
             </CardContent>
             <CardFooter className="justify-center flex gap-2">
-              <Button variant="link" asChild><Link to="termsofservice">Términos de uso</Link></Button>
-              <Button variant="link" asChild><Link to="privacypolicy">Política de privacidad</Link></Button>
+              <Button variant="link" asChild><Link to="/termsofservice">Términos de uso</Link></Button>
+              <Button variant="link" asChild><Link to="/privacypolicy">Política de privacidad</Link></Button>
             </CardFooter>
           </Card>
         </div>
