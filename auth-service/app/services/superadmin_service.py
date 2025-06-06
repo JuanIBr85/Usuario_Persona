@@ -104,13 +104,20 @@ class SuperAdminService:
             roles = session.query(Rol).filter(Rol.deleted_at == None).all()
             resultado = []
             for rol in roles:
+                permisos = [
+                    rp.permiso.nombre_permiso
+                    for rp in rol.permisos
+                    if rp.permiso and rp.permiso.deleted_at is None
+                ]
                 resultado.append({
                     "id_rol": rol.id_rol,
-                    "nombre_rol": rol.nombre_rol
+                    "nombre_rol": rol.nombre_rol,
+                    "permisos": permisos
                 })
             return {"roles": resultado}
         except Exception as e:
             raise Exception(f"Error al obtener roles: {str(e)}")
+
     # ==========
     # ==========
 
