@@ -46,13 +46,16 @@ def make_response(
     }
 
     if data is not None:
-        key = "data" if status != ResponseStatus.ERROR else "error"
+        key = "data" if status != ResponseStatus.SUCCESS else "error"
         response[key] = data
         if isinstance(data, (list, set, tuple)):
             response["total"] = len(data)
 
     if error_code:
         response["error_code"] = error_code
+
+    if not isinstance(status, ResponseStatus):
+        raise TypeError("El primer elemento de la tupla debe ser ResponseStatus")
 
     return jsonify(response)
 
