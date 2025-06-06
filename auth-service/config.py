@@ -4,6 +4,15 @@ from dotenv import load_dotenv
 
 load_dotenv()  
 
+
+# ===================
+# Debugging
+# ===================
+print("TEST MAIL_SERVER env var:", os.getenv("MAIL_SERVER"))
+print("TEST MAIL_USERNAME env var:", os.getenv("MAIL_USERNAME"))
+# ===================
+# ===================
+
 class Config:
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "clave_por_defecto_insegura")
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=int(os.getenv("JWT_ACCESS_TOKEN_EXPIRES", 900)))
