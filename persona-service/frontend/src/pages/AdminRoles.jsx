@@ -141,14 +141,34 @@ export default function AdminRoles() {
   };
 
   // Confirma y elimina el rol previamente seleccionado
-  const confirmDeleteRole = () => {
-    if (roleToDelete) {
-      setRoles(roles.filter((role) => role.id !== roleToDelete.id)); // Elimina el rol del estado
-      if (editRoleId === roleToDelete.id) resetForm(); // Si se estaba editando, limpia el formulario
-      setRoleToDelete(null); // Limpia la referencia del rol a eliminar
-      setOpenDeleteDialog(false); // Cierra el diálogo
+  const confirmDeleteRole = async () => {
+    if (!roleToDelete) return;
+
+    try {
+      const response = await fetch(`http://localhost:5000/super-admin/roles/${roleToDelete.id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        // Si hay error en la respuesta
+        const errorData = await response.json();
+        showError(errorData.message || "Error al borrar el rol en el servidor");
+        return;
+      }
+
+      // Si se borró correctamente en el backend, actualizamos el estado local
+      setRoles(roles.filter((role) => role.id !== roleToDelete.id));
+
+      if (editRoleId === roleToDelete.id) resetForm();
+
+      setRoleToDelete(null);
+      setOpenDeleteDialog(false);
+    } catch (error) {
+      showError("Error de conexión al intentar borrar el rol");
+      console.error(error);
     }
   };
+
 
   function formatPermissionName(permission) {
     return permission
