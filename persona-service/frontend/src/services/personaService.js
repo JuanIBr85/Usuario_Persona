@@ -4,19 +4,12 @@ export const PersonaService = {
 
   showError: true,
 
+  // ====== CRUD PERSONAS ======
   crear: async (body) => {
     return fetchService.fetch({
       url: `${ServiceURL.persona}/api/crear_persona`,
       method: HttpMethod.POST,
       body: body,
-      showError: PersonaService.showError
-    });
-  },
-
-  get: async () => {
-    return fetchService.fetch({
-      url: `${ServiceURL.persona}/api/personas`,
-      method: HttpMethod.GET,
       showError: PersonaService.showError
     });
   },
@@ -29,21 +22,14 @@ export const PersonaService = {
     });
   },
 
-  get_by_id: async () => {
+  get_by_id: async (id) => {
     return fetchService.fetch({
-      url: `${ServiceURL.persona}/api/personas${id}`,
+      url: `${ServiceURL.persona}/api/personas/${id}`,
       method: HttpMethod.GET,
       showError: PersonaService.showError
     });
   },
 
-  get_by_usuario: async (id) => {
-    return fetchService.fetch({
-      url: `${ServiceURL.persona}/api/personas_by_usuario/${id}`,
-      method: HttpMethod.GET,
-      showError: PersonaService.showError
-    });
-  },
 
   editar: async (id, body) => {
     return fetchService.fetch({
@@ -58,6 +44,15 @@ export const PersonaService = {
     return fetchService.fetch({
       url: `${ServiceURL.persona}/api/borrar_persona/${id}`,
       method: HttpMethod.DELETE,
+      showError: PersonaService.showError
+    });
+  },
+  // ===========================
+
+  get_by_usuario: async (id) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.persona}/api/personas_by_usuario/${id}`,
+      method: HttpMethod.GET,
       showError: PersonaService.showError
     });
   },
