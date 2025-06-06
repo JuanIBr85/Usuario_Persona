@@ -7,5 +7,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD [ "python", "run.py" ]
-
+# Comando para desarrollo con hot reload usando gunicorn
+CMD ["gunicorn", "--bind", "0.0.0.0:5002", "--reload", "run:app"]
