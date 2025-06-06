@@ -15,3 +15,12 @@ def crear_token_acceso(usuario_id, email, rol, permisos):
 
 # para mejorar se podrian crear decoradores q requieran token para el 2fa y token requerido
 # para seguridad explicita o diferenciada en las rutas
+
+def crear_token_reset_password(otp_id: int, usuario_id: int) -> str:
+    payload = {
+        "sub": str(usuario_id),
+        "otp_id": otp_id,
+        "scope": "reset_password",
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=10)
+    }
+    return jwt.encode(payload, getenv("JWT_SECRET_KEY", "clave_jwt_123"), algorithm="HS256")

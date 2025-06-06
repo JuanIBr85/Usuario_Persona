@@ -4,14 +4,14 @@ from sqlalchemy.orm import Session
 from app.models.usuarios import Usuario, PasswordLog, UsuarioLog
 from app.models.rol import RolUsuario,Rol,RolPermiso
 from app.services.rol import get_rol_por_nombre
-from app.utils.jwt import crear_token_acceso
+from app.utils.jwt import crear_token_acceso,crear_token_reset_password
 from app.schemas.usuarios_schema import LoginSchema,UsuarioInputSchema,UsuarioOutputSchema,ResetPasswordSchema,RecuperarPasswordSchema
 from marshmallow import ValidationError
 from app.services.servicio_base import ServicioBase
 from app.models.permisos import Permiso
 from app.models.otp_reset_password_model import OtpResetPassword
 from app.utils.email import enviar_email_verificacion,generar_codigo_otp,enviar_codigo_por_email,decodificar_token_verificacion
-import json
+from jwt import ExpiredSignatureError, InvalidTokenError
 from app.utils.response import ResponseStatus, make_response
 
 
@@ -91,7 +91,6 @@ class UsuarioService(ServicioBase):
                 )
 #-----------------------------------------------------------------------------------------------------------------------------
     def verificar_email(self,session:Session,token:str)->dict:
-        from jwt import ExpiredSignatureError, InvalidTokenError
         if not token:
             return (
                         ResponseStatus.NOT_FOUND,
@@ -345,7 +344,7 @@ class UsuarioService(ServicioBase):
             .first()
         )
         
-        if not otp_entry:
+        if not otp_entry or datetime.now(timezone.utc) > otp_entry.expira_en.replace(tzinfo=timezone.utc):
             return (
                         ResponseStatus.UNAUTHORIZED,
                         "El codigo es inválido o ha expirado.",
@@ -353,25 +352,55 @@ class UsuarioService(ServicioBase):
                         401
                     )
         
-        if  datetime.now(timezone.utc) > otp_entry.expira_en.replace(tzinfo=timezone.utc):
-            return (
-                        ResponseStatus.UNAUTHORIZED,
-                        "El codigo es inválido o ha expirado.",
-                        None, 
-                        401
-                    )
-        
-        otp_entry.usado = True
-        session.commit()
+        token = crear_token_reset_password(otp_entry.id, usuario.id_usuario)
+
         return (
                         ResponseStatus.SUCCESS,
                         "codigo verificado",
-                        None, 
+                        {"reset_token": token}, 
                         200
                 )
 
 #-----------------------------------------------------------------------------------------------------------------------------
-    def cambiar_password_con_codigo(self, session: Session, data :dict)->dict:
+    def cambiar_password_con_codigo(self, session: Session, data :dict, token:str)->dict:
+        try:
+            payload = decodificar_token_verificacion(token)
+
+        except ExpiredSignatureError as error:
+            return (
+                        ResponseStatus.UNAUTHORIZED,
+                        "El token ha expirado.",
+                        error, 
+                        401
+                    )
+        except InvalidTokenError as error:
+            return (
+                        ResponseStatus.UNAUTHORIZED,
+                        "El token es invalido.",
+                        error, 
+                        401
+                    )
+        
+        if payload.get("scope") != "reset_password":
+            return (
+                        ResponseStatus.UNAUTHORIZED,
+                        "El token es invalido para esta operación.",
+                        error, 
+                        401
+                    ) 
+        
+        
+        otp_id = payload.get("otp_id")
+        usuario_id = payload.get("sub")
+
+        otp_entry = session.query(OtpResetPassword).filter_by(id=otp_id, usado=False).first()
+        if not otp_entry or int(usuario_id) != otp_entry.usuario_id:
+            return (
+                        ResponseStatus.UNAUTHORIZED, 
+                        "Código de recuperación inválido o ya usado", 
+                        None, 
+                        401
+                    )
         
         try:
             data_validad = self.schema_reset.load(data)
@@ -384,7 +413,7 @@ class UsuarioService(ServicioBase):
                     )
         
         
-        usuario = session.query(Usuario).filter(Usuario.email_usuario==data_validad["email"]).first()
+        usuario = session.query(Usuario).filter_by(id_usuario=otp_entry.usuario_id).first()
         if not usuario:
             return (
                         ResponseStatus.NOT_FOUND,
@@ -405,6 +434,7 @@ class UsuarioService(ServicioBase):
         usuario.password = hashed_password
         usuario.password_changed_at = datetime.now(timezone.utc)
         
+        otp_entry.usado = True
         session.add(PasswordLog(
                 usuario_id=usuario.id_usuario,
                 password=hashed_password,

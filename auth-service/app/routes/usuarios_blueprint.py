@@ -1,68 +1,79 @@
 import json
-from flask import request, Blueprint
+from flask import request, Blueprint, jsonify
 from app.database.session import SessionLocal
-from app.utils.response import ResponseStatus,build_response
+from app.utils.response import ResponseStatus, make_response
 from app.services.usuario_service import UsuarioService
 from app.extensions import limiter
-from app.utils.decoradores import requiere_permisos,ruta_publica
+from app.utils.decoradores import requiere_permisos, ruta_publica
+
 usuario_bp = Blueprint("usuario", __name__)
 usuario_service = UsuarioService()
 
-
 #-----------------------------------------------------------------------------------------------------------------------------
-#REGISTRO Y VERIFICACIÓN
+# REGISTRO Y VERIFICACIÓN
 #-----------------------------------------------------------------------------------------------------------------------------
 
-@usuario_bp.route('/registro1', methods=['POST'])
+@usuario_bp.route('/registro', methods=['POST'])
 @ruta_publica
 def registrar_usuario1():
-    
+    session = SessionLocal()
     try:
-        session = SessionLocal()
         data = request.get_json()
-        
-        resultado = usuario_service.registrar_usuario(session, data)
-        return build_response(resultado)
-    
+        if not data:
+            return make_response(ResponseStatus.FAIL, "Datos de entrada requeridos", error_code="NO_INPUT")
+
+        status, mensaje, data, code = usuario_service.registrar_usuario(session, data)
+        return make_response(status, mensaje, data, code)
+
+    except Exception as e:
+        return make_response(ResponseStatus.ERROR, "Error al registrar usuario", str(e), error_code="REGISTRO_ERROR")
+
     finally:
         session.close()
 
 
-
-@usuario_bp.route('/verificar-email', methods=['GET']) #endpoint q manda y verifica el mail de registro
+@usuario_bp.route('/verificar-email', methods=['GET'])
 @ruta_publica
 def verificar_email():
+    session = SessionLocal()
     try:
-        session = SessionLocal()
-        token = request.args.get('token', None)
-        resultado = usuario_service.verificar_email(session, token)
-        return build_response(resultado)
-    
+        token = request.args.get('token')
+        if not token:
+            return make_response(ResponseStatus.FAIL, "Token de verificación requerido", error_code="TOKEN_MISSING")
+
+        status, mensaje, data, code = usuario_service.verificar_email(session, token)
+        return make_response(status, mensaje, data, code)
+
+    except Exception as e:
+        return make_response(ResponseStatus.ERROR, "Error al verificar email", str(e), error_code="VERIFICACION_ERROR")
+
     finally:
         session.close()
 
+
 #-----------------------------------------------------------------------------------------------------------------------------
-#LOGIN Y LOGOUT
+# LOGIN Y LOGOUT
 #-----------------------------------------------------------------------------------------------------------------------------
 
-@usuario_bp.route('/login1', methods=['POST'])
+@usuario_bp.route('/login', methods=['POST'])
 @limiter.limit("5 per minute")
 @ruta_publica
 def login1():
-    
+    session = SessionLocal()
     try:
-        session = SessionLocal()
         data = request.get_json()
-        resultado = usuario_service.login_usuario(session,data)
-        return build_response(resultado)
-  
+        if not data:
+            return make_response(ResponseStatus.FAIL, "Datos de entrada requeridos", error_code="NO_INPUT")
+
+        status, mensaje, data, code = usuario_service.login_usuario(session, data)
+        return make_response(status, mensaje, data, code)
+
+    except Exception as e:
+        return make_response(ResponseStatus.ERROR, "Error en login", str(e), error_code="LOGIN_ERROR")
+
     finally:
         session.close()
 
-#El frontend al hacer logout:
-#Elimina el token localmente (localStorage o cookie).
-#Envía un POST a /logout con el token aún válido.
-#Recibe 200 OK si todo salió bien.
 
 @usuario_bp.route('/logout', methods=['POST'])
 @requiere_permisos(["logout"])
@@ -70,17 +81,14 @@ def logout_usuario():
     session = SessionLocal()
     try:
         usuario_id = request.jwt_payload["sub"]
-        resultado = usuario_service.logout_usuario(session,usuario_id)
-        return build_response(resultado)
+        status, mensaje, data, code = usuario_service.logout_usuario(session, usuario_id)
+        return make_response(status, mensaje, data, code)
+
+    except Exception as e:
+        return make_response(ResponseStatus.ERROR, "Error al hacer logout", str(e), error_code="LOGOUT_ERROR")
 
     finally:
         session.close()
-
-logout_usuario._security_metadata = {
-    "is_public": False,  # Solo usuarios autenticados pueden hacer logout
-    "access_permissions": ["logout"]
-}
-
 
 
 @usuario_bp.route('/perfil', methods=['GET'])
@@ -89,71 +97,82 @@ def perfil_usuario():
     session = SessionLocal()
     try:
         usuario_id = request.jwt_payload["sub"]
-        resultado = usuario_service.ver_perfil(session, usuario_id)
-        return build_response(resultado)
+        status, mensaje, data, code = usuario_service.ver_perfil(session, usuario_id)
+        return make_response(status, mensaje, data, code)
+
+    except Exception as e:
+        return make_response(ResponseStatus.ERROR, "Error al obtener perfil", str(e), error_code="PERFIL_ERROR")
+
     finally:
         session.close()
 
-perfil_usuario._security_metadata = {
-    "is_public": False,
-    "access_permissions": ["ver_usuario"]
-}
-
 
 #-----------------------------------------------------------------------------------------------------------------------------
-#RECUPERACION DE PASSWORD CON CODIGO OTP VIA MAIL
+# RECUPERACIÓN DE PASSWORD CON OTP
 #-----------------------------------------------------------------------------------------------------------------------------
-
 
 @usuario_bp.route('/solicitar-otp', methods=['POST'])
 @ruta_publica 
 def solicitar_otp():
     session = SessionLocal()
-    email = request.json.get('email')
     try:
-        respuesta = usuario_service.solicitar_codigo_reset(session, email)
-        return build_response(respuesta)
+        email = request.json.get('email')
+        if not email:
+            return make_response(ResponseStatus.FAIL, "Email requerido", error_code="EMAIL_REQUIRED")
+
+        status, mensaje, data, code = usuario_service.solicitar_codigo_reset(session, email)
+        return make_response(status, mensaje, data, code)
+
+    except Exception as e:
+        return make_response(ResponseStatus.ERROR, "Error al solicitar OTP", str(e), error_code="OTP_SOLICITUD_ERROR")
+
     finally:
         session.close()
 
 
 @usuario_bp.route('/verificar-otp', methods=['POST'])
-@ruta_publica  #definir si va a ser publica
+@ruta_publica
 def verificar_otp():
     session = SessionLocal()
-    data = request.get_json()
-    email = data.get('email')
-    otp = data.get('otp')
     try:
-        respuesta = usuario_service.verificar_otp(session, email, otp)
-        return build_response(respuesta)
+        data = request.get_json()
+        email = data.get('email')
+        otp = data.get('otp')
+
+        if not email or not otp:
+            return make_response(ResponseStatus.FAIL, "Email y OTP son requeridos", error_code="FALTAN_DATOS")
+
+        status, mensaje, data, code = usuario_service.verificar_otp(session, email, otp)
+        return make_response(status, mensaje, data, code)
+
+    except Exception as e:
+        return make_response(ResponseStatus.ERROR, "Error al verificar OTP", str(e), error_code="OTP_VERIFICACION_ERROR")
+
     finally:
         session.close()
 
 
 @usuario_bp.route('/reset-password-con-codigo', methods=['POST'])
-def reset_con_otp():  #definir si va a ser publica
+@ruta_publica
+@limiter.limit("5 per minute")
+def reset_con_otp():
     session = SessionLocal()
-    data = request.get_json()
     try:
-        resultado = usuario_service.cambiar_password_con_codigo(session, data)
-        return build_response(resultado)
+        data = request.get_json()
+        token = request.headers.get("Authorization", "").replace("Bearer ", "")
+        if not data or not token:
+            return make_response(ResponseStatus.FAIL, "Datos requeridos y token requeridos", error_code="NO_INPUT")
+
+        status, mensaje, data, code = usuario_service.cambiar_password_con_codigo(session, data, token)
+        return make_response(status, mensaje, data, code)
+
+    except Exception as e:
+        return make_response(ResponseStatus.ERROR, "Error al cambiar contraseña", str(e), error_code="RESET_ERROR")
+
     finally:
         session.close()
-reset_con_otp._security_metadata ={
-    "is_public":True
-}
 
 
 @usuario_bp.route('/modificar', methods=['GET', 'POST'])
 def modificar_perfil():
-    #Agregar logica
-    pass
-
-
-
-
-
-
-#para iniciar el seed
-#python -m app.script.seed_data
+    return make_response(ResponseStatus.PENDING, "Funcionalidad en construcción")
