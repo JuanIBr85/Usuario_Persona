@@ -27,4 +27,15 @@
       env_file:
         - ./persona-service/frontend/.env
 
+    component-service:
+      build: ./component-services
+      ports:
+        - "5002:5002"
+      env_file:
+        - ./component-services/.env
+      volumes:
+        - ./component-services:/app
+      depends_on:
+        - auth-service
+
 
