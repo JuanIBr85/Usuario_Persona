@@ -46,7 +46,7 @@ def make_response(
     }
 
     if data is not None:
-        key = "data" if status != ResponseStatus.SUCCESS else "error"
+        key = "data" if status == ResponseStatus.SUCCESS else "error"
         response[key] = data
         if isinstance(data, (list, set, tuple)):
             response["total"] = len(data)
