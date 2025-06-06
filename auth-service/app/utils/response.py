@@ -40,6 +40,10 @@ def make_response(
                   "error_code": "EMAIL_NOT_FOUND"
               }
     """
+
+    if not isinstance(status, ResponseStatus):
+        raise TypeError("status debe de ser de tipo ResponseStatus")
+
     response = {
         "status": status.value,
         "message": message or ""
@@ -53,9 +57,6 @@ def make_response(
 
     if error_code:
         response["error_code"] = error_code
-
-    if not isinstance(status, ResponseStatus):
-        raise TypeError("El primer elemento de la tupla debe ser ResponseStatus")
 
     return jsonify(response)
 
