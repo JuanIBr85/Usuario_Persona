@@ -31,23 +31,16 @@ class UsuarioService(ServicioBase):
         try:
             data_validada = self.schema.load(data)
         except ValidationError as error:
-            return (
-                        ResponseStatus.FAIL,
-                        "Error de schema / Bad Request",
-                        error.messages,
-                        400
-                    )
+            return ResponseStatus.FAIL,"Error de schema / Bad Request",error.messages,400
+                        
+                    
         
         if session.query(Usuario).filter(
             (Usuario.nombre_usuario == data_validada['nombre_usuario']) |
             (Usuario.email_usuario == data_validada['email_usuario'])
         ).first():
-            return (
-                        ResponseStatus.ERROR,
-                        "El nombre de usuario o el email ya están registrados",
-                        None,
-                        400
-                    )
+            return ResponseStatus.ERROR,"El nombre de usuario o el email ya están registrados",None, 400
+                        
         
         password_hash = generate_password_hash(data_validada['password'])
         data_validada["password"] = password_hash
@@ -58,12 +51,8 @@ class UsuarioService(ServicioBase):
 
         rol_por_defecto = get_rol_por_nombre(session, "usuario")
         if not rol_por_defecto:
-            return (
-                        ResponseStatus.NOT_FOUND,
-                        "Rol no encontrado.",
-                        None,
-                        404
-                    )
+            return ResponseStatus.NOT_FOUND,"Rol no encontrado.",None,404
+                    
 
         session.add(RolUsuario(
             id_usuario=nuevo_usuario.id_usuario,
@@ -83,12 +72,8 @@ class UsuarioService(ServicioBase):
         ))
 
         session.commit()
-        return (
-                    ResponseStatus.SUCCESS,
-                    "Usuario se registrado con exito, se ha enviado un mail de verificación.",
-                    self.schema_out.dump(nuevo_usuario), 
-                    200
-                )
+        return ResponseStatus.SUCCESS,"Usuario se registrado con exito, se ha enviado un mail de verificación.",self.schema_out.dump(nuevo_usuario), 200
+                
 #-----------------------------------------------------------------------------------------------------------------------------
     def verificar_email(self,session:Session,token:str)->dict:
         if not token:
@@ -234,7 +219,9 @@ class UsuarioService(ServicioBase):
         if usuario.persona_id:
             try:
                 import requests
-                url = f"{getenv('PERSONA_SERVICE_URL', 'http://localhost:5001')}/personas/{usuario.persona_id}"
+                import os
+                
+                url = f"{os.getenv('PERSONA_SERVICE_URL', 'http://localhost:5001')}/personas/{usuario.persona_id}"
                 response = requests.get(url, timeout=5)
                 if response.status_code == 200:
                     perfil["persona"] = response.json()
@@ -433,7 +420,7 @@ class UsuarioService(ServicioBase):
         hashed_password = generate_password_hash(data_validad["password"])
         usuario.password = hashed_password
         usuario.password_changed_at = datetime.now(timezone.utc)
-        
+
         otp_entry.usado = True
         session.add(PasswordLog(
                 usuario_id=usuario.id_usuario,
