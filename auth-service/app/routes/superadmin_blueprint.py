@@ -1,4 +1,4 @@
-from flask import Blueprint , Response , request
+from flask import Blueprint, Response, request
 import json
 from app.database.session import SessionLocal
 from app.services.superadmin_service import SuperAdminService
@@ -17,7 +17,7 @@ def crear_usuario_con_rol():
         nombre = data.get("nombre_usuario")
         email = data.get("email_usuario")
         password = data.get("password")
-        nombre_rol = data["rol"] 
+        nombre_rol = data["rol"]
 
         if not nombre or not email or not password:
             return Response(
@@ -26,7 +26,8 @@ def crear_usuario_con_rol():
                 mimetype='application/json'
             )
 
-        resultado = superadmin_service.crear_usuario_con_rol(session, nombre, email, password,nombre_rol)
+        resultado = superadmin_service.crear_usuario_con_rol(
+            session, nombre, email, password, nombre_rol)
 
         return Response(
             json.dumps(resultado),
@@ -51,6 +52,7 @@ def crear_usuario_con_rol():
     finally:
 
         session.close()
+
 
 crear_usuario_con_rol._security_metadata = {
     "is_public": False,
@@ -92,6 +94,8 @@ def crear_rol():
         )
     finally:
         session.close()
+
+
 crear_rol._security_metadata = {
     "is_public": False,
     "access_permissions": ["crear_rol"]
@@ -102,7 +106,7 @@ crear_rol._security_metadata = {
 @superadmin_bp.route('/admins/<int:id>/permisos', methods=['POST'])
 def asignar_permisos_rol(id):
     session = SessionLocal()
-    try: 
+    try:
         data = request.get_json()
         permisos = data.get("permisos")
         if not permisos or not isinstance(permisos, list):
@@ -112,7 +116,8 @@ def asignar_permisos_rol(id):
                 mimetype='application/json'
             )
 
-        resultado = superadmin_service.asignar_permisos_rol(session, id, permisos)
+        resultado = superadmin_service.asignar_permisos_rol(
+            session, id, permisos)
 
         return Response(
             json.dumps(resultado),
@@ -136,6 +141,8 @@ def asignar_permisos_rol(id):
         )
     finally:
         session.close()
+
+
 asignar_permisos_rol._security_metadata = {
     "is_public": False,
     "access_permissions": ["asignar_permisos_rol"]
@@ -155,7 +162,8 @@ def modificar_usuario_con_rol(id):
                 mimetype='application/json'
             )
 
-        resultado = superadmin_service.asignar_permisos_admin(session, id, permisos)
+        resultado = superadmin_service.asignar_permisos_admin(
+            session, id, permisos)
 
         return Response(
             json.dumps(resultado),
@@ -179,6 +187,8 @@ def modificar_usuario_con_rol(id):
         )
     finally:
         session.close()
+
+
 modificar_usuario_con_rol._security_metadata = {
     "is_public": False,
     "access_permissions": ["modificar_admin"]
@@ -193,6 +203,7 @@ def modificar_rol(rol_id):
         mimetype='application/json'
     )
 
+
 modificar_rol._security_metadata = {
     "is_public": False,
     "access_permissions": ["modificar_rol"]
@@ -206,7 +217,45 @@ def crear_permiso():
         status=201,
         mimetype='application/json'
     )
+
 crear_permiso._security_metadata = {
     "is_public": False,
     "access_permissions": ["crear_permiso"]
 }
+
+
+# ==========
+# Listar roles  ## Esta función es nueva Jun 6  
+# ==========
+@superadmin_bp.route('/roles', methods=['GET'])
+def obtener_roles():
+    session = SessionLocal()
+    try:
+        roles = superadmin_service.obtener_roles(session)
+        return Response(
+            json.dumps(roles),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        session.rollback()
+        return Response(
+            json.dumps({"error": f"Error al obtener roles: {str(e)}"}),
+            status=500,
+            mimetype='application/json'
+        )
+    finally:
+        session.close()
+
+obtener_roles._security_metadata = {
+    "is_public": True,  
+    "access_permissions": []  
+}
+
+#
+#obtener_roles._security_metadata = {
+#    "is_public": False,
+#    "access_permissions": ["obtener_roles"]
+#}
+# ==========
+# ==========
