@@ -38,7 +38,8 @@ import {
 } from "@/components/ui/dialog";
 import { Link } from "react-router-dom";
 
-
+// Import de services
+import { roleService } from "@/services/roleService";
 
 
 export default function AdminRoles() {
@@ -149,6 +150,13 @@ export default function AdminRoles() {
     }
   };
 
+  function formatPermissionName(permission) {
+    return permission
+      .split('_') // separa por guiones bajos
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // capitaliza la primera letra de cada palabra
+      .join(' '); // une con espacios
+  }
+
   useEffect(() => {
     const fetchRoles = async () => {
       try {
@@ -192,8 +200,9 @@ export default function AdminRoles() {
                       {role.name}
                       <div className="text-xs text-gray-500">
                         {role.permissions?.length > 0
-                          ? role.permissions.join(", ")
+                          ? role.permissions.map(formatPermissionName).join(", ")
                           : "Sin permisos asignados"}
+
                       </div>
                     </div>
                   </span>
