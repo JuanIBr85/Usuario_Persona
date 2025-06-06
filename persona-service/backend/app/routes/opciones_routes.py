@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from app.utils.respuestas import respuesta_estandar,RespuestaStatus
-from app.constantes.tipos_documentos import TIPOS_DOCUMENTO_VALIDOS
+from config import TIPOS_DOCUMENTO_VALIDOS,REDES_SOCIALES_VALIDAS
 from app.services.domicilio_postal_service import DomicilioPostalService
 
 
@@ -14,6 +14,16 @@ def obtener_tipos_documento():
         message="Tipos de documento obtenidos correctamente",
         data=TIPOS_DOCUMENTO_VALIDOS
     )),200
+
+@opciones_bp.route("/redes_sociales", methods=["GET"])
+def obtener_red_social():
+
+    return jsonify(respuesta_estandar(
+        status=RespuestaStatus.SUCCESS,
+        message="Redes sociales obtenidos correctamente",
+        data=REDES_SOCIALES_VALIDAS
+    )),200
+
 
 @opciones_bp.route('/domicilios_postales/buscar', methods=['GET'])
 def buscar_domicilio_postal():

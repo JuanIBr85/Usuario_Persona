@@ -1,6 +1,6 @@
 from marshmallow import Schema, fields, validate
 from marshmallow.validate import Length
-from app.constantes.redes_sociales_nombres import REDES_SOCIALES_VALIDAS
+from config import REDES_SOCIALES_VALIDAS
 
 
 class ContactoSchema(Schema):
