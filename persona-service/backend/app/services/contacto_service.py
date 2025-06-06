@@ -41,7 +41,8 @@ class ContactoService(IContactoInterface):
         if not contacto:
             raise ValueError("Contacto no encontrado")
 
-        campos_editables = ['telefono_fijo', 'telefono_movil', 'red_social_contacto']
+        campos_editables = ['telefono_fijo', 'telefono_movil', 'red_social_contacto', 'red_social_nombre',
+                            'email_contacto', 'observacion_contacto']
 
         for campo in campos_editables:
             if campo in data:
