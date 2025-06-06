@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -38,24 +38,13 @@ import {
 } from "@/components/ui/dialog";
 import { Link } from "react-router-dom";
 
-// Datos iniciales de roles
-const initialRoles = [
-  { id: 1, name: "Administrador", permissions: ["Puede hacer X"] },
-  { id: 2, name: "Alumno", permissions: ["Puede hacer Y"] },
-  { id: 3, name: "Nombre Rol 3", permissions: [] },
-];
 
-// Lista de permisos disponibles para asignar a los roles
-const availablePermissions = [
-  "Puede hacer X",
-  "Puede hacer Y",
-  "Puede hacer A",
-  "Puede hacer B",
-];
+
 
 export default function AdminRoles() {
   // Estado para almacenar la lista de roles
-  const [roles, setRoles] = useState(initialRoles);
+  const [roles, setRoles] = useState([]);
+
   // Estado para mostrar u ocultar el formulario de creación/edición de rol
   const [showNewRoleForm, setShowNewRoleForm] = useState(false);
   // Estado para almacenar el nombre del nuevo rol o el nombre editado
@@ -160,6 +149,28 @@ export default function AdminRoles() {
     }
   };
 
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/super-admin/roles");
+        const data = await response.json();
+
+        const transformedRoles = data.roles.map((role) => ({
+          id: role.id_rol,
+          name: role.nombre_rol,
+          permissions: role.permisos,
+        }));
+
+        setRoles(transformedRoles);
+      } catch (error) {
+        showError("Error al cargar los roles desde el servidor.");
+        console.error(error);
+      }
+    };
+
+    fetchRoles();
+  }, []);
+
   return (
     <div className="p-6 space-y-6 py-30 px-3 md:py-25 md:px-15">
       <Fade duration={300} triggerOnce>
@@ -189,7 +200,7 @@ export default function AdminRoles() {
                   {/*Botón de editar*/}
                   <Button
                     variant="outline"
-                    
+
                     onClick={() => handleEditClick(role)}
                   >
                     <Pencil className="w-4 h-4" />
@@ -199,7 +210,7 @@ export default function AdminRoles() {
                   {/*Botón de borrar*/}
                   <Button
                     variant="outline"
-                   
+
                     onClick={() => openDeleteConfirmDialog(role)}
                   >
                     <Trash2 className="w-4 h-4" />
