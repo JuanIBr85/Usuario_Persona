@@ -37,7 +37,7 @@ function UserDetails() {
   const [editingUser, setEditingUser] = useState(null);
 
   useEffect(() => {
-    PersonaService.get_by_usuario(id)
+    PersonaService.get_by_id(id)
       .then(res => {
         console.log("Respuesta completa:", res);
         if (res?.data) {

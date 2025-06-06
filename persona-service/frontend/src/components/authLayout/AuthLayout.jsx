@@ -23,9 +23,8 @@ const AuthLayout = ({
 }) => {
   return (
     <Fade duration={500} triggerOnce>
-      {/* COLOR DE FONDO TEMPORAL, SOLO PARA DIFERENCIAR DEL FONDO */}
-      <div className={cn("h-screen flex items-center bg-blue-500 justify-center", className)}>
-        <div className="flex w-full h-full sm:h-[520px] sm:max-w-md md:max-w-3xl shadow-md rounded-xl overflow-hidden">
+      <div className={cn("h-screen flex items-center justify-center", className)}>
+        <div className="flex w-full h-full sm:h-[520px] sm:max-w-md md:max-w-3xl shadow-2xl border-1 border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden">
           {/* Sección visual (se oculta en móviles) */}
           {visualContent && (
             <Card className="w-full md:max-w-md h-full bg-[var(--color-primario)] hidden md:block rounded-none border-none">

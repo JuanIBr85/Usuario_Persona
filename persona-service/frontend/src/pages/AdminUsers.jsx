@@ -26,7 +26,7 @@ function AdminUsers() {
 
   const [users, setUsers] = useState([]);
   useEffect(() => {
-    PersonaService.get()
+    PersonaService.get_all()
       .then(res => {
         console.log("Respuesta completa:", res);
 
