@@ -1,4 +1,5 @@
-from marshmallow import Schema, fields, Length
+from marshmallow import Schema, fields
+from marshmallow.validate import Length
 from app.schema.domicilio_postal_schema import DomicilioPostalSchema
 
 class DomicilioSchema(Schema):
