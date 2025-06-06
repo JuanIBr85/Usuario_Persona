@@ -34,7 +34,7 @@ function Sign() {
           setMessage(error.message);
         }
         setIsOpen(true);
-      }).finally(()=>setIsLoading(false));
+      }).finally(() => setIsLoading(false));
   }
 
   return (
@@ -46,7 +46,7 @@ function Sign() {
         isOpen={isOpen}
         setIsOpen={setIsOpen}
       />
-      
+
       <AuthLayout
         title="Creación de cuenta"
         visualContent={<UserPlus className="text-white w-42 h-42" />}
@@ -60,14 +60,17 @@ function Sign() {
             validateMessage="Email inválido"
             required
           />
+          
           <InputValidate
             id="nombre_usuario"
             type="text"
             placeholder="Nombre de usuario"
             labelText="Nombre"
-            validateMessage="El nombre es requerido"
+            validatePattern=".{4,}"
+            validateMessage="El nombre debe tener al menos 4 caracteres"
             required
           />
+
           <InputValidate
             id="password"
             type="password"
