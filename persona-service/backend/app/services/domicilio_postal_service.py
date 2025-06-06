@@ -23,7 +23,9 @@ class DomicilioPostalService(IDomicilioPostalInterface):
         finally:
             session.close()
 
-    def obtener_id_por_cod_postal_localidad(self, codigo_postal, localidad, session=None):
+
+
+    def obtener_domicilio_postal_por_cod_postal_localidad(self, codigo_postal, localidad, session=None):
 
         cerrar=False
         if session is None:
@@ -40,9 +42,29 @@ class DomicilioPostalService(IDomicilioPostalInterface):
 
         finally:
             if cerrar:
-                session.close()        
+                session.close()     
 
+# Devuelve una lista de localidades para un determinado Codigo Postal
+    def buscar_localidades_por_codigo_postal(self, codigo_postal, session=None):
+        
+        cerrar=False
+        if session is None:
+            session = SessionLocal()
+            cerrar=True    
 
+        try:
+
+            lista_localidades= (session.query(DomicilioPostal.localidad)
+                .filter(DomicilioPostal.codigo_postal==codigo_postal.strip())
+                .distinct()
+                .all()
+                )
+            
+            return [fila.localidad for fila in lista_localidades]
+
+        finally:
+            if cerrar:
+                session.close()                 
 
     def crear_domicilio_postal(self, data, session=None):
 
