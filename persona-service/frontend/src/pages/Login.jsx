@@ -32,7 +32,6 @@ function Login() {
           token: json.data.token,
           user: json.data
         });
-        setIsOpen(true);
       }).catch((error) => {
 
         if (error.isJson) {
@@ -44,14 +43,12 @@ function Login() {
         } else {
           setMessage(error.message);
         }
-        setIsOpen(true);
-      }).finally(()=>setIsLoading(false));
+      }).finally(()=>{setIsLoading(false);setIsOpen(true);});
   }
-
-  if(isLoading)return <Loading isFixed={true}/>
 
   return (
     <>
+      {isLoading && <Loading isFixed={true} />}
       <SimpleDialog
         title="Login"
         description={dialogMessage}

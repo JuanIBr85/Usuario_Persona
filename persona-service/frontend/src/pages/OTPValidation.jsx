@@ -16,28 +16,46 @@ import {
     InputOTPSlot,
 } from "@/components/ui/input-otp"
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAuthContext } from "@/context/AuthContext";
 
 function OTPValidation() {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    const {authData} = useAuthContext();
     const location = useLocation();
     const toRedirect = location.state?.from || "/";
+    const email = location.state?.email || authData.user.email_usuario || "";
 
     const [isOpen, setIsOpen] = React.useState(false);
     const [dialogMessage, setMessage] = React.useState("");
     const [isOK, setIsOK] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState(false);
 
-    if (isLoading) return <Loading isFixed={true} />
-
     const handleSubmit = async (event) => {
         const formData = await formSubmitJson(event);
         document.activeElement.blur();
         setIsLoading(true);
-        console.log(formData)
+        AuthService
+            .validateOtp({formData, email: email})
+            .then((json) => {
+                setMessage(`Se ha verificado correctamente el código de verificación.`);
+                setIsOK(true);
+            }).catch((error) => {
+                console.log(error.data)
+                if (error.isJson) {
+                    if (error.data.error) {
+                        setMessage(FetchErrorMessage(error));
+                    } else {
+                        setMessage(error.data.message || "Error desconocido");
+                    }
+                } else {
+                    setMessage(error.message);
+                }
+            }).finally(() => { setIsLoading(false); setIsOpen(true); });
     }
 
     return (
         <>
+            {isLoading && <Loading isFixed={true} />}
             <SimpleDialog
                 title="Login"
                 description={dialogMessage}

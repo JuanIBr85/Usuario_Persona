@@ -20,10 +20,9 @@ function ForgotPassword() {
     setIsLoading(true);
     
     AuthService
-      .forgotPassword(formData)
-      .then(() => {
-        setMessage("Se ha enviado un enlace de recuperación a tu correo electrónico. Por favor, revisa tu bandeja de entrada.");
-        setIsOpen(true);
+      .requestOtp(formData)
+      .then((json) => {
+        setMessage("Se ha enviado un codigo de recuperación a tu correo electrónico. Por favor, revisa tu bandeja de entrada.");
       })
       .catch((error) => {
         if (error.isJson) {
@@ -35,9 +34,9 @@ function ForgotPassword() {
         } else {
           setMessage(error.message || "Error de conexión");
         }
-        setIsOpen(true);
+        
       })
-      .finally(() => setIsLoading(false));
+      .finally(() => {setIsLoading(false);setIsOpen(true);});
   };
 
   return (
@@ -59,7 +58,7 @@ function ForgotPassword() {
             Ingresa tu dirección de correo electrónico y te enviaremos un enlace para restablecer tu contraseña.
           </p>
           <InputValidate
-            id="email_usuario"
+            id="email"
             type="email"
             placeholder="Email"
             labelText="Email"

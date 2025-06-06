@@ -25,7 +25,7 @@ export const AuthService = {
    */
   login: async (body) => {
     return fetchService.fetch({
-      url: `${ServiceURL.auth}/login1`,
+      url: `${ServiceURL.auth}/login`,
       method: HttpMethod.POST,
       body: body,
       showError: AuthService.showError
@@ -45,7 +45,39 @@ export const AuthService = {
     console.log("Datos enviados:", body);
 
     return fetchService.fetch({
-      url: `${ServiceURL.auth}/registro1`,
+      url: `${ServiceURL.auth}/registro`,
+      method: HttpMethod.POST,
+      body: body,
+      showError: AuthService.showError
+    });
+  },
+
+  /**
+   * Solicita un código OTP para la autenticación de dos factores.
+   * @async
+   * @param {Object} body - Datos necesarios para solicitar el OTP.
+   * @param {string} body.email_usuario - Correo electrónico del usuario.
+   * @returns {Promise<Object>} Promesa que resuelve con la respuesta del servidor.
+   */
+  requestOtp: async (body) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/solicitar-otp`,
+      method: HttpMethod.POST,
+      body: body,
+      showError: AuthService.showError
+    });
+  },
+
+  /**
+   * Valida un código OTP proporcionado por el usuario.
+   * @async
+   * @param {Object} body - Datos necesarios para validar el OTP.
+   * @param {string} body.otp - Código OTP proporcionado por el usuario.
+   * @returns {Promise<Object>} Promesa que resuelve con la respuesta del servidor.
+   */
+  validateOtp: async (body) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/verificar-otp`,
       method: HttpMethod.POST,
       body: body,
       showError: AuthService.showError
