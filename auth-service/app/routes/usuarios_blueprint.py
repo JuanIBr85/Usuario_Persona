@@ -23,10 +23,10 @@ def registrar_usuario1():
             return make_response(ResponseStatus.FAIL, "Datos de entrada requeridos", error_code="NO_INPUT")
 
         status, mensaje, data, code = usuario_service.registrar_usuario(session, data)
-        return make_response(status, mensaje, data, code)
+        return make_response(status, mensaje, data, code), code
 
     except Exception as e:
-        return make_response(ResponseStatus.ERROR, "Error al registrar usuario", str(e), error_code="REGISTRO_ERROR")
+        return make_response(ResponseStatus.ERROR, "Error al registrar usuario", str(e), error_code="REGISTRO_ERROR"), 500
 
     finally:
         session.close()
@@ -39,13 +39,13 @@ def verificar_email():
     try:
         token = request.args.get('token')
         if not token:
-            return make_response(ResponseStatus.FAIL, "Token de verificación requerido", error_code="TOKEN_MISSING")
+            return make_response(ResponseStatus.FAIL, "Token de verificación requerido", error_code="TOKEN_MISSING"), 400
 
         status, mensaje, data, code = usuario_service.verificar_email(session, token)
-        return make_response(status, mensaje, data, code)
+        return make_response(status, mensaje, data, code), code
 
     except Exception as e:
-        return make_response(ResponseStatus.ERROR, "Error al verificar email", str(e), error_code="VERIFICACION_ERROR")
+        return make_response(ResponseStatus.ERROR, "Error al verificar email", str(e), error_code="VERIFICACION_ERROR"), 500
 
     finally:
         session.close()
@@ -66,10 +66,10 @@ def login1():
             return make_response(ResponseStatus.FAIL, "Datos de entrada requeridos", error_code="NO_INPUT")
 
         status, mensaje, data, code = usuario_service.login_usuario(session, data)
-        return make_response(status, mensaje, data, code)
+        return make_response(status, mensaje, data, code), code
 
     except Exception as e:
-        return make_response(ResponseStatus.ERROR, "Error en login", str(e), error_code="LOGIN_ERROR")
+        return make_response(ResponseStatus.ERROR, "Error en login", str(e), error_code="LOGIN_ERROR"), 500
 
     finally:
         session.close()
@@ -82,10 +82,10 @@ def logout_usuario():
     try:
         usuario_id = request.jwt_payload["sub"]
         status, mensaje, data, code = usuario_service.logout_usuario(session, usuario_id)
-        return make_response(status, mensaje, data, code)
+        return make_response(status, mensaje, data, code), code
 
     except Exception as e:
-        return make_response(ResponseStatus.ERROR, "Error al hacer logout", str(e), error_code="LOGOUT_ERROR")
+        return make_response(ResponseStatus.ERROR, "Error al hacer logout", str(e), error_code="LOGOUT_ERROR"), 500
 
     finally:
         session.close()
@@ -98,10 +98,10 @@ def perfil_usuario():
     try:
         usuario_id = request.jwt_payload["sub"]
         status, mensaje, data, code = usuario_service.ver_perfil(session, usuario_id)
-        return make_response(status, mensaje, data, code)
+        return make_response(status, mensaje, data, code), code
 
     except Exception as e:
-        return make_response(ResponseStatus.ERROR, "Error al obtener perfil", str(e), error_code="PERFIL_ERROR")
+        return make_response(ResponseStatus.ERROR, "Error al obtener perfil", str(e), error_code="PERFIL_ERROR"), 500
 
     finally:
         session.close()
@@ -118,13 +118,13 @@ def solicitar_otp():
     try:
         email = request.json.get('email')
         if not email:
-            return make_response(ResponseStatus.FAIL, "Email requerido", error_code="EMAIL_REQUIRED")
+            return make_response(ResponseStatus.FAIL, "Email requerido", error_code="EMAIL_REQUIRED"), 400
 
         status, mensaje, data, code = usuario_service.solicitar_codigo_reset(session, email)
-        return make_response(status, mensaje, data, code)
+        return make_response(status, mensaje, data, code), code
 
     except Exception as e:
-        return make_response(ResponseStatus.ERROR, "Error al solicitar OTP", str(e), error_code="OTP_SOLICITUD_ERROR")
+        return make_response(ResponseStatus.ERROR, "Error al solicitar OTP", str(e), error_code="OTP_SOLICITUD_ERROR"), 500
 
     finally:
         session.close()
@@ -140,13 +140,13 @@ def verificar_otp():
         otp = data.get('otp')
 
         if not email or not otp:
-            return make_response(ResponseStatus.FAIL, "Email y OTP son requeridos", error_code="FALTAN_DATOS")
+            return make_response(ResponseStatus.FAIL, "Email y OTP son requeridos", error_code="FALTAN_DATOS"), 400
 
         status, mensaje, data, code = usuario_service.verificar_otp(session, email, otp)
-        return make_response(status, mensaje, data, code)
+        return make_response(status, mensaje, data, code), code
 
     except Exception as e:
-        return make_response(ResponseStatus.ERROR, "Error al verificar OTP", str(e), error_code="OTP_VERIFICACION_ERROR")
+        return make_response(ResponseStatus.ERROR, "Error al verificar OTP", str(e), error_code="OTP_VERIFICACION_ERROR"), 500
 
     finally:
         session.close()
@@ -161,13 +161,13 @@ def reset_con_otp():
         data = request.get_json()
         token = request.headers.get("Authorization", "").replace("Bearer ", "")
         if not data or not token:
-            return make_response(ResponseStatus.FAIL, "Datos requeridos y token requeridos", error_code="NO_INPUT")
+            return make_response(ResponseStatus.FAIL, "Datos requeridos y token requeridos", error_code="NO_INPUT"), 400
 
         status, mensaje, data, code = usuario_service.cambiar_password_con_codigo(session, data, token)
-        return make_response(status, mensaje, data, code)
+        return make_response(status, mensaje, data, code), code
 
     except Exception as e:
-        return make_response(ResponseStatus.ERROR, "Error al cambiar contraseña", str(e), error_code="RESET_ERROR")
+        return make_response(ResponseStatus.ERROR, "Error al cambiar contraseña", str(e), error_code="RESET_ERROR"), 500
 
     finally:
         session.close()
@@ -175,4 +175,4 @@ def reset_con_otp():
 
 @usuario_bp.route('/modificar', methods=['GET', 'POST'])
 def modificar_perfil():
-    return make_response(ResponseStatus.PENDING, "Funcionalidad en construcción")
+    return make_response(ResponseStatus.PENDING, "Funcionalidad en construcción"), 501
