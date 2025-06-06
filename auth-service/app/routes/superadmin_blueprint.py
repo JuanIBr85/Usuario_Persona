@@ -8,6 +8,7 @@ superadmin_bp = Blueprint('admin', __name__)
 
 superadmin_service = SuperAdminService()
 
+
 @superadmin_bp.route('/admins', methods=['POST'])
 @jwt_required()
 def crear_usuario_con_rol():
@@ -60,6 +61,8 @@ crear_usuario_con_rol._security_metadata = {
 }
 
 # Crear rol
+
+
 @superadmin_bp.route('/roles', methods=['POST'])
 def crear_rol():
     session = SessionLocal()
@@ -149,6 +152,8 @@ asignar_permisos_rol._security_metadata = {
 }
 
 # Modificar usuarios con rol
+
+
 @superadmin_bp.route('/admins/<int:id>', methods=['PUT'])
 def modificar_usuario_con_rol(id):
     session = SessionLocal()
@@ -195,6 +200,8 @@ modificar_usuario_con_rol._security_metadata = {
 }
 
 # Modificar rol
+
+
 @superadmin_bp.route('/roles/<int:rol_id>', methods=['PUT'])
 def modificar_rol(rol_id):
     return Response(
@@ -210,6 +217,8 @@ modificar_rol._security_metadata = {
 }
 
 # Crear permiso
+
+
 @superadmin_bp.route('/permisos', methods=['POST'])
 def crear_permiso():
     return Response(
@@ -218,6 +227,7 @@ def crear_permiso():
         mimetype='application/json'
     )
 
+
 crear_permiso._security_metadata = {
     "is_public": False,
     "access_permissions": ["crear_permiso"]
@@ -225,7 +235,7 @@ crear_permiso._security_metadata = {
 
 
 # ==========
-# Listar roles  ## Esta función es nueva Jun 6  
+# Listar roles  ## Esta función es nueva Jun 6
 # ==========
 @superadmin_bp.route('/roles', methods=['GET'])
 def obtener_roles():
@@ -247,15 +257,61 @@ def obtener_roles():
     finally:
         session.close()
 
+
 obtener_roles._security_metadata = {
-    "is_public": True,  
-    "access_permissions": []  
+    "is_public": True,
+    "access_permissions": []
 }
 
 #
-#obtener_roles._security_metadata = {
+# obtener_roles._security_metadata = {
 #    "is_public": False,
 #    "access_permissions": ["obtener_roles"]
-#}
+# }
+# ==========
+# ==========
+
+
+# ==========
+# Borrar Roles  ## Esta función es nueva Jun 6
+# ==========
+@superadmin_bp.route('/roles/<int:rol_id>', methods=['DELETE'])
+# @jwt_required()
+def borrar_rol(rol_id):
+    session = SessionLocal()
+    try:
+        resultado = superadmin_service.borrar_rol(session, rol_id)
+        return Response(
+            json.dumps(resultado),
+            status=200,
+            mimetype='application/json'
+        )
+    except ValueError as e:
+        session.rollback()
+        return Response(
+            json.dumps({"error": str(e)}),
+            status=400,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        session.rollback()
+        return Response(
+            json.dumps({"error": f"Error inesperado: {str(e)}"}),
+            status=500,
+            mimetype='application/json'
+        )
+    finally:
+        session.close()
+
+
+borrar_rol._security_metadata = {
+    "is_public": True,
+    "access_permissions": []
+}
+
+# borrar_rol._security_metadata = {
+#    "is_public": False,
+#    "access_permissions": ["borrar_rol"]
+# }
 # ==========
 # ==========

@@ -121,4 +121,21 @@ class SuperAdminService:
     # ==========
     # ==========
 
+    # ==========
+    # borrar_rol ## Esta función es nueva Jun 6
+    # ==========
+    def borrar_rol(self, session: Session, rol_id: int) -> dict:
+        rol = session.query(Rol).filter_by(
+            id_rol=rol_id, deleted_at=None).first()
+        if not rol:
+            raise ValueError("No se encontró el rol o ya fue eliminado.")
 
+        #  borrado lógico:
+        rol.deleted_at = datetime.now(timezone.utc)
+
+        session.commit()
+        return {
+            "mensaje": f"Rol '{rol.nombre_rol}' eliminado correctamente."
+        }
+    # ==========
+    # ==========
