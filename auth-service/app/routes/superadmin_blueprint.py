@@ -148,11 +148,15 @@ def asignar_permisos_rol(id):
     finally:
         session.close()
 
-
 asignar_permisos_rol._security_metadata = {
-    "is_public": False,
-    "access_permissions": ["asignar_permisos_rol"]
+    "is_public": True,
+    "access_permissions": [""]
 }
+
+#asignar_permisos_rol._security_metadata = {
+#    "is_public": False,
+#    "access_permissions": ["asignar_permisos_rol"]
+#}
 
 # Modificar usuarios con rol
 
@@ -230,11 +234,16 @@ def crear_permiso():
         mimetype='application/json'
     )
 
-
+# --- Debugging ---
 crear_permiso._security_metadata = {
-    "is_public": False,
-    "access_permissions": ["crear_permiso"]
+    "is_public": True,
+    "access_permissions": []
 }
+
+#crear_permiso._security_metadata = {
+#    "is_public": False,
+#    "access_permissions": ["crear_permiso"]
+#}
 
 
 # ==========

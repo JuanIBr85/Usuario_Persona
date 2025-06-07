@@ -47,16 +47,16 @@ class SuperAdminService:
         for nombre_permiso in permisos:
             permiso = session.query(Permiso).filter_by(
                 nombre_permiso=nombre_permiso).first()
-        if not permiso:
-            raise ValueError(f"Permiso '{nombre_permiso}' no encontrado.")
+            if not permiso:
+                raise ValueError(f"Permiso '{nombre_permiso}' no encontrado.")
 
-        existe = session.query(RolPermiso).filter_by(
-            id_rol=rol.id_rol,
-            permiso_id=permiso.id_permiso
-        ).first()
-        if not existe:
-            session.add(RolPermiso(id_rol=rol.id_rol,
-                        permiso_id=permiso.id_permiso))
+            existe = session.query(RolPermiso).filter_by(
+                id_rol=rol.id_rol,
+                permiso_id=permiso.id_permiso
+            ).first()
+            if not existe:
+                session.add(RolPermiso(id_rol=rol.id_rol,
+                            permiso_id=permiso.id_permiso))
 
         session.commit()
 
