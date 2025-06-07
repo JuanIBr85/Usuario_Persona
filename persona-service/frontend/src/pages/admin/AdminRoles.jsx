@@ -74,35 +74,50 @@ export default function AdminRoles() {
     );
   };
 
+  const handleAddRole = async () => {
+  if (!newRoleName.trim()) return showError("El nombre del rol no puede estar vacío");
 
-  const handleAddRole = async () => { // Agrega un nuevo rol a la lista
-    if (!newRoleName.trim()) return showError("El nombre del rol no puede estar vacío");
-    const exists = roles.some(
-      (role) => role.name.toLowerCase() === newRoleName.trim().toLowerCase()
-    );
-    if (exists) return showError("Ya existe un rol con ese nombre");
+  const exists = roles.some(
+    role => role.name.toLowerCase() === newRoleName.trim().toLowerCase()
+  );
+  if (exists) return showError("Ya existe un rol con ese nombre");
 
-    const newRoleBody = {
-      nombre_rol: newRoleName.trim(),
-      descripcion: "", //Vacío por ahora
-      permisos: [selectedPermissions], // Vacío por ahora
-    };
-    console.log(selectedPermissions)
-    try {
-      const response = await roleService.crear(newRoleBody);
-      const newRole = {
-        id: response.id_rol,
-        name: response.nombre_rol || newRoleName.trim(),
-        permissions: response.permisos || selectedPermissions,
-      };
-
-      setRoles([...roles, newRole]); // Agrega el nuevo rol al estado
-      resetForm();
-    } catch (error) {
-      showError("Error al crear el rol.");
-      console.error(error);
-    }
+  const newRoleBody = {
+    nombre_rol: newRoleName.trim(),
+    descripcion: "",
   };
+
+  try {
+    // Debido a que primero se crean los roles y luego recién se asignan sus permisos los pasos son los sgtes.:
+
+    // 1. Se crea el rol sin permisos
+    const response = await roleService.crear(newRoleBody);
+
+    // 2. se extrae el id del rol creado
+    const newRoleId = response.id_rol;
+
+    // 3. transformamos selectedPermissions a array solo con nombres para que el json cumpla las condiciones del backend
+    const permisosNombres = selectedPermissions.map(p => p.name);
+
+    // 4. se asigna permisos usando el servicio
+    await permisoService.asignarPermisos(newRoleId, permisosNombres);
+
+    // 5. actualizamos el estado con el nuevo rol (sin permisos, o con los permisos asignados)
+    const newRole = {
+      id: newRoleId,
+      name: response.nombre_rol || newRoleName.trim(),
+      permissions: permisosNombres,
+    };
+
+    setRoles([...roles, newRole]);
+    resetForm();
+
+  } catch (error) {
+    showError("Error al crear el rol y asignar permisos.");
+    console.error(error);
+  }
+};
+
 
   const handleEditClick = (role) => { // Prepara el formulario para editar un rol existente
     setEditRoleId(role.id); // Establece el ID del rol que se está editando
