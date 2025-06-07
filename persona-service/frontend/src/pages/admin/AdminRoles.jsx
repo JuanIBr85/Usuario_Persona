@@ -145,22 +145,9 @@ export default function AdminRoles() {
     if (!roleToDelete) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/super-admin/roles/${roleToDelete.id}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        // Si hay error en la respuesta
-        const errorData = await response.json();
-        showError(errorData.message || "Error al borrar el rol en el servidor");
-        return;
-      }
-
-      // Si se borró correctamente en el backend, actualizamos el estado local
+      const response = await roleService.borrar(roleToDelete.id);
       setRoles(roles.filter((role) => role.id !== roleToDelete.id));
-
       if (editRoleId === roleToDelete.id) resetForm();
-
       setRoleToDelete(null);
       setOpenDeleteDialog(false);
     } catch (error) {
@@ -168,7 +155,6 @@ export default function AdminRoles() {
       console.error(error);
     }
   };
-
 
   function formatPermissionName(permission) {
     return permission
@@ -180,8 +166,7 @@ export default function AdminRoles() {
   useEffect(() => {
     const fetchRoles = async () => {
       try {
-        const response = await fetch("http://localhost:5000/super-admin/roles");
-        const data = await response.json();
+        const data = await roleService.get_all();
 
         const transformedRoles = data.roles.map((role) => ({
           id: role.id_rol,
