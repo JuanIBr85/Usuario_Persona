@@ -11,4 +11,13 @@ export const roleService = {
     });
   },
 
+  borrar: async (id) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/super-admin/roles/${id}`,
+      method: HttpMethod.DELETE,
+      showError: roleService.showError,
+      useToken: true
+    });
+  },
+
 };
