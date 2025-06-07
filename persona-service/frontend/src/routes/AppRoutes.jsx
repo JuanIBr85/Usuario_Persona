@@ -1,21 +1,21 @@
 import { Routes, Route } from 'react-router-dom';
 
 import React from 'react'
-import Profile from '@/pages/Profile';
-import AdminPanel from '@/pages/AdminPanel';
-import NotFound from '@/pages/NotFound';
-import Login from '@/pages/Login';
-import Logout from '@/pages/Logout';
-import Sign from '@/pages/Sign';
-import Logs from '@/pages/Logs';
-import AdminUsers from '@/pages/AdminUsers';
-import AdminRoles from '@/pages/AdminRoles';
-import UserDetails from '@/pages/UserDetails';
-import TermsOfService from '@/pages/TermsOfService';
-import AboutPrivacyPolicy from '@/pages/AboutPrivacyPolicy';
-import Faq from '@/pages/Faq';
-import ForgotPassword from '@/pages/ForgotPassword';
-import OTPValidation from '@/pages/OTPValidation';
+import Profile from '@/pages/user/Profile';
+import AdminPanel from '@/pages/admin/AdminPanel';
+import NotFound from '@/pages/other/NotFound';
+import Login from '@/pages/auth/Login';
+import Logout from '@/pages/auth/Logout';
+import Sign from '@/pages/auth/Sign';
+import Logs from '@/pages/admin/Logs';
+import AdminUsers from '@/pages/admin/AdminUsers';
+import AdminRoles from '@/pages/admin/AdminRoles';
+import UserDetails from '@/pages/admin/UserDetails';
+import TermsOfService from '@/pages/user/TermsOfService';
+import AboutPrivacyPolicy from '@/pages/user/AboutPrivacyPolicy';
+import Faq from '@/pages/user/Faq';
+import ForgotPassword from '@/pages/auth/ForgotPassword';
+import OTPValidation from '@/pages/auth/OTPValidation';
 
 /**
  * Componente que define todas las rutas de la aplicación utilizando react-router-dom.

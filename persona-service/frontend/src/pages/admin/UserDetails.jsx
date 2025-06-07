@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Fade } from "react-awesome-reveal";
 import { useParams, Link } from 'react-router-dom';
 
-import Loading from '../components/loading/Loading'
+import Loading from '@/components/loading/Loading'
 
 import {
   Breadcrumb,
