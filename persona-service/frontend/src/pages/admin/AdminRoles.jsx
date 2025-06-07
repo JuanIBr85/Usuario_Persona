@@ -85,36 +85,36 @@ export default function AdminRoles() {
 
   // Agrega un nuevo rol a la lista
   const handleAddRole = async () => {
-  if (!newRoleName.trim()) return showError("El nombre del rol no puede estar vacío");
+    if (!newRoleName.trim()) return showError("El nombre del rol no puede estar vacío");
 
-  // Verifica si ya existe un rol con el mismo nombre (ignorando mayúsculas)
-  const exists = roles.some(
-    (role) => role.name.toLowerCase() === newRoleName.trim().toLowerCase()
-  );
-  if (exists) return showError("Ya existe un rol con ese nombre");
+    // Verifica si ya existe un rol con el mismo nombre (ignorando mayúsculas)
+    const exists = roles.some(
+      (role) => role.name.toLowerCase() === newRoleName.trim().toLowerCase()
+    );
+    if (exists) return showError("Ya existe un rol con ese nombre");
 
-  const newRoleBody = {
-    nombre_rol: newRoleName.trim(),
-    descripcion: "", //Vacío por ahora
-    permisos: [], // Vacío por ahora
-  };
-
-  try {
-    const response = await roleService.crear(newRoleBody);
-
-    const newRole = {
-      id: response.id_rol,  
-      name: response.nombre_rol || newRoleName.trim(),
-      permissions: response.permisos || selectedPermissions,
+    const newRoleBody = {
+      nombre_rol: newRoleName.trim(),
+      descripcion: "", //Vacío por ahora
+      permisos: [], // Vacío por ahora
     };
 
-    setRoles([...roles, newRole]); // Agrega el nuevo rol al estado
-    resetForm(); // Limpia el formulario
-  } catch (error) {
-    showError("Error al crear el rol.");
-    console.error(error);
-  }
-};
+    try {
+      const response = await roleService.crear(newRoleBody);
+
+      const newRole = {
+        id: response.id_rol,
+        name: response.nombre_rol || newRoleName.trim(),
+        permissions: response.permisos || selectedPermissions,
+      };
+
+      setRoles([...roles, newRole]); // Agrega el nuevo rol al estado
+      resetForm(); // Limpia el formulario
+    } catch (error) {
+      showError("Error al crear el rol.");
+      console.error(error);
+    }
+  };
 
 
   // Prepara el formulario para editar un rol existente
@@ -269,7 +269,7 @@ export default function AdminRoles() {
                       value={newRoleName}
                       onChange={(e) => setNewRoleName(e.target.value)}
                     />
-        
+                    */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                       {/* availablePermissions.map((permission) => (
                         <label key={permission} className="flex items-center gap-2">
