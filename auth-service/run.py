@@ -12,6 +12,7 @@ from app.script.reset_db import crear_base, eliminar_base
 from app.script.seed_data import seed
 from flask_cors import CORS
 from app.utils.response import register_error_handlers
+from app.utils.make_endpoints_list import make_endpoints_list
 
 load_dotenv()
 
@@ -61,6 +62,13 @@ index._security_metadata ={
     "is_public":True
 }
 
+
+@app.route('/components')
+def endpoints():
+    return jsonify(make_endpoints_list(app)),200
+endpoints._security_metadata ={
+    "is_public":True
+}
 
 def init_app():
     FORZAR_RESET = True  # poner True para resetear cada vez que se cree (solo para desarrollo)

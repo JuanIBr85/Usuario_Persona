@@ -1,7 +1,7 @@
 
 export const ServiceURL = Object.freeze({
-    auth: "http://localhost:5000",
-    persona: "http://localhost:5001",
+    auth: "http://localhost:5002/api",
+    persona: "http://localhost:5002/api",
 });
 
 // Lista de métodos HTTP que podemos usar para comunicarnos con el servidor
@@ -68,7 +68,7 @@ export const fetchService = {
             signal: controller.signal, // Para poder cancelar la petición
             method: method,            // GET, POST, PUT, etc.
             headers: {
-                "Content-Type": "application/json", 
+                ...(method === HttpMethod.GET ? {} : {"Content-Type": "application/json"}), 
                 ...headers, 
                 
                 // Si useToken es true, agregamos el token de autorización

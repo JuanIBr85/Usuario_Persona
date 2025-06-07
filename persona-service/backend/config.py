@@ -8,14 +8,24 @@ load_dotenv()
 
 #CONFIGURACIONES BASE DE DATOS
 
-user= os.environ['MYSQL_USER']
-password= os.environ['MYSQL_PASSWORD']
-host= os.environ['MYSQL_HOST']
-database= os.environ['MYSQL_DATABASE']
 
-SQLALCHEMY_DATABASE_URI = f'mysql+pymysql://{user}:{password}@{host}/{database}'
+import os
+from dotenv import load_dotenv
+
+#carga las variables de entorno desde .env
+load_dotenv()
+
+#CONFIGURACIONES GENERALES
+
+#CONFIGURACIONES BASE DE DATOS
+
+#user= os.environ['MYSQL_USER']
+#password= os.environ['MYSQL_PASSWORD']
+#host= os.environ['MYSQL_HOST']
+#database= os.environ['MYSQL_DATABASE']
+
+SQLALCHEMY_DATABASE_URI = f"sqlite:///persona.db"
 SQLALCHEMY_TRACK_MODIFICATIONS = False
-
 
 #CONFIGURACIONES JWT
 
