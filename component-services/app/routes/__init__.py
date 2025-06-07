@@ -43,7 +43,7 @@ def authenticate_request():
 
     adapter = url_map.bind_to_environ(request.environ)
     try:
-        matched_endpoint, _ = adapter.match()
+        matched_endpoint, args = adapter.match()
         service_route = _services_route[matched_endpoint]
         
         if not service_route.is_public:
@@ -51,46 +51,11 @@ def authenticate_request():
             abort(401, description=f"El endpoint <{request.path}> requiere autenticación")
 
         g.service_route = service_route
+        g.args = args
 
     except Exception:
         abort(404, description=f"El servicio '{request.path}' no existe")
-
-
-def request_to_service(service_url):
-    #se remueve el parametro 'Host' y el 'Accept-Encoding' de los headers, para evitar errores
-    headers = {key: value for key, value in request.headers if key.upper() not in [
-            "HOST", 
-            "ACCEPT-ENCODING",
-            "CONNECTION",
-            "CONTENT-LENGTH",
-            "TRANSFER-ENCODING",
-            "KEEP-ALIVE"
-    ]}
-    #Armo la request para enviar al microservicio con todos los datos recibidos
-    _request = {
-        "url":service_url, #Esta es la url donde esta alojado el endpoint del microservicio
-        "headers": headers,
-        "params":request.args,
-        "json":request.get_json() if request.is_json else None,
-        "data":request.form if not request.is_json else None
-    }
-   
-    response = requests.request(method=request.method, **_request)
-
-    # Filtrar headers que Flask no debe reenviar
-    excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
-    response_headers = {
-        key: value for key, value in response.headers.items() 
-        if key.lower() not in excluded_headers
-    }
-
-    # Devolver la respuesta completa con headers, contenido y status code
-    return Response(
-        response=response.content,
-        status=response.status_code,
-        headers=response_headers,
-        mimetype=response.headers.get('content-type')
-    )
+    
 
 @bp2.route('/', defaults={'path': ''}, methods=['GET'])
 @bp2.route('/<path:path>', methods=['GET'])
@@ -99,7 +64,7 @@ def proxy_static_files(path):
     Proxy que redirige todas las peticiones GET al servidor web estático
     Maneja tanto la ruta raíz como cualquier archivo estático
     """
-
+    
     try:
         # Construir la URL completa
         target_url = f"http://persona-frontend:5173/{path}"
@@ -117,13 +82,15 @@ def proxy_static_files(path):
         )
         
         # Determinar el tipo de contenido
-        content_type = response.headers.get('content-type')
+        content_type = response.headers.get('Content-Type')
+     
         if not content_type and path:
+            
             # Intentar determinar el tipo MIME por extensión
             content_type, _ = mimetypes.guess_type(path)
             if not content_type:
                 content_type = 'application/octet-stream'
-        
+            
         # Preparar headers para la respuesta
         response_headers = {}
         
@@ -166,5 +133,46 @@ def proxy_static_files(path):
 @bp.route('/api/<path:subpath>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def api_gateway_api(subpath):
     endpoint = g.service_route
-    return request_to_service(endpoint.api_url)    
+    #se remueve el parametro 'Host' y el 'Accept-Encoding' de los headers, para evitar errores
+    headers = {key: value for key, value in request.headers if key.upper() not in [
+            "HOST", 
+            "ACCEPT-ENCODING",
+            "CONNECTION",
+            "CONTENT-LENGTH",
+            "TRANSFER-ENCODING",
+            "KEEP-ALIVE"
+    ]}
+
+    args = ""
+    if len(g.args) > 0:
+        args = "/".join([str(x) for x in g.args.values()])
+        args = f"/{args}"
+
+    current_app.logger.warning(f"URL: {endpoint.api_url}{args}")
+
+    #Armo la request para enviar al microservicio con todos los datos recibidos
+    _request = {
+        "url":f"{endpoint.api_url}{args}", #Esta es la url donde esta alojado el endpoint del microservicio
+        "headers": headers,
+        "params":request.args,
+        "json":request.get_json() if request.is_json else None,
+        "data":request.form if not request.is_json else None
+    }
+   
+    response = requests.request(method=request.method, **_request)
+
+    # Filtrar headers que Flask no debe reenviar
+    excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
+    response_headers = {
+        key: value for key, value in response.headers.items() 
+        if key.lower() not in excluded_headers
+    }
+
+    # Devolver la respuesta completa con headers, contenido y status code
+    return Response(
+        response=response.content,
+        status=response.status_code,
+        headers=response_headers,
+        mimetype=response.headers.get('content-type')
+    )  
     
