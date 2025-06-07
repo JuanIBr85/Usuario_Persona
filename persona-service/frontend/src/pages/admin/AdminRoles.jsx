@@ -95,8 +95,8 @@ export default function AdminRoles() {
 
   const newRoleBody = {
     nombre_rol: newRoleName.trim(),
-    descripcion: "", // Si tienes estado para descripción, ponlo aquí
-    permisos: [], // Debe ser un array, no string
+    descripcion: "", //Vacío por ahora
+    permisos: [], // Vacío por ahora
   };
 
   try {
@@ -264,12 +264,12 @@ export default function AdminRoles() {
                       value={newRoleName}
                       onChange={(e) => setNewRoleName(e.target.value)}
                     />
-                    <Input
+                    {/*<Input
                       placeholder="Descripción del rol"
                       value={newRoleName}
                       onChange={(e) => setNewRoleName(e.target.value)}
                     />
-
+        
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                       {/* availablePermissions.map((permission) => (
                         <label key={permission} className="flex items-center gap-2">
