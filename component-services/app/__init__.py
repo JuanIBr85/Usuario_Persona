@@ -17,10 +17,16 @@ def create_app()->Flask:
     with app.app_context():
         Base.metadata.create_all(bind=engine)
 
-    @app.route('/')
+    @app.route('/service')
     def index():
         return jsonify({
             "message": "Bienvenido a la API de Componentes"
         }),200
-    
+
+    # Importar y registrar blueprints
+    from app.routes import bp as routes_bp
+    app.register_blueprint(routes_bp)
+    from app.routes import bp2 as routes_bp2
+    app.register_blueprint(routes_bp2)
+
     return app

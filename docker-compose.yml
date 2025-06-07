@@ -19,6 +19,7 @@
       - ./persona-service/backend/.env
       volumes:
         - ./persona-service/backend:/app
+        - ./persona-service/backend/persona.db:/app/persona.db
 
     persona-frontend:
       build: ./persona-service/frontend
@@ -37,5 +38,6 @@
         - ./component-services:/app
       depends_on:
         - auth-service
+        - persona-backend
 
 
