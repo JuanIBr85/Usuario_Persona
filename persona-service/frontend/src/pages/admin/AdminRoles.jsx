@@ -84,25 +84,38 @@ export default function AdminRoles() {
   };
 
   // Agrega un nuevo rol a la lista
-  const handleAddRole = () => {
-    if (!newRoleName.trim()) return showError("El nombre del rol no puede estar vacío");
+  const handleAddRole = async () => {
+  if (!newRoleName.trim()) return showError("El nombre del rol no puede estar vacío");
 
-    // Verifica si ya existe un rol con el mismo nombre (ignorando mayúsculas)
-    const exists = roles.some(
-      (role) => role.name.toLowerCase() === newRoleName.trim().toLowerCase()
-    );
-    if (exists) return showError("Ya existe un rol con ese nombre");
+  // Verifica si ya existe un rol con el mismo nombre (ignorando mayúsculas)
+  const exists = roles.some(
+    (role) => role.name.toLowerCase() === newRoleName.trim().toLowerCase()
+  );
+  if (exists) return showError("Ya existe un rol con ese nombre");
 
-    // Crea un nuevo rol con un id único y los datos ingresados
+  const newRoleBody = {
+    nombre_rol: newRoleName.trim(),
+    descripcion: "", // Si tienes estado para descripción, ponlo aquí
+    permisos: [], // Debe ser un array, no string
+  };
+
+  try {
+    const response = await roleService.crear(newRoleBody);
+
     const newRole = {
-      id: Date.now(),
-      name: newRoleName.trim(),
-      permissions: selectedPermissions,
+      id: response.id_rol,  
+      name: response.nombre_rol || newRoleName.trim(),
+      permissions: response.permisos || selectedPermissions,
     };
 
     setRoles([...roles, newRole]); // Agrega el nuevo rol al estado
     resetForm(); // Limpia el formulario
-  };
+  } catch (error) {
+    showError("Error al crear el rol.");
+    console.error(error);
+  }
+};
+
 
   // Prepara el formulario para editar un rol existente
   const handleEditClick = (role) => {
@@ -207,7 +220,6 @@ export default function AdminRoles() {
                         {role.permissions?.length > 0
                           ? role.permissions.map(formatPermissionName).join(", ")
                           : "Sin permisos asignados"}
-
                       </div>
                     </div>
                   </span>
@@ -252,8 +264,14 @@ export default function AdminRoles() {
                       value={newRoleName}
                       onChange={(e) => setNewRoleName(e.target.value)}
                     />
+                    <Input
+                      placeholder="Descripción del rol"
+                      value={newRoleName}
+                      onChange={(e) => setNewRoleName(e.target.value)}
+                    />
+
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      {availablePermissions.map((permission) => (
+                      {/* availablePermissions.map((permission) => (
                         <label key={permission} className="flex items-center gap-2">
                           <input
                             type="checkbox"
@@ -262,7 +280,7 @@ export default function AdminRoles() {
                           />
                           <span className="text-sm">{permission}</span>
                         </label>
-                      ))}
+                      ))*/}
                     </div>
                     <div className="flex gap-2">
                       {editRoleId ? (

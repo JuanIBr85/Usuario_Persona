@@ -3,6 +3,16 @@ import { fetchService, HttpMethod, ServiceURL } from "@/utils/fetchUtils";
 export const roleService = {
   showError: true,
 
+  crear: async (body) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/super-admin/roles`,
+      method: HttpMethod.POST,
+      showError: roleService.showError,
+      body: body,
+
+    })
+  },
+
   get_all: async () => {
     return fetchService.fetch({
       url: `${ServiceURL.auth}/super-admin/roles`,

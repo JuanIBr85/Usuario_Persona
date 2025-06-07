@@ -95,9 +95,8 @@ class SuperAdminService:
             "mensaje": f"Rol '{nombre_rol}' creado correctamente.",
             "id_rol": nuevo_rol.id_rol
         }
-
+    
     # ==========
-    # Obtener roles ## Esta función es nueva Jun 6
     # ==========
     def obtener_roles(self, session: Session) -> dict:
         try:
@@ -118,12 +117,9 @@ class SuperAdminService:
         except Exception as e:
             raise Exception(f"Error al obtener roles: {str(e)}")
 
-    # ==========
-    # ==========
+   
 
-    # ==========
-    # borrar_rol ## Esta función es nueva Jun 6
-    # ==========
+   
     def borrar_rol(self, session: Session, rol_id: int) -> dict:
         rol = session.query(Rol).filter_by(
             id_rol=rol_id, deleted_at=None).first()
@@ -137,5 +133,21 @@ class SuperAdminService:
         return {
             "mensaje": f"Rol '{rol.nombre_rol}' eliminado correctamente."
         }
+    
+
+    def obtener_permisos(self, session: Session) -> dict:
+        try:
+            permisos = session.query(Permiso).filter(Permiso.deleted_at == None).all()
+            resultado = [
+                {
+                    "id_permiso": permiso.id_permiso,
+                    "nombre_permiso": permiso.nombre_permiso,
+                    #"descripcion": permiso.descripcion
+                }
+                for permiso in permisos
+            ]
+            return {"permisos": resultado}
+        except Exception as e:
+            raise Exception(f"Error al obtener permisos: {str(e)}")
     # ==========
     # ==========

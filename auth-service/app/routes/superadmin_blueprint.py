@@ -61,8 +61,6 @@ crear_usuario_con_rol._security_metadata = {
 }
 
 # Crear rol
-
-
 @superadmin_bp.route('/roles', methods=['POST'])
 def crear_rol():
     session = SessionLocal()
@@ -98,11 +96,16 @@ def crear_rol():
     finally:
         session.close()
 
-
+# ---- Debugging -----
 crear_rol._security_metadata = {
-    "is_public": False,
-    "access_permissions": ["crear_rol"]
+    "is_public": True,
+    "access_permissions": []
 }
+
+#crear_rol._security_metadata = {
+#    "is_public": False,
+#    "access_permissions": ["crear_rol"]
+#}
 
 
 # Asignar permisos a rol
@@ -235,7 +238,6 @@ crear_permiso._security_metadata = {
 
 
 # ==========
-# Listar roles  ## Esta función es nueva Jun 6
 # ==========
 @superadmin_bp.route('/roles', methods=['GET'])
 def obtener_roles():
@@ -257,7 +259,7 @@ def obtener_roles():
     finally:
         session.close()
 
-
+# --- Debugging --- 
 obtener_roles._security_metadata = {
     "is_public": True,
     "access_permissions": []
@@ -268,14 +270,9 @@ obtener_roles._security_metadata = {
 #    "is_public": False,
 #    "access_permissions": ["obtener_roles"]
 # }
-# ==========
-# ==========
 
-
-# ==========
-# Borrar Roles  ## Esta función es nueva Jun 6
-# ==========
 @superadmin_bp.route('/roles/<int:rol_id>', methods=['DELETE'])
+# --- Debugging --- 
 # @jwt_required()
 def borrar_rol(rol_id):
     session = SessionLocal()
@@ -303,7 +300,7 @@ def borrar_rol(rol_id):
     finally:
         session.close()
 
-
+# --- Debugging --- 
 borrar_rol._security_metadata = {
     "is_public": True,
     "access_permissions": []
@@ -312,6 +309,33 @@ borrar_rol._security_metadata = {
 # borrar_rol._security_metadata = {
 #    "is_public": False,
 #    "access_permissions": ["borrar_rol"]
-# }
+
+
+@superadmin_bp.route('/permisos', methods=['GET'])
+def obtener_permisos():
+    session = SessionLocal()
+    try:
+        resultado = superadmin_service.obtener_permisos(session)
+        return Response(
+            json.dumps(resultado),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        session.rollback()
+        return Response(
+            json.dumps({"error": f"Error al obtener permisos: {str(e)}"}),
+            status=500,
+            mimetype='application/json'
+        )
+    finally:
+        session.close()
+
+# --- Debugging --- 
+obtener_permisos._security_metadata = {
+    "is_public": True, 
+    "access_permissions": []  
+}
+
 # ==========
 # ==========
