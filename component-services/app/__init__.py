@@ -2,7 +2,7 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 import os
 from app.extensions import jwt, engine, Base
-
+from app.routes import register_blueprints
 
 def create_app()->Flask:
 
@@ -23,10 +23,6 @@ def create_app()->Flask:
             "message": "Bienvenido a la API de Componentes"
         }),200
 
-    # Importar y registrar blueprints
-    from app.routes import bp as routes_bp
-    app.register_blueprint(routes_bp)
-    from app.routes import bp2 as routes_bp2
-    app.register_blueprint(routes_bp2)
-
+    #Registra todas las rutas
+    register_blueprints(app)
     return app

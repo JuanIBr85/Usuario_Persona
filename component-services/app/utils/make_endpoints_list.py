@@ -13,7 +13,6 @@ def make_endpoints_list(app) -> List[Dict[str, Any]]:
         List[Dict[str, Any]]: Lista de diccionarios con la información de los endpoints
     """
     endpoints = {}
-    current_url = "http://localhost:5002"
     for rule in app.url_map.iter_rules():
         # Saltar endpoints estáticos
         if rule.endpoint == 'static':
@@ -26,9 +25,15 @@ def make_endpoints_list(app) -> List[Dict[str, Any]]:
         base_route = re.sub(r'<[^>]+>', '', rule.rule).rstrip('/')
 
         endpoints[str(rule).removeprefix("/")] = {
-            "api_url":current_url+str(base_route),
+            "api_url":str(base_route),
             "is_public":True,  # Por defecto asumimos que es público
             "methods":methods  # Convertir la lista de métodos a un set
         }
     
     return endpoints
+
+def make_service_response(app, name):
+    return {
+        "name":name,
+        "endpoints":make_endpoints_list(app)
+    }
