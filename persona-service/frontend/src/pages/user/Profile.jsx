@@ -26,12 +26,13 @@ const ProfileForm = () => {
     personaData,
     photoUrl,
     email,
+    redes_sociales,
     handlePhotoChange
   } = useProfile();
 
   const lastUpdate = tiempoTranscurrido(personaData.updated_at);
   const subscribedServices = ['Residencia', 'Becas', 'Oferta educativa'];
-
+  console.log(personaData)
   if (isLoading) {
     return <Loading />;
   }
@@ -74,6 +75,7 @@ const ProfileForm = () => {
                 <TabsContent value="contacto">
                   <FormContacto
                     contacto={personaData.contacto || {}}
+                    redes_sociales={redes_sociales}
                   />
                 </TabsContent>
 

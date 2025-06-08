@@ -12,8 +12,9 @@ import { Label } from '@/components/ui/label'
  * @param {string} validatePattern - Expresión regular usada para validar el contenido del input.
  * @param {string} validateMessage - Mensaje que se mostrará debajo del input si la validación falla.
  * @param {Object} props - Props adicionales que serán pasadas al componente <Input>.
+ * @param {string} containerClassName - Clases adicionales para el contenedor del input.
  */
-export default function InputValidate({ id, type, placeholder, labelText, validatePattern, validateMessage, ...props }) {
+export default function InputValidate({ id, type, placeholder, labelText, validatePattern, validateMessage, containerClassName, onChange, ...props }) {
     //Este estado sirve para indicar si hubo un error en la validacion del input
     const [error, setError] = React.useState(false)
     //Este estado sirve para indicar si debe o no ocultar la contraseña
@@ -32,10 +33,14 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
         if (input.checkValidity()) {
             setError(false)
         }
+
+        if(onChange){
+            onChange(event)
+        }
     }
 
     return (
-        <div className="grid w-full items-center gap-1.5">
+        <div className={`grid w-full items-center gap-1.5 ${containerClassName}`}>
             <Label htmlFor={id}>{labelText}</Label>
             <div className="relative">
                 <Input

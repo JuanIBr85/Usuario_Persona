@@ -36,6 +36,7 @@ export function useProfile() {
   const [tipoDocumento, setTipoDocumento] = useState([]);
   const [personaData, setPersonaData] = useState(initialPersonaState);
   const [photoUrl, setPhotoUrl] = useState('https://i.pravatar.cc/150?img=69');
+  const [redes_sociales, setRedesSociales] = useState([])
 
   useEffect(() => {
     if (!authData.token) {
@@ -45,9 +46,10 @@ export function useProfile() {
 
     const fetchData = async () => {
       try {
-        const [profileResponse, tiposDocumentoResponse] = await Promise.all([
+        const [profileResponse, tiposDocumentoResponse, redes_socialesResponse] = await Promise.all([
           PersonaService.get_by_usuario(authData.user.id_usuario),
-          PersonaService.get_tipos_documentos()
+          PersonaService.get_tipos_documentos(),
+          PersonaService.get_redes_sociales()
         ]);
 
         if (profileResponse?.data) {
@@ -60,6 +62,7 @@ export function useProfile() {
         }
 
         setTipoDocumento(tiposDocumentoResponse?.data || []);
+        setRedesSociales(redes_socialesResponse?.data || []);
       } catch (error) {
         console.error("Error al cargar los datos:", error);
       } finally {
@@ -94,6 +97,7 @@ export function useProfile() {
     personaData,
     photoUrl,
     email: authData.user?.email_usuario || '',
+    redes_sociales,
     handlePhotoChange,
     handleUpdateField
   };

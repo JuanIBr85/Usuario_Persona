@@ -1,13 +1,9 @@
 import InputValidate from "@/components/inputValidate/InputValidate"
 import { Button } from "@/components/ui/button"
 import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
   SelectItem
 } from "@/components/ui/select"
-import { Label } from '@/components/ui/label'
+import SimpleSelect from "@/components/SimpleSelect"
 
 export default function FormDatos({ handleSubmit, tipoDocumento, personaData, handleChange }) {
   return (
@@ -29,27 +25,19 @@ export default function FormDatos({ handleSubmit, tipoDocumento, personaData, ha
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
-        <div className="grid w-full items-center gap-1.5">
-          <Label htmlFor="tipo_documento">Tipo de documento</Label>
-          <div className="relative">
-            <Select
-              value={personaData.tipo_documento}
-              onChange={(e) => handleChange('tipo_documento', e.target.value)}
-              id="tipo_documento"
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Selecciona un tipo de documento" />
-              </SelectTrigger>
-              <SelectContent>
-                {tipoDocumento.map((tipo) => (
-                  <SelectItem key={tipo} value={tipo}>
-                    {tipo}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+        <SimpleSelect
+          name="tipo_documento"
+          label="Tipo de documento"
+          placeholder="Selecciona un tipo de documento"
+          value={personaData.tipo_documento}
+          required
+        >
+          {tipoDocumento.map((tipo) => (
+            <SelectItem key={tipo} value={tipo}>
+              {tipo}
+            </SelectItem>
+          ))}
+        </SimpleSelect>
         <InputValidate
           id="num_doc_persona"
           type="text"
