@@ -1,7 +1,7 @@
 from flask import abort, request, g, Response, Blueprint, current_app      
 import requests
 from werkzeug.routing import Map, Rule
-from app.models.endpoint_route_model import EndpointRouteModel
+from common.models.endpoint_route_model import EndpointRouteModel
 from app.extensions import services_config
 import time
 
@@ -11,6 +11,7 @@ bp = Blueprint('gateway', __name__)
 endpoints = {}
 print("Esperando servicios")
 for service in services_config["services"]:
+    break
     print(f"Esperando a {service['name']}") 
     while True:
         try:

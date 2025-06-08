@@ -3,6 +3,7 @@ from flask_cors import CORS
 import os
 from app.extensions import jwt, engine, Base
 from app.routes import register_blueprints
+from common.decorators.api_access import api_access
 
 def create_app()->Flask:
 
@@ -17,12 +18,13 @@ def create_app()->Flask:
     with app.app_context():
         Base.metadata.create_all(bind=engine)
 
-    @app.route('/service')
+    @api_access(is_public=True)
+    @app.route('/')
     def index():
         return jsonify({
             "message": "Bienvenido a la API de Componentes"
-        }),200
-
+            }),200
+    
     #Registra todas las rutas
     register_blueprints(app)
     return app
