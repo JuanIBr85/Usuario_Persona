@@ -19,7 +19,8 @@ export default function FormDomicillio({ handleSubmit, domicilio, handleChange }
     const [localidad, setLocalidad] = useState(domicilio.domicilio_postal.localidad);
 
     const fetchLocalidades = useCallback(() => {
-        if (String(codigoPostal).trim().length < 4) {
+        let cpa = String(codigoPostal);
+        if (cpa.trim().length < 4) {
             setLocalidades([]);
             return;
         }
@@ -28,8 +29,16 @@ export default function FormDomicillio({ handleSubmit, domicilio, handleChange }
             setLocalidades([]);
             return;
         }
+        
+        //Convierte el CPA a CP
+        if (cpa.length > 4) {
+            cpa = cpa.substring(1, 5);
+            setCodigoPostal(cpa);
+            return;
+        }
+
         PersonaService
-        .get_localidades_by_codigo_postal(codigoPostal)
+        .get_localidades_by_codigo_postal(cpa)
         .then(response => {
             setLocalidades(response.data || []);
         })
@@ -97,12 +106,12 @@ export default function FormDomicillio({ handleSubmit, domicilio, handleChange }
                 <InputValidate
                     type="text"
                     placeholder="Código postal"
-                    labelText={<>Código Postal<a className="text-indigo-600 hover:underline cursor-pointer">¿no sabes el codigo?</a></>}
+                    labelText={<>Código Postal<a href="https://www.correoargentino.com.ar/formularios/cpa" target="_blank" className="text-indigo-600 hover:underline cursor-pointer">¿no sabes el codigo?</a></>}
                     value={codigoPostal}
                     ref={inputCPRef}
                     onChange={(e) => setCodigoPostal(e.target.value)}
-                    validatePattern="^[0-9]{4,8}$"
-                    validateMessage="Ingresa un código postal válido (CPA o 4 dígitos)"
+                    validatePattern="^(?:[A-Za-z]\d{4}[A-Za-z]{3}|\d{4})$"
+                    validateMessage="Ingrese CP (4 dígitos) o CPA (1 letra + 4 dígitos + 3 letras, todo en mayúsculas)"
                     required
                 />
                 <SimpleSelect
