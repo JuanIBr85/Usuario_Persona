@@ -98,7 +98,7 @@ export default function AdminRoles() {
 
     // 3. transformamos selectedPermissions a array solo con nombres para que el json cumpla las condiciones del backend
     const permisosNombres = selectedPermissions.map(p => p.name);
-
+    console.log(permisosNombres)
     // 4. se asigna permisos usando el servicio
     await permisoService.asignarPermisos(newRoleId, permisosNombres);
 
