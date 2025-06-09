@@ -45,8 +45,8 @@ def make_endpoints_list(app) -> List[Dict[str, Any]]:
             endpoints[str(rule).removeprefix("/")] = {
                 "api_url": str(base_route),
                 "is_public": is_public,
-                "methods": methods,
-                "access_permissions": list(getattr(view_func._security_metadata, 'access_permissions', []))
+                "methods": tuple(methods),
+                "access_permissions": tuple(getattr(view_func._security_metadata, 'access_permissions', []))
             }
     
     return endpoints

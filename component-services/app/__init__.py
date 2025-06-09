@@ -6,7 +6,7 @@ from app.routes import register_blueprints
 from common.decorators.api_access import api_access
 from flask_jwt_extended import JWTManager
 from app.extensions import jwt
-
+from common.utils.component_service import component_service
 
 def create_app()->Flask:
 
@@ -16,6 +16,8 @@ def create_app()->Flask:
 
     CORS(app, supports_credentials=True)
     
+    component_service(app)
+
     #Inicializa de las exteniciones
     jwt.init_app(app)
     with app.app_context():
