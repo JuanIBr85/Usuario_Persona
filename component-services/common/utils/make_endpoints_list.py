@@ -48,7 +48,7 @@ def make_endpoints_list(app) -> List[Dict[str, Any]]:
                 "access_permissions": list(getattr(view_func._security_metadata, 'access_permissions', []))
             }
     
-    return list(endpoints.values())
+    return endpoints
 
 def make_service_response(app, name):
     return {
