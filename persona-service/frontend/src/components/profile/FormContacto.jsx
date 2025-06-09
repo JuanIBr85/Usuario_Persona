@@ -5,7 +5,25 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import SimpleSelect from "@/components/SimpleSelect";
-export default function FormContacto({ handleSubmit, contacto, redes_sociales }) {
+
+import { PersonaService } from "@/services/personaService"
+import { useState } from "react"
+import { formSubmitJson } from "@/utils/formUtils"
+
+export default function FormContacto({ persona_id, setPersonaData, contacto, redes_sociales }) {
+  const handleSubmit = async (event) => {
+      const formData = await formSubmitJson(event);
+      document.activeElement.blur();
+      PersonaService.editar(persona_id, {
+        contacto: formData
+      })
+        .then(response => {
+          setPersonaData(response.data);
+        })
+        .catch(error => {
+          console.error('Error updating domicilio:', error.data);
+        });
+    };
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Datos editables con InputValidate */}
@@ -57,7 +75,14 @@ export default function FormContacto({ handleSubmit, contacto, redes_sociales })
         </SimpleSelect>
       </div>
 
-
+      <InputValidate
+        id="email_contacto"
+        type="email"
+        labelText="Email de contacto"
+        placeholder="Ingresa el email de contacto"
+        validateMessage="Email inválido"
+        value={contacto?.email_contacto || ''}
+      />
 
       <div className="flex flex-col gap-3 pt-4">
         <Button type="submit" className="w-full">

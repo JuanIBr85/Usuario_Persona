@@ -54,7 +54,7 @@ function Login() {
         description={dialogMessage}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
-        actionHandle={isLogin ? ()=>setTimeout(()=>navigate('/profile'), 200) : undefined}
+        actionHandle={isLogin ? ()=>setTimeout(()=>navigate('/profile'), 500) : undefined}
       />
       
       <AuthLayout

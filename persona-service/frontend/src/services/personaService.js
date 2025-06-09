@@ -37,7 +37,6 @@ export const PersonaService = {
       url: `${ServiceURL.persona}/api/modificar_persona/${id}`,
       method: HttpMethod.PUT,
       body: body,
-      
       showError: PersonaService.showError
     });
   },

@@ -1,54 +1,14 @@
 import InputValidate from "@/components/inputValidate/InputValidate"
 import { Button } from "@/components/ui/button"
-import { useState, useEffect } from "react"
-import { useDebounce } from "@/hooks/useDebounce"
-import { useRef } from "react"
-import { PersonaService } from "@/services/personaService"
-import { Label } from "@/components/ui/label"
 import {
     SelectItem
 } from "@/components/ui/select"
-import { useCallback } from "react"
-import { Link } from "react-router-dom"
 import SimpleSelect from "@/components/SimpleSelect"
+import { useFormDomicilio } from "@/hooks/profile/useFormDomicillio"
 
-export default function FormDomicillio({ handleSubmit, domicilio, handleChange }) {
-    const [codigoPostal, setCodigoPostal] = useState(domicilio.domicilio_postal.codigo_postal);
-    const [localidades, setLocalidades] = useState([]);
-    const inputCPRef = useRef(null);
-    const [localidad, setLocalidad] = useState(domicilio.domicilio_postal.localidad);
-
-    const fetchLocalidades = useCallback(() => {
-        let cpa = String(codigoPostal);
-        if (cpa.trim().length < 4) {
-            setLocalidades([]);
-            return;
-        }
-        
-        if (!inputCPRef.current?.checkValidity()) {
-            setLocalidades([]);
-            return;
-        }
-        
-        //Convierte el CPA a CP
-        if (cpa.length > 4) {
-            cpa = cpa.substring(1, 5);
-            setCodigoPostal(cpa);
-            return;
-        }
-
-        PersonaService
-        .get_localidades_by_codigo_postal(cpa)
-        .then(response => {
-            setLocalidades(response.data || []);
-        })
-        .catch(error => {
-            console.error('Error fetching localidades:', error);
-            setLocalidades([]);
-        });
-    }, [codigoPostal]); 
-
-    useDebounce(fetchLocalidades, 500, [codigoPostal]);
+export default function FormDomicillio({ domicilio, setPersonaData, persona_id }) {
+    
+    const {handleSubmit, localidades, codigoPostal, setCodigoPostal, inputCPRef, localidad} = useFormDomicilio(domicilio, setPersonaData, persona_id);
     
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -104,6 +64,7 @@ export default function FormDomicillio({ handleSubmit, domicilio, handleChange }
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
                 {/* Campo Código Postal */}
                 <InputValidate
+                    id="codigo_postal"
                     type="text"
                     placeholder="Código postal"
                     labelText={<>Código Postal<a href="https://www.correoargentino.com.ar/formularios/cpa" target="_blank" className="text-indigo-600 hover:underline cursor-pointer">¿no sabes el codigo?</a></>}
@@ -119,7 +80,6 @@ export default function FormDomicillio({ handleSubmit, domicilio, handleChange }
                     label="Localidad"
                     placeholder="Selecciona una localidad"
                     value={localidad}
-                    onChange={(e) => setLocalidad(e.target.value)}
                     required
                 >
                     {localidades.map((localidad) => (

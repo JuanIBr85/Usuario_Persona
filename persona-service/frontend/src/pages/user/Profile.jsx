@@ -27,7 +27,8 @@ const ProfileForm = () => {
     photoUrl,
     email,
     redes_sociales,
-    handlePhotoChange
+    handlePhotoChange,
+    setPersonaData
   } = useProfile();
 
   const lastUpdate = tiempoTranscurrido(personaData.updated_at);
@@ -69,19 +70,25 @@ const ProfileForm = () => {
                   <FormDatos
                     tipoDocumento={tipoDocumento}
                     personaData={{ ...personaData, email }}
+                    persona_id={personaData.id_persona}
+                    setPersonaData={setPersonaData}
                   />
                 </TabsContent>
 
                 <TabsContent value="contacto">
                   <FormContacto
+                    persona_id={personaData.id_persona}
                     contacto={personaData.contacto || {}}
                     redes_sociales={redes_sociales}
+                    setPersonaData={setPersonaData}
                   />
                 </TabsContent>
 
                 <TabsContent value="domicilio">
                   <FormDomicillio
                     domicilio={personaData.domicilio || {}}
+                    persona_id={personaData.id_persona}
+                    setPersonaData={setPersonaData}
                   />
                 </TabsContent>
 

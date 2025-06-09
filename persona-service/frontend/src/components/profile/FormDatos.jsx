@@ -4,21 +4,38 @@ import {
   SelectItem
 } from "@/components/ui/select"
 import SimpleSelect from "@/components/SimpleSelect"
+import { PersonaService } from "@/services/personaService"
+import { useState } from "react"
+import { formSubmitJson } from "@/utils/formUtils"
 
-export default function FormDatos({ handleSubmit, tipoDocumento, personaData, handleChange }) {
+
+export default function FormDatos({ persona_id, tipoDocumento, personaData, handleChange, setPersonaData }) {
+
+  const handleSubmit = async (event) => {
+    const { email, ...formData } = await formSubmitJson(event);
+    document.activeElement.blur();
+    PersonaService.editar(persona_id, formData)
+      .then(response => {
+        setPersonaData(response.data);
+      })
+      .catch(error => {
+        console.error('Error updating domicilio:', error.data);
+      });
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Datos fijos */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
         <InputValidate
-          id="nombre"
+          id="nombre_persona"
           type="text"
           labelText="Nombre"
           value={personaData.nombre_persona || ''}
         />
         <InputValidate
-          id="apellido"
+          id="apellido_persona"
           type="text"
           labelText="Apellido"
           value={personaData.apellido_persona || ''}
@@ -60,7 +77,7 @@ export default function FormDatos({ handleSubmit, tipoDocumento, personaData, ha
         <InputValidate
           id="email"
           type="email"
-          labelText="Email"
+          labelText="Email de usuario"
           value={personaData.email || ''}
           className="bg-gray-100 cursor-not-allowed w-full"
           readOnly
