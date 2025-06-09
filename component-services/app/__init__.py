@@ -21,8 +21,8 @@ def create_app()->Flask:
     with app.app_context():
         Base.metadata.create_all(bind=engine)
 
-    @api_access(is_public=False)
     @app.route('/')
+    @api_access(is_public=False)
     def index():
         return jsonify({
             "message": "Bienvenido a la API de Componentes"
