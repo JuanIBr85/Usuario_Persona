@@ -8,11 +8,14 @@ import { SimpleDialog, FetchErrorMessage } from "@/components/SimpleDialog";
 import { AuthService } from "@/services/authService";
 import Loading from "@/components/loading/Loading";
 import AuthLayout from "@/components/authLayout/AuthLayout";
+import { useNavigate } from "react-router-dom";
 
 function Sign() {
   const [isOpen, setIsOpen] = React.useState(false);
   const [dialogMessage, setMessage] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isOK, setIsOK] = React.useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     const formData = await formSubmitJson(event);
@@ -22,7 +25,7 @@ function Sign() {
       .register(formData)
       .then((json) => {
         setMessage(`La cuenta ha sido creada correctamente. Por favor, verifique su correo electrónico para activar su cuenta.`);
-        setIsOpen(true);
+        setIsOK(true);
       }).catch((error) => {
         if (error.isJson) {
           if (error.data.error) {
@@ -33,8 +36,8 @@ function Sign() {
         } else {
           setMessage(error.message);
         }
-        setIsOpen(true);
-      }).finally(() => setIsLoading(false));
+        setIsOK(false);
+      }).finally(() => {setIsLoading(false);setIsOpen(true);});
   }
 
   return (
@@ -45,6 +48,7 @@ function Sign() {
         description={dialogMessage}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
+        actionHandle={isOK ? ()=>setTimeout(()=>navigate('/login'), 500) : undefined}
       />
 
       <AuthLayout

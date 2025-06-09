@@ -1,0 +1,13 @@
+{
+    "services": [
+        {
+            "name": "auth-service",
+            "url": "localhost:5000"
+        },
+        {
+            "name": "persona-backend",
+            "url": "localhost:5001"
+        }
+    ],
+    "static_server": "localhost:5173"
+}

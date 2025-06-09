@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import InputValidate from "@/components/inputValidate/InputValidate";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { KeyRound, Mail } from "lucide-react";
 import { formSubmitJson } from "@/utils/formUtils";
 import { SimpleDialog, FetchErrorMessage } from "@/components/SimpleDialog";
@@ -13,12 +13,13 @@ function ForgotPassword() {
   const [isOpen, setIsOpen] = React.useState(false);
   const [dialogMessage, setMessage] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     const formData = await formSubmitJson(event);
     document.activeElement.blur();
     setIsLoading(true);
-    
+
     AuthService
       .requestOtp(formData)
       .then((json) => {
@@ -34,9 +35,9 @@ function ForgotPassword() {
         } else {
           setMessage(error.message || "Error de conexión");
         }
-        
+
       })
-      .finally(() => {setIsLoading(false);setIsOpen(true);});
+      .finally(() => { setIsLoading(false); setIsOpen(true); });
   };
 
   return (
@@ -46,9 +47,14 @@ function ForgotPassword() {
         title="Recuperar contraseña"
         description={dialogMessage}
         isOpen={isOpen}
-        setIsOpen={setIsOpen}
+        setIsOpen={(value) => {
+          setIsOpen(value);
+          if (!value && dialogMessage.includes("Se ha enviado un codigo")) {
+            navigate("/otpvalidation");
+          }
+        }}
       />
-      
+
       <AuthLayout
         title="Recuperar contraseña"
         visualContent={<Mail className="text-white w-42 h-42" />}

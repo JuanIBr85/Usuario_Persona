@@ -41,10 +41,10 @@ def buscar_localidades_por_codigo_postal():
 
         if not localidades:
             return respuesta_estandar(
-                status=RespuestaStatus.ERROR,
+                status=RespuestaStatus.SUCCESS,
                 message="No se encontraron localidades con ese código postal",
-                data={"codigo postal": codigo_postal}
-            ), 404
+                data=[]
+            ), 200
 
         return respuesta_estandar(
             status=RespuestaStatus.SUCCESS,

@@ -1,55 +1,66 @@
 import InputValidate from "@/components/inputValidate/InputValidate"
 import { Button } from "@/components/ui/button"
 import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
   SelectItem
 } from "@/components/ui/select"
-import { Label } from '@/components/ui/label'
+import SimpleSelect from "@/components/SimpleSelect"
+import { PersonaService } from "@/services/personaService"
+import { useState } from "react"
+import { formSubmitJson } from "@/utils/formUtils"
+import Loading from "@/components/loading/Loading"
 
-export default function FormDatos({ handleSubmit, tipoDocumento, personaData, handleChange }) {
+
+export default function FormDatos({ persona_id, tipoDocumento, personaData, handleChange, setPersonaData }) {
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (event) => {
+    const { email, ...formData } = await formSubmitJson(event);
+    document.activeElement.blur();
+    setLoading(true);
+    PersonaService.editar(persona_id, formData)
+      .then(response => {
+        setPersonaData(response.data);
+      })
+      .catch(error => {
+        console.error('Error updating domicilio:', error.data);
+      })
+      .finally(() => setLoading(false));
+  };
+
   return (
+    <>
+    {loading && <Loading isFixed={true} />}
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Datos fijos */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
         <InputValidate
-          id="nombre"
+          id="nombre_persona"
           type="text"
           labelText="Nombre"
           value={personaData.nombre_persona || ''}
         />
         <InputValidate
-          id="apellido"
+          id="apellido_persona"
           type="text"
           labelText="Apellido"
           value={personaData.apellido_persona || ''}
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
-        <div className="grid w-full items-center gap-1.5">
-          <Label htmlFor="tipo_documento">Tipo de documento</Label>
-          <div className="relative">
-            <Select
-              value={personaData.tipo_documento}
-              onChange={(e) => handleChange('tipo_documento', e.target.value)}
-              id="tipo_documento"
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Selecciona un tipo de documento" />
-              </SelectTrigger>
-              <SelectContent>
-                {tipoDocumento.map((tipo) => (
-                  <SelectItem key={tipo} value={tipo}>
-                    {tipo}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+        <SimpleSelect
+          name="tipo_documento"
+          label="Tipo de documento"
+          placeholder="Selecciona un tipo de documento"
+          value={personaData.tipo_documento}
+          required
+        >
+          {tipoDocumento.map((tipo) => (
+            <SelectItem key={tipo} value={tipo}>
+              {tipo}
+            </SelectItem>
+          ))}
+        </SimpleSelect>
         <InputValidate
           id="num_doc_persona"
           type="text"
@@ -72,7 +83,7 @@ export default function FormDatos({ handleSubmit, tipoDocumento, personaData, ha
         <InputValidate
           id="email"
           type="email"
-          labelText="Email"
+          labelText="Email de usuario"
           value={personaData.email || ''}
           className="bg-gray-100 cursor-not-allowed w-full"
           readOnly
@@ -92,5 +103,6 @@ export default function FormDatos({ handleSubmit, tipoDocumento, personaData, ha
         </Button>
       </div>
     </form>
+    </>
   );
 }

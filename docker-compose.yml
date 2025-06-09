@@ -19,6 +19,7 @@
       - ./persona-service/backend/.env
       volumes:
         - ./persona-service/backend:/app
+        - ./persona-service/backend/persona.db:/app/persona.db
 
     persona-frontend:
       build: ./persona-service/frontend
@@ -26,5 +27,19 @@
         - "5173:5173"
       env_file:
         - ./persona-service/frontend/.env
+
+    component-service:
+      build: ./component-services
+      ports:
+        - "5002:5002"
+      env_file:
+        - ./component-services/.env
+      volumes:
+        - ./component-services:/app
+      environment:
+        - SERVICES_CONFIG_FILE=app/config/services-docker.json
+      depends_on:
+        - auth-service
+        - persona-backend
 
 
