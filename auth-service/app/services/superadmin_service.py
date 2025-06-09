@@ -64,22 +64,35 @@ class SuperAdminService:
             "mensaje": f"Permisos asignados al rol {rol.nombre_rol} exitosamente."
         }
 
-    def modificar_admin(self, session: Session, usuario_id: int, datos: dict) -> dict:
-        usuario = session.query(Usuario).filter_by(
-            id_usuario=usuario_id).first()
+    def modificar_usuario_con_rol(self, session: Session, usuario_id: int, datos: dict) -> dict:
+        usuario = session.query(Usuario).filter_by(id_usuario=usuario_id).first()
         if not usuario:
-            raise ValueError("No se encontró el admin.")
+            raise ValueError("No se encontró el usuario.")
 
+    # Modificar atributos del usuario (excepto roles)
         for key, value in datos.items():
-            if hasattr(usuario, key):
-                setattr(usuario, key, value)
+            if key != "roles" and hasattr(usuario, key):
+              setattr(usuario, key, value)
+
         usuario.updated_at = datetime.now(timezone.utc)
+
+        # Si vienen roles, actualizarlos
+        if "roles" in datos:
+        # Eliminar roles actuales del usuario
+            session.query(RolUsuario).filter_by(id_usuario=usuario_id).delete()
+
+        for rol_id in datos["roles"]:
+            rol = session.query(Rol).filter_by(id_rol=rol_id).first()
+            if not rol:
+                raise ValueError(f"Rol con ID '{rol_id}' no encontrado.")
+            nueva_relacion = RolUsuario(id_usuario=usuario_id, id_rol=rol.id_rol)
+            session.add(nueva_relacion)
 
         session.commit()
 
         return {
-            "mensaje": f"Admin {usuario.nombre_usuario} modificado exitosamente."
-        }
+        "mensaje": f"Usuario {usuario.nombre_usuario} modificado exitosamente."
+    }
 
     def crear_rol(self, session: Session, nombre_rol: str) -> dict:
         rol_existente = session.query(Rol).filter_by(
