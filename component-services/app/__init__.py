@@ -1,9 +1,12 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 import os
-from app.extensions import jwt, engine, Base
+from app.extensions import engine, Base
 from app.routes import register_blueprints
 from common.decorators.api_access import api_access
+from flask_jwt_extended import JWTManager
+from app.extensions import jwt
+
 
 def create_app()->Flask:
 
@@ -18,7 +21,7 @@ def create_app()->Flask:
     with app.app_context():
         Base.metadata.create_all(bind=engine)
 
-    @api_access(is_public=True)
+    @api_access(is_public=False)
     @app.route('/')
     def index():
         return jsonify({

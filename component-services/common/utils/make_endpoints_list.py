@@ -1,5 +1,6 @@
 from typing import List, Dict, Any, Set
 import re
+from common.models.endpoint_route_model import EndpointRouteModel
 
 def make_endpoints_list(app) -> List[Dict[str, Any]]:
     """
@@ -25,11 +26,11 @@ def make_endpoints_list(app) -> List[Dict[str, Any]]:
         # Verificar si la función tiene el decorador api_access
         if view_func and hasattr(view_func, '_security_metadata'):
             # Obtener métodos HTTP permitidos (excluyendo HEAD y OPTIONS)
-            methods = sorted(rule.methods - {'HEAD', 'OPTIONS'})
+            methods = rule.methods - {'HEAD', 'OPTIONS'}
             
-            # Si hay métodos específicos definidos en el decorador, filtrar por ellos
-            if hasattr(view_func._security_metadata, 'methods') and view_func._security_metadata.methods:
-                methods = [m for m in methods if m in view_func._security_metadata.methods]
+            # Si no es un EndpointRouteModel, saltar este endpoint
+            if not isinstance(view_func._security_metadata, EndpointRouteModel):
+                continue
             
             # Si no hay métodos después del filtrado, saltar este endpoint
             if not methods:
