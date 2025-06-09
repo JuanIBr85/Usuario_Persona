@@ -96,16 +96,12 @@ def crear_rol():
     finally:
         session.close()
 
-# ---- Debugging -----
 crear_rol._security_metadata = {
-    "is_public": True,
-    "access_permissions": []
+    "is_public": False,
+    "access_permissions": [crear_rol]
 }
 
-#crear_rol._security_metadata = {
-#    "is_public": False,
-#    "access_permissions": ["crear_rol"]
-#}
+
 
 
 # Asignar permisos a rol
@@ -149,14 +145,10 @@ def asignar_permisos_rol(id):
         session.close()
 
 asignar_permisos_rol._security_metadata = {
-    "is_public": True,
-    "access_permissions": [""]
+    "is_public": False,
+    "access_permissions": ["asignar_permisos_rol"]
 }
 
-#asignar_permisos_rol._security_metadata = {
-#    "is_public": False,
-#    "access_permissions": ["asignar_permisos_rol"]
-#}
 
 # Modificar usuarios con rol
 
@@ -236,15 +228,9 @@ def crear_permiso():
 
 # --- Debugging ---
 crear_permiso._security_metadata = {
-    "is_public": True,
-    "access_permissions": []
+    "is_public": False,
+    "access_permissions": [crear_permiso]
 }
-
-#crear_permiso._security_metadata = {
-#    "is_public": False,
-#    "access_permissions": ["crear_permiso"]
-#}
-
 
 # ==========
 # ==========
@@ -270,15 +256,9 @@ def obtener_roles():
 
 # --- Debugging --- 
 obtener_roles._security_metadata = {
-    "is_public": True,
-    "access_permissions": []
+    "is_public": False,
+    "access_permissions": [obtener_roles]
 }
-
-#
-# obtener_roles._security_metadata = {
-#    "is_public": False,
-#    "access_permissions": ["obtener_roles"]
-# }
 
 @superadmin_bp.route('/roles/<int:rol_id>', methods=['DELETE'])
 # --- Debugging --- 
@@ -309,15 +289,10 @@ def borrar_rol(rol_id):
     finally:
         session.close()
 
-# --- Debugging --- 
 borrar_rol._security_metadata = {
-    "is_public": True,
-    "access_permissions": []
+    "is_public": False,
+    "access_permissions": [borrar_rol]
 }
-
-# borrar_rol._security_metadata = {
-#    "is_public": False,
-#    "access_permissions": ["borrar_rol"]
 
 
 @superadmin_bp.route('/permisos', methods=['GET'])
@@ -340,10 +315,9 @@ def obtener_permisos():
     finally:
         session.close()
 
-# --- Debugging --- 
 obtener_permisos._security_metadata = {
-    "is_public": True, 
-    "access_permissions": []  
+    "is_public": False, 
+    "access_permissions": [obtener_permisos]  
 }
 
 # ==========

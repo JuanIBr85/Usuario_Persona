@@ -116,10 +116,9 @@ class SuperAdminService:
             return {"roles": resultado}
         except Exception as e:
             raise Exception(f"Error al obtener roles: {str(e)}")
-
-   
-
-   
+        
+    #===========
+    #===========
     def borrar_rol(self, session: Session, rol_id: int) -> dict:
         rol = session.query(Rol).filter_by(
             id_rol=rol_id, deleted_at=None).first()

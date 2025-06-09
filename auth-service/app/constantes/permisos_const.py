@@ -13,6 +13,10 @@ PERMISOS = [
     "asignar_permisos_rol",
     "modificar_admin",
     "logout"
+    "obtener_roles"
+    "borrar_rol"
+    "obtener_permisos"
+    "modificar_rol"
 ]
 
 # Permisos por rol
