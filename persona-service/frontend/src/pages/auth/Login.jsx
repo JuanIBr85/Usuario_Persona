@@ -2,28 +2,38 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import InputValidate from "@/components/inputValidate/InputValidate";
 import { Link } from 'react-router-dom';
-import { UserPlus } from "lucide-react";
+import { KeyRound } from "lucide-react";
 import { formSubmitJson } from "@/utils/formUtils";
 import { SimpleDialog, FetchErrorMessage } from "@/components/SimpleDialog";
 import { AuthService } from "@/services/authService";
+import { useAuthContext } from "@/context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import Loading from "@/components/loading/Loading";
 import AuthLayout from "@/components/authLayout/AuthLayout";
 
-function Sign() {
+function Login() {
+  const navigate = useNavigate()
   const [isOpen, setIsOpen] = React.useState(false);
   const [dialogMessage, setMessage] = React.useState("");
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [isLogin, setIsLogin] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);  
+  const {updateData} = useAuthContext();
 
   const handleSubmit = async (event) => {
     const formData = await formSubmitJson(event);
     document.activeElement.blur();
     setIsLoading(true);
     AuthService
-      .register(formData)
+      .login(formData)
       .then((json) => {
-        setMessage(`La cuenta ha sido creada correctamente. Por favor, verifique su correo electrónico para activar su cuenta.`);
-        setIsOpen(true);
+        setMessage(`Login exitoso. Bienvenido ${json.data.nombre_usuario}!`);
+        setIsLogin(true);
+        updateData({
+          token: json.data.token,
+          user: json.data
+        });
       }).catch((error) => {
+
         if (error.isJson) {
           if (error.data.error) {
             setMessage(FetchErrorMessage(error));
@@ -33,23 +43,23 @@ function Sign() {
         } else {
           setMessage(error.message);
         }
-        setIsOpen(true);
-      }).finally(() => setIsLoading(false));
+      }).finally(()=>{setIsLoading(false);setIsOpen(true);});
   }
 
   return (
     <>
       {isLoading && <Loading isFixed={true} />}
       <SimpleDialog
-        title="Registro"
+        title="Login"
         description={dialogMessage}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
+        actionHandle={isLogin ? ()=>setTimeout(()=>navigate('/profile'), 500) : undefined}
       />
-
+      
       <AuthLayout
-        title="Creación de cuenta"
-        visualContent={<UserPlus className="text-white w-42 h-42" />}
+        title="Inicio de sesión"
+        visualContent={<KeyRound className="text-white w-42 h-42" />}
       >
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 h-full">
           <InputValidate
@@ -60,17 +70,6 @@ function Sign() {
             validateMessage="Email inválido"
             required
           />
-          
-          <InputValidate
-            id="nombre_usuario"
-            type="text"
-            placeholder="Nombre de usuario"
-            labelText="Nombre"
-            validatePattern=".{4,}"
-            validateMessage="El nombre debe tener al menos 4 caracteres"
-            required
-          />
-
           <InputValidate
             id="password"
             type="password"
@@ -81,13 +80,17 @@ function Sign() {
             required
           />
           <Button variant="link" asChild className="p-0">
-            <Link to="/login">¿Ya tienes una cuenta? Inicia sesión</Link>
+            <Link to="/forgotPassword">¿Olvidaste la contraseña?</Link>
           </Button>
-          <Button type="submit" className="mt-4">Registrarse</Button>
+          <Button variant="link" asChild className="p-0">
+            <Link to="/sign">¿No tienes una cuenta? Regístrate</Link>
+          </Button>
+          <Button type="submit" className="mt-4">Iniciar sesión</Button>
         </form>
       </AuthLayout>
     </>
+    
   );
 }
 
-export default Sign
+export default Login;

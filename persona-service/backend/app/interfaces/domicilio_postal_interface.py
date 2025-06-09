@@ -11,5 +11,9 @@ class IDomicilioPostalInterface(ABC):
         pass
 
     @abstractmethod
-    def obtener_id_por_cod_postal_localidad(self, codigo_postal, localidad):
+    def obtener_domicilio_postal_por_cod_postal_localidad(self, codigo_postal, localidad):
         pass 
+
+    @abstractmethod
+    def buscar_localidades_por_codigo_postal(self, codigo_postal):
+        pass

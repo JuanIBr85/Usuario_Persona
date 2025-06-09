@@ -28,6 +28,7 @@ export const AuthService = {
       url: `${ServiceURL.auth}/login`,
       method: HttpMethod.POST,
       body: body,
+      
       showError: AuthService.showError
     });
   },
@@ -48,6 +49,7 @@ export const AuthService = {
       url: `${ServiceURL.auth}/registro`,
       method: HttpMethod.POST,
       body: body,
+      
       showError: AuthService.showError
     });
   },
@@ -64,6 +66,7 @@ export const AuthService = {
       url: `${ServiceURL.auth}/solicitar-otp`,
       method: HttpMethod.POST,
       body: body,
+      
       showError: AuthService.showError
     });
   },
@@ -80,6 +83,7 @@ export const AuthService = {
       url: `${ServiceURL.auth}/verificar-otp`,
       method: HttpMethod.POST,
       body: body,
+      
       showError: AuthService.showError
     });
   }

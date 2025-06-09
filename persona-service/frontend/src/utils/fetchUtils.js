@@ -62,20 +62,27 @@ export const fetchService = {
             controller.abort(); // Cancela la petición
             console.warn(`Fetch [${url}] timeout.`); // Avisa que se canceló por timeout
         }, timeout);
-        
+
         // Hacemos la petición Fetch
         return fetch(url, {
             signal: controller.signal, // Para poder cancelar la petición
             method: method,            // GET, POST, PUT, etc.
             headers: {
+<<<<<<< HEAD
                 ...(method === HttpMethod.GET ? {} : {"Content-Type": "application/json"}), 
+=======
+                ...(body && !['GET', 'DELETE', 'HEAD'].includes(method.toUpperCase()) && {
+                    "Content-Type": "application/json"
+                }), 
+>>>>>>> origin/master
                 ...headers, 
                 
-                // Si useToken es true, agregamos el token de autorización
                 ...(useToken && {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    "X-Authorization": `Bearer ${localStorage.getItem("token")}`,
                 }),
             },
+            
+            
             // Si tenemos datos para enviar, los convertimos a JSON; si no, enviamos undefined
             body: body ? JSON.stringify(body) : undefined,
         })

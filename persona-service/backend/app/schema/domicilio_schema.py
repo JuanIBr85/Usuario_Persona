@@ -10,14 +10,10 @@ class DomicilioSchema(Schema):
     domicilio_piso=fields.Str()
     domicilio_dpto=fields.Str()
     domicilio_referencia=fields.Str(validate=Length(max=1000))
-
-    codigo_postal = fields.Dict(required=True, load_only=True)
-
     codigo_postal_id=fields.Int(dump_only=True)
 
-    #completar al crear el schema domicilio postal para mantener la relacion
-    #codigo_postal=fields.Nested(DomicilioPostalSchema, required=True)
-    domicilio_postal = fields.Nested(DomicilioPostalSchema, dump_only=True)
+    codigo_postal = fields.Dict(required=True, load_only=True)
+    domicilio_postal = fields.Nested(DomicilioPostalSchema, dump_only=True, attribute="codigo_postal")
 
     created_at=fields.DateTime(dump_only=True)
     updated_at=fields.DateTime(dump_only=True)

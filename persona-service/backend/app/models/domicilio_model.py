@@ -12,11 +12,11 @@ class Domicilio(Base):
     domicilio_numero=Column(String (10), nullable=False)
     domicilio_piso=Column(String(3), nullable=True)
     domicilio_dpto=Column(String(2), nullable=True)
-    domicilio_referencia=Column(Text, nullable=True)
+    domicilio_referencia=Column(String(200), nullable=True)
 
     codigo_postal_id=Column(Integer, ForeignKey('domicilios_postales.id_domicilio_postal'))
     
-    codigo_postal=relationship("DomicilioPostal")
+    codigo_postal=relationship("DomicilioPostal", backref="domicilios", lazy="joined")
 
     created_at=Column(DateTime, default=datetime.now(timezone.utc))
     updated_at=Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))

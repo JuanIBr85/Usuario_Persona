@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -38,46 +38,27 @@ import {
 } from "@/components/ui/dialog";
 import { Link } from "react-router-dom";
 
-// Datos iniciales de roles
-const initialRoles = [
-  { id: 1, name: "Administrador", permissions: ["Puede hacer X"] },
-  { id: 2, name: "Alumno", permissions: ["Puede hacer Y"] },
-  { id: 3, name: "Nombre Rol 3", permissions: [] },
-];
+// Import de services
+import { roleService } from "@/services/roleService";
+import { permisoService } from "@/services/permisoService";
 
-// Lista de permisos disponibles para asignar a los roles
-const availablePermissions = [
-  "Puede hacer X",
-  "Puede hacer Y",
-  "Puede hacer A",
-  "Puede hacer B",
-];
 
 export default function AdminRoles() {
-  // Estado para almacenar la lista de roles
-  const [roles, setRoles] = useState(initialRoles);
-  // Estado para mostrar u ocultar el formulario de creación/edición de rol
-  const [showNewRoleForm, setShowNewRoleForm] = useState(false);
-  // Estado para almacenar el nombre del nuevo rol o el nombre editado
-  const [newRoleName, setNewRoleName] = useState("");
-  // Estado para almacenar los permisos seleccionados
-  const [selectedPermissions, setSelectedPermissions] = useState([]);
-  // Estado para identificar si se está editando un rol (por su id)
-  const [editRoleId, setEditRoleId] = useState(null);
-  // Estado para manejar el diálogo de error (abierto y mensaje)
-  const [errorDialog, setErrorDialog] = useState({ open: false, message: "" });
-  // Estado para controlar la visibilidad del diálogo de confirmación de eliminación
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  // Estado que guarda el rol que se desea eliminar
-  const [roleToDelete, setRoleToDelete] = useState(null);
+  const [roles, setRoles] = useState([]); // Estado para almacenar la lista de roles
+  const [showNewRoleForm, setShowNewRoleForm] = useState(false);   // Estado para mostrar u ocultar el formulario de creación/edición de rol
+  const [newRoleName, setNewRoleName] = useState("");   // Estado para almacenar el nombre del nuevo rol o el nombre editado
+  const [selectedPermissions, setSelectedPermissions] = useState([]);   // Estado para almacenar los permisos seleccionados
+  const [editRoleId, setEditRoleId] = useState(null);   // Estado para identificar si se está editando un rol (por su id)
+  const [errorDialog, setErrorDialog] = useState({ open: false, message: "" });   // Estado para manejar el diálogo de error (abierto y mensaje)
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);   // Estado para controlar la visibilidad del diálogo de confirmación de eliminación
+  const [roleToDelete, setRoleToDelete] = useState(null);   // Estado que guarda el rol que se desea eliminar
 
-  // Muestra un diálogo de error con un mensaje específico
-  const showError = (message) => {
+  const [availablePermissions, setAvailablePermissions] = useState([]);
+
+  const showError = (message) => { // Muestra un diálogo de error con un mensaje específico
     setErrorDialog({ open: true, message });
   };
-
-  // Resetea el formulario de rol (nuevo o edición)
-  const resetForm = () => {
+  const resetForm = () => { // Resetea el formulario 
     setNewRoleName("");
     setSelectedPermissions([]);
     setShowNewRoleForm(false);
@@ -93,40 +74,60 @@ export default function AdminRoles() {
     );
   };
 
-  // Agrega un nuevo rol a la lista
-  const handleAddRole = () => {
-    if (!newRoleName.trim()) return showError("El nombre del rol no puede estar vacío");
+  const handleAddRole = async () => {
+  if (!newRoleName.trim()) return showError("El nombre del rol no puede estar vacío");
 
-    // Verifica si ya existe un rol con el mismo nombre (ignorando mayúsculas)
-    const exists = roles.some(
-      (role) => role.name.toLowerCase() === newRoleName.trim().toLowerCase()
-    );
-    if (exists) return showError("Ya existe un rol con ese nombre");
+  const exists = roles.some(
+    role => role.name.toLowerCase() === newRoleName.trim().toLowerCase()
+  );
+  if (exists) return showError("Ya existe un rol con ese nombre");
 
-    // Crea un nuevo rol con un id único y los datos ingresados
-    const newRole = {
-      id: Date.now(),
-      name: newRoleName.trim(),
-      permissions: selectedPermissions,
-    };
-
-    setRoles([...roles, newRole]); // Agrega el nuevo rol al estado
-    resetForm(); // Limpia el formulario
+  const newRoleBody = {
+    nombre_rol: newRoleName.trim(),
+    descripcion: "",
   };
 
-  // Prepara el formulario para editar un rol existente
-  const handleEditClick = (role) => {
+  try {
+    // Debido a que primero se crean los roles y luego recién se asignan sus permisos los pasos son los sgtes.:
+
+    // 1. Se crea el rol sin permisos
+    const response = await roleService.crear(newRoleBody);
+
+    // 2. se extrae el id del rol creado
+    const newRoleId = response.id_rol;
+
+    // 3. transformamos selectedPermissions a array solo con nombres para que el json cumpla las condiciones del backend
+    const permisosNombres = selectedPermissions.map(p => p.name);
+
+    // 4. se asigna permisos usando el servicio
+    await permisoService.asignarPermisos(newRoleId, permisosNombres);
+
+    // 5. actualizamos el estado con el nuevo rol (sin permisos, o con los permisos asignados)
+    const newRole = {
+      id: newRoleId,
+      name: response.nombre_rol || newRoleName.trim(),
+      permissions: permisosNombres,
+    };
+
+    setRoles([...roles, newRole]);
+    resetForm();
+
+  } catch (error) {
+    showError("Error al crear el rol y asignar permisos.");
+    console.error(error);
+  }
+};
+
+
+  const handleEditClick = (role) => { // Prepara el formulario para editar un rol existente
     setEditRoleId(role.id); // Establece el ID del rol que se está editando
     setNewRoleName(role.name); // Llena el campo de nombre con el valor actual del rol
     setSelectedPermissions(role.permissions || []); // Llena los permisos actuales del rol
     setShowNewRoleForm(true); // Muestra el formulario de edición
   };
 
-  // Guarda los cambios hechos a un rol existente
-  const handleSaveChanges = () => {
+  const handleSaveChanges = () => {  // Guarda los cambios hechos a un rol existente
     if (!newRoleName.trim()) return showError("El nombre del rol no puede estar vacío");
-
-    // Verifica que no haya otro rol con el mismo nombre (excluyendo el actual)
     const exists = roles.some(
       (role) =>
         role.id !== editRoleId &&
@@ -134,31 +135,81 @@ export default function AdminRoles() {
     );
     if (exists) return showError("Ya existe otro rol con ese nombre");
 
-    // Mapea los roles y actualiza solo el que coincide con el ID en edición
-    const updatedRoles = roles.map((role) =>
+    const updatedRoles = roles.map((role) => // Mapea los roles y actualiza solo el que coincide con el ID en edición
       role.id === editRoleId
         ? { ...role, name: newRoleName.trim(), permissions: selectedPermissions }
         : role
     );
     setRoles(updatedRoles); // Actualiza el estado con la nueva lista
-    resetForm(); // Limpia el formulario
+    resetForm();
   };
 
-  // Abre el diálogo de confirmación para eliminar un rol específico
-  const openDeleteConfirmDialog = (role) => {
+  const openDeleteConfirmDialog = (role) => {  // Abre el diálogo de confirmación para eliminar un rol específico
     setRoleToDelete(role); // Guarda el rol que se desea eliminar
     setOpenDeleteDialog(true); // Muestra el diálogo de confirmación
   };
 
-  // Confirma y elimina el rol previamente seleccionado
-  const confirmDeleteRole = () => {
-    if (roleToDelete) {
-      setRoles(roles.filter((role) => role.id !== roleToDelete.id)); // Elimina el rol del estado
-      if (editRoleId === roleToDelete.id) resetForm(); // Si se estaba editando, limpia el formulario
-      setRoleToDelete(null); // Limpia la referencia del rol a eliminar
-      setOpenDeleteDialog(false); // Cierra el diálogo
+  const confirmDeleteRole = async () => { // Confirma y elimina el rol previamente seleccionado
+    if (!roleToDelete) return;
+
+    try {
+      const response = await roleService.borrar(roleToDelete.id);
+      setRoles(roles.filter((role) => role.id !== roleToDelete.id));
+      if (editRoleId === roleToDelete.id) resetForm();
+      setRoleToDelete(null);
+      setOpenDeleteDialog(false);
+    } catch (error) {
+      showError("Error de conexión al intentar borrar el rol");
+      console.error(error);
     }
   };
+  function formatPermissionName(permission) {
+    if (typeof permission !== 'string') return ''; // Evita errores si permission es undefined o no es string
+
+    return permission
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+
+
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const data = await roleService.get_all();
+
+        const transformedRoles = data.roles.map((role) => ({
+          id: role.id_rol,
+          name: role.nombre_rol,
+          permissions: role.permisos,
+        }));
+
+        setRoles(transformedRoles);
+      } catch (error) {
+        showError("Error al cargar los roles desde el servidor.");
+        console.error(error);
+      }
+    };
+
+    const fetchPermisos = async () => {
+      try {
+        const data = await permisoService.get_all();
+
+        const transformedPermisos = data.permisos.map((permiso) => ({
+          id: permiso.id_permiso,
+          name: permiso.nombre_permiso,
+        }));
+
+        setAvailablePermissions(transformedPermisos);
+      } catch (error) {
+        showError("Error al cargar los permisos desde el servidor.");
+        console.error(error);
+      }
+    };
+
+    fetchPermisos();
+    fetchRoles();
+  }, []);
 
   return (
     <div className="p-6 space-y-6 py-30 px-3 md:py-25 md:px-15">
@@ -181,7 +232,7 @@ export default function AdminRoles() {
                       {role.name}
                       <div className="text-xs text-gray-500">
                         {role.permissions?.length > 0
-                          ? role.permissions.join(", ")
+                          ? role.permissions.map(formatPermissionName).join(", ")
                           : "Sin permisos asignados"}
                       </div>
                     </div>
@@ -189,7 +240,7 @@ export default function AdminRoles() {
                   {/*Botón de editar*/}
                   <Button
                     variant="outline"
-                    
+
                     onClick={() => handleEditClick(role)}
                   >
                     <Pencil className="w-4 h-4" />
@@ -199,7 +250,7 @@ export default function AdminRoles() {
                   {/*Botón de borrar*/}
                   <Button
                     variant="outline"
-                   
+
                     onClick={() => openDeleteConfirmDialog(role)}
                   >
                     <Trash2 className="w-4 h-4" />
@@ -228,14 +279,14 @@ export default function AdminRoles() {
                       onChange={(e) => setNewRoleName(e.target.value)}
                     />
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      {availablePermissions.map((permission) => (
-                        <label key={permission} className="flex items-center gap-2">
+                      {availablePermissions && availablePermissions.map((permission) => (
+                        <label key={permission.id} className="flex items-center gap-2">
                           <input
                             type="checkbox"
-                            checked={selectedPermissions.includes(permission)}
+                            checked={selectedPermissions.some(p => p.id === permission.id)}
                             onChange={() => handlePermissionToggle(permission)}
                           />
-                          <span className="text-sm">{permission}</span>
+                          <span className="text-sm">{formatPermissionName(permission.name)}</span>
                         </label>
                       ))}
                     </div>

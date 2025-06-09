@@ -19,3 +19,6 @@ env/
 # IDEs
 .vscode/
 .idea/
+
+.auth_data/
+*.db

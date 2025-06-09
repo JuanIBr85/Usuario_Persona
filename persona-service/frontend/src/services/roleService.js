@@ -1,56 +1,33 @@
-import { fetchService, HttpMethod } from './fetchUtils';
+import { fetchService, HttpMethod, ServiceURL } from "@/utils/fetchUtils";
 
-export async function getAllRoles() {
-  return await fetchService.useDefaultUrl({
-    url: "api/roles",
-    method: HttpMethod.GET,
-  }).catch(error => {
-    console.error("Error al obtener los roles:", error);
-    throw new Error('Error al obtener los roles');
-  });
-}
+export const roleService = {
+  showError: true,
 
-export async function getRoleById(id) {
-  return await fetchService.useDefaultUrl({
-    url: `api/roles/${id}`,
-    method: HttpMethod.GET,
-  }).catch(error => {
-    console.error("Error al obtener rol por ID:", error);
-    throw new Error('Rol no encontrado');
-  });
-}
+  crear: async (body) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/super-admin/roles`,
+      method: HttpMethod.POST,
+      showError: roleService.showError,
+      body: body,
 
-export async function createRole(roleData) {
-  return await fetchService.useDefaultUrl({
-    url: "api/crear_rol",
-    method: HttpMethod.POST,
-    body: roleData,
-    useToken: true,
-  }).catch(error => {
-    console.error("Error al crear el rol:", error);
-    throw new Error('Error al crear el rol');
-  });
-}
+    })
+  },
 
-export async function updateRole(id, updatedData) {
-  return await fetchService.useDefaultUrl({
-    url: `api/actualizar_rol/${id}`,
-    method: HttpMethod.PUT,
-    body: updatedData,
-    useToken: true,
-  }).catch(error => {
-    console.error("Error al actualizar el rol:", error);
-    throw new Error('Error al actualizar el rol');
-  });
-}
+  get_all: async () => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/super-admin/roles`,
+      method: HttpMethod.GET,
+      showError: roleService.showError
+    });
+  },
 
-export async function deleteRole(id) {
-  return await fetchService.useDefaultUrl({
-    url: `api/eliminar_rol/${id}`,
-    method: HttpMethod.DELETE,
-    useToken: true,
-  }).catch(error => {
-    console.error("Error al eliminar el rol:", error);
-    throw new Error('Error al eliminar el rol');
-  });
-}
+  borrar: async (id) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/super-admin/roles/${id}`,
+      method: HttpMethod.DELETE,
+      showError: roleService.showError,
+      useToken: true
+    });
+  },
+
+};

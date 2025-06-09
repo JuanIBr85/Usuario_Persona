@@ -1,5 +1,5 @@
 from marshmallow import Schema, fields, validate
-from app.constantes.tipos_documentos import TIPOS_DOCUMENTO_VALIDOS
+from config import TIPOS_DOCUMENTO_VALIDOS
 from app.schema.contacto_schema import ContactoSchema
 from app.schema.domicilio_schema import DomicilioSchema
 

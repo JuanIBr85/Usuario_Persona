@@ -10,6 +10,7 @@ export const PersonaService = {
       url: `${ServiceURL.persona}/api/crear_persona`,
       method: HttpMethod.POST,
       body: body,
+      
       showError: PersonaService.showError
     });
   },
@@ -60,6 +61,22 @@ export const PersonaService = {
   get_tipos_documentos: async () => {
     return fetchService.fetch({
       url: `${ServiceURL.persona}/api/tipos_documento`,
+      method: HttpMethod.GET,
+      showError: PersonaService.showError
+    });
+  },
+
+  get_redes_sociales: async () => {
+    return fetchService.fetch({
+      url: `${ServiceURL.persona}/api/redes_sociales`,
+      method: HttpMethod.GET,
+      showError: PersonaService.showError
+    });
+  },
+
+  get_localidades_by_codigo_postal: async (codigo_postal) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.persona}/api/domicilios_postales/localidades?codigo_postal=${codigo_postal}`,
       method: HttpMethod.GET,
       showError: PersonaService.showError
     });
