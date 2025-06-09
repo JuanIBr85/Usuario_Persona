@@ -19,7 +19,7 @@ for service in services_config["services"]:
             response = requests.get(f"{service_url}/component_service/endpoints").json()
             
             for k,v in response.items():
-                v["api_url"] = f"{service_url}{v["api_url"]}"
+                v["api_url"] = f"{service_url}{v['api_url']}"
             endpoints.update(response)
             break
         except Exception:
