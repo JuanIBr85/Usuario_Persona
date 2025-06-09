@@ -3,6 +3,6 @@ from common.utils.make_endpoints_list import make_endpoints_list
 
 bp = Blueprint("service", __name__)
 
-@bp.route("/", methods=["GET"])
+@bp.route("/endpoints", methods=["GET"])
 def service():
     return make_endpoints_list(current_app)

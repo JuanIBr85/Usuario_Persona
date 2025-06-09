@@ -16,7 +16,7 @@ for service in services_config["services"]:
     while True:
         try:
             service_url = f"http://{service['url']}"
-            response = requests.get(f"{service_url}/service").json()
+            response = requests.get(f"{service_url}/component_service/endpoints").json()
             
             for k,v in response.items():
                 v["api_url"] = f"{service_url}{v["api_url"]}"
@@ -24,7 +24,6 @@ for service in services_config["services"]:
             break
         except Exception:
             time.sleep(1)
-
     print(f"{service['name']} listo")
 print(f"Endpoints cargados, total: {len(endpoints)}")
 
