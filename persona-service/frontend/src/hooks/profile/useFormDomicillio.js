@@ -10,6 +10,7 @@ export function useFormDomicilio(domicilio, setPersonaData, persona_id) {
     const [localidades, setLocalidades] = useState([]);
     const [localidad, setLocalidad] = useState(domicilio.domicilio_postal.localidad);
     const inputCPRef = useRef(null);
+    const [loading, setLoading] = useState(false);
 
     const fetchLocalidades = useCallback(() => {
         let cpa = String(codigoPostal);
@@ -58,13 +59,16 @@ export function useFormDomicilio(domicilio, setPersonaData, persona_id) {
             }
         };
 
+        setLoading(true);
         PersonaService.editar(persona_id, domicilioData)
             .then(response => {
+                setLoading(false);
                 setPersonaData(response.data);
             })
             .catch(error => {
                 console.error('Error updating domicilio:', error.data);
-            });
+            })
+            .finally(() => setLoading(false));
     };
-    return {handleSubmit, localidades, setLocalidades, codigoPostal, setCodigoPostal, inputCPRef, localidad, setLocalidad}
+    return {handleSubmit, localidades, setLocalidades, codigoPostal, setCodigoPostal, inputCPRef, localidad, setLocalidad, loading}
 }

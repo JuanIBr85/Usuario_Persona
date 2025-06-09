@@ -5,12 +5,15 @@ import {
 } from "@/components/ui/select"
 import SimpleSelect from "@/components/SimpleSelect"
 import { useFormDomicilio } from "@/hooks/profile/useFormDomicillio"
+import Loading from "@/components/loading/Loading"
 
 export default function FormDomicillio({ domicilio, setPersonaData, persona_id }) {
     
-    const {handleSubmit, localidades, codigoPostal, setCodigoPostal, inputCPRef, localidad} = useFormDomicilio(domicilio, setPersonaData, persona_id);
+    const {handleSubmit, localidades,  codigoPostal, setCodigoPostal, inputCPRef, localidad, loading} = useFormDomicilio(domicilio, setPersonaData, persona_id);
     
     return (
+        <>
+        {loading && <Loading isFixed={true} />}
         <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-4 items-end">
                 {/* Campo Calle */}
@@ -20,8 +23,8 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id }
                     placeholder="Ingresa el nombre de la calle"
                     labelText="Calle"
                     value={domicilio?.domicilio_calle || ''}
-                    validatePattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{2,50}$"
-                    validateMessage="Ingresa un nombre de calle válido (2-50 caracteres, solo letras y espacios)"
+                    validatePattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s,.]{2,50}$"
+                    validateMessage="Ingresa un nombre de calle válido (2-50 caracteres, solo letras, espacios, puntos y comas)"
                     containerClassName="sm:col-span-3"
                     required
                 />
@@ -33,7 +36,7 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id }
                     placeholder="Número de domicilio"
                     labelText="Número"
                     value={domicilio?.domicilio_numero || ''}
-                    validatePattern="^[0-9]{1,4}[a-zA-Z]?$"
+                    validatePattern="^[0-9]{1,9}[a-zA-Z]?$"
                     validateMessage="Ingresa un número válido (ej: 1234, 123A)"
                     required
                 />
@@ -96,8 +99,8 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id }
                 placeholder="Referencia (ej: Entre Calles X e Y)"
                 labelText="Referencia"
                 value={domicilio?.domicilio_referencia || ''}
-                validatePattern=".{0,100}"
-                validateMessage="Máximo 100 caracteres"
+                validatePattern=".{0,200}"
+                validateMessage="Máximo 200 caracteres"
             />
 
             <div className="flex flex-col gap-3 pt-4">
@@ -114,5 +117,6 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id }
                 </Button>
             </div>
         </form>
+        </>
     );
 }

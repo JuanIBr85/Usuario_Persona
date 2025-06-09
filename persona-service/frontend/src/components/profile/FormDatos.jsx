@@ -7,23 +7,29 @@ import SimpleSelect from "@/components/SimpleSelect"
 import { PersonaService } from "@/services/personaService"
 import { useState } from "react"
 import { formSubmitJson } from "@/utils/formUtils"
+import Loading from "@/components/loading/Loading"
 
 
 export default function FormDatos({ persona_id, tipoDocumento, personaData, handleChange, setPersonaData }) {
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (event) => {
     const { email, ...formData } = await formSubmitJson(event);
     document.activeElement.blur();
+    setLoading(true);
     PersonaService.editar(persona_id, formData)
       .then(response => {
         setPersonaData(response.data);
       })
       .catch(error => {
         console.error('Error updating domicilio:', error.data);
-      });
+      })
+      .finally(() => setLoading(false));
   };
 
   return (
+    <>
+    {loading && <Loading isFixed={true} />}
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Datos fijos */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -97,5 +103,6 @@ export default function FormDatos({ persona_id, tipoDocumento, personaData, hand
         </Button>
       </div>
     </form>
+    </>
   );
 }
