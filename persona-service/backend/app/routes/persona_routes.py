@@ -26,8 +26,8 @@ def listar_personas():
             data={"server": str(e)}
         )),500
             
-@persona_bp.route('/personas/<int:id>', methods=['GET'])
-def obtener_persona(id):
+@persona_bp.route('/personas/<int:id>/<int:a>', methods=['GET'])
+def obtener_persona(id, a):
     try:
 
         persona = persona_service.listar_persona_id(id)

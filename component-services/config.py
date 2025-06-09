@@ -8,30 +8,16 @@ load_dotenv()
 
 #CONFIGURACIONES BASE DE DATOS
 
-
-import os
-from dotenv import load_dotenv
-
-#carga las variables de entorno desde .env
-load_dotenv()
-
-#CONFIGURACIONES GENERALES
-
-#CONFIGURACIONES BASE DE DATOS
-
 #user= os.environ['MYSQL_USER']
 #password= os.environ['MYSQL_PASSWORD']
 #host= os.environ['MYSQL_HOST']
 #database= os.environ['MYSQL_DATABASE']
 
-SQLALCHEMY_DATABASE_URI = f"sqlite:///persona.db"
+SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 #CONFIGURACIONES JWT
 
 JWT_SECRET_KEY=os.environ.get('JWT_SECRET_KEY')
 
-#LISTAS REDES Y TIPOS DOCUMENTOS
-
-TIPOS_DOCUMENTO_VALIDOS=os.environ.get("TIPOS_DOCUMENTO_VALIDOS", "").split(",")
-REDES_SOCIALES_VALIDAS=os.environ.get("REDES_SOCIALES_VALIDAS", "").split(",")
+SERVICES_CONFIG_FILE=os.environ.get('SERVICES_CONFIG_FILE')

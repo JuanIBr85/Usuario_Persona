@@ -1,0 +1,13 @@
+{
+    "services": [
+        {
+            "name": "auth-service",
+            "url": "auth-service:5000"
+        },
+        {
+            "name": "persona-backend",
+            "url": "persona-backend:5001"
+        }
+    ],
+    "static_server": "persona-frontend:5173"
+}
