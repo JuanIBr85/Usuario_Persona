@@ -5,7 +5,7 @@ import json
 class EndpointRouteModel:
     
     def __init__(
-        self, api_url: str, is_public: bool = True,
+        self, api_url: str=None, is_public: bool = True,
         access_permissions: Optional[Dict[str, Any]] = None,
     ):
         self.api_url = api_url
