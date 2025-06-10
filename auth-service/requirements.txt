@@ -17,5 +17,3 @@ SQLAlchemy==2.0.41
 marshmallow==4.0.0
 Flask-Limiter==3.12
 Flask-Mail==0.10.0
-
-common_packages @ git+https://github.com/JuanIBr85/Usuario_Persona.git@feature/component-services#subdirectory=common_packages
