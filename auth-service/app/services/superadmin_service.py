@@ -44,24 +44,33 @@ class SuperAdminService:
         if not rol:
             raise ValueError("No se encontró el rol.")
 
-        for nombre_permiso in permisos:
-            permiso = session.query(Permiso).filter_by(
-                nombre_permiso=nombre_permiso).first()
-            if not permiso:
-                raise ValueError(f"Permiso '{nombre_permiso}' no encontrado.")
+        # Obtener permisos actuales asociados al rol
+        permisos_actuales = {
+            rp.permiso.nombre_permiso: rp
+            for rp in session.query(RolPermiso).filter_by(id_rol=rol_id).all()
+        }
 
-            existe = session.query(RolPermiso).filter_by(
-                id_rol=rol.id_rol,
-                permiso_id=permiso.id_permiso
-            ).first()
-            if not existe:
-                session.add(RolPermiso(id_rol=rol.id_rol,
-                            permiso_id=permiso.id_permiso))
+        permisos_nuevos_set = set(permisos)
+
+        # Quitar permisos que ya no están en la lista nueva
+        for nombre_permiso in list(permisos_actuales.keys()):
+            if nombre_permiso not in permisos_nuevos_set:
+                session.delete(permisos_actuales[nombre_permiso])
+
+        # Agregar permisos nuevos que no estén asignados
+        permisos_a_agregar = permisos_nuevos_set - set(permisos_actuales.keys())
+        permisos_objs = session.query(Permiso).filter(
+            Permiso.nombre_permiso.in_(permisos_a_agregar)
+        ).all()
+
+        for permiso_obj in permisos_objs:
+            rp = RolPermiso(id_rol=rol_id, permiso_id=permiso_obj.id_permiso)
+            session.add(rp)
 
         session.commit()
 
         return {
-            "mensaje": f"Permisos asignados al rol {rol.nombre_rol} exitosamente."
+            "mensaje": f"Permisos sincronizados correctamente para el rol {rol.nombre_rol}."
         }
 
     def modificar_usuario_con_rol(self, session: Session, usuario_id: int, datos: dict) -> dict:

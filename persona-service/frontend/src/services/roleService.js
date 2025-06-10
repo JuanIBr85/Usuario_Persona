@@ -41,4 +41,19 @@ export const roleService = {
       useToken: true
     });
   },
+
+  // Método para actualizar un rol existente
+  editar: async (id, body) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/super-admin/roles/${id}`,
+      method: HttpMethod.PUT,
+      showError: roleService.showError,
+      body,
+      useToken: true,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  },
+
 };

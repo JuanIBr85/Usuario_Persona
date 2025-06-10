@@ -98,7 +98,7 @@ def crear_rol():
 
 crear_rol._security_metadata = {
     "is_public": False,
-    "access_permissions": [crear_rol]
+    "access_permissions": ["crear_rol"]
 }
 
 
@@ -194,7 +194,6 @@ modificar_usuario_con_rol._security_metadata = {
 }
 
 # Modificar rol
-
 @superadmin_bp.route('/roles/<int:rol_id>', methods=['PUT'])
 def modificar_rol(rol_id):
     return Response(
@@ -222,7 +221,7 @@ def crear_permiso():
 
 crear_permiso._security_metadata = {
     "is_public": False,
-    "access_permissions": [crear_permiso]
+    "access_permissions": ["crear_permiso"]
 }
 
 # ==========
@@ -250,7 +249,6 @@ def obtener_roles():
 # --- Debugging --- 
 obtener_roles._security_metadata = {
     "is_public": False,
-    #"access_permissions": [obtener_roles]
     "access_permissions": ["obtener_roles"]
 }
 
@@ -313,6 +311,5 @@ obtener_permisos._security_metadata = {
     "is_public": False, 
     "access_permissions": ["obtener_permisos"]  
 }
-
 # ==========
 # ==========
