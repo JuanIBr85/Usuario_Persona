@@ -13,6 +13,7 @@ export const permisoService = {
             url: `${ServiceURL.auth}/super-admin/permisos`,
             method: HttpMethod.GET,
             showError: permisoService.showError,
+            useToken: true,
         })
     },
 
@@ -26,6 +27,7 @@ export const permisoService = {
             headers: { // Encabezados HTTP que indican que el contenido enviado es JSON
                 "Content-Type": "application/json",
             },
+            useToken: true,
         });
     },
 };

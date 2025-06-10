@@ -47,7 +47,7 @@ export const AuthService = {
 
     return fetchService.fetch({
       url: `${ServiceURL.auth}/registro`,
-      method: HttpMethod.POST,
+      method: HttpMethod.POST,  
       body: body,
       
       showError: AuthService.showError

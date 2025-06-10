@@ -26,6 +26,7 @@ def registrar_usuario1():
         return make_response(status, mensaje, data, code), code
 
     except Exception as e:
+        print("❌ ERROR INTERNO EN /registro:", str(e)) 
         return make_response(ResponseStatus.ERROR, "Error al registrar usuario", str(e), error_code="REGISTRO_ERROR"), 500
 
     finally:

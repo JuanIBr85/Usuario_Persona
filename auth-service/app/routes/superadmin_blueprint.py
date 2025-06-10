@@ -250,7 +250,8 @@ def obtener_roles():
 # --- Debugging --- 
 obtener_roles._security_metadata = {
     "is_public": False,
-    "access_permissions": [obtener_roles]
+    #"access_permissions": [obtener_roles]
+    "access_permissions": ["obtener_roles"]
 }
 
 @superadmin_bp.route('/roles/<int:rol_id>', methods=['DELETE'])
@@ -284,7 +285,7 @@ def borrar_rol(rol_id):
 
 borrar_rol._security_metadata = {
     "is_public": False,
-    "access_permissions": [borrar_rol]
+    "access_permissions": ["borrar_rol"]
 }
 
 
@@ -310,7 +311,7 @@ def obtener_permisos():
 
 obtener_permisos._security_metadata = {
     "is_public": False, 
-    "access_permissions": [obtener_permisos]  
+    "access_permissions": ["obtener_permisos"]  
 }
 
 # ==========

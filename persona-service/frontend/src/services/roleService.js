@@ -15,7 +15,7 @@ export const roleService = {
       method: HttpMethod.POST,
       showError: roleService.showError,
       body: body,
-
+      useToken: true
     })
   },
 
@@ -25,11 +25,13 @@ export const roleService = {
     return fetchService.fetch({
       url: `${ServiceURL.auth}/super-admin/roles`,
       method: HttpMethod.GET,
-      showError: roleService.showError
+      showError: roleService.showError,
+      useToken: true,
+      showError: true,
     });
   },
 
-  
+
   // Método para eliminar un rol específico utilizando su ID
   borrar: async (id) => {
     return fetchService.fetch({
