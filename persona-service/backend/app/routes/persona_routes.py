@@ -3,11 +3,13 @@ from marshmallow import ValidationError
 from app.services.persona_service import PersonaService
 from app.schema.persona_schema import PersonaSchema
 from app.utils.respuestas import respuesta_estandar,RespuestaStatus
+from common.decorators.api_access import api_access
 
 persona_bp = Blueprint('persona_bp', __name__)
 persona_service = PersonaService()
 persona_schema= PersonaSchema()
 
+@api_access(access_permissions=[])
 @persona_bp.route('/personas', methods=['GET'])
 def listar_personas():
     try:
@@ -26,6 +28,7 @@ def listar_personas():
             data={"server": str(e)}
         )),500
             
+@api_access(access_permissions=[])
 @persona_bp.route('/personas/<int:id>/', methods=['GET'])
 def obtener_persona(id):
     try:
@@ -53,6 +56,7 @@ def obtener_persona(id):
         )),500    
 
 #crea una persona
+@api_access(access_permissions=[])
 @persona_bp.route('/crear_persona', methods=['POST'])
 def crear_persona():
     try:    
@@ -90,6 +94,7 @@ def crear_persona():
             )),500
     
 # modificar persona, siguiendo el formato json sugerido    
+@api_access(access_permissions=[])
 @persona_bp.route('/modificar_persona/<int:id>', methods=['PUT'])
 def modificar_persona(id):
     try:
@@ -123,6 +128,7 @@ def modificar_persona(id):
         )), 500
 
 #borrar una persona
+@api_access(access_permissions=[])
 @persona_bp.route('/borrar_persona/<int:id>', methods=['DELETE'])
 def borrar_persona(id):
 
@@ -149,6 +155,7 @@ def borrar_persona(id):
         )),500       
 
 #Restaurar una persona
+@api_access(access_permissions=[])
 @persona_bp.route('/restaurar_persona/<int:id>', methods=['PATCH'])
 def restaurar_persona(id):
 
@@ -181,6 +188,7 @@ def restaurar_persona(id):
             data={"server": str(e)}
         )),500
 
+@api_access(access_permissions=[])
 @persona_bp.route('/personas_by_usuario/<int:id>', methods=['GET'])
 def obtener_persona_usuario(id):
     try:

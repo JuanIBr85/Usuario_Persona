@@ -2,10 +2,11 @@ from flask import Blueprint, jsonify, request
 from app.utils.respuestas import respuesta_estandar,RespuestaStatus
 from config import TIPOS_DOCUMENTO_VALIDOS,REDES_SOCIALES_VALIDAS
 from app.services.domicilio_postal_service import DomicilioPostalService
-
+from common.decorators.api_access import api_access
 
 opciones_bp = Blueprint("opciones_bp", __name__)
 
+@api_access(access_permissions=["modificar_rol"])
 @opciones_bp.route("/tipos_documento", methods=['GET'])
 def obtener_tipos_documento():
 
@@ -15,6 +16,7 @@ def obtener_tipos_documento():
         data=TIPOS_DOCUMENTO_VALIDOS
     )),200
 
+@api_access()
 @opciones_bp.route("/redes_sociales", methods=['GET'])
 def obtener_red_social():
 
@@ -24,7 +26,7 @@ def obtener_red_social():
         data=REDES_SOCIALES_VALIDAS
     )),200
 
-
+@api_access()
 @opciones_bp.route('/domicilios_postales/localidades', methods=['GET'])
 def buscar_localidades_por_codigo_postal():
     try:
@@ -59,7 +61,7 @@ def buscar_localidades_por_codigo_postal():
             data={"server": str(e)}
         ), 500
 
-
+@api_access()
 @opciones_bp.route('/domicilios_postales/buscar', methods=['GET'])
 def buscar_domicilio_postal():
 
