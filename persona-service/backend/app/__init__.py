@@ -7,7 +7,6 @@ from app.models.contacto_model import Contacto
 from app.models.domicilio_model import Domicilio
 from app.models.domicilio_postal_model import DomicilioPostal
 from app.utils.carga_domicilio_postal import cargar_domicilios_postales_csv
-from app.utils.make_endpoints_list import make_endpoints_list
 
 def create_app():
 
@@ -59,14 +58,6 @@ def create_app():
                 'rule': str(rule)
             })
         return jsonify(output)
-
-    @app.route('/components')
-    def endpoints():
-        return jsonify(make_endpoints_list(app)),200
-    
-    endpoints._security_metadata ={
-        "is_public":True
-    }
 
     return app
     
