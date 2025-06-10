@@ -58,9 +58,20 @@ def authenticate_request():
     #Verifico si el usuario tiene un token
     identity = get_jwt_identity()
     #Si no tiene el token y no es publico, aborto con 401
-    if not service_route.is_public and not identity:
-        abort(401, description=f"El endpoint <{request.path}> requiere autenticación")
-    
+    if not service_route.is_public:
+        #Si no tiene token se rechaza el acceso
+        if not identity:
+            abort(401, description=f"El endpoint <{request.path}> requiere autenticación")
+        payload = get_jwt()
+        
+        print("access_permissions", type(service_route.access_permissions))
+        print("payload", type(payload.get("perms", [])))
+
+        #Si no tiene los permisos necesario para acceder al endpoint se rechaza el acceso
+        if not service_route.access_permissions.issubset(payload.get("perms", [])):
+            abort(403, description=f"Acceso denegado: se requieren permisos {service_route.access_permissions}")
+
+
     #Si tiene el token, lo guardo en el contexto
     if identity:
         g.jwt = get_jwt()
