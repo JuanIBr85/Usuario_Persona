@@ -7,6 +7,7 @@ from app.models.contacto_model import Contacto
 from app.models.domicilio_model import Domicilio
 from app.models.domicilio_postal_model import DomicilioPostal
 from app.utils.carga_domicilio_postal import cargar_domicilios_postales_csv
+from common.utils.component_service import component_service
 
 def create_app():
 
@@ -19,6 +20,8 @@ def create_app():
     #Inicializa de las exteniciones
     jwt.init_app(app)
     
+    component_service(app)
+
     #Registro de blueprints
     from app.routes.persona_routes import persona_bp
     from app.routes.opciones_routes import opciones_bp
