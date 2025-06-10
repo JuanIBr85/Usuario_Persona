@@ -101,10 +101,7 @@ crear_rol._security_metadata = {
     "access_permissions": ["crear_rol"]
 }
 
-
-
-
-# Asignar permisos a rol
+# Asignar permisos a rol (Si, "reemplaza" los permisos que no se asignan, esto es aproposito para funcionar con los checkbox del front)
 @superadmin_bp.route('/admins/<int:id>/permisos', methods=['POST'])
 def asignar_permisos_rol(id):
     session = SessionLocal()
