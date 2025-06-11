@@ -102,11 +102,10 @@ def crear_rol():
 
 crear_rol._security_metadata = {
     "is_public": False,
-    "access_permissions": [crear_rol]
+    "access_permissions": ["crear_rol"]
 }
-# ==========
-# Asignar permisos a rol
-# ==========
+
+# Asignar permisos a rol (Si, "reemplaza" los permisos que no se asignan, esto es aproposito para funcionar con los checkbox del front)
 @superadmin_bp.route('/admins/<int:id>/permisos', methods=['POST'])
 def asignar_permisos_rol(id):
     session = SessionLocal()
@@ -196,7 +195,6 @@ modificar_usuario_con_rol._security_metadata = {
 }
 # ==========
 # Modificar rol
-# ==========
 @superadmin_bp.route('/roles/<int:rol_id>', methods=['PUT'])
 def modificar_rol(rol_id):
     return Response(
@@ -223,7 +221,7 @@ def crear_permiso():
 
 crear_permiso._security_metadata = {
     "is_public": False,
-    "access_permissions": [crear_permiso]
+    "access_permissions": ["crear_permiso"]
 }
 # ==========
 #obtener roles
@@ -250,7 +248,7 @@ def obtener_roles():
 
 obtener_roles._security_metadata = {
     "is_public": False,
-    "access_permissions": [obtener_roles]
+    "access_permissions": ["obtener_roles"]
 }
 # ==========
 # borrar rol
@@ -284,7 +282,7 @@ def borrar_rol(rol_id):
 
 borrar_rol._security_metadata = {
     "is_public": False,
-    "access_permissions": [borrar_rol]
+    "access_permissions": ["borrar_rol"]
 }
 # ==========
 # obtener permisos
@@ -311,7 +309,7 @@ def obtener_permisos():
 
 obtener_permisos._security_metadata = {
     "is_public": False, 
-    "access_permissions": [obtener_permisos]  
+    "access_permissions": ["obtener_permisos"]  
 }
 # ==========
 # ==========

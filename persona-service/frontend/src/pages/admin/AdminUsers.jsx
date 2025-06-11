@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
-
+import UserFilter from "@/components/UserFilter";
 import Loading from '@/components/loading/Loading'
 
 // Import de services
@@ -21,10 +21,11 @@ import { PersonaService } from "@/services/personaService";
 function AdminUsers() {
   const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
   const [editingUser, setEditingUser] = useState(null);
-
   const [users, setUsers] = useState([]);
+  const [mostrarFiltroAvanzado, setMostrarFiltroAvanzado] = useState(false);
+
+
   useEffect(() => {
     PersonaService.get_all()
       .then(res => {
@@ -113,6 +114,26 @@ function AdminUsers() {
           </CardHeader>
 
           <CardContent>
+            <div className="overflow-auto border p-3 rounded-md shadow-sm mb-4">
+
+
+              <UserFilter
+                mostrarFiltroAvanzado={mostrarFiltroAvanzado}
+                setMostrarFiltroAvanzado={setMostrarFiltroAvanzado}
+              />
+
+
+              {mostrarFiltroAvanzado && (
+                <Input
+                  placeholder="Filtro avanzado (opcional)"
+                  className="w-full mb-4" />
+              )}
+
+
+            </div>
+
+
+
             <div className="overflow-auto border p-3 rounded-md shadow-sm">
               <Table>
                 <TableCaption>Lista de usuarios registrados.</TableCaption>

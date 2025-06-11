@@ -79,12 +79,14 @@ export default function AdminRoles() {
   /* ------------------------------ Handlers ----------------------------- */
   // Alterna un permiso en la lista de seleccionados (lo agrega o elimina)
   const handlePermissionToggle = (permission) => {
-    setSelectedPermissions((prev) =>
-      prev.includes(permission)
-        ? prev.filter((p) => p !== permission) // Lo elimina si ya está
-        : [...prev, permission] // Lo agrega si no está
-    );
+    setSelectedPermissions((prev) => {
+      const exists = prev.some((p) => p.name === permission.name);
+      return exists
+        ? prev.filter((p) => p.name !== permission.name)
+        : [...prev, permission];
+    });
   };
+
 
   // Crea un nuevo rol
   const handleAddRole = async () => {
@@ -134,16 +136,23 @@ export default function AdminRoles() {
 
   // Prepara la edición de un rol
   const handleEditClick = (role) => {
-    setEditRoleId(role.id); // Establece el ID del rol que se está editando
-    setNewRoleName(role.name); // Llena el campo de nombre con el valor actual del rol
-    setSelectedPermissions(role.permissions || []); // Llena los permisos actuales del rol
-    setShowNewRoleForm(true); // Muestra el formulario de edición
+    setEditRoleId(role.id); // ID del rol
+    setNewRoleName(role.name); // Nombre
+
+    // Mapear strings de permisos a objetos completos desde availablePermissions
+    const permisosCompletos = availablePermissions.filter((permiso) =>
+      role.permissions.includes(permiso.name)
+    );
+
+    setSelectedPermissions(permisosCompletos); // Asignar permisos como objetos
+    setShowNewRoleForm(true);
   };
 
-  const handleSaveChanges = () => {  // Guarda los cambios hechos a un rol existente
+
+  const handleSaveChanges = async () => {
     if (!newRoleName.trim()) return showError("El nombre del rol no puede estar vacío");
 
-    // Evita duplicar nombres
+    // Verifica que no haya duplicado el nombre
     const exists = roles.some(
       (role) =>
         role.id !== editRoleId &&
@@ -151,15 +160,33 @@ export default function AdminRoles() {
     );
     if (exists) return showError("Ya existe otro rol con ese nombre");
 
-    // Actualiza el rol en memoria
-    const updatedRoles = roles.map((role) => // Mapea los roles y actualiza solo el que coincide con el ID en edición
-      role.id === editRoleId
-        ? { ...role, name: newRoleName.trim(), permissions: selectedPermissions }
-        : role
-    );
-    setRoles(updatedRoles); // Actualiza el estado con la nueva lista
-    resetForm();
+    try {
+      // 1) Actualizar el nombre del rol
+      await roleService.editar(editRoleId, {
+        nombre_rol: newRoleName.trim(),
+        descripcion: "",
+      });
+
+      // 2) Enviar permisos actualizados
+      const permisosNombres = selectedPermissions.map(p => p.name || p);
+      await permisoService.asignarPermisos(editRoleId, permisosNombres);
+
+      // 3) Actualiza el estado local
+      const updatedRoles = roles.map((role) =>
+        role.id === editRoleId
+          ? { ...role, name: newRoleName.trim(), permissions: permisosNombres }
+          : role
+      );
+
+      setRoles(updatedRoles);
+      console.log(updatedRoles)
+      resetForm();
+    } catch (error) {
+      showError("Error al actualizar el rol o los permisos.");
+      console.error(error);
+    }
   };
+
 
   const openDeleteConfirmDialog = (role) => {  // Abre el diálogo de confirmación para eliminar un rol específico
     setRoleToDelete(role); // Guarda el rol que se desea eliminar
@@ -264,10 +291,10 @@ export default function AdminRoles() {
                   </span>
 
                   {/*Botón de editar*/}
-                  <Button 
-                  variant="outline" 
+                  <Button
+                    variant="outline"
 
-                  onClick={() => handleEditClick(role)}
+                    onClick={() => handleEditClick(role)}
                   >
                     <Pencil className="w-4 h-4" />
                     Editar

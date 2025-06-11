@@ -1,37 +1,39 @@
 from flask import Blueprint, jsonify, request
-from app.utils.respuestas import respuesta_estandar,RespuestaStatus
+from common.utils.response import make_response, ResponseStatus
 from config import TIPOS_DOCUMENTO_VALIDOS,REDES_SOCIALES_VALIDAS
 from app.services.domicilio_postal_service import DomicilioPostalService
-
+from common.decorators.api_access import api_access
 
 opciones_bp = Blueprint("opciones_bp", __name__)
 
+@api_access(access_permissions=["modificar_rol"])
 @opciones_bp.route("/tipos_documento", methods=['GET'])
 def obtener_tipos_documento():
 
-    return jsonify(respuesta_estandar(
-        status=RespuestaStatus.SUCCESS,
+    return make_response(
+        status=ResponseStatus.SUCCESS,
         message="Tipos de documento obtenidos correctamente",
         data=TIPOS_DOCUMENTO_VALIDOS
-    )),200
+    ),200
 
+@api_access()
 @opciones_bp.route("/redes_sociales", methods=['GET'])
 def obtener_red_social():
 
-    return jsonify(respuesta_estandar(
-        status=RespuestaStatus.SUCCESS,
+    return make_response(
+        status=ResponseStatus.SUCCESS,
         message="Redes sociales obtenidos correctamente",
         data=REDES_SOCIALES_VALIDAS
-    )),200
+    ),200
 
-
+@api_access()
 @opciones_bp.route('/domicilios_postales/localidades', methods=['GET'])
 def buscar_localidades_por_codigo_postal():
     try:
         codigo_postal = request.args.get('codigo_postal')
         if not codigo_postal:
-            return respuesta_estandar(
-                status=RespuestaStatus.ERROR,
+            return make_response(
+                status=ResponseStatus.ERROR,
                 message="Debe enviar el código postal",
                 data=None
             ), 400
@@ -40,26 +42,26 @@ def buscar_localidades_por_codigo_postal():
         localidades = service.buscar_localidades_por_codigo_postal(codigo_postal)
 
         if not localidades:
-            return respuesta_estandar(
-                status=RespuestaStatus.SUCCESS,
+            return make_response(
+                status=ResponseStatus.SUCCESS,
                 message="No se encontraron localidades con ese código postal",
                 data=[]
             ), 200
 
-        return respuesta_estandar(
-            status=RespuestaStatus.SUCCESS,
+        return make_response(
+            status=ResponseStatus.SUCCESS,
             message="Localidades encontradas",
             data=localidades
         ), 200
 
     except Exception as e:
-        return respuesta_estandar(
-            status=RespuestaStatus.ERROR,
+        return make_response(
+            status=ResponseStatus.ERROR,
             message="Error interno del servidor",
             data={"server": str(e)}
         ), 500
 
-
+@api_access()
 @opciones_bp.route('/domicilios_postales/buscar', methods=['GET'])
 def buscar_domicilio_postal():
 
@@ -69,33 +71,33 @@ def buscar_domicilio_postal():
         localidad = request.args.get('localidad')
 
         if not localidad or not codigo_postal:
-            return jsonify(respuesta_estandar(
-                 status=RespuestaStatus.ERROR,
+            return make_response(
+                 status=ResponseStatus.ERROR,
                  message="Debe enviar código_postal y localidad",
                  data=None
-            )),400
+            ),400
         
         service = DomicilioPostalService()
         dom_postal = service.obtener_domicilio_postal_por_cod_postal_localidad(codigo_postal, localidad)
 
         if not dom_postal:
-            return jsonify(respuesta_estandar(
-                status=RespuestaStatus.ERROR,
+            return make_response(
+                status=ResponseStatus.ERROR,
                 message="No se encontró un domicilio postal con esos datos",
                 data={"codigo_postal": codigo_postal, "localidad": localidad}
-            )),404   
+            ),404   
         
-        return jsonify(respuesta_estandar(
-            status=RespuestaStatus.SUCCESS,
+        return make_response(
+            status=ResponseStatus.SUCCESS,
             message="Domicilio postal encontrado correctamente",
             data=service.schema.dump(dom_postal)
-        )), 200
+        ), 200
     
     except Exception as e:
-        return jsonify(respuesta_estandar(
-            status=RespuestaStatus.ERROR,
+        return make_response(
+            status=ResponseStatus.ERROR,
             message="Error interno del servidor",
             data={"server": str(e)}
-        )),500
+        ),500
 
 

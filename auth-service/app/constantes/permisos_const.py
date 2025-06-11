@@ -16,7 +16,7 @@ PERMISOS = [
     "obtener_roles",
     "borrar_rol",
     "obtener_permisos",
-    "modificar_rol"
+    "modificar_rol",
 ]
 
 # Permisos por rol
