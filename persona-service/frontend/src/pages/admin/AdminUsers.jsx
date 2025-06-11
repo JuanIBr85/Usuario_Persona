@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
-
+import UserFilter from "@/components/UserFilter";
 import Loading from '@/components/loading/Loading'
 
 // Import de services
@@ -115,43 +115,14 @@ function AdminUsers() {
 
           <CardContent>
             <div className="overflow-auto border p-3 rounded-md shadow-sm mb-4">
-              <div className="flex flex-col md:flex-row items-center gap-3 mb-4">
-                <Input
-                  placeholder="Buscar usuario por nombre, apellido o email"
-                  className="w-full md:w-1/3"
-                />
 
-                <Select>
-                  <SelectTrigger className="w-full md:w-1/4">
-                    <SelectValue placeholder="Filtrar por rol" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Todos">Todos</SelectItem>
-                    <SelectItem value="Alumno">Alumno</SelectItem>
-                    <SelectItem value="Profesor">Profesor</SelectItem>
-                    <SelectItem value="Admin">Admin</SelectItem>
-                    <SelectItem value="Invitado">Invitado</SelectItem>
-                  </SelectContent>
-                </Select>
 
-                <Select>
-                  <SelectTrigger className="w-full md:w-1/4">
-                    <SelectValue placeholder="Filtrar por status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Todos">Todos</SelectItem>
-                    <SelectItem value="Activo">Activo</SelectItem>
-                    <SelectItem value="Inactivo">Inactivo</SelectItem>
-                    <SelectItem value="Egresado">Egresado</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Button
-                  variant="outline"
-                  onClick={() => setMostrarFiltroAvanzado(!mostrarFiltroAvanzado)}
-                >
-                  {mostrarFiltroAvanzado ? "Ocultar filtro avanzado" : "Mostrar filtro avanzado"}
-                </Button>
-              </div>
+              <UserFilter
+                mostrarFiltroAvanzado={mostrarFiltroAvanzado}
+                setMostrarFiltroAvanzado={setMostrarFiltroAvanzado}
+              />
+
+
               {mostrarFiltroAvanzado && (
                 <Input
                   placeholder="Filtro avanzado (opcional)"
