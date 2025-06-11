@@ -10,6 +10,8 @@
       volumes:
         - ./auth-service:/app
         - ./auth-service/auth_data:/app/auth_data
+        #Temporal hay que usar secrets para esto
+        - ./auth-service/secrets/private_key.pem:/app/secrets/private_key.pem
 
     persona-backend:
       build: ./persona-service/backend
@@ -19,7 +21,6 @@
       - ./persona-service/backend/.env
       volumes:
         - ./persona-service/backend:/app
-        - ./persona-service/backend/persona.db:/app/persona.db
 
     persona-frontend:
       build: ./persona-service/frontend
@@ -36,6 +37,8 @@
         - ./component-services/.env
       volumes:
         - ./component-services:/app
+        #Temporal hay que usar secrets para esto
+        - ./auth-service/secrets/private_key.pem:/app/secrets/private_key.pem
       environment:
         - SERVICES_CONFIG_FILE=app/config/services-docker.json
       depends_on:

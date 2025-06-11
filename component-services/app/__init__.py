@@ -13,7 +13,7 @@ def create_app()->Flask:
     app=Flask(__name__)
 
     app.config.from_object("config")
-
+    
     CORS(app, supports_credentials=True)
     
     component_service(app)

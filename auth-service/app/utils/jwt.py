@@ -2,16 +2,22 @@
 import jwt
 from datetime import datetime, timedelta, timezone
 from os import getenv
+from flask_jwt_extended import create_access_token
 
 def crear_token_acceso(usuario_id, email, rol, permisos):
-    payload = {
-        "sub": str(usuario_id),
-        "email": email,
-        "rol": rol,
-        "perms": permisos,  # Aquí metemos la lista
-        "exp": datetime.now(timezone.utc) + timedelta(seconds=int(getenv("JWT_ACCESS_TOKEN_EXPIRES", 900)))
-    }
-    return jwt.encode(payload, getenv("JWT_SECRET_KEY", "clave_jwt_123"), algorithm="HS256")
+    expires_delta = timedelta(seconds=int(getenv("JWT_ACCESS_TOKEN_EXPIRES", 900)))
+
+    return create_access_token(
+        identity=str(usuario_id),
+        additional_claims={
+            "sub": str(usuario_id),
+            "email": email,
+            "rol": rol,
+            "perms": permisos,
+            "exp": datetime.now(timezone.utc) + expires_delta
+        },
+        expires_delta=expires_delta
+    )
 
 # para mejorar se podrian crear decoradores q requieran token para el 2fa y token requerido
 # para seguridad explicita o diferenciada en las rutas

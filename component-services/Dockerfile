@@ -2,6 +2,9 @@ FROM python:3.13.3
 
 WORKDIR /app
 
+# Instalar gunicorn antes de copiar el código para aprovechar la caché de Docker
+RUN pip install --no-cache-dir gunicorn
+
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 

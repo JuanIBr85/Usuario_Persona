@@ -13,11 +13,11 @@ load_dotenv()
 #host= os.environ['MYSQL_HOST']
 #database= os.environ['MYSQL_DATABASE']
 
-SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
+SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI') or 'sqlite:///components.db'
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 #CONFIGURACIONES JWT
 
-JWT_SECRET_KEY=os.environ.get('JWT_SECRET_KEY')
-
-SERVICES_CONFIG_FILE=os.environ.get('SERVICES_CONFIG_FILE')
+SERVICES_CONFIG_FILE=os.environ.get('SERVICES_CONFIG_FILE') or 'app/config/services-dev.json'
+JWT_ALGORITHM = 'RS256'
+JWT_PUBLIC_KEY = open('./secrets/public_key.pem', 'r').read()
