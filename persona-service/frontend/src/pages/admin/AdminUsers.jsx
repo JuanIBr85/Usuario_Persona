@@ -129,7 +129,7 @@ function AdminUsers() {
                   className="w-full mb-4" />
               )}
 
-              {/* Tu tabla u otro contenido puede venir acá */}
+
             </div>
 
 
