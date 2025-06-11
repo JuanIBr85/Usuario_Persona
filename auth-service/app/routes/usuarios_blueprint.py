@@ -5,6 +5,11 @@ from app.utils.response import ResponseStatus, make_response
 from app.services.usuario_service import UsuarioService
 from app.extensions import limiter
 from app.utils.decoradores import requiere_permisos, ruta_publica
+from jwt import decode, ExpiredSignatureError, InvalidTokenError
+from app.utils.email import decodificar_token_verificacion, generar_token_dispositivo
+from app.models.usuarios import Usuario
+from app.models.dispositivos_confiable import DispositivoConfiable
+from datetime import datetime, timezone, timedelta
 
 usuario_bp = Blueprint("usuario", __name__)
 usuario_service = UsuarioService()
@@ -64,8 +69,11 @@ def login1():
         data = request.get_json()
         if not data:
             return make_response(ResponseStatus.FAIL, "Datos de entrada requeridos", error_code="NO_INPUT")
+        
+        user_agent = request.headers.get('User-Agent', '')
+        ip = request.remote_addr
 
-        status, mensaje, data, code = usuario_service.login_usuario(session, data)
+        status, mensaje, data, code = usuario_service.login_usuario(session, data,user_agent,ip)
         return make_response(status, mensaje, data, code), code
 
     except Exception as e:
@@ -176,3 +184,41 @@ def reset_con_otp():
 @usuario_bp.route('/modificar', methods=['GET', 'POST'])
 def modificar_perfil():
     return make_response(ResponseStatus.PENDING, "Funcionalidad en construcción"), 501
+
+@usuario_bp.route('/verificar-dispositivo', methods=['GET'])
+@ruta_publica
+def verificar_dispositivo():
+    token = request.args.get('token')
+    if not token:
+        return "Token faltante", 400
+
+    try:
+        datos = decodificar_token_verificacion(token)
+    except ExpiredSignatureError:
+        return "El enlace ha expirado.", 400
+    except InvalidTokenError:
+        return "Token inválido.", 400
+
+    # Extraer datos
+    email = datos["email"]
+    user_agent = datos["user_agent"]
+    ip = datos["ip"]
+
+    # Buscar usuario
+    session = SessionLocal()
+    usuario = session.query(Usuario).filter_by(email_usuario=email).first()
+    if not usuario:
+        return "Usuario no encontrado.", 404
+
+    # Registrar el dispositivo como confiable
+    nuevo_dispositivo = DispositivoConfiable(
+        usuario_id=usuario.id_usuario,
+        user_agent=user_agent,
+        token_dispositivo= generar_token_dispositivo(email, user_agent, ip),
+        fecha_registro = datetime.now(timezone.utc),
+        fecha_expira = datetime.now(timezone.utc) + timedelta(days=30)
+    )
+    session.add(nuevo_dispositivo)
+    session.commit()
+
+    return "Dispositivo confirmado. Ahora podés volver a iniciar sesión.", 200

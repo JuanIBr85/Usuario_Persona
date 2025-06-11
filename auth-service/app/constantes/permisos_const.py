@@ -12,10 +12,10 @@ PERMISOS = [
     "crear_usuario_con_rol",
     "asignar_permisos_rol",
     "modificar_admin",
-    "logout"
-    "obtener_roles"
-    "borrar_rol"
-    "obtener_permisos"
+    "logout",
+    "obtener_roles",
+    "borrar_rol",
+    "obtener_permisos",
     "modificar_rol"
 ]
 

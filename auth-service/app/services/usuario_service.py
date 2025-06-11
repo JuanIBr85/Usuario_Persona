@@ -2,6 +2,7 @@ from datetime import datetime, timezone,timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import Session
 from app.models.usuarios import Usuario, PasswordLog, UsuarioLog
+from app.models.dispositivos_confiable import DispositivoConfiable
 from app.models.rol import RolUsuario,Rol,RolPermiso
 from app.services.rol import get_rol_por_nombre
 from app.utils.jwt import crear_token_acceso,crear_token_reset_password
@@ -10,7 +11,7 @@ from marshmallow import ValidationError
 from app.services.servicio_base import ServicioBase
 from app.models.permisos import Permiso
 from app.models.otp_reset_password_model import OtpResetPassword
-from app.utils.email import enviar_email_verificacion,generar_codigo_otp,enviar_codigo_por_email,decodificar_token_verificacion
+from app.utils.email import enviar_email_verificacion,generar_codigo_otp,enviar_codigo_por_email,decodificar_token_verificacion,enviar_email_validacion_dispositivo
 from jwt import ExpiredSignatureError, InvalidTokenError
 from app.utils.response import ResponseStatus, make_response
 
@@ -120,7 +121,7 @@ class UsuarioService(ServicioBase):
 #LOGIN Y LOGOUT
 #-----------------------------------------------------------------------------------------------------------------------------
 
-    def login_usuario(self, session: Session, data:dict) -> dict:
+    def login_usuario(self, session: Session, data:dict, user_agent: str , ip: str) -> dict:
         try:
             data_validada = self.schema_login.load(data)
         except ValidationError as error:
@@ -170,30 +171,47 @@ class UsuarioService(ServicioBase):
         )
         permisos_lista = [p.nombre_permiso for p in permisos_query]
 
-        # Crear token con permisos incluidos
-        token = crear_token_acceso(
-                                    usuario.id_usuario, 
-                                    usuario.email_usuario, 
-                                    rol_nombre, 
-                                    permisos_lista
-                                )
-        # Registrar log de login
-        session.add(UsuarioLog(
-            usuario_id=usuario.id_usuario,
-            accion="login",
-            detalles="El usuario se logueó correctamente"
-        ))
-        session.commit()
+        # Verificar si el dispositivo ya está registrado
+        dispositivo_confiable = session.query(DispositivoConfiable).filter_by(
+        usuario_id=usuario.id_usuario,
+        user_agent=user_agent
+        ).first()
 
-        usuario_data = self.schema_out.dump(usuario)
-        usuario_data["token"] = token
+        if not dispositivo_confiable or dispositivo_confiable.fecha_expira.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
+           # Dispositivo nuevo o expirado → enviar email de validación
+           enviar_email_validacion_dispositivo(usuario, user_agent, ip)
+           return (
+            ResponseStatus.PENDING,
+            "Verificación de dispositivo enviada al email. Por favor confírmelo.",
+            None,
+            401
+          )
+        else:
+            # Crear token con permisos incluidos
+            token = crear_token_acceso(
+               usuario.id_usuario,
+               usuario.email_usuario,
+               rol_nombre,
+               permisos_lista
+            )
 
-        return (
-                    ResponseStatus.SUCCESS,
-                    "Login exitoso.",
-                    usuario_data, 
-                    200
-                )
+            # Registrar log de login
+            session.add(UsuarioLog(
+               usuario_id=usuario.id_usuario,
+               accion="login",
+               detalles="El usuario se logueó correctamente"
+            ))
+            session.commit()
+
+            usuario_data = self.schema_out.dump(usuario)
+            usuario_data["token"] = token
+
+            return (
+               ResponseStatus.SUCCESS,
+               "Login exitoso.",
+               usuario_data,
+               200
+            )
 #-----------------------------------------------------------------------------------------------------------------------------
 #terminar de modificar con persona-service
     def ver_perfil(self, session: Session, usuario_id: int) -> dict:

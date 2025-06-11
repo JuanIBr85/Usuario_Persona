@@ -45,3 +45,29 @@ def enviar_codigo_por_email(usuario, codigo_otp):
         body=f"Hola {usuario.nombre_usuario},\n\nTu código para recuperar tu contraseña es: {codigo_otp}\n\nEste código expirará en 15 minutos."
     )
     mail.send(msg)
+
+def generar_token_dispositivo(email, user_agent, ip):
+    payload = {
+        "email": email,
+        "user_agent": user_agent,
+        "ip": ip,
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=30)
+    }
+    return jwt.encode(payload, current_app.config['JWT_SECRET_KEY'], algorithm='HS256')
+
+
+def enviar_email_validacion_dispositivo(usuario, user_agent, ip):
+    token = generar_token_dispositivo(usuario.email_usuario, user_agent, ip)
+    enlace = f"{current_app.config['DEVICE_VERIFICATION_URL']}?token={token}"
+
+    msg = Message(
+        subject="Nuevo dispositivo detectado",
+        recipients=[usuario.email_usuario],
+        body=(
+            f"Hola {usuario.nombre_usuario},\n\n"
+            f"Detectamos un inicio de sesión desde un nuevo dispositivo.\n\n"
+            f"Para confirmar que fuiste vos, hacé clic en el siguiente enlace:\n\n{enlace}\n\n"
+            f"Este enlace expirará en 30 minutos."
+        )
+    )
+    mail.send(msg)

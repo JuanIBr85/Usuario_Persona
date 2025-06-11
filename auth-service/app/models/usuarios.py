@@ -27,6 +27,7 @@ class Usuario(Base):
     roles = relationship("RolUsuario", back_populates="usuario")
     logs = relationship("UsuarioLog", back_populates="usuario")
     password_logs = relationship("PasswordLog", back_populates="usuario")
+    dispositivos = relationship("DispositivoConfiable", back_populates="usuario", cascade="all, delete-orphan")
 
     def marcar_email_verificado(self):
         self.email_verificado = True

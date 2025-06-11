@@ -9,6 +9,10 @@ superadmin_bp = Blueprint('admin', __name__)
 superadmin_service = SuperAdminService()
 
 
+
+# ==========
+# crear usuario con rol
+# ==========
 @superadmin_bp.route('/admins', methods=['POST'])
 @jwt_required()
 def crear_usuario_con_rol():
@@ -54,13 +58,13 @@ def crear_usuario_con_rol():
 
         session.close()
 
-
 crear_usuario_con_rol._security_metadata = {
     "is_public": False,
     "access_permissions": ["crear_usuario_con_rol"]
 }
-
+# ==========
 # Crear rol
+# ==========
 @superadmin_bp.route('/roles', methods=['POST'])
 def crear_rol():
     session = SessionLocal()
@@ -100,11 +104,9 @@ crear_rol._security_metadata = {
     "is_public": False,
     "access_permissions": [crear_rol]
 }
-
-
-
-
+# ==========
 # Asignar permisos a rol
+# ==========
 @superadmin_bp.route('/admins/<int:id>/permisos', methods=['POST'])
 def asignar_permisos_rol(id):
     session = SessionLocal()
@@ -148,9 +150,9 @@ asignar_permisos_rol._security_metadata = {
     "is_public": False,
     "access_permissions": ["asignar_permisos_rol"]
 }
-
-
+# ==========
 # Modificar usuarios con rol
+# ==========
 @superadmin_bp.route('/usuarios/<int:id>', methods=['PUT'])
 def modificar_usuario_con_rol(id):
     session = SessionLocal()
@@ -192,9 +194,9 @@ modificar_usuario_con_rol._security_metadata = {
     "is_public": False,
     "access_permissions": ["modificar_usuario_con_rol"]
 }
-
+# ==========
 # Modificar rol
-
+# ==========
 @superadmin_bp.route('/roles/<int:rol_id>', methods=['PUT'])
 def modificar_rol(rol_id):
     return Response(
@@ -208,10 +210,9 @@ modificar_rol._security_metadata = {
     "is_public": False,
     "access_permissions": ["modificar_rol"]
 }
-
+# ==========
 # Crear permiso
-
-
+# ==========
 @superadmin_bp.route('/permisos', methods=['POST'])
 def crear_permiso():
     return Response(
@@ -224,8 +225,8 @@ crear_permiso._security_metadata = {
     "is_public": False,
     "access_permissions": [crear_permiso]
 }
-
 # ==========
+#obtener roles
 # ==========
 @superadmin_bp.route('/roles', methods=['GET'])
 def obtener_roles():
@@ -247,15 +248,14 @@ def obtener_roles():
     finally:
         session.close()
 
-# --- Debugging --- 
 obtener_roles._security_metadata = {
     "is_public": False,
     "access_permissions": [obtener_roles]
 }
-
+# ==========
+# borrar rol
+# ==========
 @superadmin_bp.route('/roles/<int:rol_id>', methods=['DELETE'])
-# --- Debugging --- 
-# @jwt_required()
 def borrar_rol(rol_id):
     session = SessionLocal()
     try:
@@ -286,8 +286,9 @@ borrar_rol._security_metadata = {
     "is_public": False,
     "access_permissions": [borrar_rol]
 }
-
-
+# ==========
+# obtener permisos
+# ==========
 @superadmin_bp.route('/permisos', methods=['GET'])
 def obtener_permisos():
     session = SessionLocal()
@@ -312,6 +313,5 @@ obtener_permisos._security_metadata = {
     "is_public": False, 
     "access_permissions": [obtener_permisos]  
 }
-
 # ==========
 # ==========
