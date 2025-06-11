@@ -24,7 +24,7 @@ def verificar_permisos(app):
         return  # Ruta pública, pasa directo
 
     # Rutas protegidas → revisamos token
-    auth_header = request.headers.get('X-Authorization')
+    auth_header = request.headers.get('Authorization')
  
     if not auth_header:
         abort(401, description="Token no proporcionado")
@@ -33,7 +33,7 @@ def verificar_permisos(app):
 
     try:
         payload = jwt.decode(token, getenv("JWT_SECRET_KEY", "clave_jwt_123"), algorithms=["HS256"])
-        permisos_usuario = set(payload.get("perms", []))
+        permisos_usuario = set(payload.get("permisos", []))
         
         permisos_necesarios = set(meta.get("access_permissions", []))
         
