@@ -21,10 +21,11 @@ import { PersonaService } from "@/services/personaService";
 function AdminUsers() {
   const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
   const [editingUser, setEditingUser] = useState(null);
-
   const [users, setUsers] = useState([]);
+  const [mostrarFiltroAvanzado, setMostrarFiltroAvanzado] = useState(false);
+
+
   useEffect(() => {
     PersonaService.get_all()
       .then(res => {
@@ -113,6 +114,55 @@ function AdminUsers() {
           </CardHeader>
 
           <CardContent>
+            <div className="overflow-auto border p-3 rounded-md shadow-sm mb-4">
+              <div className="flex flex-col md:flex-row items-center gap-3 mb-4">
+                <Input
+                  placeholder="Buscar usuario por nombre, apellido o email"
+                  className="w-full md:w-1/3"
+                />
+
+                <Select>
+                  <SelectTrigger className="w-full md:w-1/4">
+                    <SelectValue placeholder="Filtrar por rol" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Todos">Todos</SelectItem>
+                    <SelectItem value="Alumno">Alumno</SelectItem>
+                    <SelectItem value="Profesor">Profesor</SelectItem>
+                    <SelectItem value="Admin">Admin</SelectItem>
+                    <SelectItem value="Invitado">Invitado</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select>
+                  <SelectTrigger className="w-full md:w-1/4">
+                    <SelectValue placeholder="Filtrar por status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Todos">Todos</SelectItem>
+                    <SelectItem value="Activo">Activo</SelectItem>
+                    <SelectItem value="Inactivo">Inactivo</SelectItem>
+                    <SelectItem value="Egresado">Egresado</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button
+                  variant="outline"
+                  onClick={() => setMostrarFiltroAvanzado(!mostrarFiltroAvanzado)}
+                >
+                  {mostrarFiltroAvanzado ? "Ocultar filtro avanzado" : "Mostrar filtro avanzado"}
+                </Button>
+              </div>
+              {mostrarFiltroAvanzado && (
+                <Input
+                  placeholder="Filtro avanzado (opcional)"
+                  className="w-full mb-4" />
+              )}
+
+              {/* Tu tabla u otro contenido puede venir acá */}
+            </div>
+
+
+
             <div className="overflow-auto border p-3 rounded-md shadow-sm">
               <Table>
                 <TableCaption>Lista de usuarios registrados.</TableCaption>
