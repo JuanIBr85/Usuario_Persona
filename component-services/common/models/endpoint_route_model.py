@@ -20,7 +20,7 @@ class EndpointRouteModel:
         Convierte la instancia a un diccionario.
         """
         return {
-            k:v if not isinstance(v,[set,]) else tuple(v) for k,v in self.__dict__.items()
+            k:v if not isinstance(v,set) else tuple(v) for k,v in self.__dict__.items()
         }
     
     def __str__(self) -> str:
