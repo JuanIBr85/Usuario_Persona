@@ -6,7 +6,7 @@ def api_access(is_public: bool = False, access_permissions: list[str] = None, li
         f._security_metadata = EndpointRouteModel(
             is_public=is_public,
             access_permissions=tuple(set(access_permissions or [])),
-            limiter=limiter
+            limiter=limiter if limiter is None else ";".join(limiter)
         )
         return f
 
