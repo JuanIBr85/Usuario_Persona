@@ -6,6 +6,7 @@ from app.extensions import services_config
 import time
 from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
 import json
+from app.extensions import limiter
 # Creamos un Blueprint
 bp = Blueprint('gateway', __name__)
 
@@ -62,7 +63,7 @@ def authenticate_request():
         #Si no tiene token se rechaza el acceso
         if not identity:
             abort(401, description=f"El endpoint <{request.path}> requiere autenticación")
-        
+         
         payload = get_jwt()
 
         #Si no tiene los permisos necesario para acceder al endpoint se rechaza el acceso
@@ -77,9 +78,19 @@ def authenticate_request():
     #Guardo el endpoint y los argumentos en el contexto
     g.service_route = service_route
     g.args = args
+    g.matched_endpoint = matched_endpoint
 
 #Esto toma todo lo que entre por service por cualquier metodo
 @bp.route('/api/<path:subpath>', methods=['GET', 'POST', 'PUT', 'DELETE'])
+
+@limiter.limit(
+    #Reglas de limite
+    limit_value=lambda: g.service_route.limiter,   
+    #Una clave unica que identifica el cliente
+    key_func=lambda: f"{request.remote_addr}:{g.matched_endpoint}", 
+    #Excepcion cuando no hay limite
+    exempt_when=lambda: g.service_route.limiter is None
+)
 def api_gateway_api(subpath):
     endpoint = g.service_route
     

@@ -39,14 +39,12 @@ def make_endpoints_list(app) -> List[Dict[str, Any]]:
             # Eliminar parámetros dinámicos de la ruta
             base_route = re.sub(r'<[^>]+>', '', rule.rule).rstrip('/')
             
-            # Usar la información de seguridad del decorador
-            is_public = getattr(view_func._security_metadata, 'is_public', False)
-            
             endpoints[str(rule).removeprefix("/")] = {
                 "api_url": str(base_route),
-                "is_public": is_public,
+                "is_public": view_func._security_metadata.is_public,
                 "methods": tuple(methods),
-                "access_permissions": tuple(getattr(view_func._security_metadata, 'access_permissions', []))
+                "access_permissions": tuple(view_func._security_metadata.access_permissions or []),
+                "limiter": view_func._security_metadata.limiter
             }
     
     return endpoints
