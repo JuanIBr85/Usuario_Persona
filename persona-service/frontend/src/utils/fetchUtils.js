@@ -74,7 +74,7 @@ export const fetchService = {
                 ...headers, 
                 
                 ...(useToken && {
-                    "X-Authorization": `Bearer ${localStorage.getItem("token")}`,
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
                 }),
             },
             

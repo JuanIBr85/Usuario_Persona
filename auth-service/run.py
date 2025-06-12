@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from dotenv import load_dotenv
 from app.routes.usuarios_blueprint import usuario_bp
 import os
@@ -34,8 +34,10 @@ print("MAIL_PASSWORD:", app.config.get("MAIL_PASSWORD")[:3] + "***")
 mail.init_app(app)
 
 jwt = JWTManager(app)
-CORS(app, supports_credentials=True)
-mail.init_app(app)
+CORS(app, 
+     resources={r"/*": {"origins": "*"}},
+     supports_credentials=True, 
+     allow_headers=["Content-Type", "Authentication", "authorization", "Authorization"])
 register_error_handlers(app) # maneja los errores y excepciones globales y las convierte a un formato con build_response
 
 @app.before_request
@@ -46,6 +48,7 @@ limiter.init_app(app)
 
 @app.route('/')
 def index():
+    print(request.headers)
     output = []
     for rule in app.url_map.iter_rules():
         if rule.endpoint == 'static': continue

@@ -67,7 +67,7 @@ def authenticate_request():
         payload = get_jwt()
 
         #Si no tiene los permisos necesario para acceder al endpoint se rechaza el acceso
-        if not service_route.access_permissions.issubset(payload.get("perms", [])):
+        if not service_route.access_permissions.issubset(payload.get("permisos", [])):
             abort(403, description=f"Acceso denegado: se requieren permisos {service_route.access_permissions}")
 
 
