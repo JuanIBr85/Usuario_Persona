@@ -1,3 +1,4 @@
+// Importaciones de React y componentes del proyecto
 import React from "react";
 import { Button } from "@/components/ui/button";
 import InputValidate from "@/components/inputValidate/InputValidate";
@@ -10,23 +11,33 @@ import Loading from "@/components/loading/Loading";
 import AuthLayout from "@/components/authLayout/AuthLayout";
 import { useNavigate } from "react-router-dom";
 
-function Sign() {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [dialogMessage, setMessage] = React.useState("");
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [isOK, setIsOK] = React.useState(false);
-  const navigate = useNavigate();
+/** 
+ * Componente: Sign
+ * Permite crear una cuenta ingresando su email, nombre y contraseña.
+ * Realiza validaciones de los campos, envía los datos al backend y redirige al login en caso de éxito.
+ */
 
+function Sign() {
+  const [isOpen, setIsOpen] = React.useState(false); // Controla si el modal de feedback está abierto
+  const [dialogMessage, setMessage] = React.useState(""); // Mensaje a mostrar en el modal
+  const [isLoading, setIsLoading] = React.useState(false); // Estado de carga (spinner)
+  const [isOK, setIsOK] = React.useState(false); // Indica si el registro fue exitoso
+  const navigate = useNavigate(); // Utilizado para la redirección
+
+  // Maneja el envío del formulario
   const handleSubmit = async (event) => {
-    const formData = await formSubmitJson(event);
+    const formData = await formSubmitJson(event); // Convierte los datos del formulario a JSON
     document.activeElement.blur();
     setIsLoading(true);
+
     AuthService
-      .register(formData)
+      .register(formData) // Llama al servicio para registrar al usuario
       .then((json) => {
+        // Si fue exitoso, muestra mensaje de éxito y activa bandera isOK
         setMessage(`La cuenta ha sido creada correctamente. Por favor, verifique su correo electrónico para activar su cuenta.`);
         setIsOK(true);
       }).catch((error) => {
+        // Si hay error, se maneja según si es error con JSON o error general
         if (error.isJson) {
           if (error.data.error) {
             setMessage(FetchErrorMessage(error));
@@ -42,20 +53,25 @@ function Sign() {
 
   return (
     <>
+      {/* Spinner de carga mientras se realiza la solicitud */}
       {isLoading && <Loading isFixed={true} />}
+
+      {/* Modal que muestra el resultado del registro */}
       <SimpleDialog
         title="Registro"
         description={dialogMessage}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
-        actionHandle={isOK ? ()=>setTimeout(()=>navigate('/login'), 500) : undefined}
+        actionHandle={isOK ? ()=>setTimeout(()=>navigate('/login'), 500) : undefined} // Redirige al login si fue exitoso
       />
 
+      {/* Layout del formulario de registro */}
       <AuthLayout
         title="Creación de cuenta"
         visualContent={<UserPlus className="text-white w-42 h-42" />}
       >
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 h-full">
+          {/* Input de email */}
           <InputValidate
             id="email_usuario"
             type="email"
@@ -64,7 +80,8 @@ function Sign() {
             validateMessage="Email inválido"
             required
           />
-          
+
+          {/* Input de nombre de usuario con mínimo 4 caracteres */}
           <InputValidate
             id="nombre_usuario"
             type="text"
@@ -75,6 +92,7 @@ function Sign() {
             required
           />
 
+          {/* Input de contraseña con regex fuerte (mínimo 8 caracteres, 1 mayúscula, 1 minúscula, 1 número y 1 símbolo) */}
           <InputValidate
             id="password"
             type="password"
@@ -84,9 +102,13 @@ function Sign() {
             validateMessage="La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula, un número y un carácter especial."
             required
           />
+
+          {/* Link para ir al login si ya tiene cuenta */}
           <Button variant="link" asChild className="p-0">
             <Link to="/login">¿Ya tienes una cuenta? Inicia sesión</Link>
           </Button>
+
+          {/* Botón de envío del formulario */}
           <Button type="submit" className="mt-4">Registrarse</Button>
         </form>
       </AuthLayout>
@@ -94,4 +116,4 @@ function Sign() {
   );
 }
 
-export default Sign
+export default Sign;

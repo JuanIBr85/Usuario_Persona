@@ -19,7 +19,6 @@ usuario_service = UsuarioService()
 #-----------------------------------------------------------------------------------------------------------------------------
 
 @usuario_bp.route('/registro', methods=['POST'])
-@ruta_publica
 def registrar_usuario1():
     session = SessionLocal()
     try:
@@ -31,7 +30,7 @@ def registrar_usuario1():
         return make_response(status, mensaje, data, code), code
 
     except Exception as e:
-        print("❌ ERROR INTERNO EN /registro:", str(e)) 
+        print(" ERROR INTERNO EN /registro:", str(e)) 
         return make_response(ResponseStatus.ERROR, "Error al registrar usuario", str(e), error_code="REGISTRO_ERROR"), 500
 
     finally:
@@ -39,7 +38,6 @@ def registrar_usuario1():
 
 
 @usuario_bp.route('/verificar-email', methods=['GET'])
-@ruta_publica
 def verificar_email():
     session = SessionLocal()
     try:
@@ -62,8 +60,6 @@ def verificar_email():
 #-----------------------------------------------------------------------------------------------------------------------------
 
 @usuario_bp.route('/login', methods=['POST'])
-@limiter.limit("5 per minute")
-@ruta_publica
 def login1():
     session = SessionLocal()
     try:
@@ -85,7 +81,6 @@ def login1():
 
 
 @usuario_bp.route('/logout', methods=['POST'])
-@requiere_permisos(["logout"])
 def logout_usuario():
     session = SessionLocal()
     try:
@@ -101,7 +96,6 @@ def logout_usuario():
 
 
 @usuario_bp.route('/perfil', methods=['GET'])
-@requiere_permisos(["ver_usuario"]) 
 def perfil_usuario():
     session = SessionLocal()
     try:
@@ -121,7 +115,6 @@ def perfil_usuario():
 #-----------------------------------------------------------------------------------------------------------------------------
 
 @usuario_bp.route('/solicitar-otp', methods=['POST'])
-@ruta_publica 
 def solicitar_otp():
     session = SessionLocal()
     try:
@@ -140,7 +133,6 @@ def solicitar_otp():
 
 
 @usuario_bp.route('/verificar-otp', methods=['POST'])
-@ruta_publica
 def verificar_otp():
     session = SessionLocal()
     try:
@@ -162,8 +154,6 @@ def verificar_otp():
 
 
 @usuario_bp.route('/reset-password-con-codigo', methods=['POST'])
-@ruta_publica
-@limiter.limit("5 per minute")
 def reset_con_otp():
     session = SessionLocal()
     try:
@@ -187,7 +177,6 @@ def modificar_perfil():
     return make_response(ResponseStatus.PENDING, "Funcionalidad en construcción"), 501
 
 @usuario_bp.route('/verificar-dispositivo', methods=['GET'])
-@ruta_publica
 def verificar_dispositivo():
     token = request.args.get('token')
     if not token:

@@ -4,8 +4,7 @@ from app.routes.usuarios_blueprint import usuario_bp
 import os
 from flask_jwt_extended import JWTManager
 from config import Config
-from app.utils.utils_authorization import verificar_permisos
-from app.extensions import limiter, mail
+from app.extensions import mail
 from app.routes.superadmin_blueprint import superadmin_bp
 from app.routes.admin_microservicios_blueprint import admin_micro_bp
 from app.script.reset_db import crear_base, eliminar_base
@@ -40,11 +39,6 @@ CORS(app,
      allow_headers=["Content-Type", "Authentication", "authorization", "Authorization"])
 register_error_handlers(app) # maneja los errores y excepciones globales y las convierte a un formato con build_response
 
-@app.before_request
-def control_acceso():
-    verificar_permisos(app)
-
-limiter.init_app(app)
 
 @app.route('/')
 def index():

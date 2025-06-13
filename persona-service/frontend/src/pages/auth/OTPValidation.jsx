@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import InputValidate from "@/components/inputValidate/InputValidate";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
 import { formSubmitJson } from "@/utils/formUtils";
 import { SimpleDialog, FetchErrorMessage } from "@/components/SimpleDialog";
@@ -14,15 +14,14 @@ import {
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
-} from "@/components/ui/input-otp"
-import { useLocation, useNavigate } from "react-router-dom";
+} from "@/components/ui/input-otp";
 import { useAuthContext } from "@/context/AuthContext";
 
 function OTPValidation() {
   const navigate = useNavigate();
   const { authData } = useAuthContext();
   const location = useLocation();
-  const toRedirect = location.state?.from || "/";
+  const toRedirect = location.state?.from || "/resetpassword";
   const email = location.state?.email || authData.user.email_usuario || "";
 
   const [isOpen, setIsOpen] = React.useState(false);
@@ -34,16 +33,26 @@ function OTPValidation() {
     const formData = await formSubmitJson(event);
     document.activeElement.blur();
     setIsLoading(true);
+
     AuthService
       .validateOtp({
         otp: formData.otp,
         email: email
       })
       .then((json) => {
-        setMessage(`Se ha verificado correctamente el código de verificación.`);
-        setIsOK(true);
+        const token = json.data?.reset_token;
+        if (token) {
+          localStorage.setItem("reset_token", token); // Guardamos el token para usarlo después
+          localStorage.setItem("email_para_reset", email); // Guardamos el email para usarlo después
+          setMessage("Se ha verificado correctamente el código de verificación.");
+          setIsOK(true);
+        } else {
+          setMessage("No se recibió el token de verificación.");
+          setIsOK(false);
+        }
       }).catch((error) => {
-        console.log(error.data)
+        console.log(error.data);
+        setIsOK(false);
         if (error.isJson) {
           if (error.data.error) {
             setMessage(FetchErrorMessage(error));
@@ -53,18 +62,27 @@ function OTPValidation() {
         } else {
           setMessage(error.message);
         }
-      }).finally(() => { setIsLoading(false); setIsOpen(true); });
-  }
+      }).finally(() => {
+        setIsLoading(false);
+        setIsOpen(true);
+      });
+  };
 
   return (
     <>
       {isLoading && <Loading isFixed={true} />}
+
       <SimpleDialog
-        title="Login"
+        title="Verificación"
         description={dialogMessage}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
-        actionHandle={isOK ? () => setTimeout(() => navigate(toRedirect), 200) : undefined}
+        actionHandle={
+          isOK ? () => {
+            setIsOpen(false);
+            navigate(toRedirect);
+          } : () => setIsOpen(false)
+        }
       />
 
       <AuthLayout
@@ -90,12 +108,13 @@ function OTPValidation() {
               </InputOTP>
             </div>
           </div>
+
           <Button variant="link" asChild className="p-0 mt-4">
-            <Link>¿No te llegó el código? reenviar</Link>
+            <Link>¿No te llegó el código? Reenviar</Link>
           </Button>
+
           <Button type="submit" className="mt-4">Validar</Button>
         </form>
-
       </AuthLayout>
     </>
   );
