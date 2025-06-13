@@ -8,11 +8,18 @@ from datetime import datetime, timezone
 
 class SuperAdminService:
 
+    #============================================
+    # Crea un usuario nuevo con un rol específico
+    #============================================
     def crear_usuario_con_rol(self, session: Session, nombre: str, email: str, password: str, nombre_rol: str) -> dict:
+        # Verifica si ya existe un usuario con el mismo email
         if session.query(Usuario).filter_by(email_usuario=email).first():
             raise ValueError("Ya existe un usuario con ese email.")
-
+        
+        # Hashea la contraseña 
         hashed_password = generate_password_hash(password)
+        
+        # Crea el nuevo usuario
         nuevo_usuario = Usuario(
             nombre_usuario=nombre,
             email_usuario=email,
@@ -21,11 +28,12 @@ class SuperAdminService:
         session.add(nuevo_usuario)
         session.flush()  # obtener id
 
+        # Busca el rol a asignar
         rol = session.query(Rol).filter_by(nombre_rol=nombre_rol).first()
         if not rol:
             raise ValueError(
                 f"No se encontró el rol '{nombre_rol}' en la base.")
-
+        # Crea la relación entre el usuario y el rol
         relacion_rol = RolUsuario(
             id_usuario=nuevo_usuario.id_usuario,
             id_rol=rol.id_rol
@@ -38,7 +46,9 @@ class SuperAdminService:
             "mensaje": f"Admin {nombre} creado exitosamente.",
             "id_usuario": nuevo_usuario.id_usuario
         }
-
+    #====================================================
+    # Asigna permisos a un rol, reemplazando los actuales
+    #====================================================
     def asignar_permisos_rol(self, session: Session, rol_id: int, permisos: list) -> dict:
         rol = session.query(Rol).filter_by(id_rol=rol_id).first()
         if not rol:
@@ -70,15 +80,17 @@ class SuperAdminService:
         session.commit()
 
         return {
-            "mensaje": f"Permisos sincronizados correctamente para el rol {rol.nombre_rol}."
+            "mensaje": f"Permisos asignados correctamente a {rol.nombre_rol}."
         }
-
+    #=====================================================================
+    # Modifica los datos de un usuario, y sus roles si vienen en los datos
+    #=====================================================================
     def modificar_usuario_con_rol(self, session: Session, usuario_id: int, datos: dict) -> dict:
         usuario = session.query(Usuario).filter_by(id_usuario=usuario_id).first()
         if not usuario:
             raise ValueError("No se encontró el usuario.")
 
-    # Modificar atributos del usuario (excepto roles)
+        # Modificar atributos del usuario (excepto los roles)
         for key, value in datos.items():
             if key != "roles" and hasattr(usuario, key):
               setattr(usuario, key, value)
@@ -89,7 +101,8 @@ class SuperAdminService:
         if "roles" in datos:
         # Eliminar roles actuales del usuario
             session.query(RolUsuario).filter_by(id_usuario=usuario_id).delete()
-
+        
+        # Agrega nuevos roles
         for rol_id in datos["roles"]:
             rol = session.query(Rol).filter_by(id_rol=rol_id).first()
             if not rol:
@@ -102,7 +115,9 @@ class SuperAdminService:
         return {
         "mensaje": f"Usuario {usuario.nombre_usuario} modificado exitosamente."
     }
-
+    #=================================================
+    # Crea un nuevo rol, si no existe con anterioridad
+    #=================================================
     def crear_rol(self, session: Session, nombre_rol: str) -> dict:
         rol_existente = session.query(Rol).filter_by(
             nombre_rol=nombre_rol).first()
@@ -118,8 +133,9 @@ class SuperAdminService:
             "id_rol": nuevo_rol.id_rol
         }
     
-    # ==========
-    # ==========
+    # =========================
+    # Devuelve todos los roles 
+    # =========================
     def obtener_roles(self, session: Session) -> dict:
         try:
             roles = session.query(Rol).filter(Rol.deleted_at == None).all()
@@ -139,8 +155,9 @@ class SuperAdminService:
         except Exception as e:
             raise Exception(f"Error al obtener roles: {str(e)}")
         
-    #===========
-    #===========
+    #=================================
+    # Realiza borrado lógico de un rol
+    #=================================
     def borrar_rol(self, session: Session, rol_id: int) -> dict:
         rol = session.query(Rol).filter_by(
             id_rol=rol_id, deleted_at=None).first()
@@ -154,8 +171,9 @@ class SuperAdminService:
         return {
             "mensaje": f"Rol '{rol.nombre_rol}' eliminado correctamente."
         }
-    
-
+    #=============================
+    # Devuelve todos los permisos
+    #=============================
     def obtener_permisos(self, session: Session) -> dict:
         try:
             permisos = session.query(Permiso).filter(Permiso.deleted_at == None).all()
@@ -170,5 +188,5 @@ class SuperAdminService:
             return {"permisos": resultado}
         except Exception as e:
             raise Exception(f"Error al obtener permisos: {str(e)}")
-    # ==========
-    # ==========
+    # =========================
+    # =========================

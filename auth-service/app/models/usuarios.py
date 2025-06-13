@@ -14,8 +14,7 @@ class Usuario(Base):
     email_verificado = Column(Integer, default=0)
     
     password = Column(String, nullable=False)
-    persona_id = Column(Integer, nullable=True,default=None) # se le quito --> , ForeignKey('persona_model.id_persona') --> solo para desarrollo, agregar cuanto este la tabla persona
-
+    
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
     deleted_at = Column(DateTime, nullable=True)
