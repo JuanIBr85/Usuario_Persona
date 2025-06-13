@@ -83,7 +83,9 @@ def proxy_static_files(path):
 
 @bp.route('/endpoints', methods=['GET'])
 def api_gateway():
-    output = []
+    output = {}
     for endpoint in services_route:
-        output.append(services_route[endpoint].to_dict())
+        output.update({
+            endpoint: services_route[endpoint].to_dict()
+        })
     return jsonify(output)

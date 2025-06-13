@@ -10,7 +10,7 @@ export const PersonaService = {
       url: `${ServiceURL.persona}/api/crear_persona`,
       method: HttpMethod.POST,
       body: body,
-      
+      useToken: true,
       showError: PersonaService.showError
     });
   },
@@ -19,6 +19,7 @@ export const PersonaService = {
     return fetchService.fetch({
       url: `${ServiceURL.persona}/api/personas`,
       method: HttpMethod.GET,
+      useToken: true,
       showError: PersonaService.showError
     });
   },
@@ -27,6 +28,7 @@ export const PersonaService = {
     return fetchService.fetch({
       url: `${ServiceURL.persona}/api/personas/${id}`,
       method: HttpMethod.GET,
+      useToken: true,
       showError: PersonaService.showError
     });
   },
@@ -35,8 +37,9 @@ export const PersonaService = {
   editar: async (id, body) => {
     return fetchService.fetch({
       url: `${ServiceURL.persona}/api/modificar_persona/${id}`,
-      method: HttpMethod.PUT,
+      method: HttpMethod.PUT, 
       body: body,
+      useToken: true,
       showError: PersonaService.showError
     });
   },
@@ -45,6 +48,8 @@ export const PersonaService = {
     return fetchService.fetch({
       url: `${ServiceURL.persona}/api/borrar_persona/${id}`,
       method: HttpMethod.DELETE,
+
+      useToken: true,
       showError: PersonaService.showError
     });
   },
@@ -54,6 +59,7 @@ export const PersonaService = {
     return fetchService.fetch({
       url: `${ServiceURL.persona}/api/personas_by_usuario/${id}`,
       method: HttpMethod.GET,
+      useToken: true,
       showError: PersonaService.showError
     });
   },
@@ -62,6 +68,7 @@ export const PersonaService = {
     return fetchService.fetch({
       url: `${ServiceURL.persona}/api/tipos_documento`,
       method: HttpMethod.GET,
+      useToken: true,
       showError: PersonaService.showError
     });
   },
@@ -70,6 +77,7 @@ export const PersonaService = {
     return fetchService.fetch({
       url: `${ServiceURL.persona}/api/redes_sociales`,
       method: HttpMethod.GET,
+      useToken: true,
       showError: PersonaService.showError
     });
   },
@@ -78,6 +86,7 @@ export const PersonaService = {
     return fetchService.fetch({
       url: `${ServiceURL.persona}/api/domicilios_postales/localidades?codigo_postal=${codigo_postal}`,
       method: HttpMethod.GET,
+      useToken: true,
       showError: PersonaService.showError
     });
   },

@@ -44,7 +44,8 @@ def make_endpoints_list(app) -> List[Dict[str, Any]]:
                 "is_public": view_func._security_metadata.is_public,
                 "methods": tuple(methods),
                 "access_permissions": tuple(view_func._security_metadata.access_permissions or []),
-                "limiter": view_func._security_metadata.limiter
+                "limiter": view_func._security_metadata.limiter,
+                "cache": view_func._security_metadata.cache
             }
     
     return endpoints

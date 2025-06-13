@@ -5,9 +5,8 @@ from app.extensions import engine, Base
 from app.routes import register_blueprints
 from common.decorators.api_access import api_access
 from flask_jwt_extended import JWTManager
-from app.extensions import jwt
 from common.utils.component_service import component_service
-from app.extensions import limiter
+from app.extensions import limiter, jwt
 
 def create_app()->Flask:
 
@@ -15,8 +14,11 @@ def create_app()->Flask:
 
     app.config.from_object("config")
 
-    CORS(app, supports_credentials=True)
-    
+    CORS(app, 
+     resources={r"/*": {"origins": "*"}},
+     supports_credentials=True, 
+     allow_headers=["Content-Type", "Authentication", "Authorization", "authorization"])
+     
     limiter.init_app(app)
 
     component_service(app)

@@ -5,6 +5,10 @@ import React, { useState, useEffect } from "react";
 // así como asignarles permisos.  Se apoya en `roleService` y `permisoService`
 /* -------------------------------------------------------------------------- */
 
+import RolesBreadcrumb from "@/components/roles/RolesBreadcrumb"
+import RolesDeleteDialog from "@/components/roles/RolesDeleteDialog";
+import RolesErrorDialog from "@/components/roles/RolesErrorDialog";
+
 import {
   Card,
   CardContent,
@@ -21,32 +25,9 @@ import {
   Pencil,
   ShieldCheck,
   Users,
-  AlertTriangle,
-  Settings2,
-  Home,
-  ShieldUser,
 } from "lucide-react";
-import { Fade } from "react-awesome-reveal";
 
-// Navegación y diálogos
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Link } from "react-router-dom";
+import { Fade } from "react-awesome-reveal";
 
 // Import de services
 import { roleService } from "@/services/roleService";
@@ -368,74 +349,21 @@ export default function AdminRoles() {
         </Card>
 
         {/* Diálogo de confirmación de borrado */}
-        <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="text-yellow-500 w-5 h-5" />
-                <DialogTitle>¿Estás seguro?</DialogTitle>
-              </div>
-              <DialogDescription>
-                Esta acción no se puede deshacer. Se eliminará el rol{" "}
-                <strong>{roleToDelete?.name}</strong>.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setOpenDeleteDialog(false)}>
-                Cancelar
-              </Button>
-              <Button variant="destructive" onClick={confirmDeleteRole}>
-                Eliminar
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <RolesDeleteDialog
+          openDeleteDialog={openDeleteDialog}
+          setOpenDeleteDialog={setOpenDeleteDialog}
+          roleToDelete={roleToDelete}
+          confirmDeleteRole={confirmDeleteRole}
+        ></RolesDeleteDialog>
 
         {/* Diálogo genérico de error */}
-        <Dialog
-          open={errorDialog.open}
-          onOpenChange={(open) => setErrorDialog({ ...errorDialog, open })}
-        >
-          <DialogContent>
-            <DialogHeader>
-              <div className="flex items-center gap-2">
-                <Settings2 className="text-red-500 w-5 h-5" />
-                <DialogTitle>Error</DialogTitle>
-              </div>
-              <DialogDescription>{errorDialog.message}</DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="flex justify-end">
-              <Button
-                onClick={() =>
-                  setErrorDialog({ ...errorDialog, open: false })
-                }
-              >
-                Cerrar
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <RolesErrorDialog
+        errorDialog={errorDialog}
+        setErrorDialog={setErrorDialog}
+        ></RolesErrorDialog>
 
         {/* Breadcrumb de navegación */}
-        <Breadcrumb className="mt-auto self-start">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link to="/adminpanel" className="flex items-center gap-1">
-                  <Home className="w-4 h-4" />
-                  Panel De Administrador
-                </Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage className="flex items-center gap-1">
-                <ShieldUser className="w-4 h-4" />
-                Roles y Permisos
-              </BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+        <RolesBreadcrumb></RolesBreadcrumb>
       </Fade>
     </div>
   );

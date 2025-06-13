@@ -54,3 +54,4 @@ wheels/
 htmlcov/
 .pytest_cache/
 .tox/
+cache-db/

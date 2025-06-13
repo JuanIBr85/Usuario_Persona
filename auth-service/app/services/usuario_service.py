@@ -188,13 +188,13 @@ class UsuarioService(ServicioBase):
           )
         else:
             # Crear token con permisos incluidos
-            token = crear_token_acceso(
+            token, expires_in = crear_token_acceso(
                usuario.id_usuario,
                usuario.email_usuario,
                rol_nombre,
                permisos_lista
             )
-
+ 
             # Registrar log de login
             session.add(UsuarioLog(
                usuario_id=usuario.id_usuario,
@@ -205,6 +205,7 @@ class UsuarioService(ServicioBase):
 
             usuario_data = self.schema_out.dump(usuario)
             usuario_data["token"] = token
+            usuario_data["expires_in"] = expires_in
 
             return (
                ResponseStatus.SUCCESS,

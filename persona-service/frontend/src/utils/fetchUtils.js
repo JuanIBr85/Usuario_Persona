@@ -2,6 +2,8 @@
 export const ServiceURL = Object.freeze({
     auth: "http://localhost:5000",
     persona: "http://localhost:5001",
+    //api gateway
+    // "http://localhost:5002/api"
 });
 
 // Lista de métodos HTTP que podemos usar para comunicarnos con el servidor
