@@ -30,6 +30,8 @@ import {
 
 import { Link } from "react-router-dom";
 
+import { PersonaService } from "@/services/personaService"
+
 const config = {
   usuariosTotales: { label: "Usuarios Totales", color: "#34d399" },
 };
@@ -45,8 +47,7 @@ export default function Logs() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5001/api/personas/count")
-      .then(res => res.json())
+    PersonaService.get_count()
       .then(json => {
         if (json.status === "success" && Array.isArray(json.data.total)) {
           // Mapear la data para el gráfico
