@@ -6,7 +6,11 @@ from app.extensions import services_config
 import time
 from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
 import json
-from app.extensions import limiter
+from app.extensions import limiter, cache
+from app.utils.cache_util import cache_response
+from app.utils.request_to_service import request_to_service
+
+
 # Creamos un Blueprint
 bp = Blueprint('gateway', __name__)
 
@@ -19,8 +23,9 @@ for service in services_config["services"]:
             service_url = f"http://{service['url']}"
             response = requests.get(f"{service_url}/component_service/endpoints").json()
             
-            for k,v in response.items():
+            for k,v in response.items(): 
                 v["api_url"] = f"{service_url}{v['api_url']}"
+    
             endpoints.update(response)
             break
         except Exception:
@@ -82,7 +87,6 @@ def authenticate_request():
 
 #Esto toma todo lo que entre por service por cualquier metodo
 @bp.route('/api/<path:subpath>', methods=['GET', 'POST', 'PUT', 'DELETE'])
-
 @limiter.limit(
     #Reglas de limite
     limit_value=lambda: g.service_route.limiter,   
@@ -93,52 +97,18 @@ def authenticate_request():
 )
 def api_gateway_api(subpath):
     endpoint = g.service_route
-    
-    #se remueven los parametros de los headers, para evitar errores
-    headers = {key: value for key, value in request.headers if key.upper() not in [
-            "HOST", 
-            "ACCEPT-ENCODING",
-            "CONNECTION",
-            "CONTENT-LENGTH",
-            "TRANSFER-ENCODING",
-            "KEEP-ALIVE"
-    ]}
-
-    #Si tiene el token, lo agrego a los headers
-    if hasattr(g, "jwt"):
-        #Guardo el id del usuario en X-USER-ID en el header
-        headers["X-USER-ID"] = g.jwt["sub"]
 
     #Si tiene argumentos, los agrego a la url
     args = ""
     if len(g.args) > 0:
         args = "/".join([str(x) for x in g.args.values()])
         args = f"/{args}"
+    url = f"{endpoint.api_url}{args}"
 
-
-    #Armo la request para enviar al microservicio con todos los datos recibidos
-    _request = {
-        "url":f"{endpoint.api_url}{args}",
-        "headers": headers,
-        "params":request.args,
-        "json":request.get_json() if request.is_json else None,
-        "data":request.form if not request.is_json else None
-    }
-
-    #Envio la request al microservicio
-    response = requests.request(method=request.method, **_request)
-
-    # Filtrar headers que Flask no debe reenviar
-    excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
-    response_headers = {
-        key: value for key, value in response.headers.items() 
-        if key.lower() not in excluded_headers
-    }
-
+    #Si el endpoint usa cache, lo guardo en cache
+    if endpoint.cache: 
+        response = cache_response(lambda: request_to_service(url), url, endpoint)
+    else: 
+        response = request_to_service(url)
     # Devolver la respuesta completa con headers, contenido y status code
-    return Response(
-        response=response.content,
-        status=response.status_code,
-        headers=response_headers,
-        mimetype=response.headers.get('content-type')
-    )  
+    return Response(**response)  

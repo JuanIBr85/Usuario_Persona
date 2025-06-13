@@ -21,3 +21,6 @@ limiter = Limiter(
     default_limits=["100/minute"]
 )
 
+from diskcache import Cache
+
+cache = Cache('cache-db')
