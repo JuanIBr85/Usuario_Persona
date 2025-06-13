@@ -12,7 +12,7 @@ from app.services.domicilio_service import DomicilioService
 
 
 #Otras importaciones
-from app.schema.persona_schema import PersonaSchema
+from app.schema.persona_schema import PersonaSchema,PersonaResumidaSchema
 from app.interfaces.persona_interface import IPersonaInterface
 from app.extensions import SessionLocal
 
@@ -20,7 +20,7 @@ class PersonaService(IPersonaInterface):
 
     def __init__(self):
         self.schema = PersonaSchema()
-        self.varios_schemas = PersonaSchema(many=True)
+        self.varios_schemas = PersonaResumidaSchema(many=True)
         self.contacto_service = ContactoService()
         self.domicilio_service = DomicilioService()
         

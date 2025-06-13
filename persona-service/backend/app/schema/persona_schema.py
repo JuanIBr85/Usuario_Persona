@@ -11,7 +11,7 @@ class PersonaSchema(Schema):
     tipo_documento = fields.Str(required=True, validate=validate.OneOf(TIPOS_DOCUMENTO_VALIDOS))
     num_doc_persona=fields.Str(required=True)
 
-    usuario_id=fields.Int(required=True)
+    usuario_id=fields.Int(required=False)
 
     domicilio=fields.Nested(DomicilioSchema, required=True)
     contacto=fields.Nested(ContactoSchema, required=True)
@@ -19,3 +19,13 @@ class PersonaSchema(Schema):
     created_at=fields.DateTime(dump_only=True)
     updated_at=fields.DateTime(dump_only=True)
     deleted_at=fields.DateTime(dump_only=True)
+
+
+class PersonaResumidaSchema(Schema):
+    id_persona=fields.Int(dump_only=True)
+    nombre_persona=fields.Str(required=True)
+    apellido_persona=fields.Str(required=True)
+    fecha_nacimiento_persona=fields.Date(required=True)
+    tipo_documento = fields.Str(required=True, validate=validate.OneOf(TIPOS_DOCUMENTO_VALIDOS))
+    num_doc_persona=fields.Str(required=True)
+    usuario_id=fields.Int(required=False)

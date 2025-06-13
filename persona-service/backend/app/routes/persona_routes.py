@@ -4,12 +4,13 @@ from app.services.persona_service import PersonaService
 from app.schema.persona_schema import PersonaSchema
 from common.decorators.api_access import api_access
 from common.utils.response import make_response, ResponseStatus
+from common.models.cache_settings import CacheSettings
 
 persona_bp = Blueprint('persona_bp', __name__)
 persona_service = PersonaService()
 persona_schema= PersonaSchema()
 
-@api_access(access_permissions=[])
+@api_access(cache=CacheSettings(expiration=60))
 @persona_bp.route('/personas', methods=['GET'])
 def listar_personas():
     try:
@@ -28,7 +29,7 @@ def listar_personas():
             data={"server": str(e)}
         ),500
             
-@api_access(access_permissions=[])
+@api_access(cache=CacheSettings(expiration=60))
 @persona_bp.route('/personas/<int:id>', methods=['GET'])
 def obtener_persona(id):
     try:
