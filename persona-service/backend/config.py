@@ -1,4 +1,5 @@
 import os
+import urllib.parse
 from dotenv import load_dotenv
 
 #carga las variables de entorno desde .env
@@ -13,7 +14,9 @@ password= os.environ['MYSQL_PASSWORD']
 host= os.environ['MYSQL_HOST']
 database= os.environ['MYSQL_DATABASE']
 
-SQLALCHEMY_DATABASE_URI = f'mysql+pymysql://{user}:{password}@{host}/{database}'
+password_enc = urllib.parse.quote(password)
+
+SQLALCHEMY_DATABASE_URI = f'mysql+pymysql://{user}:{password_enc}@{host}/{database}'
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
