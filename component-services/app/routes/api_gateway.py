@@ -46,6 +46,7 @@ url_map = Map(rules)
 @bp.before_request
 @jwt_required(optional=True)
 def authenticate_request():
+    if request.method == "OPTIONS":return
     #Probablemente ya no sea necesario
     if not request.path.startswith("/api"):
         abort(401, description=f"El endpoint <{request.path}> no es publico")
@@ -96,6 +97,7 @@ def authenticate_request():
     exempt_when=lambda: g.service_route.limiter is None
 )
 def api_gateway_api(subpath):
+    if request.method == "OPTIONS":return
     endpoint = g.service_route
 
     #Si tiene argumentos, los agrego a la url

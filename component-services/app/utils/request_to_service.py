@@ -1,17 +1,39 @@
 from flask import request, g
 import requests
 
+#Headers que se envian al microservicio
+SAFE_HEADERS = (
+        "ACCEPT",
+        "ACCEPT-LANGUAGE",
+        "CONTENT-TYPE",
+        "AUTHORIZATION", 
+        "USER-AGENT",
+)
+
+# Headers que SÍ pueden ser reenviados desde los microservicios al cliente (Lista Blanca)
+ALLOWED_RESPONSE_HEADERS = (
+    "CONTENT-TYPE", #Tipo de contenido
+    "CONTENT-LANGUAGE", #Idioma del contenido
+    "CONTENT-DISPOSITION",  # Para descargas de archivos
+    "CONTENT-RANGE",        # Para respuestas parciales (HTTP 206)
+    "ACCEPT-RANGES",        # Indica si el servidor soporta rangos
+    "CONTENT-SECURITY-POLICY", #Política de seguridad del contenido
+    "LOCATION",  # Para respuestas 201 Created y redirects
+    "ALLOW",     # Para respuestas 405 Method Not Allowed
+    "LINK",      # Para paginación (RFC 5988)
+    "X-TOTAL-COUNT",         # Total de elementos
+    "X-PAGE-COUNT",          # Total de páginas
+    "X-CURRENT-PAGE",        # Página actual
+    "X-PER-PAGE",            # Elementos por página
+    "CONTENT-LENGTH",         # Tamaño del contenido
+    "ACCEPT-ENCODING",        # Codificaciones soportadas
+    "DEPRECATION",            # RFC 8594 - indica que el endpoint está deprecado
+    "SUNSET",                 # RFC 8594 - fecha cuando el endpoint será removido
+)
+
 def request_to_service(url):
     #se remueven los parametros de los headers, para evitar errores
-    headers = {key: value for key, value in request.headers if key.upper() not in [
-            "HOST", 
-            "ACCEPT-ENCODING",
-            "CONNECTION",
-            "CONTENT-LENGTH",
-            "TRANSFER-ENCODING",
-            "KEEP-ALIVE",
-            "X-USER-ID"
-    ]}
+    headers = {key: value for key, value in request.headers if key.upper() in SAFE_HEADERS}
 
     #Si tiene el token, lo agrego a los headers
     if hasattr(g, "jwt"):
@@ -29,10 +51,9 @@ def request_to_service(url):
     })
 
     # Filtrar headers que Flask no debe reenviar
-    excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
     response_headers = {
         key: value for key, value in response.headers.items() 
-        if key.lower() not in excluded_headers
+        if key.upper() in ALLOWED_RESPONSE_HEADERS
     }
 
     return {

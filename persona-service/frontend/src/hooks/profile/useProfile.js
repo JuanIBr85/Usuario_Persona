@@ -36,7 +36,8 @@ export function useProfile() {
   const [tipoDocumento, setTipoDocumento] = useState([]);
   const [personaData, setPersonaData] = useState(initialPersonaState);
   const [photoUrl, setPhotoUrl] = useState('https://i.pravatar.cc/150?img=69');
-  const [redes_sociales, setRedesSociales] = useState([])
+  const [redes_sociales, setRedesSociales] = useState([]);
+  const [dialog, setDialog] = useState(null);
 
   const fetchData = async () => {
     try {
@@ -58,7 +59,17 @@ export function useProfile() {
       setTipoDocumento(tiposDocumentoResponse?.data || []);
       setRedesSociales(redes_socialesResponse?.data || []);
     } catch (error) {
-      console.error("Error al cargar los datos:", error);
+      if(error.statusCode === 404){
+        setDialog({
+          title: "No hay un perfil",
+          description: "Complete los datos de perfil para continuar"
+        });
+      }else{
+        setDialog({
+          title: "Error al cargar los datos",
+          description: "Error al cargar los datos del perfil"
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -89,6 +100,8 @@ export function useProfile() {
     redes_sociales,
     handlePhotoChange,
     fetchData,
-    setPersonaData
+    setPersonaData,
+    dialog, 
+    setDialog
   };
 }
