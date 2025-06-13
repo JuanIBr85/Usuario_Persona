@@ -1,3 +1,4 @@
+// Importaciones de React y componentes del proyecto
 import React from "react";
 import { Button } from "@/components/ui/button";
 import InputValidate from "@/components/inputValidate/InputValidate";
@@ -11,29 +12,41 @@ import { useNavigate } from "react-router-dom";
 import Loading from "@/components/loading/Loading";
 import AuthLayout from "@/components/authLayout/AuthLayout";
 
+/**
+ * Componente: Login.
+ * Permite al usuario autenticarse ingresando su correo y contraseña.
+ * Si el login es exitoso, se guarda el token y datos del usuario en el contexto global.
+ */
 function Login() {
-  const navigate = useNavigate()
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [dialogMessage, setMessage] = React.useState("");
-  const [isLogin, setIsLogin] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(false);  
-  const {updateData} = useAuthContext();
+  const navigate = useNavigate(); // Para redirigir luego del login
+  const [isOpen, setIsOpen] = React.useState(false); // Controla visibilidad del diálogo
+  const [dialogMessage, setMessage] = React.useState(""); // Mensaje que se mostrará en el diálogo
+  const [isLogin, setIsLogin] = React.useState(false); // Indica si el login fue exitoso
+  const [isLoading, setIsLoading] = React.useState(false); // Estado de carga (spinner)
+  const { updateData } = useAuthContext(); // Función del contexto global para guardar datos del usuario
 
+  /**
+   * Maneja el envío del formulario de login.
+   * Realiza la autenticación contra el backend usando AuthService.
+   * Muestra un diálogo con el resultado (éxito o error).
+   */
   const handleSubmit = async (event) => {
-    const formData = await formSubmitJson(event);
-    document.activeElement.blur();
-    setIsLoading(true);
+    const formData = await formSubmitJson(event); // Convierte los datos del formulario a JSON
+    document.activeElement.blur(); 
+    setIsLoading(true); 
+
     AuthService
-      .login(formData)
+      .login(formData) // Envia los datos al backend para autenticar
       .then((json) => {
+        // Si es exitoso, se muestra un mensaje y se actualiza el contexto global
         setMessage(`Login exitoso. Bienvenido ${json.data.nombre_usuario}!`);
         setIsLogin(true);
         updateData({
-          token: json.data.token,
-          user: json.data
+          token: json.data.token, // Guarda el token para futuras peticiones
+          user: json.data         // Guarda los datos del usuario logueado
         });
       }).catch((error) => {
-
+        // Si hay error, se analiza el tipo de error y se muestra mensaje adecuado
         if (error.isJson) {
           if (error.data.error) {
             setMessage(FetchErrorMessage(error));
@@ -41,27 +54,34 @@ function Login() {
             setMessage(error.data.message || "Error desconocido");
           }
         } else {
-          setMessage(error.message);
+          setMessage(error.message); 
         }
       }).finally(()=>{setIsLoading(false);setIsOpen(true);});
   }
 
   return (
     <>
+      {/* Spinner de carga mientras se realiza la solicitud */}
       {isLoading && <Loading isFixed={true} />}
+
+      {/* Diálogo emergente con el mensaje de login (éxito o error) */}
       <SimpleDialog
         title="Login"
         description={dialogMessage}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
         actionHandle={isLogin ? ()=>setTimeout(()=>navigate('/profile'), 500) : undefined}
+        // Si el login fue exitoso, redirige al perfil después de cerrar el diálogo
       />
       
+      {/* Layout visual general del formulario de login */}
       <AuthLayout
         title="Inicio de sesión"
         visualContent={<KeyRound className="text-white w-42 h-42" />}
       >
+        {/* Formulario de login */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 h-full">
+          {/* Campo para ingresar el email */}
           <InputValidate
             id="email_usuario"
             type="email"
@@ -70,6 +90,8 @@ function Login() {
             validateMessage="Email inválido"
             required
           />
+          
+          {/* Campo para ingresar la contraseña con validación de seguridad */}
           <InputValidate
             id="password"
             type="password"
@@ -79,17 +101,22 @@ function Login() {
             validateMessage="La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula, un número y un carácter especial."
             required
           />
+          
+          {/* Enlace a recuperación de contraseña */}
           <Button variant="link" asChild className="p-0">
             <Link to="/forgotPassword">¿Olvidaste la contraseña?</Link>
           </Button>
+
+          {/* Enlace para registrarse si no tiene cuenta */}
           <Button variant="link" asChild className="p-0">
             <Link to="/sign">¿No tienes una cuenta? Regístrate</Link>
           </Button>
+
+          {/* Botón para enviar el formulario */}
           <Button type="submit" className="mt-4">Iniciar sesión</Button>
         </form>
       </AuthLayout>
     </>
-    
   );
 }
 
