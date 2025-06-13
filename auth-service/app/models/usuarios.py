@@ -12,8 +12,8 @@ class Usuario(Base):
     nombre_usuario = Column(String, nullable=False)
     email_usuario = Column(String, unique=True, nullable=False)
     email_verificado = Column(Integer, default=0)
-    
     password = Column(String, nullable=False)
+    persona_id = Column(Integer, nullable=True,default=None)
     
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))

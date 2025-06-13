@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from flask import jsonify
 from marshmallow import ValidationError
-from sqlalchemy import and_
+from sqlalchemy import and_, func,extract
 
 #Se importan los modelos
 from app.models.persona_model import Persona
@@ -15,6 +15,7 @@ from app.services.domicilio_service import DomicilioService
 from app.schema.persona_schema import PersonaSchema,PersonaResumidaSchema
 from app.interfaces.persona_interface import IPersonaInterface
 from app.extensions import SessionLocal
+
 
 class PersonaService(IPersonaInterface):
 
@@ -199,5 +200,28 @@ class PersonaService(IPersonaInterface):
             session.rollback()
             raise e
 
+        finally:
+            session.close()
+            
+    def contar_personas(self):
+        session = SessionLocal()
+        try:
+            resultados = session.query(
+                extract('year', Persona.created_at).label('year'),
+                extract('month', Persona.created_at).label('month'),
+                func.count(Persona.id_persona).label('total')
+            ).filter(Persona.deleted_at.is_(None)) \
+            .group_by('year', 'month') \
+            .order_by('year', 'month') \
+            .all()
+
+            return [
+                {
+                    "year": r.year,
+                    "month": int(r.month),
+                    "total": r.total
+                }
+                for r in resultados
+            ]
         finally:
             session.close()
