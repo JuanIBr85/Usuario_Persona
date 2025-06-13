@@ -14,7 +14,10 @@ def create_app()->Flask:
 
     app.config.from_object("config")
 
-    CORS(app, supports_credentials=True)
+    CORS(app, 
+     resources={r"/*": {"origins": "*"}},
+     supports_credentials=True, 
+     allow_headers=["Content-Type", "Authentication", "authorization", "Authorization"])
     
     limiter.init_app(app)
 
