@@ -14,7 +14,7 @@ import AccessibilityMenu from './AccesibilityMenu';
  * @returns {JSX.Element} Estructura de la página con Header, Footer, Main y menú de accesibilidad.
  */
 
-const HiddenLayoutRoutes = ["/login", "/sign", "/forgotPassword", "/otpvalidation"];
+const HiddenLayoutRoutes = ["/login", "/sign", "/forgotPassword", "/otpvalidation", "/resetpassword"];
 
 const Layout = ({ children }) => {
   const location = useLocation();

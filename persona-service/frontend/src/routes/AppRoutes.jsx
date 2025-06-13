@@ -16,6 +16,7 @@ import AboutPrivacyPolicy from '@/pages/user/AboutPrivacyPolicy';
 import Faq from '@/pages/user/Faq';
 import ForgotPassword from '@/pages/auth/ForgotPassword';
 import OTPValidation from '@/pages/auth/OTPValidation';
+import ResetPassword from '@/pages/auth/ResetPassword';
 
 /**
  * Componente que define todas las rutas de la aplicación utilizando react-router-dom.
@@ -43,6 +44,7 @@ function AppRoutes() {
       <Route path="faq" element={<Faq />} />
       <Route path="*" element={<NotFound />} />
       <Route path="forgotpassword" element={<ForgotPassword />} />
+      <Route path="resetpassword" element={<ResetPassword />} />
     </Routes>
   )
 }

@@ -86,5 +86,24 @@ export const AuthService = {
       
       showError: AuthService.showError
     });
-  }
+  },
+
+  /**
+ * Cambia la contraseña usando un token temporal después de verificar OTP.
+ * @async
+ * @param {Object} body - Contiene la nueva contraseña y confirmación.
+ * @param {string} token - Token temporal recibido después de verificar OTP.
+ * @returns {Promise<Object>} Promesa que resuelve con la respuesta del servidor.
+ */
+resetPassword: async (body, token) => {
+  return fetchService.fetch({
+    url: `${ServiceURL.auth}/reset-password-con-codigo`,
+    method: HttpMethod.POST,
+    body: body,
+    headers: {
+      "Authorization": `Bearer ${token}`
+    },
+    showError: AuthService.showError
+  });
+}
 };
