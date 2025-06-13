@@ -8,7 +8,7 @@ def api_access(
     cache: CacheSettings = None
     ):
     def decorador(f):
-        if not isinstance(cache, CacheSettings):
+        if cache and not isinstance(cache, CacheSettings):
             raise ValueError("cache debe ser una instancia de CacheSettings")
         
         # Guardar los metadatos en la función
