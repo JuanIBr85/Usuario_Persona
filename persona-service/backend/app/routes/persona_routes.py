@@ -29,7 +29,7 @@ def listar_personas():
         ),500
             
 @api_access(access_permissions=[])
-@persona_bp.route('/personas/<int:id>/', methods=['GET'])
+@persona_bp.route('/personas/<int:id>', methods=['GET'])
 def obtener_persona(id):
     try:
         persona = persona_service.listar_persona_id(id)
