@@ -31,7 +31,7 @@ function AuthContextProvider({ children }) {
             const now = new Date();
             const expirationDate = new Date(authData.user.expires_in);
             
-            if (now > expirationDate || true) {
+            if (now > expirationDate) {
                 // Token expirado, limpiar datos de autenticación
                 removeAuthData();
 
