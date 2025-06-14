@@ -23,11 +23,10 @@ import { tiempoTranscurrido } from "@/utils/dateUtils"
 const ProfileForm = () => {
   const {
     isLoading,
-    tipoDocumento,
     personaData,
     photoUrl,
     email,
-    redes_sociales,
+    staticData,
     handlePhotoChange,
     setPersonaData,
     dialog ,
@@ -36,7 +35,7 @@ const ProfileForm = () => {
 
   const lastUpdate = tiempoTranscurrido(personaData.updated_at);
   const subscribedServices = ['Residencia', 'Becas', 'Oferta educativa'];
-  console.log(personaData)
+  
   if (isLoading) {
     return <Loading />;
   }
@@ -79,7 +78,7 @@ const ProfileForm = () => {
 
                   <TabsContent value="datos">
                     <FormDatos
-                      tipoDocumento={tipoDocumento}
+                      tipoDocumento={staticData.tipos_documento}
                       personaData={{ ...personaData, email }}
                       persona_id={personaData.id_persona}
                       setPersonaData={setPersonaData}
@@ -90,7 +89,7 @@ const ProfileForm = () => {
                     <FormContacto
                       persona_id={personaData.id_persona}
                       contacto={personaData.contacto || {}}
-                      redes_sociales={redes_sociales}
+                      redes_sociales={staticData.redes_sociales}
                       setPersonaData={setPersonaData}
                     />
                   </TabsContent>
@@ -107,6 +106,9 @@ const ProfileForm = () => {
                     <FormPersonaExtendida
                       persona_id={personaData.id_persona}
                       personaExtendida={personaData?.persona_extendida || {}}
+                      estadosCiviles={staticData.estados_civiles}
+                      ocupaciones={staticData.ocupaciones}
+                      estudiosAlcanzados={staticData.estudios_alcanzados}
                       setPersonaData={setPersonaData}
                     />
                   </TabsContent>

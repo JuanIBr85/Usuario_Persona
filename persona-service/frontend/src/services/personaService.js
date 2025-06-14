@@ -100,4 +100,30 @@ export const PersonaService = {
     });
   },
 
+  get_estados_civiles: async () => {
+    return fetchService.fetch({
+      url: `${ServiceURL.persona}/api/estados_civiles`,
+      method: HttpMethod.GET,
+      useToken: true,
+      showError: PersonaService.showError
+    });
+  },
+  get_ocupaciones: async () => {
+    return fetchService.fetch({
+      url: `${ServiceURL.persona}/api/ocupaciones`,
+      method: HttpMethod.GET,
+      useToken: true,
+      showError: PersonaService.showError
+    });
+  },
+  get_estudios_alcanzados: async () => {
+    return fetchService.fetch({
+      url: `${ServiceURL.persona}/api/estudios_alcanzados`,
+      method: HttpMethod.GET,
+      useToken: true,
+      showError: PersonaService.showError
+    });
+  },
+
 };
+

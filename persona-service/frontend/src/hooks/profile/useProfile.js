@@ -33,19 +33,29 @@ export function useProfile() {
   const { authData } = useAuthContext();
   
   const [isLoading, setIsLoading] = useState(true);
-  const [tipoDocumento, setTipoDocumento] = useState([]);
   const [personaData, setPersonaData] = useState(initialPersonaState);
   const [photoUrl, setPhotoUrl] = useState('https://i.pravatar.cc/150?img=69');
-  const [redes_sociales, setRedesSociales] = useState([]);
   const [dialog, setDialog] = useState(null);
+  const [staticData, setStaticData] = useState({});
 
   const fetchData = async () => {
     try {
-      const [profileResponse, tiposDocumentoResponse, redes_socialesResponse] = await Promise.all([
-        PersonaService.get_by_usuario(authData.user.id_usuario),
+      const [tiposDocumentoResponse, redes_socialesResponse, estados_civilesResponse, ocupacionesResponse, estudios_alcanzadosResponse] = await Promise.all([
         PersonaService.get_tipos_documentos(),
-        PersonaService.get_redes_sociales()
+        PersonaService.get_redes_sociales(),
+        PersonaService.get_estados_civiles(),
+        PersonaService.get_ocupaciones(),
+        PersonaService.get_estudios_alcanzados()
       ]);
+
+      setStaticData({
+        estados_civiles: estados_civilesResponse?.data || [],
+        ocupaciones: ocupacionesResponse?.data || [],
+        estudios_alcanzados: estudios_alcanzadosResponse?.data || [],
+        tipos_documento: tiposDocumentoResponse?.data || [],
+        redes_sociales: redes_socialesResponse?.data || []
+      });
+      const profileResponse = await PersonaService.get_by_usuario(authData.user.id_usuario);
 
       if (profileResponse?.data) {
         setPersonaData({
@@ -55,9 +65,6 @@ export function useProfile() {
           domicilio: profileResponse.data.domicilio || {}
         });
       }
-
-      setTipoDocumento(tiposDocumentoResponse?.data || []);
-      setRedesSociales(redes_socialesResponse?.data || []);
     } catch (error) {
       if(error.statusCode === 404){
         setDialog({
@@ -93,11 +100,10 @@ export function useProfile() {
 
   return {
     isLoading,
-    tipoDocumento,
     personaData,
     photoUrl,
     email: authData.user?.email_usuario || '',
-    redes_sociales,
+    staticData,
     handlePhotoChange,
     fetchData,
     setPersonaData,
