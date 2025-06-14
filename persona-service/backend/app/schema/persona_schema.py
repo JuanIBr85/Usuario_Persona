@@ -2,6 +2,7 @@ from marshmallow import Schema, fields, validate
 from config import TIPOS_DOCUMENTO_VALIDOS
 from app.schema.contacto_schema import ContactoSchema
 from app.schema.domicilio_schema import DomicilioSchema
+from app.schema.persona_extendida_schema import PersonaExtendidaSchema
 
 class PersonaSchema(Schema):
     id_persona=fields.Int(dump_only=True)
@@ -12,7 +13,8 @@ class PersonaSchema(Schema):
     num_doc_persona=fields.Str(required=True)
 
     usuario_id=fields.Int(required=False)
-
+    
+    persona_extendida=fields.Nested(PersonaExtendidaSchema, required=True)
     domicilio=fields.Nested(DomicilioSchema, required=True)
     contacto=fields.Nested(ContactoSchema, required=True)
 

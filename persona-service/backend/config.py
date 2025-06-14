@@ -28,3 +28,6 @@ JWT_SECRET_KEY=os.environ.get('JWT_SECRET_KEY')
 
 TIPOS_DOCUMENTO_VALIDOS=os.environ.get("TIPOS_DOCUMENTO_VALIDOS", "").split(",")
 REDES_SOCIALES_VALIDAS=os.environ.get("REDES_SOCIALES_VALIDAS", "").split(",")
+ESTADO_CIVIL=os.environ.get("ESTADO_CIVIL", "").split(",")
+OCUPACION=os.environ.get("OCUPACION", "").split(",")
+ESTUDIOS_ALCANZADOS=os.environ.get("REDES_SOCIALES_VALIDAS", "").split(",")

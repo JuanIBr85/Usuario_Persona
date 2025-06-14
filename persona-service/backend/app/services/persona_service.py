@@ -5,6 +5,7 @@ from sqlalchemy import and_
 
 #Se importan los modelos
 from app.models.persona_model import Persona
+from app.models.persona_extendida_model import PersonaExtendida
 
 #Se importan los servicios
 from app.services.contacto_service import ContactoService
@@ -78,6 +79,8 @@ class PersonaService(IPersonaInterface):
             domicilio = self.domicilio_service.crear_domicilio(data_validada.pop('domicilio'), session=session)
             contacto = self.contacto_service.crear_contacto(data_validada.pop('contacto'), session=session)
 
+            datos_extendida = data_validada.pop('persona_extendida', None)
+
             data_validada['domicilio_id']=domicilio.id_domicilio
             data_validada['contacto_id']=contacto.id_contacto
             data_validada['tipo_documento']=data_validada.pop('tipo_documento')
@@ -86,6 +89,12 @@ class PersonaService(IPersonaInterface):
             # Crear Persona
             persona_nueva=Persona(**data_validada)
             session.add(persona_nueva)
+            session.flush()
+
+            if datos_extendida:
+                extendida = PersonaExtendida(id_extendida=persona_nueva.id_persona, **datos_extendida)
+                session.add(extendida)
+
             session.commit()
             session.refresh(persona_nueva)
 

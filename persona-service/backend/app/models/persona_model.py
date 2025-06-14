@@ -15,12 +15,13 @@ class Persona(Base):
     num_doc_persona=Column(String(11), nullable=False)
     
     usuario_id = Column(Integer, nullable=True, unique=True)
-
+    extendida_id=Column(Integer, ForeignKey('personas_extendidas.id_extendida'))
     domicilio_id=Column(Integer, ForeignKey('domicilios.id_domicilio'))
     contacto_id=Column(Integer, ForeignKey('contactos.id_contacto'))
 
     domicilio = relationship("Domicilio")
     contacto = relationship("Contacto")
+    persona_extendida = relationship("PersonaExtendida", back_populates="persona", uselist=False)
 
     created_at=Column(DateTime, default=datetime.now(timezone.utc))
     updated_at=Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
