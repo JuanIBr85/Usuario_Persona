@@ -1,7 +1,7 @@
 
 export const ServiceURL = Object.freeze({
     auth: "http://localhost:5000",
-    persona: "http://localhost:5002/api",
+    persona: "http://localhost:5001",
     //api gateway
     // "http://localhost:5002/api"
 });
@@ -77,28 +77,7 @@ export const fetchService = {
             controller.abort(); // Cancela la petición
             console.warn(`Fetch [${url}] timeout.`); // Avisa que se canceló por timeout
         }, timeout);
-
-
-        console.log(
-            url, {
-                signal: controller.signal, // Para poder cancelar la petición
-                method: method,            // GET, POST, PUT, etc.
-                headers: {
-                    ...(body && !['GET', 'DELETE', 'HEAD'].includes(method.toUpperCase()) && {
-                        "Content-Type": "application/json"
-                    }), 
-                    ...headers, 
-                    
-                    ...(useToken && {
-                        "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                    }),
-                },
-                
-                
-                // Si tenemos datos para enviar, los convertimos a JSON; si no, enviamos undefined
-                body: body ? JSON.stringify(body) : undefined,
-            }
-        );
+        
         // Hacemos la petición Fetch
         return fetch(url, {
             signal: controller.signal, // Para poder cancelar la petición
