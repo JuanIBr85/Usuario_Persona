@@ -1,7 +1,7 @@
 
 export const ServiceURL = Object.freeze({
     auth: "http://localhost:5000",
-    persona: "http://localhost:5001",
+    persona: "http://localhost:5002/api",
     //api gateway
     // "http://localhost:5002/api"
 });
@@ -19,10 +19,23 @@ export const HttpMethod = Object.freeze({
 
 export class FetchError extends Error {
   constructor(mensaje, isJson, statusCode, data) {
-    super(mensaje); 
-    this.isJson = isJson; 
-    this.statusCode = statusCode; 
-    this.data = data; 
+    const mensajeCompleto = `${mensaje}\n` +
+                         `Código de estado: ${statusCode}\n` +
+                         `Es JSON: ${isJson}\n` +
+                         `Datos: ${JSON.stringify(data, null, 2)}`;
+    
+    super(mensajeCompleto);
+    
+    this.name = 'FetchError';
+    this.originalMessage = mensaje;
+    this.isJson = isJson;
+    this.statusCode = statusCode;
+    this.data = data;
+    
+    // Asegurarse de que el stack trace no se pierda
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, FetchError);
+    }
   }
 }
 
@@ -65,6 +78,27 @@ export const fetchService = {
             console.warn(`Fetch [${url}] timeout.`); // Avisa que se canceló por timeout
         }, timeout);
 
+
+        console.log(
+            url, {
+                signal: controller.signal, // Para poder cancelar la petición
+                method: method,            // GET, POST, PUT, etc.
+                headers: {
+                    ...(body && !['GET', 'DELETE', 'HEAD'].includes(method.toUpperCase()) && {
+                        "Content-Type": "application/json"
+                    }), 
+                    ...headers, 
+                    
+                    ...(useToken && {
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                    }),
+                },
+                
+                
+                // Si tenemos datos para enviar, los convertimos a JSON; si no, enviamos undefined
+                body: body ? JSON.stringify(body) : undefined,
+            }
+        );
         // Hacemos la petición Fetch
         return fetch(url, {
             signal: controller.signal, // Para poder cancelar la petición
