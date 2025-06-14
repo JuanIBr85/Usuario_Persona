@@ -44,17 +44,25 @@ function UserDetails() {
           const persona = res.data;
           const userMapped = {
             id: persona.id_persona,
-            nombre: `${persona.nombre_persona} ${persona.apellido_persona}`,
-            rol: "No definido",
-            email: persona.email || "sin email",
-            telefono: persona.contacto?.telefono_movil || "sin teléfono",
-            direccion: persona.domicilio
-              ? `${persona.domicilio.domicilio_calle} ${persona.domicilio.domicilio_numero}, Piso ${persona.domicilio.domicilio_piso}, Dpto ${persona.domicilio.domicilio_dpto}`
-              : "Sin dirección",
+            nombre: `${persona.nombre_persona}`,
+            apellido: `${persona.apellido_persona}`,
+
+            email: persona.contacto?.email_contacto || "Sin email",
+            telefono: persona.contacto?.telefono_movil || "Sin teléfono",
+
+            calle: persona.domicilio ? persona.domicilio.domicilio_calle : "Sin dirección",
+            numero: persona.domicilio ? persona.domicilio.domicilio_numero : "",
+            piso: persona.domicilio ? persona.domicilio.domicilio_piso : "",
+            dpto: persona.domicilio ? persona.domicilio.domicilio_dpto : "",
+            referencia: persona.domicilio ? persona.domicilio.domicilio_referencia : "",
+            codigo_postal: persona.domicilio ? persona.domicilio.domicilio_postal.codigo_postal : "",
+            localidad: persona.domicilio ? persona.domicilio.domicilio_postal.localidad : "",
+            partido: persona.domicilio ? persona.domicilio.domicilio_postal.partido : "",
+            provincia: persona.domicilio ? persona.domicilio.domicilio_postal.provincia : "",
+
             fechaRegistro: new Date(persona.created_at).toLocaleDateString(),
-            dni: `${persona.tipo_documento} ${persona.num_doc_persona}`,
-            beca: "No aplica",
-            status: "Activo"
+            tipo_documento: persona.tipo_documento || "Tipo de documento indefinido",
+            documento: `${persona.tipo_documento} ${persona.num_doc_persona}`,
           };
           setUser(userMapped);
         }
@@ -65,9 +73,43 @@ function UserDetails() {
   }, [id]);
 
   const handleEditSubmit = (e) => {
+
+    const body = {
+      nombre_persona: editingUser.nombre,
+      apellido_persona: editingUser.apellido,
+      fecha_nacimiento_persona: "1990-05-10", // TODO
+      tipo_documento: "", // TODO
+      num_doc_persona: "12345678", // TODO
+
+      domicilio: {
+        domicilio_calle: editingUser.calle,
+        domicilio_numero: editingUser.numero,
+        domicilio_piso: editingUser.piso,
+        domicilio_dpto: editingUser.dpto,
+        domicilio_referencia: editingUser.referencia,
+        codigo_postal: {
+          codigo_postal: editingUser.codigo_postal,
+          localidad: editingUser.localidad,
+          partido: editingUser.partido,
+          provincia: editingUser.provincia,
+        },
+      },
+
+      contacto: {
+        telefono_movil: editingUser.telefono,
+        telefono_fijo: "",  // TODO
+        red_social_contacto: "",  // TODO
+        red_social_nombre: "", // TODO
+        email_contacto: editingUser.email,
+        observacion_contacto: "Contacto principal"
+      }
+    };
+
     e.preventDefault();
+    console.log(editingUser)
     setUser(editingUser);
     setEditingUser(null);
+    PersonaService.editar(id, body)
   };
 
   if (!user) {
@@ -87,15 +129,12 @@ function UserDetails() {
 
           <CardContent className="space-y-4">
             {[
-              { label: "Nombre completo", icon: User, value: user.nombre },
+              { label: "Nombre completo", icon: User, value: user.nombre + " " + user.apellido },
               { label: "Correo electrónico", icon: Mail, value: user.email },
               { label: "Teléfono", icon: Phone, value: user.telefono },
-              { label: "Dirección", icon: MapPin, value: user.direccion },
-              { label: "Rol", icon: BadgeCheck, value: user.rol },
-              { label: "Status", icon: BadgeCheck, value: user.status },
+              { label: "Dirección", icon: MapPin, value: user.localidad + " (" + user.codigo_postal + ") " + user.calle + " " + user.numero + " " + user.dpto },
               { label: "Fecha de Registro", icon: Calendar, value: user.fechaRegistro },
-              { label: "DNI", icon: IdCard, value: user.dni },
-              { label: "¿Cobra beca?", icon: DollarSign, value: user.beca }
+              { label: user.tipo_documento, icon: IdCard, value: user.documento },
             ].map(({ label, icon: Icon, value }) => (
               <div key={label} className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-4 border-b pb-4">
                 <span className="text-sm text-gray-500 font-medium inline-flex items-center gap-1">
@@ -143,7 +182,7 @@ function UserDetails() {
 
       {/* Dialog de edición */}
       <Dialog open={!!editingUser} onOpenChange={(open) => !open && setEditingUser(null)}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Editar Usuario</DialogTitle>
             <DialogDescription>Modifica los datos del usuario.</DialogDescription>
@@ -152,11 +191,19 @@ function UserDetails() {
             <form onSubmit={handleEditSubmit}>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="nombre">Nombre completo</Label>
+                  <Label htmlFor="nombre">Nombre</Label>
                   <Input
                     id="nombre"
                     value={editingUser.nombre}
                     onChange={(e) => setEditingUser({ ...editingUser, nombre: e.target.value })}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="apellido">Apellido</Label>
+                  <Input
+                    id="apellido"
+                    value={editingUser.apellido}
+                    onChange={(e) => setEditingUser({ ...editingUser, apellido: e.target.value })}
                   />
                 </div>
                 <div className="grid gap-2">
@@ -173,6 +220,78 @@ function UserDetails() {
                     id="telefono"
                     value={editingUser.telefono}
                     onChange={(e) => setEditingUser({ ...editingUser, telefono: e.target.value })}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="calle">Calle</Label>
+                  <Input
+                    id="calle"
+                    value={editingUser.calle}
+                    onChange={(e) => setEditingUser({ ...editingUser, calle: e.target.value })}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="numero">Número</Label>
+                  <Input
+                    id="numero"
+                    value={editingUser.numero}
+                    onChange={(e) => setEditingUser({ ...editingUser, numero: e.target.value })}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="piso">Piso</Label>
+                  <Input
+                    id="piso"
+                    value={editingUser.piso}
+                    onChange={(e) => setEditingUser({ ...editingUser, piso: e.target.value })}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="dpto">Dpto</Label>
+                  <Input
+                    id="dpto"
+                    value={editingUser.dpto}
+                    onChange={(e) => setEditingUser({ ...editingUser, dpto: e.target.value })}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="referencia">Referencia</Label>
+                  <Input
+                    id="referencia"
+                    value={editingUser.referencia}
+                    onChange={(e) => setEditingUser({ ...editingUser, referencia: e.target.value })}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="codigo_postal">Código Postal</Label>
+                  <Input
+                    id="codigo_postal"
+                    value={editingUser.codigo_postal}
+                    onChange={(e) => setEditingUser({ ...editingUser, codigo_postal: e.target.value })}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="localidad">Localidad</Label>
+                  <Input
+                    id="localidad"
+                    value={editingUser.localidad}
+                    onChange={(e) => setEditingUser({ ...editingUser, localidad: e.target.value })}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="partido">Partido</Label>
+                  <Input
+                    id="partido"
+                    value={editingUser.partido}
+                    onChange={(e) => setEditingUser({ ...editingUser, partido: e.target.value })}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="provincia">Provincia</Label>
+                  <Input
+                    id="provincia"
+                    value={editingUser.provincia}
+                    onChange={(e) => setEditingUser({ ...editingUser, provincia: e.target.value })}
                   />
                 </div>
               </div>
