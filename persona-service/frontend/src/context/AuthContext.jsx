@@ -39,6 +39,8 @@ function AuthContextProvider({ children }) {
                     title: "Sesión expirada",
                     description: "Su sesión ha expirado. Por favor, inicie sesión de nuevo.",
                 });
+                
+                window.location.href = '/logout'
             }
             
         }, 1000*30); // Verificar cada 30 segundos

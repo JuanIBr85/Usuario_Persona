@@ -24,7 +24,7 @@ import { Fade } from 'react-awesome-reveal'
 
 const adminOptions = [
   {
-    title: "Usuarios",
+    title: "Personas",
     description: "Gestionar cuentas de personas",
     icon: <Users className="w-14 h-14 text-primary" />,
     path: "/adminpersons",
