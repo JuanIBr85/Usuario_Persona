@@ -3,7 +3,7 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, Dialog
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 
-function UserDeleteDialog({ user, onDelete }) {
+function PersonaDeleteDialog({ user, onDelete }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -13,7 +13,7 @@ function UserDeleteDialog({ user, onDelete }) {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[400px]">
         <DialogHeader>
-          <DialogTitle>¿Eliminar usuario?</DialogTitle>
+          <DialogTitle>¿Eliminar persona?</DialogTitle>
           <DialogDescription>
             Esta acción no se puede deshacer. ¿Deseas eliminar a <strong>{user.nombre} {user.apellido}</strong>?
           </DialogDescription>
@@ -31,4 +31,4 @@ function UserDeleteDialog({ user, onDelete }) {
   );
 }
 
-export default UserDeleteDialog;
+export default PersonaDeleteDialog;

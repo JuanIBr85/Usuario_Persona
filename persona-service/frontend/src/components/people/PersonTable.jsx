@@ -2,16 +2,15 @@ import React from "react";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Eye, Pencil, Trash2 } from "lucide-react";
-import UserDeleteDialog from "./UserDeleteDialog";
+import PersonaDeleteDialog from "./PersonDeleteDialog";
 
-function UserTable({ users, onEdit, onSeeDetails, onDelete }) {
+function PersonTable({ users, onEdit, onSeeDetails, onDelete }) {
   return (
     <Table>
-      <TableCaption>Lista de usuarios registrados.</TableCaption>
+      <TableCaption>Lista de personas registradas.</TableCaption>
       <TableHeader>
         <TableRow>
           <TableHead>Nombre</TableHead>
-          <TableHead>Email</TableHead>
           <TableHead className="text-right">Acciones</TableHead>
         </TableRow>
       </TableHeader>
@@ -20,7 +19,6 @@ function UserTable({ users, onEdit, onSeeDetails, onDelete }) {
           users.map(user => (
             <TableRow key={user.id}>
               <TableCell className="font-medium">{user.nombre} {user.apellido}</TableCell>
-              <TableCell>{user.email}</TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end items-center gap-2">
                   <Button variant="outline" onClick={() => onSeeDetails(user.id)}>
@@ -29,7 +27,7 @@ function UserTable({ users, onEdit, onSeeDetails, onDelete }) {
                   <Button variant="outline" onClick={() => onEdit(user)}>
                     <Pencil className="mr-1" /> Edición Rapida
                   </Button>
-                  <UserDeleteDialog user={user} onDelete={onDelete} />
+                  <PersonaDeleteDialog user={user} onDelete={onDelete} />
                 </div>
               </TableCell>
             </TableRow>
@@ -37,7 +35,7 @@ function UserTable({ users, onEdit, onSeeDetails, onDelete }) {
         ) : (
           <TableRow>
             <TableCell colSpan={3} className="text-center">
-              No se encontraron usuarios que coincidan con el filtro.
+              No se encontraron personas que coincidan con el filtro.
             </TableCell>
           </TableRow>
         )}
@@ -46,4 +44,4 @@ function UserTable({ users, onEdit, onSeeDetails, onDelete }) {
   );
 }
 
-export default UserTable;
+export default PersonTable;

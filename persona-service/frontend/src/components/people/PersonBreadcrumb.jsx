@@ -2,7 +2,7 @@ import React from "react";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Home, User, ChevronRight } from "lucide-react";
 
-function UserBreadcrumb() {
+function PersonBreadcrumb() {
   return (
     <Breadcrumb className="mt-auto self-start">
       <BreadcrumbList>
@@ -18,7 +18,7 @@ function UserBreadcrumb() {
         <BreadcrumbItem>
           <BreadcrumbPage className="flex items-center gap-1">
             <User className="w-4 h-4" />
-            Panel de Usuarios
+            Panel de Personas
           </BreadcrumbPage>
         </BreadcrumbItem>
       </BreadcrumbList>
@@ -26,4 +26,4 @@ function UserBreadcrumb() {
   );
 }
 
-export default UserBreadcrumb;
+export default PersonBreadcrumb;

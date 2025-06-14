@@ -1,13 +1,13 @@
 import { Input } from "@/components/ui/input";
 
 /* ----------------------------------------------
- * Componente UserFilter
+ * Componente PersonFilter
  * ----------------------------------------------
  * Permite filtrar usuarios por nombre, apellido o email.
  * Muestra un input para ingresar texto de búsqueda.
  * ----------------------------------------------
  */
-function UserFilter({mostrarFiltroAvanzado, setMostrarFiltroAvanzado, filtro, setFiltro }) {
+function PersonFilter({mostrarFiltroAvanzado, setMostrarFiltroAvanzado, filtro, setFiltro }) {
   return (
     <div className="flex flex-col md:flex-row items-center gap-3 mb-4">
       {/* Input para filtrar texto */}
@@ -21,4 +21,4 @@ function UserFilter({mostrarFiltroAvanzado, setMostrarFiltroAvanzado, filtro, se
   );
 }
 
-export default UserFilter;
+export default PersonFilter;

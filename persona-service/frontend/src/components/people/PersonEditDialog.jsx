@@ -4,16 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-function UserEditDialog({ editingUser, setEditingUser, onSubmit }) {
+function PersonEditDialog({ editingUser, setEditingUser, onSubmit }) {
   if (!editingUser) return null;
 
   return (
     <Dialog open={!!editingUser} onOpenChange={(open) => !open && setEditingUser(null)}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Editar Usuario</DialogTitle>
+          <DialogTitle>Editar Persona</DialogTitle>
           <DialogDescription>
-            Modifica los datos del usuario. Guarda los cambios al finalizar.
+            Modifica los datos de la persona. Guarda los cambios al finalizar.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={onSubmit}>
@@ -47,4 +47,4 @@ function UserEditDialog({ editingUser, setEditingUser, onSubmit }) {
   );
 }
 
-export default UserEditDialog;
+export default PersonEditDialog;

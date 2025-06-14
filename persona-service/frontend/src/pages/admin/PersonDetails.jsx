@@ -62,7 +62,7 @@ function UserDetails() {
 
             fechaRegistro: new Date(persona.created_at).toLocaleDateString(),
             tipo_documento: persona.tipo_documento || "Tipo de documento indefinido",
-            documento: `${persona.tipo_documento} ${persona.num_doc_persona}`,
+            documento: `${persona.num_doc_persona}`,
           };
           setUser(userMapped);
         }

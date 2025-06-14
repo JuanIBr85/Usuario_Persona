@@ -8,9 +8,9 @@ import Login from '@/pages/auth/Login';
 import Logout from '@/pages/auth/Logout';
 import Sign from '@/pages/auth/Sign';
 import Logs from '@/pages/admin/Logs';
-import AdminUsers from '@/pages/admin/AdminUsers';
+import AdminPersons from '@/pages/admin/AdminPersons';
 import AdminRoles from '@/pages/admin/AdminRoles';
-import UserDetails from '@/pages/admin/UserDetails';
+import PersonDetails from '@/pages/admin/PersonDetails';
 import TermsOfService from '@/pages/user/TermsOfService';
 import AboutPrivacyPolicy from '@/pages/user/AboutPrivacyPolicy';
 import Faq from '@/pages/user/Faq';
@@ -36,9 +36,9 @@ function AppRoutes() {
       <Route path="logout" element={<Logout />} />
       <Route path="otpvalidation" element={<OTPValidation />} />
       <Route path="logs" element={<Logs />} />
-      <Route path="adminusers" element={<AdminUsers />} />
+      <Route path="adminpersons" element={<AdminPersons />} />
       <Route path="adminroles" element={<AdminRoles />} />
-      <Route path="userdetails/:id" element={<UserDetails />} />
+      <Route path="persondetails/:id" element={<PersonDetails />} />
       <Route path="privacypolicy" element={<AboutPrivacyPolicy />} />
       <Route path="termsofservice" element={<TermsOfService />} />
       <Route path="faq" element={<Faq />} />
