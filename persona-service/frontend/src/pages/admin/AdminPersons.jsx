@@ -5,14 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { Users } from "lucide-react";
 
-import UserFilter from "@/components/people/PersonFilter";
+import PersonFilter from "@/components/people/PersonFilter";
 import Loading from '@/components/loading/Loading';
 
 import { PersonaService } from "@/services/personaService";
 
-import UserTable from "@/components/people/PersonTable";
-import UserEditDialog from "@/components/people/PersonEditDialog";
-import UserBreadcrumb from "@/components/people/PersonBreadcrumb";
+import PersonTable from "@/components/people/PersonTable";
+import PersonEditDialog from "@/components/people/PersonEditDialog";
+import PersonBreadcrumb from "@/components/people/PersonBreadcrumb";
 
 /**
  * Componente AdminUsers
@@ -37,10 +37,10 @@ import UserBreadcrumb from "@/components/people/PersonBreadcrumb";
  * - Edición rápida de usuario mediante diálogo modal.
  * 
  * Componentes hijos usados:
- * - UserFilter: formulario para filtrar usuarios.
- * - UserTable: tabla que muestra la lista filtrada con botones de acción.
- * - UserEditDialog: diálogo modal para editar datos de usuario.
- * - UserBreadcrumb: barra de navegación breadcrumb.
+ * - PersonFilter: formulario para filtrar usuarios.
+ * - PersonTable: tabla que muestra la lista filtrada con botones de acción.
+ * - PersonEditDialog: diálogo modal para editar datos de usuario.
+ * - PersonBreadcrumb: barra de navegación breadcrumb.
  */
 function AdminUsers() {
   const navigate = useNavigate();
@@ -144,7 +144,7 @@ function AdminUsers() {
           <CardContent>
             {/* Filtro de usuario */}
             <div className="overflow-auto border p-3 rounded-md shadow-sm mb-4">
-              <UserFilter
+              <PersonFilter
                 mostrarFiltroAvanzado={mostrarFiltroAvanzado}
                 setMostrarFiltroAvanzado={setMostrarFiltroAvanzado}
                 filtro={filtro}
@@ -154,7 +154,7 @@ function AdminUsers() {
 
             {/* Tabla con usuarios filtrados */}
             <div className="overflow-auto border p-3 rounded-md shadow-sm">
-              <UserTable
+              <PersonTable
                 users={usuariosFiltrados}
                 onEdit={setEditingUser}
                 onSeeDetails={handleSeeDetails}
@@ -165,11 +165,11 @@ function AdminUsers() {
         </Card>
 
         {/* Breadcrumb navegación */}
-        <UserBreadcrumb />
+        <PersonBreadcrumb />
       </Fade>
 
       {/* Diálogo modal para editar usuario */}
-      <UserEditDialog
+      <PersonEditDialog
         editingUser={editingUser}
         setEditingUser={setEditingUser}
         onSubmit={handleEditSubmit}
