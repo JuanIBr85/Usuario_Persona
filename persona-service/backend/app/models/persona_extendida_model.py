@@ -5,7 +5,7 @@ from app.models.persona_model import Persona
 from sqlalchemy.orm import relationship
 
 
-class PersonaExtendida(Persona):
+class PersonaExtendida(Base):
     __tablename__ = 'personas_extendidas'
 
     id_extendida = Column(Integer, ForeignKey('personas.id_persona'), primary_key=True) # va conectado con Persona

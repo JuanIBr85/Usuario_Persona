@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from common.utils.response import make_response, ResponseStatus
-from config import TIPOS_DOCUMENTO_VALIDOS,REDES_SOCIALES_VALIDAS
+from config import TIPOS_DOCUMENTO_VALIDOS,REDES_SOCIALES_VALIDAS,OCUPACION,ESTADO_CIVIL,ESTUDIOS_ALCANZADOS
 from app.services.domicilio_postal_service import DomicilioPostalService
 from common.decorators.api_access import api_access
 from common.models.cache_settings import CacheSettings
@@ -25,6 +25,36 @@ def obtener_red_social():
         status=ResponseStatus.SUCCESS,
         message="Redes sociales obtenidos correctamente",
         data=REDES_SOCIALES_VALIDAS
+    ),200
+
+@api_access(cache=CacheSettings(expiration=60*60))
+@opciones_bp.route("/estados_civiles", methods=['GET'])
+def obtener_estado_civile():
+
+    return make_response(
+        status=ResponseStatus.SUCCESS,
+        message="Estados civiles obtenidos correctamente",
+        data=ESTADO_CIVIL
+    ),200
+
+@api_access(cache=CacheSettings(expiration=60*60))
+@opciones_bp.route("/ocupaciones", methods=['GET'])
+def obtener_ocupacion():
+
+    return make_response(
+        status=ResponseStatus.SUCCESS,
+        message="Ocupacines obtenidos correctamente",
+        data=OCUPACION
+    ),200
+
+@api_access(cache=CacheSettings(expiration=60*60))
+@opciones_bp.route("/estudios_alcanzados", methods=['GET'])
+def obtener_estudios_alcanzados():
+
+    return make_response(
+        status=ResponseStatus.SUCCESS,
+        message="Estudios alcanzados obtenidos correctamente",
+        data=ESTUDIOS_ALCANZADOS
     ),200
 
 @api_access(cache=CacheSettings(expiration=60, params=["codigo_postal"]))
