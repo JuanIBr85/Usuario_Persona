@@ -95,6 +95,7 @@ class PersonaService(IPersonaInterface):
             if datos_extendida:
                 extendida = PersonaExtendida(id_extendida=persona_nueva.id_persona, **datos_extendida)
                 session.add(extendida)
+                persona_nueva.persona_extendida = extendida
 
             session.commit()
             session.refresh(persona_nueva)
