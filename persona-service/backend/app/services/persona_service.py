@@ -139,6 +139,21 @@ class PersonaService(IPersonaInterface):
             if 'contacto' in data:
                 self.contacto_service.modificar_contacto(persona.contacto_id, data['contacto'], session)
 
+            if 'persona_extendida' in data:
+               datos_extendida=data['persona_extendida'] 
+
+               if persona.persona_extendida:
+                   for atributo, value in datos_extendida.items():
+                       setattr(persona.persona_extendida, atributo,value)
+
+                   persona.persona_extendida.updated_at = datetime.now(timezone.utc)
+
+               else:
+                    nueva_extendida = PersonaExtendida(**datos_extendida)
+                    nueva_extendida.id_extendida = persona.id_persona
+                    session.add(nueva_extendida)
+                    persona.persona_extendida = nueva_extendida        
+                   
             for field in ['nombre_persona', 'apellido_persona', 'fecha_nacimiento_persona', 'num_doc_persona']: 
                 if field in data_validada:
                     setattr(persona, field, data_validada[field])

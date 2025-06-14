@@ -14,7 +14,7 @@ class PersonaSchema(Schema):
 
     usuario_id=fields.Int(required=False)
     
-    persona_extendida=fields.Nested(PersonaExtendidaSchema, required=True)
+    persona_extendida=fields.Nested(PersonaExtendidaSchema, required=False, allow_none=True)
     domicilio=fields.Nested(DomicilioSchema, required=True)
     contacto=fields.Nested(ContactoSchema, required=True)
 

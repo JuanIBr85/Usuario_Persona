@@ -20,7 +20,7 @@ class Usuario(Base):
     deleted_at = Column(DateTime, nullable=True)
     password_changed_at = Column(DateTime, default=datetime.now(timezone.utc))    #este campo se actualiza cada vez q se cambia algo en las filas, cambiar a manual mas tarde
     password_expira_en = Column(DateTime, default=lambda: datetime.now(timezone.utc) + timedelta(days=365)) #agregar fecha de expiracion predeterminada - datetime.now(timezone.utc) + timedelta(days=365)
-
+    
     # Definir las relaciones y acomodar los nombres segun la tabla Entidad-relacion
     #persona = relationship("Persona") ---> solo comentado para poder hacer desarrollo hasta que podamos usar la tabla persona.
     roles = relationship("RolUsuario", back_populates="usuario")
