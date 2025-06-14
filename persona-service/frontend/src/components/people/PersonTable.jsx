@@ -2,7 +2,7 @@ import React from "react";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Eye, Pencil, Trash2 } from "lucide-react";
-import UserDeleteDialog from "./UserDeleteDialog";
+import UserDeleteDialog from "./PersonDeleteDialog";
 
 function UserTable({ users, onEdit, onSeeDetails, onDelete }) {
   return (
@@ -11,7 +11,6 @@ function UserTable({ users, onEdit, onSeeDetails, onDelete }) {
       <TableHeader>
         <TableRow>
           <TableHead>Nombre</TableHead>
-          <TableHead>Email</TableHead>
           <TableHead className="text-right">Acciones</TableHead>
         </TableRow>
       </TableHeader>
@@ -20,7 +19,6 @@ function UserTable({ users, onEdit, onSeeDetails, onDelete }) {
           users.map(user => (
             <TableRow key={user.id}>
               <TableCell className="font-medium">{user.nombre} {user.apellido}</TableCell>
-              <TableCell>{user.email}</TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end items-center gap-2">
                   <Button variant="outline" onClick={() => onSeeDetails(user.id)}>

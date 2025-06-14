@@ -5,14 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { Users } from "lucide-react";
 
-import UserFilter from "@/components/users/UserFilter";
+import UserFilter from "@/components/people/PersonFilter";
 import Loading from '@/components/loading/Loading';
 
 import { PersonaService } from "@/services/personaService";
 
-import UserTable from "@/components/users/UserTable";
-import UserEditDialog from "@/components/users/UserEditDialog";
-import UserBreadcrumb from "@/components/users/UserBreadcrumb";
+import UserTable from "@/components/people/PersonTable";
+import UserEditDialog from "@/components/people/PersonEditDialog";
+import UserBreadcrumb from "@/components/people/PersonBreadcrumb";
 
 /**
  * Componente AdminUsers
@@ -64,7 +64,6 @@ function AdminUsers() {
             id: persona.id_persona,
             nombre: persona.nombre_persona,
             apellido: persona.apellido_persona,
-            email: persona.email || "sin@email.com",
           }));
 
           setUsers(mappedUsers);
@@ -103,7 +102,7 @@ function AdminUsers() {
    * @param {number} id - ID del usuario
    */
   const handleSeeDetails = (id) => {
-    navigate(`/userdetails/${id}`);
+    navigate(`/persondetails/${id}`);
   };
 
   /**

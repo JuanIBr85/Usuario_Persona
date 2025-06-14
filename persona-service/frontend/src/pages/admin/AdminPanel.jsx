@@ -27,7 +27,7 @@ const adminOptions = [
     title: "Usuarios",
     description: "Gestionar cuentas de usuario",
     icon: <Users className="w-14 h-14 text-primary" />,
-    path: "/adminusers",
+    path: "/adminpersons",
   },
   {
     title: "Roles",
