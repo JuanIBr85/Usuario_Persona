@@ -19,7 +19,7 @@ const initialPersonaState = Object.freeze({
     domicilio_numero: '',
     domicilio_piso: '',
     domicilio_dpto: '',
-    codigo_postal: {
+    domicilio_postal: {
       codigo_postal: '',
       localidad: '',
       partido: '',
