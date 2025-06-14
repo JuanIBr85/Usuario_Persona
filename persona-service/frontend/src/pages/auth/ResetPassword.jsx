@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { KeyRound } from "lucide-react";
+import { RotateCcwKey } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import InputValidate from "@/components/inputValidate/InputValidate";
 import { SimpleDialog, FetchErrorMessage } from "@/components/SimpleDialog";
@@ -83,7 +83,7 @@ const ResetPassword = () => {
       {/* Layout visual reutilizable para formularios de autenticación */}
       <AuthLayout
         title="Restablecer contraseña"
-        visualContent={<KeyRound className="text-white w-42 h-42" />}
+        visualContent={<RotateCcwKey className="text-white w-42 h-42" />}
       >
         {/* Formulario principal */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 h-full">
