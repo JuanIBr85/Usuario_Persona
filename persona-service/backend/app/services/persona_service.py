@@ -16,7 +16,7 @@ from app.services.domicilio_service import DomicilioService
 from app.schema.persona_schema import PersonaSchema,PersonaResumidaSchema
 from app.interfaces.persona_interface import IPersonaInterface
 from app.extensions import SessionLocal
-
+from app.schema.persona_extendida_schema import PersonaExtendidaSchema
 
 class PersonaService(IPersonaInterface):
 
@@ -143,18 +143,20 @@ class PersonaService(IPersonaInterface):
             if 'persona_extendida' in data:
                datos_extendida=data['persona_extendida'] 
 
-               if persona.persona_extendida:
-                   for atributo, value in datos_extendida.items():
-                       setattr(persona.persona_extendida, atributo,value)
+            if persona.persona_extendida:
+                validate_data = PersonaExtendidaSchema().load(
+                    datos_extendida, 
+                    partial=True
+                )
+                for key, value in validate_data.items():
+                    setattr(persona.persona_extendida, key, value)
 
-                   persona.persona_extendida.updated_at = datetime.now(timezone.utc)
-
-               else:
-                    nueva_extendida = PersonaExtendida(**datos_extendida)
-                    nueva_extendida.id_extendida = persona.id_persona
-                    session.add(nueva_extendida)
-                    persona.persona_extendida = nueva_extendida        
-                   
+                persona.persona_extendida.updated_at = datetime.now(timezone.utc)
+            else:
+                nueva_extendida = PersonaExtendida(**datos_extendida)
+                nueva_extendida.id_extendida = persona.id_persona
+                session.add(nueva_extendida)
+                persona.persona_extendida = nueva_extendida        
             for field in ['nombre_persona', 'apellido_persona', 'fecha_nacimiento_persona', 'num_doc_persona']: 
                 if field in data_validada:
                     setattr(persona, field, data_validada[field])
@@ -165,6 +167,7 @@ class PersonaService(IPersonaInterface):
 
         # si ocurre un error deshace los cambios 
         except Exception as e:
+            print(">>>>>>>>>", e)
             session.rollback()
             raise e
 
