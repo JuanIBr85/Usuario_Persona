@@ -9,6 +9,7 @@ import FormServicios from "@/components/profile/FormServicios"
 import FormContacto from "@/components/profile/FormContacto"
 import FormDomicillio from "@/components/profile/FormDomicillio"
 import ProfilePhoto from "@/components/profile/ProfilePhoto"
+import FormPersonaExtendida from "@/components/profile/FormPersonaExtendida"
 import Loading from '@/components/loading/Loading'
 import {SimpleDialog} from '@/components/SimpleDialog'
 // Hooks y utilidades
@@ -68,10 +69,11 @@ const ProfileForm = () => {
                 />
 
                 <Tabs defaultValue="datos" className="w-full">
-                  <TabsList className="grid grid-cols-4 w-full mb-3">
+                  <TabsList className="flex flex-wrap gap-2 w-full mb-3 h-auto">
                     <TabsTrigger value="datos">Datos Personales</TabsTrigger>
                     <TabsTrigger value="contacto">Contacto</TabsTrigger>
                     <TabsTrigger value="domicilio">Domicilio</TabsTrigger>
+                    <TabsTrigger value="personaExtendida">Datos Extendidos</TabsTrigger>
                     <TabsTrigger value="servicios">Mis Servicios</TabsTrigger>
                   </TabsList>
 
@@ -97,6 +99,14 @@ const ProfileForm = () => {
                     <FormDomicillio
                       domicilio={personaData.domicilio || {}}
                       persona_id={personaData.id_persona}
+                      setPersonaData={setPersonaData}
+                    />
+                  </TabsContent>
+
+                  <TabsContent value="personaExtendida">
+                    <FormPersonaExtendida
+                      persona_id={personaData.id_persona}
+                      personaExtendida={personaData?.persona_extendida || {}}
                       setPersonaData={setPersonaData}
                     />
                   </TabsContent>
