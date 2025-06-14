@@ -216,3 +216,19 @@ def obtener_persona_usuario(id):
             message="Error al obtener persona",
             data={"server": str(e)}
         ),500
+    
+@persona_bp.route('/personas/count', methods=['GET'])
+def contar_personas():
+        try:
+            total = persona_service.contar_personas()
+            return make_response(
+                status=ResponseStatus.SUCCESS,
+                message="Cantidad de personas obtenida",
+                data={"total": total}
+            ), 200
+        except Exception as e:
+            return make_response(
+                status=ResponseStatus.ERROR,
+                message="Error al contar personas",
+                data={"server": str(e)}
+            ), 500

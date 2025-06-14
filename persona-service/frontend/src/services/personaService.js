@@ -37,7 +37,7 @@ export const PersonaService = {
   editar: async (id, body) => {
     return fetchService.fetch({
       url: `${ServiceURL.persona}/api/modificar_persona/${id}`,
-      method: HttpMethod.PUT, 
+      method: HttpMethod.PUT,
       body: body,
       useToken: true,
       showError: PersonaService.showError
@@ -90,4 +90,14 @@ export const PersonaService = {
       showError: PersonaService.showError
     });
   },
+
+  get_count: async () => {
+    return fetchService.fetch({
+      url: `${ServiceURL.persona}/api/personas/count`,
+      method: HttpMethod.GET,
+      useToken: true,
+      showError: PersonaService.showError
+    });
+  },
+
 };
