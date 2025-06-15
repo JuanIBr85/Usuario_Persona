@@ -40,7 +40,7 @@ services_route = {
 
 # Creamos reglas de ruta para mapear los endpoints con métodos
 rules = [Rule(f"/api/{path}", endpoint=path, methods=services_route[path].methods) for path in services_route]
-url_map = Map(rules)
+url_map = Map(rules, strict_slashes=False)
 
 
 @bp.before_request
