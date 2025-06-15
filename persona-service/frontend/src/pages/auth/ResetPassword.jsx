@@ -52,7 +52,7 @@ const ResetPassword = () => {
       setDialogMessage("Contraseña actualizada correctamente.");
       setIsSuccess(true);
       localStorage.removeItem("reset_token"); // Eliminamos el token ya usado
-
+      localStorage.removeItem("email_para_reset");
     } catch (error) {
       // Si hay error, mostramos el mensaje correspondiente
       console.error("Error:", error);

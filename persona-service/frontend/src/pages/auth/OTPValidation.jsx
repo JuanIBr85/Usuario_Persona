@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import InputValidate from "@/components/inputValidate/InputValidate";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
 import { formSubmitJson } from "@/utils/formUtils";
@@ -15,19 +14,23 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { useAuthContext } from "@/context/AuthContext";
 
 function OTPValidation() {
   const navigate = useNavigate();
-  const { authData } = useAuthContext();
   const location = useLocation();
   const toRedirect = location.state?.from || "/auth/resetpassword";
-  const email = location.state?.email || authData.user.email_usuario || localStorage.getItem("email_para_reset") || "";
+  const email = localStorage.getItem("email_para_reset");
 
   const [isOpen, setIsOpen] = React.useState(false);
   const [dialogMessage, setMessage] = React.useState("");
   const [isOK, setIsOK] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
+
+  useEffect(() => {
+    if (!email) {
+      navigate("/auth/login");
+    }
+  }, [email, navigate]);
 
   const handleSubmit = async (event) => {
     const formData = await formSubmitJson(event);
