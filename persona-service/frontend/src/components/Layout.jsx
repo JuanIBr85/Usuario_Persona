@@ -14,13 +14,11 @@ import AccessibilityMenu from './AccesibilityMenu';
  * @returns {JSX.Element} Estructura de la página con Header, Footer, Main y menú de accesibilidad.
  */
 
-const HiddenLayoutRoutes = ["/login", "/sign", "/forgotPassword", "/otpvalidation", "/resetpassword"];
-
 const Layout = ({ children }) => {
   const location = useLocation();
 
   // Oculta Header y Footer en rutas específicas (login, sign, forgotPassword)
-  const hideHeaderFooter = HiddenLayoutRoutes.some(path => location.pathname.startsWith(path));
+  const hideHeaderFooter = location.pathname.includes("/auth/");
 
   return (
     <div className="flex flex-col h-screen">

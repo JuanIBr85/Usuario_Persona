@@ -50,7 +50,7 @@ function ForgotPassword() {
         setIsOpen={(value) => {
           setIsOpen(value);
           if (!value && dialogMessage.includes("Se ha enviado un codigo")) {
-            navigate("/otpvalidation");
+            navigate("/auth/otpvalidation");
           }
         }}
       />
@@ -72,10 +72,10 @@ function ForgotPassword() {
             required
           />
           <Button variant="link" asChild className="p-0">
-            <Link to="/login">¿Ya tienes una cuenta? Inicia sesión</Link>
+            <Link to="/auth/login">¿Ya tienes una cuenta? Inicia sesión</Link>
           </Button>
           <Button variant="link" asChild className="p-0">
-            <Link to="/sign">¿No tienes una cuenta? Regístrate</Link>
+            <Link to="/auth/sign">¿No tienes una cuenta? Regístrate</Link>
           </Button>
           <Button type="submit" className="mt-4">Solicitar cambio de contraseña</Button>
 

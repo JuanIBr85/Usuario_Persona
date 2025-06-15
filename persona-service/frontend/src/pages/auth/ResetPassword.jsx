@@ -76,7 +76,7 @@ const ResetPassword = () => {
         isOpen={isOpen}
         setIsOpen={setIsOpen}
         actionHandle={
-          isSuccess ? () => setTimeout(() => navigate("/login"), 500) : undefined
+          isSuccess ? () => setTimeout(() => navigate("/auth/login"), 500) : undefined
         }
       />
 

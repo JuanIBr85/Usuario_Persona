@@ -88,7 +88,7 @@ export function useProfile() {
 
   useEffect(() => {
     if (!authData.token) {
-      navigate('/login');
+      navigate('/auth/login');
       return;
     }
     fetchData();

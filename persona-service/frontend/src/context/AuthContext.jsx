@@ -40,7 +40,7 @@ function AuthContextProvider({ children }) {
                     description: "Su sesión ha expirado. Por favor, inicie sesión de nuevo.",
                 });
 
-                setTimeout(() => window.location.href = '/logout', 1000*60);
+                setTimeout(() => window.location.href = '/auth/logout', 1000*60);
             }
 
         }, 1000 * 30); // Verificar cada 30 segundos
@@ -71,7 +71,7 @@ function AuthContextProvider({ children }) {
                 isOpen={dialog}
                 actionHandle={() => {
                     setDialog(null);
-                    setTimeout(() => window.location.href = '/logout', 2000);
+                    setTimeout(() => window.location.href = '/auth/logout', 2000);
                 }}
             />}
             {children}

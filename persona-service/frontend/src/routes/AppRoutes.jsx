@@ -31,11 +31,8 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<AdminPanel />} />
       <Route path="profile" element={<Profile />} />
+      <Route path="perfilconnect" element={<PerfilConnect />} />
       <Route path="adminpanel" element={<AdminPanel />} />
-      <Route path="login" element={<Login />} />
-      <Route path="sign" element={<Sign />} />
-      <Route path="logout" element={<Logout />} />
-      <Route path="otpvalidation" element={<OTPValidation />} />
       <Route path="logs" element={<Logs />} />
       <Route path="adminpersons" element={<AdminPersons />} />
       <Route path="adminroles" element={<AdminRoles />} />
@@ -44,9 +41,14 @@ function AppRoutes() {
       <Route path="termsofservice" element={<TermsOfService />} />
       <Route path="faq" element={<Faq />} />
       <Route path="*" element={<NotFound />} />
-      <Route path="forgotpassword" element={<ForgotPassword />} />
-      <Route path="resetpassword" element={<ResetPassword />} />
-      <Route path="perfilconnect" element={<PerfilConnect />} />
+
+
+      <Route path="auth/forgotpassword" element={<ForgotPassword />} />
+      <Route path="auth/resetpassword" element={<ResetPassword />} />
+      <Route path="auth/login" element={<Login />} />
+      <Route path="auth/sign" element={<Sign />} />
+      <Route path="auth/logout" element={<Logout />} />
+      <Route path="auth/otpvalidation" element={<OTPValidation />} />
     </Routes>
   )
 }

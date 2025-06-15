@@ -21,7 +21,7 @@ function OTPValidation() {
   const navigate = useNavigate();
   const { authData } = useAuthContext();
   const location = useLocation();
-  const toRedirect = location.state?.from || "/resetpassword";
+  const toRedirect = location.state?.from || "/auth/resetpassword";
   const email = location.state?.email || authData.user.email_usuario || localStorage.getItem("email_para_reset") || "";
 
   const [isOpen, setIsOpen] = React.useState(false);

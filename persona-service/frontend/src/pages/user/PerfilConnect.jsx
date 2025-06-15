@@ -5,33 +5,13 @@ import InputValidate from "@/components/inputValidate/InputValidate";
 import { Button } from "@/components/ui/button";
 import Loading from "@/components/loading/Loading";
 import { SimpleDialog } from "@/components/SimpleDialog";
-import {
-    Carousel,
-    CarouselContent,
-    CarouselItem,
-    CarouselNext,
-    CarouselPrevious,
-} from "@/components/ui/carousel"
+import SimpleCarousel from "@/components/SimpleCarousel";
 import { useEffect, useState } from "react";
 import React from "react";
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/components/ui/input-otp";
 import { Label } from "@/components/ui/label";
 
-const SimpleCarousel = ({ children, setApi }) => {
-    return (
-        <Carousel setApi={setApi}>
-            <CarouselContent>
-                {React.Children.map(children, (child, index) => (
-                    <CarouselItem key={`carousel-${index}`}>
-                        {child}
-                    </CarouselItem>
-                ))}
-            </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
-        </Carousel>
-    )
-}
+
 
 function PerfilConnect() {
     const [loading, setLoading] = useState(false);

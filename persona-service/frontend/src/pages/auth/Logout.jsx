@@ -10,7 +10,7 @@ const Logout = () => {
   useEffect(() => {
     removeAuthData();
     sessionStorage.clear();
-    navigate('/login');
+    navigate('/auth/login');
   }, [navigate]);
 
   return (

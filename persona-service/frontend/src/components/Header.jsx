@@ -61,7 +61,7 @@ const Header = () => {
                             >
                                 Perfil
                             </NavLink></li>
-                            <li><NavLink to="/logout">Cerrar Sesión</NavLink></li>
+                            <li><NavLink to="/auth/logout">Cerrar Sesión</NavLink></li>
                         </ul>
                         <div className="md:hidden" ref={hamburgerRef}>
                             <Hamburger toggled={isOpen} toggle={setIsOpen} />
@@ -76,7 +76,7 @@ const Header = () => {
                     >
                         <li><NavLink to="/adminpanel" onClick={() => setIsOpen(false)}>Panel de Administrador</NavLink></li>
                         <li><NavLink to="/profile" onClick={() => setIsOpen(false)} >Perfil</NavLink></li>
-                        <li><NavLink to="/logout" onClick={() => setIsOpen(false)}>Cerrar Sesión</NavLink></li>
+                        <li><NavLink to="/auth/logout" onClick={() => setIsOpen(false)}>Cerrar Sesión</NavLink></li>
                     </ul>
 
                 </div>
