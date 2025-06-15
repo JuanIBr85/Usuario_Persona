@@ -25,6 +25,12 @@ function AuthContextProvider({ children }) {
     const [dialog, setDialog] = useState(null); 
     const navigate = useNavigate();
 
+    const toLogout = () => {
+        if(!window.location.pathname.includes("/auth/")){
+            window.location.href = '/auth/logout';
+        }
+    }
+
     useEffect(() => {
         // Verificar expiración del token cada minuto
         const interval = setInterval(() => {
@@ -41,7 +47,7 @@ function AuthContextProvider({ children }) {
                     description: "Su sesión ha expirado. Por favor, inicie sesión de nuevo.",
                 });
 
-                setTimeout(() => window.location.href = '/auth/logout', 1000*60);
+                setTimeout(toLogout, 1000*60);
             }
 
         }, 1000 * 30); // Verificar cada 30 segundos
@@ -84,7 +90,7 @@ function AuthContextProvider({ children }) {
                 isOpen={dialog}
                 actionHandle={() => {
                     setDialog(null);
-                    setTimeout(() => window.location.href = '/auth/logout', 2000);
+                    setTimeout(toLogout, 2000);
                 }}
             />}
             {children}
