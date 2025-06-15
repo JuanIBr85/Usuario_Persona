@@ -30,7 +30,7 @@ const ProfileForm = () => {
     handlePhotoChange,
     setPersonaData,
     dialog ,
-    setDialog 
+    setDialog,
   } = useProfile();
 
   const lastUpdate = tiempoTranscurrido(personaData.updated_at);
@@ -49,8 +49,10 @@ const ProfileForm = () => {
         setIsOpen={()=>setDialog(null)}
       />
       <Fade duration={300} triggerOnce>
-        <div className="w-full flex items-center justify-center sm:p-4">
-          <div className="w-full h-full sm:h-auto sm:max-w-md md:max-w-2xl shadow-md rounded-xl overflow-hidden">
+        
+
+        <div className="w-full flex items-center justify-center sm:p-4" >
+          <div className="w-full h-full sm:h-auto md:max-w-7xl shadow-md rounded-xl overflow-hidden w-full flex items-center justify-center sm:p-4">
             <Card className="w-full h-full rounded-xl">
               <CardHeader className="text-center">
                 <CardTitle className="text-2xl">
