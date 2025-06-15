@@ -58,16 +58,17 @@ function AdminUsers() {
   useEffect(() => {
     PersonaService.get_all()
       .then(res => {
-        if (res && res.data) {
-          // Mapea la respuesta para adaptar estructura de usuarios
+        if (res && res.data && Array.isArray(res.data)) {
           const mappedUsers = res.data.map(persona => ({
             id: persona.id_persona,
             nombre: persona.nombre_persona,
             apellido: persona.apellido_persona,
             tipo_documento: persona.tipo_documento,
-            nro_documento: persona.num_doc_persona
+            nro_documento: persona.num_doc_persona,
+            fecha_nacimiento: persona.fecha_nacimiento_persona,
+            usuario_id: persona.usuario_id
           }));
-          console.log(mappedUsers)
+          console.log("mappedUsers:", mappedUsers);
           setUsers(mappedUsers);
         }
       })
@@ -83,7 +84,7 @@ function AdminUsers() {
       user.nro_documento.toLowerCase().includes(filtro.toLowerCase());
     return textoMatch;
   });
-  console.log("usuariosFiltrados",usuariosFiltrados)
+  console.log("usuariosFiltrados", usuariosFiltrados)
 
   /**
    * Elimina un usuario por id.
@@ -113,23 +114,39 @@ function AdminUsers() {
    * Actualiza el usuario en la lista local y hace petición para actualizar en backend.
    * @param {Event} e - Evento submit del formulario
    */
-  const handleEditSubmit = (e) => {
+  const handleEditSubmit = async (e) => {
     e.preventDefault();
 
-    setUsers(users.map(u => u.id === editingUser.id ? editingUser : u));
+    setErrorMsg(null); // reseteo error previo
 
+    // Construye el body con todos los campos para enviar al backend
     const body = {
       nombre_persona: editingUser.nombre || '',
       apellido_persona: editingUser.apellido || '',
+      tipo_documento: editingUser.tipo_documento || 'DNI',
+      num_doc_persona: editingUser.nro_documento || '',
+      fecha_nacimiento_persona: editingUser.fecha_nacimiento || '',
+      usuario_id: editingUser.usuario_id || null
     };
 
-    PersonaService.editar(editingUser.id, body)
-      .catch(err => {
-        console.error("Error actualizando usuario:", err);
-      });
+    try {
+      await PersonaService.editar(editingUser.id, body);
 
-    setEditingUser(null);
+      // Actualiza el estado local solo si la petición fue exitosa
+      setUsers(users.map(u => u.id === editingUser.id ? editingUser : u));
+      setEditingUser(null);
+    } catch (err) {
+      // Captura el mensaje de error que venga del backend (suponiendo formato JSON)
+      if (err.data && err.data.error && err.data.error.server) {
+        setErrorMsg(err.data.error.server);
+      } else {
+        setErrorMsg("Error inesperado al actualizar usuario.");
+      }
+      console.error("Error actualizando usuario:", err);
+    }
   };
+
+
 
   // Muestra loader si aún no hay usuarios cargados
   if (!users) return <Loading />;

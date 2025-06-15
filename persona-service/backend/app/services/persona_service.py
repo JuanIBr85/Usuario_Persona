@@ -158,7 +158,7 @@ class PersonaService(IPersonaInterface):
                     persona.persona_extendida = nueva_extendida     
 
 
-            for field in ['nombre_persona', 'apellido_persona', 'fecha_nacimiento_persona', 'num_doc_persona']: 
+            for field in ['nombre_persona', 'apellido_persona', 'fecha_nacimiento_persona', 'num_doc_persona' , 'tipo_documento']: 
                 if field in data_validada:
                     setattr(persona, field, data_validada[field])
 
