@@ -141,22 +141,23 @@ class PersonaService(IPersonaInterface):
                 self.contacto_service.modificar_contacto(persona.contacto_id, data['contacto'], session)
 
             if 'persona_extendida' in data:
-               datos_extendida=data['persona_extendida'] 
-
-            if persona.persona_extendida:
+                datos_extendida=data['persona_extendida'] 
                 validate_data = PersonaExtendidaSchema().load(
-                    datos_extendida, 
-                    partial=True
-                )
-                for key, value in validate_data.items():
-                    setattr(persona.persona_extendida, key, value)
+                        datos_extendida, 
+                        partial=True
+                    )
+                if persona.persona_extendida:
+                    for key, value in validate_data.items():
+                        setattr(persona.persona_extendida, key, value)
 
-                persona.persona_extendida.updated_at = datetime.now(timezone.utc)
-            else:
-                nueva_extendida = PersonaExtendida(**datos_extendida)
-                nueva_extendida.id_extendida = persona.id_persona
-                session.add(nueva_extendida)
-                persona.persona_extendida = nueva_extendida        
+                    persona.persona_extendida.updated_at = datetime.now(timezone.utc)
+                else:
+                    nueva_extendida = PersonaExtendida(**validate_data)
+                    nueva_extendida.id_extendida = persona.id_persona
+                    session.add(nueva_extendida)
+                    persona.persona_extendida = nueva_extendida     
+
+
             for field in ['nombre_persona', 'apellido_persona', 'fecha_nacimiento_persona', 'num_doc_persona']: 
                 if field in data_validada:
                     setattr(persona, field, data_validada[field])
@@ -167,7 +168,9 @@ class PersonaService(IPersonaInterface):
 
         # si ocurre un error deshace los cambios 
         except Exception as e:
-            print(">>>>>>>>>", e)
+            import traceback
+            print("Error al modificar persona:")
+            print(traceback.format_exc())
             session.rollback()
             raise e
 
