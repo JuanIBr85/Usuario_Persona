@@ -9,7 +9,7 @@ import PersonFilter from "@/components/people/PersonFilter";
 import Loading from '@/components/loading/Loading';
 
 import { PersonaService } from "@/services/personaService";
-
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import PersonTable from "@/components/people/PersonTable";
 import PersonEditDialog from "@/components/people/PersonEditDialog";
 import PersonBreadcrumb from "@/components/people/PersonBreadcrumb";
@@ -53,6 +53,8 @@ function AdminUsers() {
   const [mostrarFiltroAvanzado, setMostrarFiltroAvanzado] = useState(false);
   // Texto del filtro
   const [filtro, setFiltro] = useState("");
+
+  const [alert, setAlert] = useState(null)
 
   // Carga inicial de usuarios al montar el componente
   useEffect(() => {
@@ -109,6 +111,7 @@ function AdminUsers() {
     navigate(`/persondetails/${id}`);
   };
 
+
   /**
    * Maneja el envío del formulario de edición.
    * Actualiza el usuario en la lista local y hace petición para actualizar en backend.
@@ -117,7 +120,6 @@ function AdminUsers() {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
 
-    setErrorMsg(null); // reseteo error previo
 
     // Construye el body con todos los campos para enviar al backend
     const body = {
@@ -136,17 +138,17 @@ function AdminUsers() {
       setUsers(users.map(u => u.id === editingUser.id ? editingUser : u));
       setEditingUser(null);
     } catch (err) {
-      // Captura el mensaje de error que venga del backend (suponiendo formato JSON)
-      if (err.data && err.data.error && err.data.error.server) {
-        setErrorMsg(err.data.error.server);
-      } else {
-        setErrorMsg("Error inesperado al actualizar usuario.");
-      }
+
       console.error("Error actualizando usuario:", err);
+
+      const message = err?.response?.data?.message || err.message || "Error desconocido";
+
+      setAlert({
+        title: "Error al actualizar usuario",
+        description: message,
+      });
     }
   };
-
-
 
   // Muestra loader si aún no hay usuarios cargados
   if (!users) return <Loading />;
@@ -154,6 +156,18 @@ function AdminUsers() {
   return (
     <div className="p-6 space-y-6 py-30 px-3 md:py-25 md:px-15">
       <Fade duration={300} triggerOnce>
+        {alert && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertTitle>{alert.title}</AlertTitle>
+            <AlertDescription>{alert.description}</AlertDescription>
+            <button
+              onClick={() => setAlert(null)}
+              className="ml-auto bg-transparent text-red-600 hover:text-red-800 font-semibold"
+            >
+              Cerrar
+            </button>
+          </Alert>
+        )}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
