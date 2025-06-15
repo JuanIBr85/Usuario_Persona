@@ -71,7 +71,8 @@ export function useProfile() {
         setShowFormEmailVerify(true);
         setDialog({
           title: "No hay un perfil",
-          description: "Complete los datos de perfil para continuar"
+          description: "Complete los datos de perfil para continuar",
+          action: () => navigate('/perfilConnect')
         });
         
       }else{
