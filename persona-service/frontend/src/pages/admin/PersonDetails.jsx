@@ -42,27 +42,42 @@ function UserDetails() {
         console.log("Respuesta completa:", res);
         if (res?.data) {
           const persona = res.data;
+
           const userMapped = {
             id: persona.id_persona,
-            nombre: `${persona.nombre_persona}`,
-            apellido: `${persona.apellido_persona}`,
+            usuario_id: persona.usuario_id || null,
 
-            email: persona.contacto?.email_contacto || "Sin email",
-            telefono: persona.contacto?.telefono_movil || "Sin teléfono",
+            nombre: persona.nombre_persona || "",
+            apellido: persona.apellido_persona || "",
 
-            calle: persona.domicilio ? persona.domicilio.domicilio_calle : "Sin dirección",
-            numero: persona.domicilio ? persona.domicilio.domicilio_numero : "",
-            piso: persona.domicilio ? persona.domicilio.domicilio_piso : "",
-            dpto: persona.domicilio ? persona.domicilio.domicilio_dpto : "",
-            referencia: persona.domicilio ? persona.domicilio.domicilio_referencia : "",
-            codigo_postal: persona.domicilio ? persona.domicilio.domicilio_postal.codigo_postal : "",
-            localidad: persona.domicilio ? persona.domicilio.domicilio_postal.localidad : "",
-            partido: persona.domicilio ? persona.domicilio.domicilio_postal.partido : "",
-            provincia: persona.domicilio ? persona.domicilio.domicilio_postal.provincia : "",
-
-            fechaRegistro: new Date(persona.created_at).toLocaleDateString(),
             tipo_documento: persona.tipo_documento || "Tipo de documento indefinido",
-            documento: `${persona.num_doc_persona}`,
+            documento: persona.num_doc_persona || "",
+
+            fecha_nacimiento: persona.fecha_nacimiento_persona || "",
+            fechaRegistro: new Date(persona.created_at).toLocaleDateString(),
+            fechaActualizacion: new Date(persona.updated_at).toLocaleDateString(),
+            eliminado: persona.deleted_at !== null,
+
+            // Contacto
+            email: persona.contacto?.email_contacto || "Sin email",
+            telefono_movil: persona.contacto?.telefono_movil || "Sin móvil",
+            telefono_fijo: persona.contacto?.telefono_fijo || "Sin fijo",
+            red_social_nombre: persona.contacto?.red_social_nombre || "Sin red social",
+            red_social_contacto: persona.contacto?.red_social_contacto || "Sin nombre de usuario en red",
+            observacion_contacto: persona.contacto?.observacion_contacto || "",
+
+            // Domicilio
+            calle: persona.domicilio?.domicilio_calle || "Sin dirección",
+            numero: persona.domicilio?.domicilio_numero || "",
+            piso: persona.domicilio?.domicilio_piso || "",
+            dpto: persona.domicilio?.domicilio_dpto || "",
+            referencia: persona.domicilio?.domicilio_referencia || "",
+            codigo_postal: persona.domicilio?.domicilio_postal?.codigo_postal || "",
+            localidad: persona.domicilio?.domicilio_postal?.localidad || "",
+            partido: persona.domicilio?.domicilio_postal?.partido || "",
+            provincia: persona.domicilio?.domicilio_postal?.provincia || "",
+            domicilio_id: persona.domicilio?.id_domicilio || null,
+            domicilio_cp_id: persona.domicilio?.codigo_postal_id || null,
           };
           setUser(userMapped);
         }
@@ -77,9 +92,9 @@ function UserDetails() {
     const body = {
       nombre_persona: editingUser.nombre,
       apellido_persona: editingUser.apellido,
-      fecha_nacimiento_persona: "1990-05-10", // TODO
-      tipo_documento: "", // TODO
-      num_doc_persona: "12345678", // TODO
+      tipo_documento: editingUser.tipo_documento || "",
+      num_doc_persona: editingUser.documento || "",
+      fecha_nacimiento_persona: editingUser.fecha_nacimiento || '',
 
       domicilio: {
         domicilio_calle: editingUser.calle,
@@ -96,14 +111,14 @@ function UserDetails() {
       },
 
       contacto: {
-        telefono_movil: editingUser.telefono,
-        telefono_fijo: "",  // TODO
-        red_social_contacto: "",  // TODO
-        red_social_nombre: "", // TODO
-        email_contacto: editingUser.email,
-        observacion_contacto: "Contacto principal"
+        telefono_movil: editingUser.telefono_movil || "",
+        telefono_fijo: editingUser.telefono_fijo || "",
+        red_social_contacto: editingUser.red_social_contacto || null,
+        red_social_nombre: editingUser.red_social_nombre || null,
+        email_contacto: editingUser.email || "",
       }
     };
+
 
     e.preventDefault();
     console.log(editingUser)
@@ -122,19 +137,84 @@ function UserDetails() {
         <Card>
           <CardHeader>
             <CardTitle className="inline-flex items-center gap-1">
-              <User /> Perfil de Usuario
+              <User /> Perfil de Persona
             </CardTitle>
-            <CardDescription>Información detallada del usuario.</CardDescription>
+            <CardDescription>Información detallada de la persona.</CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-4">
             {[
-              { label: "Nombre completo", icon: User, value: user.nombre + " " + user.apellido },
+              { label: "Nombre completo", icon: User, value: `${user.nombre} ${user.apellido}` },
               { label: "Correo electrónico", icon: Mail, value: user.email },
-              { label: "Teléfono", icon: Phone, value: user.telefono },
-              { label: "Dirección", icon: MapPin, value: user.localidad + " (" + user.codigo_postal + ") " + user.calle + " " + user.numero + " " + user.dpto },
-              { label: "Fecha de Registro", icon: Calendar, value: user.fechaRegistro },
-              { label: user.tipo_documento, icon: IdCard, value: user.documento },
+              {
+                label: "Teléfonos",
+                icon: Phone,
+                value: (
+                  <div className="flex gap-x-6">
+                    <span><strong>Móvil:</strong> {user.telefono_movil || "-"}</span>
+                    <span><strong>Fijo:</strong> {user.telefono_fijo || "-"}</span>
+                  </div>
+                ),
+              },
+              {
+                label: "Red social",
+                icon: BadgeCheck,
+                value: user.red_social_nombre
+                  ? `${user.red_social_nombre} (${user.red_social_contacto || "sin usuario"})`
+                  : "Sin red social",
+              },
+              { label: "Observaciones", icon: BadgeCheck, value: user.observacion_contacto || "Sin observaciones" },
+
+              {
+                label: "Dirección y Ubicación",
+                icon: MapPin,
+                value: (
+                  <div className="flex flex-wrap gap-x-4 gap-y-1">
+                    <span>
+                      <strong>Dirección:</strong> {`${user.localidad || "-"} (${user.codigo_postal || "-"}) - ${user.calle || "-"} ${user.numero || "-"} - Piso: ${user.piso || "-"} Dpto: ${user.dpto || "-"}`}
+                    </span>
+                    <span>
+                      <strong>Referencia:</strong> {user.referencia || "Sin referencia"}
+                    </span>
+                    <span>
+                      <strong>Partido:</strong> {user.partido || "-"}
+                    </span>
+                    <span>
+                      <strong>Provincia:</strong> {user.provincia || "-"}
+                    </span>
+                  </div>
+                )
+              },
+
+              {
+                // Grupo: Tipo de documento y Número de documento en la misma línea
+                label: "Documento",
+                icon: IdCard,
+                value: (
+                  <div className="flex gap-x-6">
+                    <span><strong>Tipo:</strong> {user.tipo_documento || "-"}</span>
+                    <span><strong>Número:</strong> {user.documento || "-"}</span>
+                  </div>
+                ),
+              },
+
+              {
+                label: "Fecha de nacimiento",
+                icon: Calendar,
+                value: user.fecha_nacimiento || "-",
+              },
+
+              {
+                // Grupo: Fecha de registro y Última actualización en la misma línea
+                label: "Fechas",
+                icon: Calendar,
+                value: (
+                  <div className="flex gap-x-6">
+                    <span><strong>Registro:</strong> {user.fechaRegistro || "-"}</span>
+                    <span><strong>Última actualización:</strong> {user.fechaActualizacion || "-"}</span>
+                  </div>
+                ),
+              },
             ].map(({ label, icon: Icon, value }) => (
               <div key={label} className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-4 border-b pb-4">
                 <span className="text-sm text-gray-500 font-medium inline-flex items-center gap-1">
@@ -218,8 +298,8 @@ function UserDetails() {
                   <Label htmlFor="telefono">Teléfono</Label>
                   <Input
                     id="telefono"
-                    value={editingUser.telefono}
-                    onChange={(e) => setEditingUser({ ...editingUser, telefono: e.target.value })}
+                    value={editingUser.telefono_movil}
+                    onChange={(e) => setEditingUser({ ...editingUser, telefono_movil: e.target.value })}
                   />
                 </div>
                 <div className="grid gap-2">
@@ -292,6 +372,51 @@ function UserDetails() {
                     id="provincia"
                     value={editingUser.provincia}
                     onChange={(e) => setEditingUser({ ...editingUser, provincia: e.target.value })}
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="fecha_nacimiento">Fecha de nacimiento</Label>
+                  <Input
+                    id="fecha_nacimiento"
+                    type="date"
+                    value={editingUser.fecha_nacimiento || ""}
+                    onChange={(e) => setEditingUser({ ...editingUser, fecha_nacimiento: e.target.value })}
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="tipo_documento">Tipo de documento</Label>
+                  <Input
+                    id="tipo_documento"
+                    value={editingUser.tipo_documento || ""}
+                    onChange={(e) => setEditingUser({ ...editingUser, tipo_documento: e.target.value })}
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="documento">Número de Documento</Label>
+                  <Input
+                    id="documento"
+                    value={editingUser.documento || ""}
+                    onChange={(e) => setEditingUser({ ...editingUser, documento: e.target.value })}
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="red_social_nombre">Red Social</Label>
+                  <Input
+                    id="red_social_nombre"
+                    value={editingUser.red_social_nombre || ""}
+                    onChange={(e) => setEditingUser({ ...editingUser, red_social_nombre: e.target.value })}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="red_social_contacto">Usuario de Red Social</Label>
+                  <Input
+                    id="red_social_contacto"
+                    value={editingUser.red_social_contacto || ""}
+                    onChange={(e) => setEditingUser({ ...editingUser, red_social_contacto: e.target.value })}
                   />
                 </div>
               </div>
