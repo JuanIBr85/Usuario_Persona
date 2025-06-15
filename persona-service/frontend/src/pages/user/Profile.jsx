@@ -46,7 +46,10 @@ const ProfileForm = () => {
         title={dialog?.title} 
         description={dialog?.description} 
         isOpen={dialog}
-        setIsOpen={()=>setDialog(null)}
+        actionHandle={()=>{
+          setDialog(null);
+          setTimeout(() => dialog?.action(), 500);
+        }}
       />
       <Fade duration={300} triggerOnce>
         
@@ -125,7 +128,6 @@ const ProfileForm = () => {
 
               <CardFooter className="flex justify-between text-sm text-gray-500 border-t">
                 <span>Última actualización: hace {lastUpdate}</span>
-                <span>Perfil verificado</span>
               </CardFooter>
             </Card>
           </div>
