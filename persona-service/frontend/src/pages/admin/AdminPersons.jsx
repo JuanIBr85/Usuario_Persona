@@ -64,8 +64,10 @@ function AdminUsers() {
             id: persona.id_persona,
             nombre: persona.nombre_persona,
             apellido: persona.apellido_persona,
+            tipo_documento: persona.tipo_documento,
+            nro_documento: persona.num_doc_persona
           }));
-
+          console.log(mappedUsers)
           setUsers(mappedUsers);
         }
       })
@@ -78,9 +80,10 @@ function AdminUsers() {
   const usuariosFiltrados = users.filter(user => {
     const textoMatch =
       `${user.nombre} ${user.apellido}`.toLowerCase().includes(filtro.toLowerCase()) ||
-      user.email.toLowerCase().includes(filtro.toLowerCase());
+      user.nro_documento.toLowerCase().includes(filtro.toLowerCase());
     return textoMatch;
   });
+  console.log("usuariosFiltrados",usuariosFiltrados)
 
   /**
    * Elimina un usuario por id.

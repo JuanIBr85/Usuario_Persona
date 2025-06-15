@@ -12,7 +12,7 @@ function PersonFilter({mostrarFiltroAvanzado, setMostrarFiltroAvanzado, filtro, 
     <div className="flex flex-col md:flex-row items-center gap-3 mb-4">
       {/* Input para filtrar texto */}
       <Input
-        placeholder="Buscar usuario por nombre, apellido o email"
+        placeholder="Buscar usuario por nombre o número de documento..."
         className="w-full md:w-1/3"
         value={filtro}
         onChange={(e) => setFiltro(e.target.value)}

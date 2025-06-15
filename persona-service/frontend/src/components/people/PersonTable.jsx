@@ -11,6 +11,7 @@ function PersonTable({ users, onEdit, onSeeDetails, onDelete }) {
       <TableHeader>
         <TableRow>
           <TableHead>Nombre</TableHead>
+          <TableHead>Nro. Documento</TableHead>
           <TableHead className="text-right">Acciones</TableHead>
         </TableRow>
       </TableHeader>
@@ -19,6 +20,8 @@ function PersonTable({ users, onEdit, onSeeDetails, onDelete }) {
           users.map(user => (
             <TableRow key={user.id}>
               <TableCell className="font-medium">{user.nombre} {user.apellido}</TableCell>
+              <TableCell className="font-medium">{user.nro_documento} </TableCell>
+
               <TableCell className="text-right">
                 <div className="flex justify-end items-center gap-2">
                   <Button variant="outline" onClick={() => onSeeDetails(user.id)}>

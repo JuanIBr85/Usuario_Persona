@@ -13,7 +13,7 @@ const defaultData = Object.freeze({
         email_usuario: "",
         permisos: [],
         rol: "",
-        expires_in:null//Date
+        expires_in: null//Date
     },
 });
 
@@ -30,7 +30,7 @@ function AuthContextProvider({ children }) {
             if (!authData.user?.expires_in) return;
             const now = new Date();
             const expirationDate = new Date(authData.user.expires_in);
-            
+
             if (now > expirationDate) {
                 // Token expirado, limpiar datos de autenticación
                 removeAuthData();
@@ -39,24 +39,26 @@ function AuthContextProvider({ children }) {
                     title: "Sesión expirada",
                     description: "Su sesión ha expirado. Por favor, inicie sesión de nuevo.",
                 });
-                
-                window.location.href = '/logout'
+
+                setTimeout(() => {
+                    window.location.href = '/logout';
+                }, 4000); // Esperar 4 segundos antes de redirigir
             }
-            
-        }, 1000*30); // Verificar cada 30 segundos
+
+        }, 1000 * 30); // Verificar cada 30 segundos
 
         return () => clearInterval(interval);
     }, [authData.user?.expires_in]);
 
-    const removeAuthData = ()=>{
+    const removeAuthData = () => {
         setAuthData(defaultData);
         localStorage.removeItem('authData');
         localStorage.removeItem('token');
     }
 
     const updateData = (values) => {
-        setAuthData(data=>{
-            const newData = {...data, ...values};
+        setAuthData(data => {
+            const newData = { ...data, ...values };
             localStorage.setItem("authData", JSON.stringify(newData));
             localStorage.setItem("token", newData.token);
             return newData;
@@ -64,11 +66,11 @@ function AuthContextProvider({ children }) {
     };
 
     return (
-        <AuthContext.Provider value={{authData, updateData, removeAuthData}}>
-            {dialog && <SimpleDialog 
-                title={dialog.title} 
-                description={dialog.description} 
-                isOpen={dialog} 
+        <AuthContext.Provider value={{ authData, updateData, removeAuthData }}>
+            {dialog && <SimpleDialog
+                title={dialog.title}
+                description={dialog.description}
+                isOpen={dialog}
                 actionHandle={() => setDialog(null)}
             />}
             {children}
@@ -78,6 +80,6 @@ function AuthContextProvider({ children }) {
 
 export const useAuthContext = () => {
     return useContext(AuthContext);
-};  
+};
 
 export default AuthContextProvider;
