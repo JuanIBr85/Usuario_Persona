@@ -31,7 +31,7 @@ const initialPersonaState = Object.freeze({
 export function useProfile() {
   const navigate = useNavigate();
   const { authData } = useAuthContext();
-  
+
   const [isLoading, setIsLoading] = useState(true);
   const [personaData, setPersonaData] = useState(initialPersonaState);
   const [photoUrl, setPhotoUrl] = useState('https://i.pravatar.cc/150?img=69');
@@ -67,15 +67,20 @@ export function useProfile() {
         });
       }
     } catch (error) {
-      if(error.statusCode === 404){
+      if (error.statusCode === 404) {
         setShowFormEmailVerify(true);
         setDialog({
           title: "No hay un perfil",
           description: "Complete los datos de perfil para continuar",
           action: () => navigate('/perfilConnect')
         });
-        
-      }else{
+
+      } else {
+        if (!error.data) {
+          alert("A ocurrido un error al comunicarse con el servidor")
+          navigate("/*");
+        }
+
         setDialog({
           title: "Error al cargar los datos",
           description: "Error al cargar los datos del perfil"
@@ -92,7 +97,7 @@ export function useProfile() {
       return;
     }
     fetchData();
-  }, [authData, navigate]);
+  }, [authData]);
 
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
@@ -111,7 +116,7 @@ export function useProfile() {
     handlePhotoChange,
     fetchData,
     setPersonaData,
-    dialog, 
+    dialog,
     showFormEmailVerify,
     setShowFormEmailVerify,
     setDialog

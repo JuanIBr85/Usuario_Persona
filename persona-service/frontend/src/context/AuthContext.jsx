@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { SimpleDialog } from '@/components/SimpleDialog';
-
+import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
 
@@ -22,7 +22,8 @@ const saveAuthData = _authData ? JSON.parse(_authData) : defaultData;
 
 function AuthContextProvider({ children }) {
     const [authData, setAuthData] = useState(saveAuthData);
-    const [dialog, setDialog] = useState(null)
+    const [dialog, setDialog] = useState(null); 
+    const navigate = useNavigate();
 
     useEffect(() => {
         // Verificar expiración del token cada minuto
@@ -44,6 +45,14 @@ function AuthContextProvider({ children }) {
             }
 
         }, 1000 * 30); // Verificar cada 30 segundos
+        
+        if(!authData.user?.expires_in && !window.location.pathname.includes("/auth/")){
+            setDialog({
+                title: "No deberias de estar aqui",
+                description: "Inicia sesion para ingresar",
+            });
+            navigate('/auth/login');
+        }
 
         return () => clearInterval(interval);
     }, [authData.user?.expires_in]);
