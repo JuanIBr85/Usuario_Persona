@@ -37,6 +37,7 @@ export function useProfile() {
   const [photoUrl, setPhotoUrl] = useState('https://i.pravatar.cc/150?img=69');
   const [dialog, setDialog] = useState(null);
   const [staticData, setStaticData] = useState({});
+  const [showFormEmailVerify, setShowFormEmailVerify] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -56,7 +57,7 @@ export function useProfile() {
         redes_sociales: redes_socialesResponse?.data || []
       });
       const profileResponse = await PersonaService.get_by_usuario(authData.user.id_usuario);
-
+      console.log(profileResponse);
       if (profileResponse?.data) {
         setPersonaData({
           ...initialPersonaState,
@@ -67,10 +68,12 @@ export function useProfile() {
       }
     } catch (error) {
       if(error.statusCode === 404){
+        setShowFormEmailVerify(true);
         setDialog({
           title: "No hay un perfil",
           description: "Complete los datos de perfil para continuar"
         });
+        
       }else{
         setDialog({
           title: "Error al cargar los datos",
@@ -108,6 +111,8 @@ export function useProfile() {
     fetchData,
     setPersonaData,
     dialog, 
+    showFormEmailVerify,
+    setShowFormEmailVerify,
     setDialog
   };
 }

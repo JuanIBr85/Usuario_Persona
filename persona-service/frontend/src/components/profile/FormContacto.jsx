@@ -32,6 +32,7 @@ export default function FormContacto({ persona_id, setPersonaData, contacto, red
     <>
       {loading && <Loading isFixed={true} />}
       <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid grid-cols-2 gap-4 items-end">
         {/* Datos editables con InputValidate */}
         <InputValidate
           id="telefono_fijo"
@@ -54,7 +55,7 @@ export default function FormContacto({ persona_id, setPersonaData, contacto, red
           validateMessage="Ingresa un número de teléfono válido"
           required
         />
-
+      </div>
         <div className="grid grid-cols-2 gap-4 items-end">
           <InputValidate
             id="red_social_contacto"
@@ -88,6 +89,14 @@ export default function FormContacto({ persona_id, setPersonaData, contacto, red
           placeholder="Ingresa el email de contacto"
           validateMessage="Email inválido"
           value={contacto?.email_contacto || ''}
+          required
+        />
+        <InputValidate
+          id="observacion_contacto"
+          type="text"
+          labelText="Observación del contacto"
+          placeholder="Ingresa una observación"
+          value={contacto?.observacion_contacto || ''}
         />
 
         <div className="flex flex-col gap-3 pt-4">
