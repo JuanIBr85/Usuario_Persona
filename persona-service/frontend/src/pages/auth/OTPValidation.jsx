@@ -19,7 +19,7 @@ function OTPValidation() {
   const navigate = useNavigate();
   const location = useLocation();
   const toRedirect = location.state?.from || "/auth/resetpassword";
-  const email = localStorage.getItem("email_para_reset");
+  const email = sessionStorage.getItem("email_para_reset");
 
   const [isOpen, setIsOpen] = React.useState(false);
   const [dialogMessage, setMessage] = React.useState("");
@@ -45,8 +45,8 @@ function OTPValidation() {
       .then((json) => {
         const token = json.data?.reset_token;
         if (token) {
-          localStorage.setItem("reset_token", token); // Guardamos el token para usarlo después
-          localStorage.setItem("email_para_reset", email); // Guardamos el email para usarlo después
+          sessionStorage.setItem("reset_token", token); // Guardamos el token para usarlo después
+          sessionStorage.setItem("email_para_reset", email); // Guardamos el email para usarlo después
           setMessage("Se ha verificado correctamente el código de verificación.");
           setIsOK(true);
         } else {

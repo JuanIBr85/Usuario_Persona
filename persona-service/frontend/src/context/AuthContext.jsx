@@ -45,13 +45,17 @@ function AuthContextProvider({ children }) {
             }
 
         }, 1000 * 30); // Verificar cada 30 segundos
-        
-        if(!authData.user?.expires_in && !window.location.pathname.includes("/auth/")){
-            setDialog({
-                title: "No deberias de estar aqui",
-                description: "Inicia sesion para ingresar",
-            });
-            navigate('/auth/login');
+        if(!window.location.pathname.includes("/auth/")){
+            if(!authData.user?.expires_in){
+                setDialog({
+                    title: "No deberias de estar aqui",
+                    description: "Inicia sesion para ingresar",
+                });
+                navigate('/auth/login');
+            }
+
+            //Elimino el email para reset en caso de que el usuario salga de la seccion de autenticacion
+            sessionStorage.removeItem("email_para_reset");
         }
 
         return () => clearInterval(interval);

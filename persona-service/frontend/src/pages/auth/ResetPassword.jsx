@@ -19,12 +19,12 @@ const ResetPassword = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Obtenemos el email del estado de navegación o del localStorage
+  // Obtenemos el email del estado de navegación o del sessionStorage
   const email =
-    location.state?.email || localStorage.getItem("email_para_reset") || "";
+    location.state?.email || sessionStorage.getItem("email_para_reset") || "";
 
-  // Obtenemos el token guardado en localStorage (recibido al verificar OTP)
-  const token = location.state?.token || localStorage.getItem("reset_token");
+  // Obtenemos el token guardado en sessionStorage (recibido al verificar OTP)
+  const token = location.state?.token || sessionStorage.getItem("reset_token");
 
   // Manejador del envío del formulario
   const handleSubmit = async (event) => {
@@ -51,8 +51,8 @@ const ResetPassword = () => {
       // Si todo salió bien, mostramos mensaje y marcamos como exitoso
       setDialogMessage("Contraseña actualizada correctamente.");
       setIsSuccess(true);
-      localStorage.removeItem("reset_token"); // Eliminamos el token ya usado
-      localStorage.removeItem("email_para_reset");
+      sessionStorage.removeItem("reset_token"); // Eliminamos el token ya usado
+      sessionStorage.removeItem("email_para_reset");
     } catch (error) {
       // Si hay error, mostramos el mensaje correspondiente
       console.error("Error:", error);

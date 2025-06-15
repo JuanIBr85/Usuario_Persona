@@ -23,7 +23,7 @@ function ForgotPassword() {
     AuthService
       .requestOtp(formData)
       .then((json) => {
-        localStorage.setItem("email_para_reset", formData.email);
+        sessionStorage.setItem("email_para_reset", formData.email);
         setMessage("Se ha enviado un codigo de recuperación a tu correo electrónico. Por favor, revisa tu bandeja de entrada.");
       })
       .catch((error) => {
