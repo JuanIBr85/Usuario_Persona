@@ -19,5 +19,5 @@ Flask-Limiter==3.12
 Flask-Mail==0.10.0
 
 #Componentes comunes a todos los microservicios
--e git+https://github.com/JuanIBr85/Usuario_Persona.git#egg=component-services&subdirectory=component-services
+./component_services.tar.gz
 
