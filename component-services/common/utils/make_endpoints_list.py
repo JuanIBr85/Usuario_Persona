@@ -41,7 +41,7 @@ def make_endpoints_list(app) -> List[Dict[str, Any]]:
             
             url = str(rule).removeprefix("/")
             
-            endpoints[f"{url}_{"_".join(methods)}"] = {
+            endpoints[f"{url}_{'_'.join(methods)}"] = {
                 "api_url": str(base_route),
                 "access_url": url,
                 "is_public": view_func._security_metadata.is_public,
