@@ -40,6 +40,8 @@ def request_to_service(url):
         #Guardo el id del usuario en X-USER-ID en el header
         headers["X-USER-ID"] = g.jwt["sub"]
 
+    headers["X-CLIENT-IP"] = request.remote_addr
+    headers["X-CLIENT-USER-AGENT"] = request.user_agent.string
     #Armo la request para enviar al microservicio con todos los datos recibidos
     #Envio la request al microservicio
     response = requests.request(method=request.method, **{

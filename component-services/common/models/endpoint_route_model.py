@@ -8,7 +8,8 @@ class EndpointRouteModel:
         access_permissions: Optional[List[str]] = None,
         methods: Optional[Set[str]] = None,
         limiter: Optional[List[str]] = None,
-        cache: Optional[Dict[str, Any]] = None
+        cache: Optional[Dict[str, Any]] = None,
+        access_url: str = ""
     ):
         self.api_url = api_url
         self.is_public = is_public
@@ -16,6 +17,7 @@ class EndpointRouteModel:
         self.methods = set(methods or [])
         self.limiter = limiter
         self.cache = cache    
+        self.access_url = access_url
     
     def to_dict(self) -> Dict[str, Any]:
         """

@@ -39,8 +39,11 @@ def make_endpoints_list(app) -> List[Dict[str, Any]]:
             # Eliminar parámetros dinámicos de la ruta
             base_route = re.sub(r'<[^>]+>', '', rule.rule).rstrip('/')
             
-            endpoints[str(rule).removeprefix("/")] = {
+            url = str(rule).removeprefix("/")
+            
+            endpoints[f"{url}_{"_".join(methods)}"] = {
                 "api_url": str(base_route),
+                "access_url": url,
                 "is_public": view_func._security_metadata.is_public,
                 "methods": tuple(methods),
                 "access_permissions": tuple(view_func._security_metadata.access_permissions or []),

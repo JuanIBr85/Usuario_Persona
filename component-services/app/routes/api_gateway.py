@@ -39,7 +39,7 @@ services_route = {
 }
 
 # Creamos reglas de ruta para mapear los endpoints con métodos
-rules = [Rule(f"/api/{path}", endpoint=path, methods=services_route[path].methods) for path in services_route]
+rules = [Rule(f"/api/{services_route[path].access_url}", endpoint=path, methods=services_route[path].methods) for path in services_route]
 url_map = Map(rules, strict_slashes=False)
 
 
