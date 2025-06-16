@@ -15,8 +15,6 @@ class PersonaExtendida(Base):
     vencimiento_dni = Column(Date,nullable=True)
     foto_perfil = Column(String(255), nullable=True)
 
-    persona = relationship("Persona", back_populates="persona_extendida")
-
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
     deleted_at= Column(DateTime, nullable=True)

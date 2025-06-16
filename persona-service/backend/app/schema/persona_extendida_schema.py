@@ -18,6 +18,10 @@ class PersonaExtendidaSchema(Schema):
     estudios_alcanzados = fields.Str(allow_none=True, required=False,validate=permitir_vacios(ESTUDIOS_ALCANZADOS))
     vencimiento_dni = fields.Date(required=False, allow_none=True)
     foto_perfil = fields.Str(required=False, allow_none=True)
+
+    created_at=fields.DateTime(dump_only=True)
+    updated_at=fields.DateTime(dump_only=True)
+    deleted_at=fields.DateTime(dump_only=True)
     
 
     @pre_load
