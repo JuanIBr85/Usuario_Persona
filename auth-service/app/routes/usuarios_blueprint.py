@@ -10,6 +10,8 @@ from app.utils.email import decodificar_token_verificacion, generar_token_dispos
 from app.models.usuarios import Usuario
 from app.models.dispositivos_confiable import DispositivoConfiable
 from datetime import datetime, timezone, timedelta
+from common.decorators.api_access import api_access
+from common.models.cache_settings import CacheSettings
 
 usuario_bp = Blueprint("usuario", __name__)
 usuario_service = UsuarioService()
@@ -19,6 +21,7 @@ usuario_service = UsuarioService()
 #-----------------------------------------------------------------------------------------------------------------------------
 
 @usuario_bp.route('/registro', methods=['POST'])
+@api_access(is_public=True, limiter=["2 per minute"])
 def registrar_usuario1():
     session = SessionLocal()
     try:
@@ -38,6 +41,7 @@ def registrar_usuario1():
 
 
 @usuario_bp.route('/verificar-email', methods=['GET'])
+@api_access(is_public=True, limiter=["1 per minute"])
 def verificar_email():
     session = SessionLocal()
     try:
@@ -60,6 +64,7 @@ def verificar_email():
 #-----------------------------------------------------------------------------------------------------------------------------
 
 @usuario_bp.route('/login', methods=['POST'])
+@api_access(is_public=True, limiter=["3 per minute"])
 def login1():
     session = SessionLocal()
     try:
@@ -81,6 +86,7 @@ def login1():
 
 
 @usuario_bp.route('/logout', methods=['POST'])
+@api_access(is_public=True)
 def logout_usuario():
     session = SessionLocal()
     try:
@@ -96,6 +102,7 @@ def logout_usuario():
 
 
 @usuario_bp.route('/perfil', methods=['GET'])
+@api_access(is_public=True, limiter=["4 per minute"])
 def perfil_usuario():
     session = SessionLocal()
     try:
@@ -115,6 +122,7 @@ def perfil_usuario():
 #-----------------------------------------------------------------------------------------------------------------------------
 
 @usuario_bp.route('/solicitar-otp', methods=['POST'])
+@api_access(is_public=True, limiter=["1 per 5 minutes"])
 def solicitar_otp():
     session = SessionLocal()
     try:
@@ -133,6 +141,7 @@ def solicitar_otp():
 
 
 @usuario_bp.route('/verificar-otp', methods=['POST'])
+@api_access(is_public=True, limiter=["3 per minute"], cache=CacheSettings(expiration=60, params=["email", "otp"]))
 def verificar_otp():
     session = SessionLocal()
     try:
@@ -154,6 +163,7 @@ def verificar_otp():
 
 
 @usuario_bp.route('/reset-password-con-codigo', methods=['POST'])
+@api_access(is_public=True, limiter=["2 per minute"])
 def reset_con_otp():
     session = SessionLocal()
     try:
@@ -173,10 +183,12 @@ def reset_con_otp():
 
 
 @usuario_bp.route('/modificar', methods=['GET', 'POST'])
+@api_access(is_public=True, limiter=["2 per minute"])
 def modificar_perfil():
     return make_response(ResponseStatus.PENDING, "Funcionalidad en construcción"), 501
 
 @usuario_bp.route('/verificar-dispositivo', methods=['GET'])
+@api_access(is_public=True, limiter=["2 per minute"], cache=CacheSettings(expiration=30, params=["token"]))
 def verificar_dispositivo():
     token = request.args.get('token')
     if not token:

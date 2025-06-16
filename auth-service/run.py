@@ -11,9 +11,10 @@ from app.script.reset_db import crear_base, eliminar_base
 from app.script.seed_data import seed
 from flask_cors import CORS
 from app.utils.response import register_error_handlers
+from common.utils.component_service import component_service
 
 load_dotenv()
-
+ 
 app = Flask(__name__)
 app.register_blueprint(superadmin_bp, url_prefix='/super-admin')
 app.register_blueprint(admin_micro_bp, url_prefix='/admin-micro')
@@ -38,7 +39,7 @@ CORS(app,
      supports_credentials=True, 
      allow_headers=["Content-Type", "Authentication", "authorization", "Authorization"])
 register_error_handlers(app) # maneja los errores y excepciones globales y las convierte a un formato con build_response
-
+component_service(app)
 
 @app.route('/')
 def index():

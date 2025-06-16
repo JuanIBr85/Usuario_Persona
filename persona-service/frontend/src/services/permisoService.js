@@ -20,7 +20,7 @@ export const permisoService = {
     // Método para asignar permisos a un rol específico
     asignarPermisos: async (idRol, permisos) => {
         return fetchService.fetch({
-            url: `${ServiceURL.auth}/super-admin/admins/${idRol}/permisos`,
+            url: `${ServiceURL.auth}/super-admin/admins/permisos/${idRol}`,
             method: HttpMethod.POST,
             body: { permisos }, // Cuerpo de la solicitud: contiene la lista de permisos a asignar
             showError: permisoService.showError,
