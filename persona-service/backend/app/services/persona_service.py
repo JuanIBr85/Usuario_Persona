@@ -1,5 +1,6 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from flask import jsonify
+from flask_jwt_extended import create_access_token
 from marshmallow import ValidationError
 from sqlalchemy import and_, func,extract
 
@@ -10,6 +11,7 @@ from app.models.persona_extendida_model import PersonaExtendida
 #Se importan los servicios
 from app.services.contacto_service import ContactoService
 from app.services.domicilio_service import DomicilioService
+from app.services.otp_service import OtpService
 
 
 #Otras importaciones
@@ -25,6 +27,7 @@ class PersonaService(IPersonaInterface):
         self.varios_schemas = PersonaResumidaSchema(many=True)
         self.contacto_service = ContactoService()
         self.domicilio_service = DomicilioService()
+        self.otp_service = OtpService()
         
 
     def listar_personas(self):
@@ -247,5 +250,46 @@ class PersonaService(IPersonaInterface):
                 }
                 for r in resultados
             ]
+        finally:
+            session.close()
+
+    #VERIFICACION DE PERSONA CON DOCUMENTO
+    def verificar_o_crear_persona(self, usuario_id: int, datos: dict) -> dict:
+        """
+        si la persona no existe la crea
+        si la persona existe, genera un OTP, lo envía y devuelve un JWT con el código
+           en sus claims para que el cliente lo valide luego.
+        """
+        session = SessionLocal()
+        try:
+            persona = (
+                session
+                .query(Persona)
+                .filter(
+                    Persona.tipo_documento == datos['tipo_documento'],
+                    Persona.num_doc_persona == datos['num_doc_persona']
+                )
+                .first()
+            )
+
+            if persona is None:
+                datos['usuario_id'] = usuario_id
+                nueva_persona = self.crear_persona(datos)
+                return {'persona': nueva_persona}
+
+            
+            codigo = self.otp_service.solicitar_otp(persona)
+
+            # se crea un token que incluye el otp
+            token = create_access_token(
+                identity=usuario_id,
+                additional_claims={
+                    'persona_id': persona.id_persona,
+                    'otp': codigo
+                },
+                expires_delta=timedelta(minutes=15)
+            )
+            return {'otp_token': token}
+
         finally:
             session.close()

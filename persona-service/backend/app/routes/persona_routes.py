@@ -1,7 +1,10 @@
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required, get_jwt_identity, decode_token
+from app.extensions import SessionLocal
 from marshmallow import ValidationError
 from app.services.persona_service import PersonaService
 from app.schema.persona_schema import PersonaSchema
+from app.models.persona_model import Persona
 from common.decorators.api_access import api_access
 from common.utils.response import make_response, ResponseStatus
 from common.models.cache_settings import CacheSettings
@@ -232,3 +235,60 @@ def contar_personas():
                 message="Error al contar personas",
                 data={"server": str(e)}
             ), 500
+
+@persona_bp.route('/personas/verify', methods=['POST'])
+@jwt_required()
+def verificar_persona():
+    try:
+        usuario_id = get_jwt_identity()
+        datos = request.get_json()
+        resultado = persona_service.verificar_o_crear_persona(usuario_id, datos)
+
+        if 'otp_token' in resultado:
+            return make_response(
+                status=ResponseStatus.PENDING,
+                message="Persona encontrada. Se envió código OTP.",
+                data={'otp_token': resultado['otp_token']}
+            ), 200
+
+        return make_response(
+            status=ResponseStatus.SUCCESS,
+            message="Persona creada y vinculada correctamente.",
+            data=resultado['persona']
+        ), 201
+
+    except ValidationError as err:
+        return make_response(ResponseStatus.FAIL, "Datos inválidos", err.messages), 400
+
+
+@persona_bp.route('/personas/verify-otp', methods=['POST'])
+def verificar_otp_persona():
+    body = request.get_json()
+    token = body.get('token')
+    codigo_input = body.get('codigo')
+
+    if not token or not codigo_input:
+        return make_response(ResponseStatus.FAIL, "Faltan token o código"), 400
+
+    try:
+        claims = decode_token(token)
+    except Exception:
+        return make_response(ResponseStatus.FAIL, "Token inválido o expirado"), 400
+
+    persona_id = claims.get('persona_id')
+    otp_guardado = claims.get('otp')
+    usuario_id = claims.get('sub')
+
+    if otp_guardado != codigo_input:
+        return make_response(ResponseStatus.FAIL, "OTP incorrecto"), 400
+
+    # Vincular persona con usuario
+    session = SessionLocal()
+    try:
+        session.query(Persona)\
+               .filter_by(id_persona=persona_id)\
+               .update({'usuario_id': usuario_id})
+        session.commit()
+        return make_response(ResponseStatus.SUCCESS, "Persona vinculada con usuario"), 200
+    finally:
+        session.close()
