@@ -1,7 +1,7 @@
 
 export const ServiceURL = Object.freeze({
-    auth: "http://localhost:5000",
-    persona: "http://localhost:5001",
+    auth: "http://localhost:5002/api",
+    persona: "http://localhost:5002/api",
     //api gateway
     // "http://localhost:5002/api"
 });

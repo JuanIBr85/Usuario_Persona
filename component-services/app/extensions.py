@@ -5,7 +5,7 @@ from flask_jwt_extended import JWTManager
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from config import SQLALCHEMY_DATABASE_URI, SERVICES_CONFIG_FILE
-import requests
+from diskcache import FanoutCache
 import json
 
 engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=True, future=True)
@@ -21,6 +21,9 @@ limiter = Limiter(
     default_limits=["100/minute"]
 )
 
-from diskcache import Cache
 
-cache = Cache('cache-db')
+cache = FanoutCache(
+    'cache-db',
+    shards=4,  # Número de shards para mejor concurrencia
+    timeout=1  # Timeout para operaciones
+)
