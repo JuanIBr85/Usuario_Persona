@@ -41,8 +41,38 @@ class PersonaExtendidaService(IPersonaExtendidaInterface):
             if cerrar:
                 session.close()    
 
-    def modificar_persona_extendida(self, id, data):
-        return super().modificar_persona_extendida(id, data)
+    def modificar_persona_extendida(self, id, data,session=None):
+
+        cerrar = False
+        if session is None:
+            session=SessionLocal()
+            cerrar = True
+
+        try:
+
+            persona_ext = session.query(PersonaExtendida).filter_by(id_extendida=id).first()
+            if not persona_ext:
+                raise Exception("Persona extendida no encontrada")
+
+            data_validada = self.schema.load(data, partial=True)
+
+            for campo, valor in data_validada.items():
+                setattr(persona_ext,campo,valor)
+
+            persona_ext.updated_at = datetime.now(timezone.utc)    
+
+            session.commit()    
+            session.refresh(persona_ext)
+            return persona_ext
+
+        except Exception as e:
+            session.rollback()
+            raise e
+
+        finally:
+            if cerrar:
+                session.close()
+        
     
     def borrar_persona_extendida(self, id):
         return super().borrar_persona_extendida(id)
