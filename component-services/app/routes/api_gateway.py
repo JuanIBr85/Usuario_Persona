@@ -8,7 +8,7 @@ from app.utils.request_to_service import request_to_service
 bp = Blueprint('gateway', __name__)
 
 #Esto toma todo lo que entre por service por cualquier metodo
-@bp.route('/api/<path:subpath>', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@bp.route('/<path:subpath>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 @limiter.limit(
     #Reglas de limite
     limit_value=lambda: g.service_route.limiter,   

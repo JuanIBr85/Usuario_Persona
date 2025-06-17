@@ -38,12 +38,7 @@ def create_app()->Flask:
     
 
 
-    @app.route('/api/aaa', methods=["GET"])
-    @api_access(is_public=True)
-    def index2():
-        return jsonify({
-            "message": "Bienvenido a la API de Componentes"
-            }),200
+    
     
     #Registra todas las rutas
     register_blueprints(app)

@@ -9,6 +9,7 @@ def authenticate_config(app):
     @jwt_required(optional=True)
     def authenticate_request():
         if request.method == "OPTIONS":return
+        
         #Probablemente ya no sea necesario
         if not request.path.startswith("/api"):
             abort(404, description=f"El endpoint <{request.path}> no existe")
@@ -17,6 +18,9 @@ def authenticate_config(app):
             service_route = core_endpoints()
         else:
             service_route = component_endpoints()
+
+        #Guardo el endpoint en el contexto
+        g.service_route = service_route
 
         #Verifico si el usuario tiene un token
         identity = get_jwt_identity()
@@ -42,7 +46,6 @@ def core_endpoints():
         #Obtengo el endpoint del diccionario
         service_route, args, matched_endpoint = endpoints_search_service.get_route()
         #Guardo el endpoint y los argumentos en el contexto
-        g.service_route = service_route
         g.args = args
         g.matched_endpoint = matched_endpoint
     except Exception:
