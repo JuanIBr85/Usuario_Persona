@@ -17,7 +17,8 @@ def authenticate_config(app):
 
         # Probablemente ya no sea necesario
         if not request.path.startswith("/api") or request.endpoint is None:
-            abort(404, description=f"El endpoint <{request.path}> no existe")
+            return
+            # abort(404, description=f"El endpoint <{request.path}> no existe")
 
         if request.endpoint.startswith("gateway."):
             service_route = core_endpoints()
