@@ -179,6 +179,9 @@ class PersonaService(IPersonaInterface):
             if persona.domicilio_id:
                 self.domicilio_service.borrar_domicilio(persona.domicilio_id, session)
 
+            if persona.extendida_id:
+                self.persona_ext_service.borrar_persona_extendida(persona.extendida_id, session)
+
             persona.deleted_at = datetime.now(timezone.utc)
             session.commit()
             return True

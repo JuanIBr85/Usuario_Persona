@@ -74,11 +74,55 @@ class PersonaExtendidaService(IPersonaExtendidaInterface):
                 session.close()
         
     
-    def borrar_persona_extendida(self, id):
-        return super().borrar_persona_extendida(id)
+    def borrar_persona_extendida(self, id, session =None):
+        cerrar = False
+        if session is None:
+            session = SessionLocal()
+            cerrar = True
+
+        try:
+
+            persona_ext = session.query(PersonaExtendida).get(id)
+            if persona_ext:
+                persona_ext.deleted_at = datetime.now(timezone.utc)
+            else:
+                raise ValueError (f"No se encontró ese id: {id}")
+
+        except Exception as e:
+            session.rollback()
+            raise e
+
+        finally:
+            if cerrar:
+                session.close()
+                session.commit()
+
     
-    def restaurar_persona_extendida(self, id):
-        return super().restaurar_persona_extendida(id)
+    def restaurar_persona_extendida(self, id,session=None):
+        cerrar = False
+
+        if session is None:
+            session = SessionLocal()
+            cerrar = True
+
+        try:
+            persona_ext = session.query(PersonaExtendida).get(id)
+            if persona_ext:
+                persona_ext.deleted_at = None
+                session.flush()
+
+            else:
+                raise ValueError (f"No se encontró ese id: {id}")
+
+        except Exception as e:
+            session.rollback()
+            raise e
+
+        finally:
+            if cerrar:
+                session.close()
+                session.commit()
+
 
 
     
