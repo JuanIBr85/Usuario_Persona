@@ -7,6 +7,7 @@ from common.decorators.api_access import api_access
 from flask_jwt_extended import JWTManager
 from common.utils.component_service import component_service
 from app.extensions import limiter, jwt
+from app.services.endpoints_search_service import EndpointsSearchService
 
 def create_app()->Flask:
 
@@ -35,6 +36,19 @@ def create_app()->Flask:
             "message": "Bienvenido a la API de Componentes"
             }),200
     
+
+
+    @app.route('/api/aaa', methods=["GET"])
+    @api_access(is_public=True)
+    def index2():
+        return jsonify({
+            "message": "Bienvenido a la API de Componentes"
+            }),200
+    
     #Registra todas las rutas
     register_blueprints(app)
+
+    #Inicializa el servicio de busqueda de endpoints
+    EndpointsSearchService().refresh_endpoints()
+
     return app
