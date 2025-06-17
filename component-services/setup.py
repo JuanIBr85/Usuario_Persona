@@ -5,11 +5,11 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="component-services",
-    version="0.2.14",
+    version="0.2.18",
     description="Servicio de componentes",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    packages=find_packages(include=['common', 'common.*']),
+    packages=find_packages(include=["common", "common.*"]),
     include_package_data=True,
     install_requires=[
         "blinker==1.9.0",
@@ -34,6 +34,6 @@ setup(
         "SQLAlchemy==2.0.41",
         "typing_extensions==4.13.2",
         "urllib3==2.4.0",
-        "Werkzeug==3.1.3"
-    ]
+        "Werkzeug==3.1.3",
+    ],
 )

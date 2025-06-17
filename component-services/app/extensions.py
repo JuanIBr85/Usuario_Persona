@@ -10,20 +10,19 @@ import json
 
 engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=True, future=True)
 Base = declarative_base()
-SessionLocal = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
+SessionLocal = scoped_session(
+    sessionmaker(autocommit=False, autoflush=False, bind=engine)
+)
 
 jwt = JWTManager()
 
 services_config = json.load(open(SERVICES_CONFIG_FILE))
 
-limiter = Limiter(
-    key_func=get_remote_address,
-    default_limits=["100/minute"]
-)
+limiter = Limiter(key_func=get_remote_address, default_limits=["100/minute"])
 
 
 cache = FanoutCache(
-    'cache-db',
+    "cache-db",
     shards=4,  # Número de shards para mejor concurrencia
-    timeout=1  # Timeout para operaciones
+    timeout=1,  # Timeout para operaciones
 )
