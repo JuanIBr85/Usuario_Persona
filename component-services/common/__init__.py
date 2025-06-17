@@ -3,4 +3,4 @@ from . import utils
 from . import routes
 from . import decorators
 
-__all__ = ['models', 'utils', 'routes', 'decorators']
+__all__ = ["models", "utils", "routes", "decorators"]
