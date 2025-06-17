@@ -239,31 +239,41 @@ def contar_personas():
 @persona_bp.route('/personas/verify', methods=['POST'])
 @jwt_required()
 def verificar_persona():
+    body = request.get_json() or {}
+    token = body.get('token')
+    datos = body.get('datos')
+
+    if not token or not datos:
+        return make_response(ResponseStatus.FAIL, "Faltan token o datos de persona"), 400
+
+    
     try:
-        usuario_id = get_jwt_identity()
-        datos = request.get_json()
-        resultado = persona_service.verificar_o_crear_persona(usuario_id, datos)
+        session_claims = decode_token(token)
+    except Exception:
+        return make_response(ResponseStatus.FAIL, "Token invalido o expirado"), 400
+    
+    usuario_id = session_claims.get('sub')
 
-        if 'otp_token' in resultado:
-            return make_response(
-                status=ResponseStatus.PENDING,
-                message="Persona encontrada. Se envió código OTP.",
-                data={'otp_token': resultado['otp_token']}
-            ), 200
+    resultado = persona_service.verificar_o_crear_persona(usuario_id, datos)
 
+    if 'otp_token' in resultado:
         return make_response(
-            status=ResponseStatus.SUCCESS,
-            message="Persona creada y vinculada correctamente.",
-            data=resultado['persona']
-        ), 201
+            status=ResponseStatus.PENDING,
+            message="Persona encontrada. Se envió código OTP.",
+            data={'otp_token': resultado['otp_token']}
+        ), 200
 
-    except ValidationError as err:
-        return make_response(ResponseStatus.FAIL, "Datos inválidos", err.messages), 400
+    return make_response(
+        status=ResponseStatus.SUCCESS,
+        message="Persona creada y vinculada correctamente.",
+        data=resultado['persona']
+    ), 201
 
 
 @persona_bp.route('/personas/verify-otp', methods=['POST'])
 def verificar_otp_persona():
-    body = request.get_json()
+    
+    body = request.get_json() or {}
     token = body.get('token')
     codigo_input = body.get('codigo')
 
@@ -281,8 +291,7 @@ def verificar_otp_persona():
 
     if otp_guardado != codigo_input:
         return make_response(ResponseStatus.FAIL, "OTP incorrecto"), 400
-
-    # Vincular persona con usuario
+    # vincula persona con usuario, actualiza usuario_id
     session = SessionLocal()
     try:
         session.query(Persona)\
