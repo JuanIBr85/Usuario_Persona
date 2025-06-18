@@ -11,11 +11,20 @@ import { Camera } from "lucide-react";
 const ProfilePhoto = ({ photoUrl, onPhotoChange }) => (
   <div className="flex flex-col items-center mb-6">
     <div className="relative">
+       <img
+        className="w-24 h-24 object-cover rounded-full border-4   shadow-md"
+        src={photoUrl}
+        alt="Foto de perfil"
+      />
+      {/*}
       <img
         className="w-24 h-24 object-cover rounded-full border-4 border-indigo-600 shadow-md"
         src={photoUrl}
         alt="Foto de perfil"
       />
+      /*
+      }
+      {/*
       <label className="absolute bottom-0 right-0 bg-indigo-600 text-white rounded-full p-1 cursor-pointer hover:bg-indigo-700 transition">
         <input 
           type="file" 
@@ -25,6 +34,7 @@ const ProfilePhoto = ({ photoUrl, onPhotoChange }) => (
         />
         <Camera className="h-4 w-4" />
       </label>
+      */}
     </div>
   </div>
 );
