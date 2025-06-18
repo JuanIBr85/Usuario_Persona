@@ -1,11 +1,13 @@
 import json
-from flask import request, Blueprint, jsonify
+import jwt
+from os import getenv
+from flask import request, Blueprint, Response
 from app.database.session import SessionLocal
 from app.utils.response import ResponseStatus, make_response
 from app.services.usuario_service import UsuarioService
 from app.extensions import limiter
 from app.utils.decoradores import requiere_permisos, ruta_publica
-from jwt import decode, ExpiredSignatureError, InvalidTokenError
+from jwt import ExpiredSignatureError, InvalidTokenError
 from app.utils.email import decodificar_token_verificacion, generar_token_dispositivo
 from app.models.usuarios import Usuario
 from app.models.dispositivos_confiable import DispositivoConfiable
@@ -224,3 +226,55 @@ def verificar_dispositivo():
     session.commit()
 
     return "Dispositivo confirmado. Ahora podés volver a iniciar sesión.", 200
+
+@usuario_bp.route('/refresh', methods=['POST'])
+@api_access(is_public=True)  # solo controla si es pública, pero no te ayuda con el refresh_token
+def refresh_token():
+    session = SessionLocal()
+    try:
+        data = request.get_json()
+        token = data.get("refresh_token")
+
+        if not token:
+            return Response(
+                json.dumps({"error": "Token de refresh requerido"}),
+                status=400,
+                mimetype='application/json'
+            )
+
+        # Validar y decodificar manualmente el refresh token
+        try:
+            payload = jwt.decode(token, getenv("JWT_SECRET_KEY", "clave_jwt_123"), algorithms=["HS256"])
+            if payload.get("scope") != "refresh_token":
+                return Response(
+                    json.dumps({"error": "Token inválido para refresh"}),
+                    status=401,
+                    mimetype='application/json'
+                )
+        except jwt.ExpiredSignatureError:
+            return Response(
+                json.dumps({"error": "Token de refresh expirado"}),
+                status=401,
+                mimetype='application/json'
+            )
+        except jwt.InvalidTokenError:
+            return Response(
+                json.dumps({"error": "Token inválido"}),
+                status=401,
+                mimetype='application/json'
+            )
+
+        # Usar el sub (id de usuario) para generar un nuevo access token
+        usuario_id = int(payload["sub"])
+        result = usuario_service.refresh_token(session, usuario_id)
+
+        return Response(
+            json.dumps(result),
+            status=result.get("code", 200),
+            mimetype='application/json'
+        )
+
+    finally:
+        session.close()
+
+

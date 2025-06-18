@@ -5,7 +5,7 @@ from app.models.usuarios import Usuario, PasswordLog, UsuarioLog
 from app.models.dispositivos_confiable import DispositivoConfiable
 from app.models.rol import RolUsuario,Rol,RolPermiso
 from app.services.rol import get_rol_por_nombre
-from app.utils.jwt import crear_token_acceso,crear_token_reset_password
+from app.utils.jwt import crear_token_acceso,crear_token_reset_password, crear_token_refresh
 from app.schemas.usuarios_schema import LoginSchema,UsuarioInputSchema,UsuarioOutputSchema,ResetPasswordSchema,RecuperarPasswordSchema
 from marshmallow import ValidationError
 from app.services.servicio_base import ServicioBase
@@ -14,6 +14,7 @@ from app.models.otp_reset_password_model import OtpResetPassword
 from app.utils.email import enviar_email_verificacion,generar_codigo_otp,enviar_codigo_por_email,decodificar_token_verificacion,enviar_email_validacion_dispositivo
 from jwt import ExpiredSignatureError, InvalidTokenError
 from app.utils.response import ResponseStatus, make_response
+from flask_jwt_extended import  create_access_token
 
 
 class UsuarioService(ServicioBase):
@@ -132,7 +133,6 @@ class UsuarioService(ServicioBase):
                         400
                     )
 
-
         usuario = session.query(Usuario).filter_by(email_usuario=data_validada['email_usuario']).first()
         if not usuario:
             return (
@@ -194,7 +194,7 @@ class UsuarioService(ServicioBase):
                rol_nombre,
                permisos_lista
             )
- 
+            refresh_token, refresh_expires= crear_token_refresh(usuario.id_usuario)
             # Registrar log de login
             session.add(UsuarioLog(
                usuario_id=usuario.id_usuario,
@@ -206,6 +206,8 @@ class UsuarioService(ServicioBase):
             usuario_data = self.schema_out.dump(usuario)
             usuario_data["token"] = token
             usuario_data["expires_in"] = expires_in
+            usuario_data["refresh_token"] = refresh_token
+            usuario_data["refresh_expires"] = refresh_expires.isoformat()
 
             return (
                ResponseStatus.SUCCESS,
@@ -461,3 +463,47 @@ class UsuarioService(ServicioBase):
                     {"usuario_id": usuario.id_usuario}, 
                     200
                 )
+#------------------------------------------------------------------------------------------------
+
+    def refresh_token(self, session: Session, usuario_id: int) -> dict:
+        usuario = session.query(Usuario).filter_by(id_usuario=usuario_id).first()
+        if not usuario:
+          return {
+            "status": ResponseStatus.UNAUTHORIZED,
+            "message": "Usuario no encontrado",
+            "data": None,
+            "code": 401
+          }
+
+        rol = (
+           session.query(Rol)
+           .join(RolUsuario, Rol.id_rol == RolUsuario.id_rol)
+           .filter(RolUsuario.id_usuario == usuario.id_usuario)
+           .first()
+        )
+        rol_nombre = rol.nombre_rol if rol else "sin_rol"
+
+        permisos_query = (
+           session.query(Permiso.nombre_permiso)
+           .join(RolPermiso, Permiso.id_permiso == RolPermiso.permiso_id)
+           .filter(RolPermiso.id_rol == rol.id_rol)
+           .all()
+        )
+        permisos = [p.nombre_permiso for p in permisos_query]
+
+        nuevo_access_token = create_access_token(
+            identity=usuario_id,
+            additional_claims={
+               "sub": usuario.id_usuario,
+               "email": usuario.email_usuario,
+               "rol": rol_nombre,
+               "permisos": permisos
+            }
+        )
+
+        return {
+              "status": ResponseStatus.SUCCESS.value,
+              "message": "Nuevo token generado exitosamente.",
+              "data": {"access_token": nuevo_access_token},
+              "code": 200
+        }
