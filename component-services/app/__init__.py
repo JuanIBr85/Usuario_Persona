@@ -48,6 +48,6 @@ def create_app() -> Flask:
     register_blueprints(app)
 
     # Inicializa el servicio de busqueda de endpoints
-    # EndpointsSearchService().refresh_endpoints()
+    EndpointsSearchService().refresh_endpoints()
 
     return app
