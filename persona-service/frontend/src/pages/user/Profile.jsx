@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Fade } from 'react-awesome-reveal';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
@@ -11,10 +11,12 @@ import FormDomicillio from "@/components/profile/FormDomicillio"
 import ProfilePhoto from "@/components/profile/ProfilePhoto"
 import FormPersonaExtendida from "@/components/profile/FormPersonaExtendida"
 import Loading from '@/components/loading/Loading'
-import {SimpleDialog} from '@/components/SimpleDialog'
+import { SimpleDialog } from '@/components/SimpleDialog'
 // Hooks y utilidades
 import { useProfile } from "@/hooks/profile/useProfile"
 import { tiempoTranscurrido } from "@/utils/dateUtils"
+import ProfileNick from '@/components/ProfileNick'
+
 
 /**
  * Componente principal del perfil de usuario
@@ -29,30 +31,32 @@ const ProfileForm = () => {
     staticData,
     handlePhotoChange,
     setPersonaData,
-    dialog ,
+    dialog,
     setDialog,
   } = useProfile();
 
   const lastUpdate = tiempoTranscurrido(personaData.updated_at);
   const subscribedServices = ['Residencia', 'Becas', 'Oferta educativa'];
-  
+
   if (isLoading) {
     return <Loading />;
   }
 
+
+
   return (
     <>
-      <SimpleDialog 
-        title={dialog?.title} 
-        description={dialog?.description} 
+      <SimpleDialog
+        title={dialog?.title}
+        description={dialog?.description}
         isOpen={dialog}
-        actionHandle={()=>{
+        actionHandle={() => {
           setDialog(null);
           setTimeout(() => dialog?.action(), 500);
         }}
       />
       <Fade duration={300} triggerOnce>
-        
+
 
         <div className="w-full flex items-center justify-center sm:p-4" >
           <div className="w-full h-full sm:h-auto md:max-w-7xl shadow-md rounded-xl overflow-hidden w-full flex items-center justify-center sm:p-4">
@@ -67,10 +71,7 @@ const ProfileForm = () => {
               </CardHeader>
 
               <CardContent className="h-full overflow-y-auto">
-                <ProfilePhoto
-                  photoUrl={`https://ui-avatars.com/api/?name=${personaData.nombre_persona}+${personaData.apellido_persona}&background=random`}
-                  onPhotoChange={handlePhotoChange}
-                />
+                <ProfileNick firstName={personaData.nombre_persona} lastName={personaData.apellido_persona} />
 
                 <Tabs defaultValue="datos" className="w-full">
                   <TabsList className="flex flex-wrap gap-2 w-full mb-3 h-auto">

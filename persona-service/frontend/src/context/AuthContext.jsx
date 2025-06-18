@@ -22,37 +22,41 @@ const saveAuthData = _authData ? JSON.parse(_authData) : defaultData;
 
 function AuthContextProvider({ children }) {
     const [authData, setAuthData] = useState(saveAuthData);
-    const [dialog, setDialog] = useState(null); 
+    const [dialog, setDialog] = useState(null);
     const navigate = useNavigate();
 
     const toLogout = () => {
-        if(!window.location.pathname.includes("/auth/")){
+        if (!window.location.pathname.includes("/auth/")) {
             window.location.href = '/auth/logout';
         }
     }
 
+    const checkToken = () => {
+        if (!authData.user?.expires_in) return;
+        const now = new Date();
+        const expirationDate = new Date(authData.user.expires_in);
+
+        if (now > expirationDate) {
+            // Token expirado, limpiar datos de autenticación
+            removeAuthData();
+
+            setDialog({
+                title: "Sesión expirada",
+                description: "Su sesión ha expirado. Por favor, inicie sesión de nuevo.",
+            });
+
+            setTimeout(toLogout, 1000 * 60);
+        }
+
+    };
+
     useEffect(() => {
+        checkToken();
+
         // Verificar expiración del token cada minuto
-        const interval = setInterval(() => {
-            if (!authData.user?.expires_in) return;
-            const now = new Date();
-            const expirationDate = new Date(authData.user.expires_in);
-
-            if (now > expirationDate) {
-                // Token expirado, limpiar datos de autenticación
-                removeAuthData();
-
-                setDialog({
-                    title: "Sesión expirada",
-                    description: "Su sesión ha expirado. Por favor, inicie sesión de nuevo.",
-                });
-
-                setTimeout(toLogout, 1000*60);
-            }
-
-        }, 1000 * 30); // Verificar cada 30 segundos
-        if(!window.location.pathname.includes("/auth/")){
-            if(!authData.user?.expires_in){
+        const interval = setInterval(checkToken, 1000 * 2); // Verificar cada 2 segundos
+        if (!window.location.pathname.includes("/auth/")) {
+            if (!authData.user?.expires_in) {
                 setDialog({
                     title: "No deberias de estar aqui",
                     description: "Inicia sesion para ingresar",
