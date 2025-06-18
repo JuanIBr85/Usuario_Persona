@@ -3,6 +3,7 @@ import requests
 from app.extensions import services_config
 import mimetypes
 from app.services.endpoints_search_service import EndpointsSearchService
+from app.decorators.cp_api_access import cp_api_access
 
 bp = Blueprint("routes2", __name__, cli_group="routes2")
 
