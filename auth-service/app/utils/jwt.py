@@ -25,3 +25,13 @@ def crear_token_reset_password(otp_id: int, usuario_id: int) -> str:
         "exp": datetime.now(timezone.utc) + timedelta(minutes=10)
     }
     return jwt.encode(payload, getenv("JWT_SECRET_KEY", "clave_jwt_123"), algorithm="HS256")
+
+
+def crear_token_refresh(usuario_id):
+    expires_in = datetime.now(timezone.utc) + timedelta(days=int(getenv("JWT_REFRESH_TOKEN_EXPIRES_DAYS", 7)))
+    payload = {
+        "sub": str(usuario_id),
+        "scope": "refresh_token",
+        "exp": expires_in
+    }
+    return jwt.encode(payload, getenv("JWT_SECRET_KEY", "clave_jwt_123"), algorithm="HS256"), expires_in
