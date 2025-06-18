@@ -502,8 +502,8 @@ def distribute_package(source_file):
 def main():
     """Función principal"""
     clear_screen()
-
     print("🏗️  Iniciando proceso de build y distribución...")
+    print("👉 SIEMPRE EJECUTE ESTO SIN UN ENTORNO VIRTUAL ACTIVO 👈")
     print("=" * 49)
 
     # Verificar permisos en Windows

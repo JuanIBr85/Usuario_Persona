@@ -8,6 +8,10 @@ from flask_jwt_extended import JWTManager
 from common.utils.component_service import component_service
 from app.extensions import limiter, jwt
 from app.services.endpoints_search_service import EndpointsSearchService
+from app.services.services_serch_service import ServicesSearchService
+
+# Defino los modelos
+import app.models
 
 
 def create_app() -> Flask:
@@ -44,6 +48,6 @@ def create_app() -> Flask:
     register_blueprints(app)
 
     # Inicializa el servicio de busqueda de endpoints
-    EndpointsSearchService().refresh_endpoints()
+    # EndpointsSearchService().refresh_endpoints()
 
     return app

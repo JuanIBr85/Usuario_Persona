@@ -1,8 +1,9 @@
 from flask import request
 import requests
 from werkzeug.routing import Map, Rule
+from app.services.services_serch_service import ServicesSearchService
 from common.models.endpoint_route_model import EndpointRouteModel
-from app.extensions import services_config
+from app.models.service_model import ServiceModel
 import time
 import logging
 
@@ -40,7 +41,9 @@ class EndpointsSearchService:
             cls._instance = super(EndpointsSearchService, cls).__new__(cls)
         return cls._instance
 
-    def _wait_for_service(self, service) -> dict[str, dict[str, str]] | None:
+    def _wait_for_service(
+        self, service: ServiceModel
+    ) -> dict[str, dict[str, str]] | None:
         # Contador de errores consecutivos
         error_cnt = 0
         self._stop_search = False
@@ -49,7 +52,7 @@ class EndpointsSearchService:
         while not self._stop_search:
             try:
                 # Construye y realiza la petición al servicio
-                service_url = f"http://{service['url']}"
+                service_url = service.service_url
                 response = requests.get(
                     f"{service_url}/component_service/endpoints"
                 ).json()
@@ -64,14 +67,13 @@ class EndpointsSearchService:
                 }
 
             except Exception as e:
-                logger.exception(e)
                 # Manejo de errores con reintentos
                 error_cnt += 1
                 # Logea error cada minuto (60 intentos)
                 if error_cnt % (60 * 1) == 0:
-                    logger.error(f"Error conectando con {service['name']}")
-                self._search_log[service["name"]]["success"] = "error"
-                self._search_log[service["name"]]["error"] = str(e)
+                    logger.error(f"Error conectando con {service.service_name}")
+                self._search_log[service.service_name]["success"] = "error"
+                self._search_log[service.service_name]["error"] = str(e)
                 # Espera 1 segundo entre reintentos
                 time.sleep(1)
 
@@ -80,10 +82,12 @@ class EndpointsSearchService:
         logger.info("Iniciando carga de servicios")
         self._endpoints = {}
         self._search_in_progress = True
+        self._search_log = {}
 
+        services = ServicesSearchService().get_services()
         # Itera sobre cada servicio en la configuración
-        for service in services_config["services"]:
-            self._search_log[service["name"]] = {
+        for service in services:
+            self._search_log[service.service_name] = {
                 "in_progress": True,
                 "success": "in_progress",
                 "start_time": time.time(),
@@ -91,16 +95,16 @@ class EndpointsSearchService:
             }
 
             if self._stop_search:  # Verifica señal de parada
-                self._search_log[service["name"]]["in_progress"] = False
-                self._search_log[service["name"]]["success"] = "stop"
+                self._search_log[service.service_name]["in_progress"] = False
+                self._search_log[service.service_name]["success"] = "stop"
                 break
 
-            logger.info(f"Conectando con {service['name']}...")
+            logger.info(f"Conectando con {service.service_name}...")
             try:
                 # Obtiene endpoints del servicio actual
                 service_endpoints = self._wait_for_service(service)
                 if service_endpoints is None:
-                    self._search_log[service["name"]][
+                    self._search_log[service.service_name][
                         "error"
                     ] = "No se pudo obtener endpoints"
                     continue
@@ -108,13 +112,13 @@ class EndpointsSearchService:
                 # Actualiza el diccionario de endpoints
                 self._endpoints.update(service_endpoints)
                 logger.info(
-                    f"{service['name']} - {len(service_endpoints)} endpoints cargados"
+                    f"{service.service_name} - {len(service_endpoints)} endpoints cargados"
                 )
             except Exception as e:
-                logger.error(f"Error cargando {service['name']}: {str(e)}")
-                self._search_log[service["name"]]["error"] = str(e)
-            self._search_log[service["name"]]["in_progress"] = False
-            self._search_log[service["name"]]["success"] = "success"
+                logger.error(f"Error cargando {service.service_name}: {str(e)}")
+                self._search_log[service.service_name]["error"] = str(e)
+            self._search_log[service.service_name]["in_progress"] = False
+            self._search_log[service.service_name]["success"] = "success"
         # Finalización de la carga
         self._search_in_progress = False
         logger.info(f"Carga completada. Total de endpoints: {len(self._endpoints)}")
@@ -195,3 +199,6 @@ class EndpointsSearchService:
         # Convertimos args a dict[str, str] para cumplir con el tipo de retorno
         args_dict = {k: str(v) for k, v in args.items()}
         return endpoint_route, args_dict, str(matched_endpoint)
+
+    def get_search_log(self) -> dict[str, dict[str, str]]:
+        return self._search_log or {}

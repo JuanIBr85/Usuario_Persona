@@ -59,13 +59,16 @@ const ProfileNick = ({ firstName, lastName }) => {
   });
 
   useEffect(() => {
-    const _name = (firstName ? firstName[0].toUpperCase() : "?").charCodeAt(0);
-    const _lastName = (lastName ? lastName[0]?.toUpperCase() : "?").charCodeAt(0);
+    const _name = (firstName ? firstName[0].toUpperCase() : "?");
+    const _lastName = (lastName ? lastName[0]?.toUpperCase() : "?");
+
+    const c_name = _name.charCodeAt(0);
+    const c_lastName = _lastName.charCodeAt(0);
 
     //Aleatoriedad, mucho mejor que mi implementacion, seguro!!!
     // rota bits de a 5 posiciones y XOR con b
-    const rotated = ((_name << 5) | (_name >>> 3)) >>> 0;
-    const seed = (rotated ^ _lastName) % profileColors.length;
+    const rotated = (c_name << 5) | (c_name >>> 3);
+    const seed = (rotated ^ c_lastName) % profileColors.length;
     setNick({
       name: `${_name}${_lastName}`,
       color: profileColors[seed]

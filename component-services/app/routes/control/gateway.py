@@ -1,10 +1,5 @@
 import threading
-from flask import abort, request, g, Response, Blueprint, jsonify
-from app.extensions import limiter
-from app.utils.cache_util import cache_response
-from app.utils.request_to_service import request_to_service
-from common.decorators.api_access import api_access
-from flask_jwt_extended import jwt_required
+from flask import Blueprint
 from app.decorators.cp_api_access import cp_api_access
 from app.services.endpoints_search_service import EndpointsSearchService
 from common.utils.response import make_response, ResponseStatus
@@ -48,7 +43,8 @@ def get_research_status():
             ResponseStatus.SUCCESS,
             "Estado de la busqueda de endpoints",
             {
-                "search_in_progress": endpoints_search_service._search_in_progress,
+                "search_in_progress": endpoints_search_service.is_search_in_progress(),
+                "log": endpoints_search_service.get_search_log(),
             },
         ),
         200,

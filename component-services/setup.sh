@@ -6,7 +6,7 @@ VENV_DIR=".venv"
 # Eliminar entorno virtual si existe
 if [ -d "$VENV_DIR" ]; then
     echo "Eliminando entorno virtual existente..."
-    rm -rf "$VENV_DIR"
+    #rm -rf "$VENV_DIR"
 fi
 
 # Crear el entorno virtual

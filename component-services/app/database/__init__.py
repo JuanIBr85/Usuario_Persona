@@ -1,0 +1,1 @@
+from app.database.seed_services_core import load_services_from_config

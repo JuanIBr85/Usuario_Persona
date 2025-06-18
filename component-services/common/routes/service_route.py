@@ -7,3 +7,8 @@ bp = Blueprint("service", __name__, cli_group="component")
 @bp.route("/endpoints", methods=["GET"])
 def service():
     return make_endpoints_list(current_app)
+
+
+@bp.route("/health", methods=["GET"])
+def health():
+    return "OK", 200
