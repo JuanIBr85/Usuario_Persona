@@ -12,7 +12,7 @@ const ProfilePhoto = ({ photoUrl, onPhotoChange }) => (
   <div className="flex flex-col items-center mb-6">
     <div className="relative">
        <img
-        className="w-24 h-24 object-cover rounded-full border-4 shadow-md"
+        className="w-24 h-24 object-cover rounded-full border-4   shadow-md"
         src={photoUrl}
         alt="Foto de perfil"
       />
