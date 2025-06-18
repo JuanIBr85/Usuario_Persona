@@ -7,6 +7,11 @@ from config import SQLALCHEMY_DATABASE_URI, SERVICES_CONFIG_FILE
 from diskcache import FanoutCache
 import json
 
+import os
+
+# Elimino la base de datos si existe
+os.remove("components.db")
+
 engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=True, future=True)
 Base = declarative_base()
 SessionLocal = scoped_session(

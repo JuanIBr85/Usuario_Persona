@@ -25,7 +25,7 @@ echo "Actualizando pip dentro del entorno virtual..."
 
 # Limpiar cache de pip
 echo "Limpiando cache de pip..."
-"$VENV_DIR/bin/pip" cache purge
+#"$VENV_DIR/bin/pip" cache purge
 
 # Verificar que existe requirements.txt
 if [ ! -f "requirements.txt" ]; then
