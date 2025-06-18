@@ -9,7 +9,9 @@ from common.utils.component_service import component_service
 from app.extensions import limiter, jwt
 from app.services.endpoints_search_service import EndpointsSearchService
 from app.services.services_serch_service import ServicesSearchService
+import threading
 
+endpoints_search_service = EndpointsSearchService()
 # Defino los modelos
 import app.models
 
@@ -48,6 +50,9 @@ def create_app() -> Flask:
     register_blueprints(app)
 
     # Inicializa el servicio de busqueda de endpoints
-    EndpointsSearchService().refresh_endpoints()
+    # Iniciar el refresco en segundo plano
+    thread = threading.Thread(target=endpoints_search_service.refresh_endpoints)
+    thread.daemon = True  # El hilo se cerrará cuando el programa principal termine
+    thread.start()
 
     return app
