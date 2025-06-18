@@ -46,7 +46,6 @@ class EndpointsSearchService:
     ) -> dict[str, dict[str, str]] | None:
         # Contador de errores consecutivos
         error_cnt = 0
-        self._stop_search = False
 
         # Bucle de reintentos hasta conexión exitosa o señal de parada
         while not self._stop_search:
@@ -84,6 +83,7 @@ class EndpointsSearchService:
         self._search_in_progress = True
         self._search_log = {}
 
+        self._stop_search = False
         services = ServicesSearchService().get_services()
         # Itera sobre cada servicio en la configuración
         for service in services:
@@ -97,6 +97,7 @@ class EndpointsSearchService:
             if self._stop_search:  # Verifica señal de parada
                 self._search_log[service.service_name]["in_progress"] = False
                 self._search_log[service.service_name]["success"] = "stop"
+                logger.info(f"Parada de búsqueda de endpoints")
                 break
 
             logger.info(f"Conectando con {service.service_name}...")
@@ -111,6 +112,7 @@ class EndpointsSearchService:
 
                 # Actualiza el diccionario de endpoints
                 self._endpoints.update(service_endpoints)
+                self._search_log[service.service_name]["error"] = ""
                 logger.info(
                     f"{service.service_name} - {len(service_endpoints)} endpoints cargados"
                 )
