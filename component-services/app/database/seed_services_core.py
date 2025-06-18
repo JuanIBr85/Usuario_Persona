@@ -9,9 +9,7 @@ from config import SERVICES_CONFIG_FILE
 
 def load_services_from_config():
     # Obtener la ruta del archivo de configuración
-    config_path = os.path.join(
-        os.path.dirname(__file__), "../config/", SERVICES_CONFIG_FILE
-    )
+    config_path = os.path.join(os.getcwd(), "app/config/", SERVICES_CONFIG_FILE)
     # Cargar el archivo de configuración
     with open(config_path, "r") as f:
         config = json.load(f)
