@@ -68,7 +68,7 @@ const ProfileForm = () => {
 
               <CardContent className="h-full overflow-y-auto">
                 <ProfilePhoto
-                  photoUrl={photoUrl}
+                  photoUrl={`https://ui-avatars.com/api/?name=${personaData.nombre_persona}+${personaData.apellido_persona}&background=random`}
                   onPhotoChange={handlePhotoChange}
                 />
 
