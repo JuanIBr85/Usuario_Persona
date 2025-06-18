@@ -50,8 +50,8 @@ Corre en el puerto `5173`.
 ### 1. Clonar el repositorio
 
 ```bash
-git clone https://github.com/tu-usuario/tu-repo.git
-cd tu-repo
+git clone https://github.com/JuanIBr85/Usuario_Persona.git
+cd Usuario_Persona
 ```
 
 ## 2.a 🔐 Equipo 1 – Auth Service (Backend)

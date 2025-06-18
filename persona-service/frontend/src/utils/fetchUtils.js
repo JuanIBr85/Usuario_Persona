@@ -1,7 +1,7 @@
 
 export const ServiceURL = Object.freeze({
-    auth: "http://localhost:5000",
-    persona: "http://localhost:5001",
+    auth: "http://localhost:5002/api",
+    persona: "http://localhost:5002/api",
     //api gateway
     // "http://localhost:5002/api"
 });
@@ -19,10 +19,23 @@ export const HttpMethod = Object.freeze({
 
 export class FetchError extends Error {
   constructor(mensaje, isJson, statusCode, data) {
-    super(mensaje); 
-    this.isJson = isJson; 
-    this.statusCode = statusCode; 
-    this.data = data; 
+    const mensajeCompleto = `${mensaje}\n` +
+                         `Código de estado: ${statusCode}\n` +
+                         `Es JSON: ${isJson}\n` +
+                         `Datos: ${JSON.stringify(data, null, 2)}`;
+    
+    super(mensajeCompleto);
+    
+    this.name = 'FetchError';
+    this.originalMessage = mensaje;
+    this.isJson = isJson;
+    this.statusCode = statusCode;
+    this.data = data;
+    
+    // Asegurarse de que el stack trace no se pierda
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, FetchError);
+    }
   }
 }
 
@@ -64,7 +77,7 @@ export const fetchService = {
             controller.abort(); // Cancela la petición
             console.warn(`Fetch [${url}] timeout.`); // Avisa que se canceló por timeout
         }, timeout);
-
+        
         // Hacemos la petición Fetch
         return fetch(url, {
             signal: controller.signal, // Para poder cancelar la petición

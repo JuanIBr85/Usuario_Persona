@@ -11,6 +11,7 @@ from app.models.persona_extendida_model import PersonaExtendida
 #Se importan los servicios
 from app.services.contacto_service import ContactoService
 from app.services.domicilio_service import DomicilioService
+from app.services.persona_extendida_service import PersonaExtendidaService
 from app.services.otp_service import OtpService
 
 
@@ -18,7 +19,7 @@ from app.services.otp_service import OtpService
 from app.schema.persona_schema import PersonaSchema,PersonaResumidaSchema
 from app.interfaces.persona_interface import IPersonaInterface
 from app.extensions import SessionLocal
-
+from app.schema.persona_extendida_schema import PersonaExtendidaSchema
 
 class PersonaService(IPersonaInterface):
 
@@ -27,6 +28,7 @@ class PersonaService(IPersonaInterface):
         self.varios_schemas = PersonaResumidaSchema(many=True)
         self.contacto_service = ContactoService()
         self.domicilio_service = DomicilioService()
+        self.persona_ext_service = PersonaExtendidaService()
         self.otp_service = OtpService()
         
 
@@ -83,22 +85,18 @@ class PersonaService(IPersonaInterface):
             domicilio = self.domicilio_service.crear_domicilio(data_validada.pop('domicilio'), session=session)
             contacto = self.contacto_service.crear_contacto(data_validada.pop('contacto'), session=session)
 
-            datos_extendida = data_validada.pop('persona_extendida', None)
+            extendida = data_validada.pop('persona_extendida', {})
+            persona_extendida = self.persona_ext_service.crear_persona_extendida(extendida,session=session)
 
             data_validada['domicilio_id']=domicilio.id_domicilio
             data_validada['contacto_id']=contacto.id_contacto
+            data_validada['extendida_id'] = persona_extendida.id_extendida
             data_validada['tipo_documento']=data_validada.pop('tipo_documento')
             
 
             # Crear Persona
             persona_nueva=Persona(**data_validada)
             session.add(persona_nueva)
-            session.flush()
-
-            if datos_extendida:
-                extendida = PersonaExtendida(id_extendida=persona_nueva.id_persona, **datos_extendida)
-                session.add(extendida)
-
             session.commit()
             session.refresh(persona_nueva)
 
@@ -143,21 +141,11 @@ class PersonaService(IPersonaInterface):
                 self.contacto_service.modificar_contacto(persona.contacto_id, data['contacto'], session)
 
             if 'persona_extendida' in data:
-               datos_extendida=data['persona_extendida'] 
+                if persona.persona_extendida:
+                    self.persona_ext_service.modificar_persona_extendida(persona.extendida_id,data['persona_extendida'], session)
 
-               if persona.persona_extendida:
-                   for atributo, value in datos_extendida.items():
-                       setattr(persona.persona_extendida, atributo,value)
 
-                   persona.persona_extendida.updated_at = datetime.now(timezone.utc)
-
-               else:
-                    nueva_extendida = PersonaExtendida(**datos_extendida)
-                    nueva_extendida.id_extendida = persona.id_persona
-                    session.add(nueva_extendida)
-                    persona.persona_extendida = nueva_extendida        
-                   
-            for field in ['nombre_persona', 'apellido_persona', 'fecha_nacimiento_persona', 'num_doc_persona']: 
+            for field in ['nombre_persona', 'apellido_persona', 'fecha_nacimiento_persona', 'num_doc_persona' , 'tipo_documento']: 
                 if field in data_validada:
                     setattr(persona, field, data_validada[field])
 
@@ -167,6 +155,9 @@ class PersonaService(IPersonaInterface):
 
         # si ocurre un error deshace los cambios 
         except Exception as e:
+            import traceback
+            print("Error al modificar persona:")
+            print(traceback.format_exc())
             session.rollback()
             raise e
 
@@ -190,6 +181,9 @@ class PersonaService(IPersonaInterface):
                 self.contacto_service.borrar_contacto(persona.contacto_id , session)
             if persona.domicilio_id:
                 self.domicilio_service.borrar_domicilio(persona.domicilio_id, session)
+
+            if persona.extendida_id:
+                self.persona_ext_service.borrar_persona_extendida(persona.extendida_id, session)
 
             persona.deleted_at = datetime.now(timezone.utc)
             session.commit()

@@ -37,7 +37,7 @@
       volumes:
         - ./component-services:/app
       environment:
-        - SERVICES_CONFIG_FILE=app/config/services-docker.json
+        - SERVICES_CONFIG_FILE=services-docker.json
       depends_on:
         - auth-service
         - persona-backend

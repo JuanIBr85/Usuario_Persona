@@ -8,15 +8,16 @@ import Login from '@/pages/auth/Login';
 import Logout from '@/pages/auth/Logout';
 import Sign from '@/pages/auth/Sign';
 import Logs from '@/pages/admin/Logs';
-import AdminUsers from '@/pages/admin/AdminUsers';
+import AdminPersons from '@/pages/admin/AdminPersons';
 import AdminRoles from '@/pages/admin/AdminRoles';
-import UserDetails from '@/pages/admin/UserDetails';
+import PersonDetails from '@/pages/admin/PersonDetails';
 import TermsOfService from '@/pages/user/TermsOfService';
 import AboutPrivacyPolicy from '@/pages/user/AboutPrivacyPolicy';
 import Faq from '@/pages/user/Faq';
 import ForgotPassword from '@/pages/auth/ForgotPassword';
 import OTPValidation from '@/pages/auth/OTPValidation';
 import ResetPassword from '@/pages/auth/ResetPassword';
+import PerfilConnect from '@/pages/user/PerfilConnect';
 
 /**
  * Componente que define todas las rutas de la aplicación utilizando react-router-dom.
@@ -30,21 +31,24 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<AdminPanel />} />
       <Route path="profile" element={<Profile />} />
+      <Route path="perfilconnect" element={<PerfilConnect />} />
       <Route path="adminpanel" element={<AdminPanel />} />
-      <Route path="login" element={<Login />} />
-      <Route path="sign" element={<Sign />} />
-      <Route path="logout" element={<Logout />} />
-      <Route path="otpvalidation" element={<OTPValidation />} />
       <Route path="logs" element={<Logs />} />
-      <Route path="adminusers" element={<AdminUsers />} />
+      <Route path="adminpersons" element={<AdminPersons />} />
       <Route path="adminroles" element={<AdminRoles />} />
-      <Route path="userdetails/:id" element={<UserDetails />} />
+      <Route path="persondetails/:id" element={<PersonDetails />} />
       <Route path="privacypolicy" element={<AboutPrivacyPolicy />} />
       <Route path="termsofservice" element={<TermsOfService />} />
       <Route path="faq" element={<Faq />} />
       <Route path="*" element={<NotFound />} />
-      <Route path="forgotpassword" element={<ForgotPassword />} />
-      <Route path="resetpassword" element={<ResetPassword />} />
+
+
+      <Route path="auth/forgotpassword" element={<ForgotPassword />} />
+      <Route path="auth/resetpassword" element={<ResetPassword />} />
+      <Route path="auth/login" element={<Login />} />
+      <Route path="auth/sign" element={<Sign />} />
+      <Route path="auth/logout" element={<Logout />} />
+      <Route path="auth/otpvalidation" element={<OTPValidation />} />
     </Routes>
   )
 }

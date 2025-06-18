@@ -17,10 +17,11 @@ class Persona(Base):
     usuario_id = Column(Integer, nullable=True, unique=True)
     domicilio_id=Column(Integer, ForeignKey('domicilios.id_domicilio'))
     contacto_id=Column(Integer, ForeignKey('contactos.id_contacto'))
+    extendida_id = Column(Integer, ForeignKey('personas_extendidas.id_extendida'))
 
     domicilio = relationship("Domicilio")
     contacto = relationship("Contacto")
-    persona_extendida = relationship("PersonaExtendida", back_populates="persona", uselist=False,cascade="all, delete-orphan")
+    persona_extendida = relationship("PersonaExtendida")
 
     created_at=Column(DateTime, default=datetime.now(timezone.utc))
     updated_at=Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))

@@ -104,12 +104,12 @@ function Login() {
           
           {/* Enlace a recuperación de contraseña */}
           <Button variant="link" asChild className="p-0">
-            <Link to="/forgotPassword">¿Olvidaste la contraseña?</Link>
+            <Link to="/auth/forgotPassword">¿Olvidaste la contraseña?</Link>
           </Button>
 
           {/* Enlace para registrarse si no tiene cuenta */}
           <Button variant="link" asChild className="p-0">
-            <Link to="/sign">¿No tienes una cuenta? Regístrate</Link>
+            <Link to="/auth/sign">¿No tienes una cuenta? Regístrate</Link>
           </Button>
 
           {/* Botón para enviar el formulario */}

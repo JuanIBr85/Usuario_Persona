@@ -31,22 +31,33 @@ const initialPersonaState = Object.freeze({
 export function useProfile() {
   const navigate = useNavigate();
   const { authData } = useAuthContext();
-  
+
   const [isLoading, setIsLoading] = useState(true);
-  const [tipoDocumento, setTipoDocumento] = useState([]);
   const [personaData, setPersonaData] = useState(initialPersonaState);
   const [photoUrl, setPhotoUrl] = useState('https://i.pravatar.cc/150?img=69');
-  const [redes_sociales, setRedesSociales] = useState([]);
   const [dialog, setDialog] = useState(null);
+  const [staticData, setStaticData] = useState({});
+  const [showFormEmailVerify, setShowFormEmailVerify] = useState(false);
 
   const fetchData = async () => {
     try {
-      const [profileResponse, tiposDocumentoResponse, redes_socialesResponse] = await Promise.all([
-        PersonaService.get_by_usuario(authData.user.id_usuario),
+      const [tiposDocumentoResponse, redes_socialesResponse, estados_civilesResponse, ocupacionesResponse, estudios_alcanzadosResponse] = await Promise.all([
         PersonaService.get_tipos_documentos(),
-        PersonaService.get_redes_sociales()
+        PersonaService.get_redes_sociales(),
+        PersonaService.get_estados_civiles(),
+        PersonaService.get_ocupaciones(),
+        PersonaService.get_estudios_alcanzados()
       ]);
 
+      setStaticData({
+        estados_civiles: estados_civilesResponse?.data || [],
+        ocupaciones: ocupacionesResponse?.data || [],
+        estudios_alcanzados: estudios_alcanzadosResponse?.data || [],
+        tipos_documento: tiposDocumentoResponse?.data || [],
+        redes_sociales: redes_socialesResponse?.data || []
+      });
+      const profileResponse = await PersonaService.get_by_usuario(authData.user.id_usuario);
+      console.log(profileResponse);
       if (profileResponse?.data) {
         setPersonaData({
           ...initialPersonaState,
@@ -55,16 +66,21 @@ export function useProfile() {
           domicilio: profileResponse.data.domicilio || {}
         });
       }
-
-      setTipoDocumento(tiposDocumentoResponse?.data || []);
-      setRedesSociales(redes_socialesResponse?.data || []);
     } catch (error) {
-      if(error.statusCode === 404){
+      if (error.statusCode === 404) {
+        setShowFormEmailVerify(true);
         setDialog({
           title: "No hay un perfil",
-          description: "Complete los datos de perfil para continuar"
+          description: "Complete los datos de perfil para continuar",
+          action: () => navigate('/perfilConnect')
         });
-      }else{
+
+      } else {
+        if (!error.data) {
+          alert("A ocurrido un error al comunicarse con el servidor")
+          navigate("/*");
+        }
+
         setDialog({
           title: "Error al cargar los datos",
           description: "Error al cargar los datos del perfil"
@@ -77,11 +93,11 @@ export function useProfile() {
 
   useEffect(() => {
     if (!authData.token) {
-      navigate('/login');
+      navigate('/auth/login');
       return;
     }
     fetchData();
-  }, [authData, navigate]);
+  }, [authData]);
 
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
@@ -93,15 +109,16 @@ export function useProfile() {
 
   return {
     isLoading,
-    tipoDocumento,
     personaData,
     photoUrl,
     email: authData.user?.email_usuario || '',
-    redes_sociales,
+    staticData,
     handlePhotoChange,
     fetchData,
     setPersonaData,
-    dialog, 
+    dialog,
+    showFormEmailVerify,
+    setShowFormEmailVerify,
     setDialog
   };
 }

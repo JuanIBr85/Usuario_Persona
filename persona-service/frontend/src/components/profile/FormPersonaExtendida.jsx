@@ -9,42 +9,25 @@ import { useState } from "react"
 import { formSubmitJson } from "@/utils/formUtils"
 import Loading from "@/components/loading/Loading"
 
-export default function FormPersonaExtendida({ persona_id, personaExtendida, setPersonaData }) {
+export default function FormPersonaExtendida({ persona_id, personaExtendida, estadosCiviles, ocupaciones, estudiosAlcanzados }) {
   const [loading, setLoading] = useState(false);
-
-  // Opciones para los selects
-  const estadosCiviles = [
-    'Soltero/a',
-    'Casado/a',
-    'Divorciado/a',
-    'Viudo/a',
-    'Separado/a',
-    'Unión convivencial',
-    'Otro'
-  ];
-
-  const nivelesEstudios = [
-    'Sin estudios',
-    'Primario incompleto',
-    'Primario completo',
-    'Secundario incompleto',
-    'Secundario completo',
-    'Terciario/Universitario incompleto',
-    'Terciario/Universitario completo',
-    'Posgrado',
-    'Maestría/Doctorado'
-  ];
 
   const handleSubmit = async (event) => {
     const formData = await formSubmitJson(event);
     document.activeElement.blur();
     setLoading(true);
+    console.log(formData);  
+    PersonaService.editar(persona_id, {
+      persona_extendida: formData
+    })
+    .then(response => {
+      setPersonaData(response.data);
+    })
+    .catch(error => {
+      console.error('Error updating persona extendida:', error.data);
+    })
+    .finally(() => setLoading(false));
     
-    // Convertir fecha de vencimiento al formato correcto si existe
-    if (formData.vencimiento_dni) {
-      formData.vencimiento_dni = new Date(formData.vencimiento_dni).toISOString().split('T')[0];
-    }
-
   };
 
   return (
@@ -67,16 +50,18 @@ export default function FormPersonaExtendida({ persona_id, personaExtendida, set
           </SimpleSelect>
 
           {/* Ocupación */}
-          <InputValidate
-            id="ocupacion"
+          <SimpleSelect
             name="ocupacion"
-            type="text"
-            placeholder="Ingresa tu ocupación"
-            labelText="Ocupación"
+            label="Ocupación"
+            placeholder="Selecciona tu ocupación"
             value={personaExtendida?.ocupacion || ''}
-            validatePattern=".{3,100}"
-            validateMessage="La ocupación debe tener entre 3 y 100 caracteres"
-          />
+          >
+            {ocupaciones.map((ocupacion) => (
+              <SelectItem key={ocupacion} value={ocupacion}>
+                {ocupacion}
+              </SelectItem>
+            ))}
+          </SimpleSelect>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -87,7 +72,7 @@ export default function FormPersonaExtendida({ persona_id, personaExtendida, set
             placeholder="Selecciona tu nivel de estudios"
             value={personaExtendida?.estudios_alcanzados || ''}
           >
-            {nivelesEstudios.map((nivel) => (
+            {estudiosAlcanzados.map((nivel) => (
               <SelectItem key={nivel} value={nivel}>
                 {nivel}
               </SelectItem>
@@ -97,11 +82,11 @@ export default function FormPersonaExtendida({ persona_id, personaExtendida, set
           {/* Vencimiento DNI */}
           <InputValidate
             id="vencimiento_dni"
-            name="vencimiento_dni"
             type="date"
-            labelText="Vencimiento del DNI"
-            value={personaExtendida?.vencimiento_dni ? new Date(personaExtendida.vencimiento_dni).toISOString().split('T')[0] : ''}
-            validateMessage="Selecciona una fecha de vencimiento válida"
+            placeholder="Ingresa tu fecha de vencimiento del DNI"
+            labelText="Fecha de vencimiento del DNI"
+            value={personaExtendida?.vencimiento_dni || ''}
+            onChange={(e) => handleChange('vencimiento_dni', e.target.value)}
           />
         </div>
 

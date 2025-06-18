@@ -62,7 +62,7 @@ function Sign() {
         description={dialogMessage}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
-        actionHandle={isOK ? ()=>setTimeout(()=>navigate('/login'), 500) : undefined} // Redirige al login si fue exitoso
+        actionHandle={isOK ? ()=>setTimeout(()=>navigate('/auth/login'), 500) : undefined} // Redirige al login si fue exitoso
       />
 
       {/* Layout del formulario de registro */}
@@ -105,7 +105,7 @@ function Sign() {
 
           {/* Link para ir al login si ya tiene cuenta */}
           <Button variant="link" asChild className="p-0">
-            <Link to="/login">¿Ya tienes una cuenta? Inicia sesión</Link>
+            <Link to="/auth/login">¿Ya tienes una cuenta? Inicia sesión</Link>
           </Button>
 
           {/* Botón de envío del formulario */}

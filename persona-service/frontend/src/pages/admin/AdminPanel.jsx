@@ -24,10 +24,10 @@ import { Fade } from 'react-awesome-reveal'
 
 const adminOptions = [
   {
-    title: "Usuarios",
-    description: "Gestionar cuentas de usuario",
+    title: "Personas",
+    description: "Gestionar cuentas de personas",
     icon: <Users className="w-14 h-14 text-primary" />,
-    path: "/adminusers",
+    path: "/adminpersons",
   },
   {
     title: "Roles",
@@ -57,7 +57,7 @@ const AdminPanel = () => {
 
   return (
 
-    <div className=" py-30 px-5 md:py-20 md:px-10 ">
+    <div className=" py-30 px-5 md:py-20 md:px-10 2xl:pl-[5%] 2xl:pr-[5%]">
       <Fade duration={300} triggerOnce>
         <h2 className="text-3xl font-bold mb-10 text-center">Panel de Administración</h2>
         <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3">

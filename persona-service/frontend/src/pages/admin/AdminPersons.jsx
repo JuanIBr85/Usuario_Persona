@@ -5,14 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { Users } from "lucide-react";
 
-import UserFilter from "@/components/users/UserFilter";
+import PersonFilter from "@/components/people/PersonFilter";
 import Loading from '@/components/loading/Loading';
 
 import { PersonaService } from "@/services/personaService";
-
-import UserTable from "@/components/users/UserTable";
-import UserEditDialog from "@/components/users/UserEditDialog";
-import UserBreadcrumb from "@/components/users/UserBreadcrumb";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import PersonTable from "@/components/people/PersonTable";
+import PersonEditDialog from "@/components/people/PersonEditDialog";
+import PersonBreadcrumb from "@/components/people/PersonBreadcrumb";
 
 /**
  * Componente AdminUsers
@@ -37,10 +37,10 @@ import UserBreadcrumb from "@/components/users/UserBreadcrumb";
  * - Edición rápida de usuario mediante diálogo modal.
  * 
  * Componentes hijos usados:
- * - UserFilter: formulario para filtrar usuarios.
- * - UserTable: tabla que muestra la lista filtrada con botones de acción.
- * - UserEditDialog: diálogo modal para editar datos de usuario.
- * - UserBreadcrumb: barra de navegación breadcrumb.
+ * - PersonFilter: formulario para filtrar usuarios.
+ * - PersonTable: tabla que muestra la lista filtrada con botones de acción.
+ * - PersonEditDialog: diálogo modal para editar datos de usuario.
+ * - PersonBreadcrumb: barra de navegación breadcrumb.
  */
 function AdminUsers() {
   const navigate = useNavigate();
@@ -54,19 +54,23 @@ function AdminUsers() {
   // Texto del filtro
   const [filtro, setFiltro] = useState("");
 
+  const [alert, setAlert] = useState(null)
+
   // Carga inicial de usuarios al montar el componente
   useEffect(() => {
     PersonaService.get_all()
       .then(res => {
-        if (res && res.data) {
-          // Mapea la respuesta para adaptar estructura de usuarios
+        if (res && res.data && Array.isArray(res.data)) {
           const mappedUsers = res.data.map(persona => ({
             id: persona.id_persona,
             nombre: persona.nombre_persona,
             apellido: persona.apellido_persona,
-            email: persona.email || "sin@email.com",
+            tipo_documento: persona.tipo_documento,
+            nro_documento: persona.num_doc_persona,
+            fecha_nacimiento: persona.fecha_nacimiento_persona,
+            usuario_id: persona.usuario_id
           }));
-
+          console.log("mappedUsers:", mappedUsers);
           setUsers(mappedUsers);
         }
       })
@@ -79,9 +83,10 @@ function AdminUsers() {
   const usuariosFiltrados = users.filter(user => {
     const textoMatch =
       `${user.nombre} ${user.apellido}`.toLowerCase().includes(filtro.toLowerCase()) ||
-      user.email.toLowerCase().includes(filtro.toLowerCase());
+      user.nro_documento.toLowerCase().includes(filtro.toLowerCase());
     return textoMatch;
   });
+  console.log("usuariosFiltrados", usuariosFiltrados)
 
   /**
    * Elimina un usuario por id.
@@ -103,30 +108,46 @@ function AdminUsers() {
    * @param {number} id - ID del usuario
    */
   const handleSeeDetails = (id) => {
-    navigate(`/userdetails/${id}`);
+    navigate(`/persondetails/${id}`);
   };
+
 
   /**
    * Maneja el envío del formulario de edición.
    * Actualiza el usuario en la lista local y hace petición para actualizar en backend.
    * @param {Event} e - Evento submit del formulario
    */
-  const handleEditSubmit = (e) => {
+  const handleEditSubmit = async (e) => {
     e.preventDefault();
 
-    setUsers(users.map(u => u.id === editingUser.id ? editingUser : u));
 
+    // Construye el body con todos los campos para enviar al backend
     const body = {
       nombre_persona: editingUser.nombre || '',
       apellido_persona: editingUser.apellido || '',
+      tipo_documento: editingUser.tipo_documento || 'DNI',
+      num_doc_persona: editingUser.nro_documento || '',
+      fecha_nacimiento_persona: editingUser.fecha_nacimiento || '',
+      usuario_id: editingUser.usuario_id || null
     };
 
-    PersonaService.editar(editingUser.id, body)
-      .catch(err => {
-        console.error("Error actualizando usuario:", err);
-      });
+    try {
+      await PersonaService.editar(editingUser.id, body);
 
-    setEditingUser(null);
+      // Actualiza el estado local solo si la petición fue exitosa
+      setUsers(users.map(u => u.id === editingUser.id ? editingUser : u));
+      setEditingUser(null);
+    } catch (err) {
+
+      console.error("Error actualizando usuario:", err);
+
+      const message = err?.response?.data?.message || err.message || "Error desconocido";
+
+      setAlert({
+        title: "Error al actualizar usuario",
+        description: message,
+      });
+    }
   };
 
   // Muestra loader si aún no hay usuarios cargados
@@ -135,6 +156,18 @@ function AdminUsers() {
   return (
     <div className="p-6 space-y-6 py-30 px-3 md:py-25 md:px-15">
       <Fade duration={300} triggerOnce>
+        {alert && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertTitle>{alert.title}</AlertTitle>
+            <AlertDescription>{alert.description}</AlertDescription>
+            <button
+              onClick={() => setAlert(null)}
+              className="ml-auto bg-transparent text-red-600 hover:text-red-800 font-semibold"
+            >
+              Cerrar
+            </button>
+          </Alert>
+        )}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -145,7 +178,7 @@ function AdminUsers() {
           <CardContent>
             {/* Filtro de usuario */}
             <div className="overflow-auto border p-3 rounded-md shadow-sm mb-4">
-              <UserFilter
+              <PersonFilter
                 mostrarFiltroAvanzado={mostrarFiltroAvanzado}
                 setMostrarFiltroAvanzado={setMostrarFiltroAvanzado}
                 filtro={filtro}
@@ -155,7 +188,7 @@ function AdminUsers() {
 
             {/* Tabla con usuarios filtrados */}
             <div className="overflow-auto border p-3 rounded-md shadow-sm">
-              <UserTable
+              <PersonTable
                 users={usuariosFiltrados}
                 onEdit={setEditingUser}
                 onSeeDetails={handleSeeDetails}
@@ -166,11 +199,11 @@ function AdminUsers() {
         </Card>
 
         {/* Breadcrumb navegación */}
-        <UserBreadcrumb />
+        <PersonBreadcrumb />
       </Fade>
 
       {/* Diálogo modal para editar usuario */}
-      <UserEditDialog
+      <PersonEditDialog
         editingUser={editingUser}
         setEditingUser={setEditingUser}
         onSubmit={handleEditSubmit}

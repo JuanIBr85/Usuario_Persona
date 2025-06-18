@@ -31,7 +31,7 @@ function SimpleSelect({
             <div className="relative">
                 <Select id={id} name={name} value={internalValue} onValueChange={(e) => {
                     setInternalValue(e);
-                    onValueChange(e);
+                    onValueChange && onValueChange(e);
                 }} required={required} {...props}>
                     <SelectTrigger className="w-full">
                         <SelectValue placeholder={placeholder} />

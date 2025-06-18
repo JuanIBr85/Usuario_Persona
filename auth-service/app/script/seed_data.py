@@ -48,7 +48,6 @@ def seed():
             email_usuario=email,
             email_verificado=1,
             password=generate_password_hash("Admin123!"),
-            persona_id=None  # Hasta que se conecte con persona-service
         )
         db.add(superadmin)
         db.commit()

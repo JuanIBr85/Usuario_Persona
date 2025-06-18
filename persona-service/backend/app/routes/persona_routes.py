@@ -13,7 +13,7 @@ persona_bp = Blueprint('persona_bp', __name__)
 persona_service = PersonaService()
 persona_schema= PersonaSchema()
 
-@api_access(cache=CacheSettings(expiration=60))
+@api_access(cache=CacheSettings(expiration=30))
 @persona_bp.route('/personas', methods=['GET'])
 def listar_personas():
     try:
@@ -32,7 +32,7 @@ def listar_personas():
             data={"server": str(e)}
         ),500
             
-@api_access(cache=CacheSettings(expiration=60))
+@api_access(cache=CacheSettings(expiration=10))
 @persona_bp.route('/personas/<int:id>', methods=['GET'])
 def obtener_persona(id):
     try:

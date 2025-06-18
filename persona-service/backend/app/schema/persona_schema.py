@@ -12,9 +12,9 @@ class PersonaSchema(Schema):
     tipo_documento = fields.Str(required=True, validate=validate.OneOf(TIPOS_DOCUMENTO_VALIDOS))
     num_doc_persona=fields.Str(required=True)
 
-    usuario_id=fields.Int(required=False)
+    usuario_id=fields.Int(required=False,allow_none=True)
     
-    persona_extendida=fields.Nested(PersonaExtendidaSchema, required=False, allow_none=True)
+    persona_extendida=fields.Nested(PersonaExtendidaSchema, required= False)
     domicilio=fields.Nested(DomicilioSchema, required=True)
     contacto=fields.Nested(ContactoSchema, required=True)
 

@@ -1,14 +1,20 @@
-from datetime import datetime
-from app import db
+from datetime import datetime, timezone
+from sqlalchemy.orm import declarative_mixin
+from sqlalchemy import Column, Integer, DateTime
+from app.extensions import Base
 
-class BaseModel(db.Model):
+class BaseModel(Base):
     """Clase base para todos los modelos"""
+
     __abstract__ = True
-    
-    id = db.Column(db.Integer, primary_key=True)
-    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
-    updated_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
-    deleted_at = db.Column(db.DateTime, nullable=True)
-    
+
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    updated_at = Column(
+        DateTime,
+        default=datetime.now(timezone.utc),
+        onupdate=datetime.now(timezone.utc),
+    )
+    deleted_at = Column(DateTime, nullable=True)
+
     def set_delete(self):
         self.deleted_at = datetime.now(timezone.utc)
