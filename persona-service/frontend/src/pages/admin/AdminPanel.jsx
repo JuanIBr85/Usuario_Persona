@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -9,8 +8,8 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, ShieldCheck, FileText, HandPlatter} from "lucide-react";
-import { Fade } from 'react-awesome-reveal'
+import { Users, ShieldCheck, FileText, HandPlatter } from "lucide-react";
+import { Fade } from "react-awesome-reveal";
 
 /**
  * Lista de opciones disponibles en el panel de administración.
@@ -42,13 +41,12 @@ const adminOptions = [
     path: "/logs",
   },
   {
-    title: "Gestión de Servicios", 
+    title: "Gestión de Servicios",
     description: "Controlar y administrar servicios activos",
-    icon: <HandPlatter className="w-14 h-14 text-primary" />, 
-    path: "/adminservices", 
+    icon: <HandPlatter className="w-14 h-14 text-primary" />,
+    path: "/adminservices",
   },
 ];
-
 
 /**
  * Componente `AdminPanel`.
@@ -63,29 +61,27 @@ const AdminPanel = () => {
   const navigate = useNavigate();
 
   return (
-
     <div className=" py-30 px-5 md:py-20 md:px-10 2xl:pl-[5%] 2xl:pr-[5%]">
       <Fade duration={300} triggerOnce>
-        <h2 className="text-3xl font-bold mb-10 text-center">Panel de Administración</h2>
-        <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3">
+        <h2 className="text-3xl font-bold mb-10 text-center">
+          Panel de Administración
+        </h2>{" "}
+        <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 justify-center place-items-stretch auto-rows-[18rem]">
           {adminOptions.map((option) => (
             <Card
               key={option.title}
-              className="text-center h-72 transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-2xl cursor-pointer"
+              className="flex flex-col justify-between text-center transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-2xl cursor-pointer"
               onClick={() => navigate(option.path)}
             >
-              <CardHeader className="flex flex-col items-center justify-center h-2/3">
+              <CardHeader className="flex flex-col items-center justify-center gap-2 flex-grow">
                 {option.icon}
-                <CardTitle className="mt-4 text-2xl">{option.title}</CardTitle>
-                <CardDescription className="mt-1 text-sm">
+                <CardTitle className="mt-2 text-2xl">{option.title}</CardTitle>
+                <CardDescription className="text-sm">
                   {option.description}
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex items-center justify-center">
-                <Button
-                  variant="default"
-                  className="mt-2 cursor-pointer"
-                >
+                <Button variant="default" className="mt-2 cursor-pointer">
                   Ir a {option.title}
                 </Button>
               </CardContent>
