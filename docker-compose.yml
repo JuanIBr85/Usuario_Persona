@@ -38,6 +38,7 @@
         - ./component-services:/app
       environment:
         - SERVICES_CONFIG_FILE=services-docker.json
+        - RUN_ON_DOCKER=True
       depends_on:
         - auth-service
         - persona-backend
@@ -47,3 +48,21 @@
       container_name: redis-dev
       ports:
         - "6379:6379"
+
+
+    mysql:
+      image: mysql:5.7
+      container_name: mysql-persona
+      restart: unless-stopped
+      environment:
+        MYSQL_ROOT_PASSWORD: rootpass
+        MYSQL_DATABASE: persona_db
+        MYSQL_USER: persona_user
+        MYSQL_PASSWORD: persona_pass
+      ports:
+        - "3306:3306"  # El 3307 es el puerto en tu máquina host (no pisa XAMPP en 3306)
+      volumes:
+        - mysql_data:/var/lib/mysql
+
+  volumes:
+    mysql_data:

@@ -4,7 +4,7 @@ service:
   service_available: true
   service_description: Backend para el manejo de componentes
   service_core: true
-  service_wait: false
+  service_wait: true
 
 permissions:
   - component.admin.crear_componente

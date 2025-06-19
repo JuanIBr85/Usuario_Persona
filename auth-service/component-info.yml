@@ -20,6 +20,7 @@ permissions:
   - auth.admin.crear_usuario_con_rol
   - auth.admin.asignar_permisos_rol
   - auth.admin.modificar_admin
+  - auth.admin.modificar_usuario_con_rol
   - auth.admin.logout
   - auth.admin.obtener_roles
   - auth.admin.borrar_rol

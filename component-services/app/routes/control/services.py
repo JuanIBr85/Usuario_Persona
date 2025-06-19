@@ -18,7 +18,7 @@ services_service: ServicioBase = ServicioBase(ServiceModel, ServiceSchema())
 
 
 @bp.route("/all", methods=["GET"])
-@cp_api_access(is_public=True, limiter=["5 per minute"])
+@cp_api_access(is_public=False, limiter=["5 per minute"])
 def get_services():
     try:
         services = services_service.get_all()
