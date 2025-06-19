@@ -1,10 +1,12 @@
 import os
+import time
 import json
 from pathlib import Path
 from sqlalchemy import event
 from sqlalchemy.orm import sessionmaker
 from app.models.service_model import ServiceModel
 from config import SERVICES_CONFIG_FILE
+from app.utils.get_component_info import get_component_info
 
 
 def load_services_from_config():
@@ -34,8 +36,12 @@ def insert_initial_services(target, connection, **kw):
 
         # Insertar cada servicio en la base de datos
         for service_data in services:
-            print(service_data)
-            service = ServiceModel(**service_data)
+            print(f"Conectando con {service_data['service_name']}...")
+            info = get_component_info(service_data["service_url"], wait=True)
+
+            service = ServiceModel(
+                **info["service"], service_url=service_data["service_url"]
+            )
             session.add(service)
 
         session.commit()
@@ -43,7 +49,6 @@ def insert_initial_services(target, connection, **kw):
 
     except Exception as e:
         print(f"Error al cargar los servicios base: {str(e)}")
-        print(f"Error al cargar los servicios base: {e.with_traceback()}")
         session.rollback()
     finally:
         session.close()

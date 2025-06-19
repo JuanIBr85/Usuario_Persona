@@ -1,0 +1,13 @@
+service:
+  service_name: persona-service
+  service_prefix: persona
+  service_available: true
+  service_description: Backend para el manejo de personas
+  service_core: true
+  service_wait: false
+
+permissions:
+  - persona.admin.crear_persona
+  - persona.admin.ver_persona
+  - persona.admin.modificar_persona
+  - persona.admin.eliminar_persona

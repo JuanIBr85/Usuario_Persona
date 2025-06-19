@@ -26,6 +26,9 @@ class ServicioBase:
             or []
         )
 
+    def dump(self, model, args):
+        return self.schema.dump(model, **args)
+
     def get_by_id(self, id: int, not_dump: bool = False) -> dict | None:
         # Busca un registro por su ID
         model = self.model
@@ -44,9 +47,14 @@ class ServicioBase:
             not_dump=True,
         )
 
-    def create(self, data: Any, not_dump: bool = False) -> dict | None:
+    def create(
+        self, data: Any, not_dump: bool = False, ignore_schema=False
+    ) -> dict | None:
         # Crea un nuevo registro con los datos recibidos
-        schema = self.schema.load(data)
+        if not ignore_schema:
+            schema = self.schema.load(data)
+        else:
+            schema = data
         model = self.model(**schema)
 
         def add(session: Session) -> Any:
@@ -57,9 +65,14 @@ class ServicioBase:
 
         return self._run_with_session(add, not_dump=not_dump)
 
-    def update(self, id: int, data: Any, not_dump: bool = False) -> dict | None:
+    def update(
+        self, id: int, data: Any, not_dump: bool = False, ignore_schema=False
+    ) -> dict | None:
         # Actualiza un registro existente
-        schema = self.schema.load(data, partial=True)
+        if not ignore_schema:
+            schema = self.schema.load(data, partial=True)
+        else:
+            schema = data
 
         def merge(session: Session) -> Any:
             # Buscar el registro existente

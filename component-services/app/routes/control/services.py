@@ -6,6 +6,11 @@ from app.services.servicio_base import ServicioBase
 from common.utils.response import make_response, ResponseStatus
 from app.models.service_model import ServiceModel
 from app.schemas.service_schema import ServiceSchema
+from app.utils.get_component_info import get_component_info
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 bp = Blueprint("services", __name__, cli_group="control", url_prefix="/services")
 services_service: ServicioBase = ServicioBase(ServiceModel, ServiceSchema())
@@ -74,10 +79,103 @@ def add_service():
         return make_response(ResponseStatus.ERROR, str(e)), 500
 
 
-@bp.route("/delete_service/<int:id>", methods=["DELETE"])
+@bp.route("/recolect_perms", methods=["GET"])
 @cp_api_access(is_public=True, limiter=["5 per minute"])
-def delete_service(id: int):
+def recolect_perms():
+    services: list[ServiceModel] = services_service.get_all(not_dump=True)
+    perms = []
+    for service in services:
+        logger.info(f"Recolectando permisos de {service.service_name}")
+        info = get_component_info(service.service_url, wait=True)
+        if info is None:
+            logger.error(f"Error al recolectar permisos de {service.service_name}")
+            continue
+
+        perms.extend(info["permissions"])
+    return (
+        make_response(
+            ResponseStatus.SUCCESS, "Permisos recolectados correctamente", perms
+        ),
+        200,
+    )
+
+
+@bp.route("/install_service", methods=["POST"])
+@cp_api_access(is_public=True, limiter=["5 per minute"])
+def install_service():
     try:
+        url = request.get_json().get("url")
+
+        info = get_component_info(url, wait=False)
+        if info is None:
+            return (
+                make_response(ResponseStatus.FAIL, "Error al conectar con el servicio"),
+                400,
+            )
+
+        model = {**info["service"], "service_url": url}
+
+        _model = services_service.query(
+            lambda session: session.filter_by(
+                service_name=model["service_name"]
+            ).first(),
+            not_dump=True,
+        )
+
+        if _model is not None:
+            return (
+                make_response(ResponseStatus.FAIL, "El servicio ya existe"),
+                400,
+            )
+
+        services_service.create(model, ignore_schema=True)
+
+        return (
+            make_response(
+                ResponseStatus.SUCCESS, "Servicio instalado correctamente", model
+            ),
+            200,
+        )
+    except Exception as e:
+        return make_response(ResponseStatus.ERROR, str(e)), 500
+
+
+@bp.route("/refresh_service/<int:id>", methods=["PUT"])
+@cp_api_access(is_public=True, limiter=["5 per minute"])
+def refresh_service(id: int):
+    try:
+        service: ServiceModel = services_service.get_by_id(id)
+
+        if service is None:
+            return make_response(ResponseStatus.FAIL, "Servicio no encontrado"), 404
+
+        info = get_component_info(service["service_url"], wait=True)
+
+        if info is None:
+            return (
+                make_response(ResponseStatus.FAIL, "Error al conectar con el servicio"),
+                400,
+            )
+
+        model = {**info["service"], "service_url": service["service_url"]}
+
+        services_service.update(id, model, ignore_schema=True)
+
+        return (
+            make_response(
+                ResponseStatus.SUCCESS, "Servicio actualizado correctamente", model
+            ),
+            200,
+        )
+    except Exception as e:
+        return make_response(ResponseStatus.ERROR, str(e)), 500
+
+
+@bp.route("/remove_service/<int:id>", methods=["DELETE"])
+@cp_api_access(is_public=True, limiter=["5 per minute"])
+def remove_service(id: int):
+    try:
+
         service: ServiceModel = services_service.get_by_id(id)
 
         if service is None:
@@ -91,36 +189,10 @@ def delete_service(id: int):
                 400,
             )
 
-        services_service.delete(id)
+        services_service.delete(id, soft=False)
 
         return (
-            make_response(
-                ResponseStatus.SUCCESS, "Servicio eliminado correctamente", service
-            ),
-            200,
-        )
-    except Exception as e:
-        return make_response(ResponseStatus.ERROR, str(e)), 500
-
-
-@bp.route("/update_service/<int:id>", methods=["PUT"])
-@cp_api_access(is_public=True, limiter=["5 per minute"])
-def update_service(id: int):
-    try:
-        data = request.get_json()
-
-        valid, errors = services_service.validate(data)
-        if not valid:
-            return make_response(ResponseStatus.FAIL, "Datos invalidos", errors), 400
-
-        if not services_service.exist(id):
-            return make_response(ResponseStatus.FAIL, "Servicio no encontrado"), 404
-
-        model = services_service.update(id, data)
-        return (
-            make_response(
-                ResponseStatus.SUCCESS, "Servicio actualizado correctamente", model
-            ),
+            make_response(ResponseStatus.SUCCESS, "Servicio removido correctamente"),
             200,
         )
     except Exception as e:

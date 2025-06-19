@@ -12,7 +12,7 @@ class ServiceModel(BaseModel):
 
     # Url del servicio
     service_url = Column(String(255), nullable=False, unique=True)
-
+    service_prefix = Column(String(20), nullable=False)
     # Indica si es un servicio core, es decir, si es un servicio que no se puede deshabilitar
     service_core = Column(Boolean, nullable=True, default=False)
 
