@@ -1,0 +1,87 @@
+1-Copiar el siguiente codigo en docker-compose.yml
+2-cambiar los .env teniendo en cuenta los .env.example
+3-agregar las lineas en persona-service/backend/config.py(ahi especifica que hacer)
+4-ejecutar los siguientes comandos desde la carpeta raiz(donde se encuentra docker-compose.yml):
+docker-compose down -v              ---->baja el docker y elimina los volumenes creados(hacer esto si cambias algo en .env).
+docker-compose build --no-cache     ---->construye todos los contenedores sin el cache para no copiar viejas configuraciones.
+docker-compose up --force-recreate  ---->levanta los contenedores a la fuerza de nuevo olvidando los build anteriores.
+los comandos anteriores tambien pueden hacerse manualmente desde docker desktop eliminando todos los container,image,volumes y builds.
+
+services:
+
+  
+    redis:
+      image: redis:latest
+      container_name: redis-dev
+      ports:
+        - "6379:6379"
+
+    auth-service:
+      build:
+        context: ./auth-service
+        dockerfile: Dockerfile
+      ports:
+        - "5000:5000"
+      env_file:
+        - ./auth-service/.env
+      volumes:
+        - ./auth-service:/app
+        - ./auth-service/auth_data:/app/auth_data
+      depends_on:
+        - redis
+      environment:
+        - REDIS_HOST=redis
+        - REDIS_PORT=6379
+
+    mysql:
+      image: mysql:5.7
+      container_name: mysql-persona
+      restart: unless-stopped
+      environment:
+        MYSQL_ROOT_PASSWORD: rootpass
+        MYSQL_DATABASE: persona_db
+        MYSQL_USER: persona_user
+        MYSQL_PASSWORD: persona_pass
+      ports:
+        - "3306:3306"  # El 3307 es el puerto en tu máquina host (no pisa XAMPP en 3306)
+      volumes:
+        - mysql_data:/var/lib/mysql
+
+    persona-backend:
+      build: ./persona-service/backend
+      ports:
+        - "5001:5001"
+      env_file:
+        - ./persona-service/backend/.env
+      volumes:
+        - ./persona-service/backend:/app
+      depends_on:
+        - mysql
+
+    persona-frontend:
+      build: ./persona-service/frontend
+      ports:
+        - "5173:5173"
+      env_file:
+        - ./persona-service/frontend/.env
+
+    component-service:
+      build: ./component-services
+      ports:
+        - "5002:5002"
+      env_file:
+        - ./component-services/.env
+      volumes:
+        - ./component-services:/app
+      environment:
+        - SERVICES_CONFIG_FILE=services-docker.json
+      depends_on:
+        - auth-service
+        - persona-backend
+
+networks:
+      default:
+        driver: bridge
+
+volumes:
+      mysql_data:

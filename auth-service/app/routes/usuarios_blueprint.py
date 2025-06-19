@@ -6,7 +6,7 @@ from app.database.session import SessionLocal
 from app.utils.response import ResponseStatus, make_response
 from app.services.usuario_service import UsuarioService
 from app.extensions import limiter
-from app.utils.decoradores import requiere_permisos, ruta_publica
+from app.utils.jwt import verificar_token_reset
 from jwt import ExpiredSignatureError, InvalidTokenError
 from app.utils.email import decodificar_token_verificacion, generar_token_dispositivo
 from app.models.usuarios import Usuario
@@ -173,8 +173,16 @@ def reset_con_otp():
         token = request.headers.get("Authorization", "").replace("Bearer ", "")
         if not data or not token:
             return make_response(ResponseStatus.FAIL, "Datos requeridos y token requeridos", error_code="NO_INPUT"), 400
+        
+        email_from_token = verificar_token_reset(token)
+        if not email_from_token:
+            return make_response(
+                ResponseStatus.UNAUTHORIZED,
+                "Token inválido o expirado",
+                error_code="TOKEN_INVALID"
+            )
 
-        status, mensaje, data, code = usuario_service.cambiar_password_con_codigo(session, data, token)
+        status, mensaje, data, code = usuario_service.cambiar_password_con_codigo(session, data, token, email_from_token)
         return make_response(status, mensaje, data, code), code
 
     except Exception as e:

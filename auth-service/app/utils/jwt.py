@@ -1,5 +1,5 @@
 
-import jwt
+from jwt import decode,encode,ExpiredSignatureError,InvalidTokenError
 from datetime import datetime, timedelta, timezone
 from os import getenv
 
@@ -12,11 +12,9 @@ def crear_token_acceso(usuario_id, email, rol, permisos):
         "permisos": permisos,  # Aquí metemos la lista
         "exp": expires_in
     }
-    return jwt.encode(payload, getenv("JWT_SECRET_KEY", "clave_jwt_123"), algorithm="HS256"), expires_in
+    return encode(payload, getenv("JWT_SECRET_KEY", "clave_jwt_123"), algorithm="HS256"), expires_in
 
-# para mejorar se podrian crear decoradores q requieran token para el 2fa y token requerido
-# para seguridad explicita o diferenciada en las rutas
-
+#borrar este metodo si el otro funciona.
 def crear_token_reset_password(otp_id: int, usuario_id: int) -> str:
     payload = {
         "sub": str(usuario_id),
@@ -24,7 +22,25 @@ def crear_token_reset_password(otp_id: int, usuario_id: int) -> str:
         "scope": "reset_password",
         "exp": datetime.now(timezone.utc) + timedelta(minutes=10)
     }
-    return jwt.encode(payload, getenv("JWT_SECRET_KEY", "clave_jwt_123"), algorithm="HS256")
+    return encode(payload, getenv("JWT_SECRET_KEY", "clave_jwt_123"), algorithm="HS256")
+
+
+def generar_token_reset(email: str):
+    payload = {
+        "email": email,
+        "type": "reset",
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=10)
+    }
+    return encode(payload, getenv("JWT_SECRET", "clave_jwt_123"), algorithm="HS256")
+
+def verificar_token_reset(token: str):
+    try:
+        payload = decode(token, getenv("JWT_SECRET", "clave_jwt_123"), algorithms=["HS256"])
+        if payload.get("type") != "reset":
+            return None
+        return payload.get("email")
+    except (ExpiredSignatureError, InvalidTokenError):
+        return None
 
 
 def crear_token_refresh(usuario_id):

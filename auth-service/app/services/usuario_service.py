@@ -5,7 +5,7 @@ from app.models.usuarios import Usuario, PasswordLog, UsuarioLog
 from app.models.dispositivos_confiable import DispositivoConfiable
 from app.models.rol import RolUsuario,Rol,RolPermiso
 from app.services.rol import get_rol_por_nombre
-from app.utils.jwt import crear_token_acceso,crear_token_reset_password, crear_token_refresh
+from app.utils.jwt import crear_token_acceso,generar_token_reset,verificar_token_reset
 from app.schemas.usuarios_schema import LoginSchema,UsuarioInputSchema,UsuarioOutputSchema,ResetPasswordSchema,RecuperarPasswordSchema
 from marshmallow import ValidationError
 from app.services.servicio_base import ServicioBase
@@ -13,9 +13,8 @@ from app.models.permisos import Permiso
 from app.models.otp_reset_password_model import OtpResetPassword
 from app.utils.email import enviar_email_verificacion,generar_codigo_otp,enviar_codigo_por_email,decodificar_token_verificacion,enviar_email_validacion_dispositivo
 from jwt import ExpiredSignatureError, InvalidTokenError
-from app.utils.response import ResponseStatus, make_response
-from flask_jwt_extended import  create_access_token
-
+from app.utils.response import ResponseStatus
+from app.utils.otp_manager import guardar_otp, verificar_otp, guardar_token_recuperacion, verificar_token_recuperacion
 
 class UsuarioService(ServicioBase):
     def __init__(self):
@@ -292,218 +291,54 @@ class UsuarioService(ServicioBase):
 #RECUPERACION DE PASSWORD CON CODIGO OTP VIA MAIL
 #-----------------------------------------------------------------------------------------------------------------------------
 
-#crea el codigo de 6 digitos y expiracion y lo envia por mail. 
-#y en la base de datos se guarda todos los datos para su verificacion dsp.
-    def solicitar_codigo_reset(self, session: Session, email: str) -> dict:
+
+
+
+
+    def solicitar_codigo_reset(self, session:Session, email: str)->dict:
         try:
-            self.schema_recuperar.load({"email": email})
-        except ValidationError as error:
-            return (
-                ResponseStatus.FAIL,
-                "Error de schema / Bad Request",
-                error.messages,
-                400
-            )
-        
+            usuario = session.query(Usuario).filter_by(email_usuario=email).first()
+            if not usuario:
+                return ResponseStatus.FAIL, "Email no registrado", None, 404
+
+            otp = generar_codigo_otp()  
+            guardar_otp(email, otp)
+            enviar_codigo_por_email(usuario, otp)
+
+            return ResponseStatus.SUCCESS, "Código OTP enviado al correo", None, 200
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return ResponseStatus.ERROR, "Error interno al solicitar código", None, 500
+
+
+    def verificar_otp(self, session:Session, email: str, otp: str)->dict:
+        if not verificar_otp(email, otp):
+            return ResponseStatus.FAIL, "Código OTP inválido o expirado", None, 400
+
+        token = generar_token_reset(email)
+        guardar_token_recuperacion(email, token)
+
+        return ResponseStatus.SUCCESS, "OTP válido", {"token": token}, 200
+    
+    
+
+    def cambiar_password_con_codigo(self, session:Session, data: dict, token: str, email: str)->dict:
+
+        email_redis = verificar_token_recuperacion(token)
+        if not email_redis or email != email_redis:
+            return ResponseStatus.FAIL, "Token inválido o expirado", None, 400
+
+        nueva_pass = data.get("nueva_password")
+        if not nueva_pass:
+            return ResponseStatus.FAIL, "Contraseña nueva requerida", None, 400
+
         usuario = session.query(Usuario).filter_by(email_usuario=email).first()
         if not usuario:
-            return (
-                        ResponseStatus.NOT_FOUND,
-                        "Usuario no fue encontrado",
-                        None, 
-                        404
-                    )
-        
-        codigo = generar_codigo_otp()
+            return ResponseStatus.FAIL, "Usuario no encontrado", None, 404
 
-        otp_entry = OtpResetPassword(
-            usuario_id=usuario.id_usuario,
-            codigo_otp=codigo,
-            expira_en=datetime.now(timezone.utc) + timedelta(minutes=15)
-        )
-        session.add(otp_entry)
+        # Aquí actualizas y registras contraseña
+        usuario.password = generate_password_hash(nueva_pass)  # tu función de hash
         session.commit()
 
-        enviar_codigo_por_email(usuario, codigo)
-
-        return (
-                        ResponseStatus.SUCCESS, 
-                        "Codigo enviado al mail", 
-                        None, 
-                        200
-                        )
-#-----------------------------------------------------------------------------------------------------------------------------
-    #recibe el codigo del usuario, e email y hace una busqueda del ultimo codigo generado del usuario
-    #valida que sea
-    def verificar_otp(self, session: Session, email: str, otp: str) -> dict:
-        usuario = session.query(Usuario).filter_by(email_usuario=email).first()
-        if not usuario:
-            return (
-                        ResponseStatus.NOT_FOUND,
-                        "Usuario no fue encontrado",
-                        None, 
-                        404
-                    )
-        
-        otp_entry = (
-            session.query(OtpResetPassword)
-            .filter_by(usuario_id=usuario.id_usuario, codigo_otp=otp, usado=False)
-            .order_by(OtpResetPassword.creado_en.desc())
-            .first()
-        )
-        
-        if not otp_entry or datetime.now(timezone.utc) > otp_entry.expira_en.replace(tzinfo=timezone.utc):
-            return (
-                        ResponseStatus.UNAUTHORIZED,
-                        "El codigo es inválido o ha expirado.",
-                        None, 
-                        401
-                    )
-        
-        token = crear_token_reset_password(otp_entry.id, usuario.id_usuario)
-
-        return (
-                        ResponseStatus.SUCCESS,
-                        "codigo verificado",
-                        {"reset_token": token}, 
-                        200
-                )
-
-#-----------------------------------------------------------------------------------------------------------------------------
-    def cambiar_password_con_codigo(self, session: Session, data :dict, token:str)->dict:
-        try:
-            payload = decodificar_token_verificacion(token)
-
-        except ExpiredSignatureError as error:
-            return (
-                        ResponseStatus.UNAUTHORIZED,
-                        "El token ha expirado.",
-                        error, 
-                        401
-                    )
-        except InvalidTokenError as error:
-            return (
-                        ResponseStatus.UNAUTHORIZED,
-                        "El token es invalido.",
-                        error, 
-                        401
-                    )
-        
-        if payload.get("scope") != "reset_password":
-            return (
-                        ResponseStatus.UNAUTHORIZED,
-                        "El token es invalido para esta operación.",
-                        error, 
-                        401
-                    ) 
-        
-        
-        otp_id = payload.get("otp_id")
-        usuario_id = payload.get("sub")
-
-        otp_entry = session.query(OtpResetPassword).filter_by(id=otp_id, usado=False).first()
-        if not otp_entry or int(usuario_id) != otp_entry.usuario_id:
-            return (
-                        ResponseStatus.UNAUTHORIZED, 
-                        "Código de recuperación inválido o ya usado", 
-                        None, 
-                        401
-                    )
-        
-        try:
-            data_validad = self.schema_reset.load(data)
-        except ValidationError as error:
-            return (
-                        ResponseStatus.FAIL,
-                        "Error de schema/Bad Request",
-                        error.messages, 
-                        400
-                    )
-        
-        
-        usuario = session.query(Usuario).filter_by(id_usuario=otp_entry.usuario_id).first()
-        if not usuario:
-            return (
-                        ResponseStatus.NOT_FOUND,
-                        "Usuario no fue encontrado",
-                        None, 
-                        404
-                    )
-        
-        if check_password_hash(usuario.password, data_validad["password"]):
-            return (
-                        ResponseStatus.FAIL,
-                        "La nueva contraseña debe ser diferente a la anterior",
-                        None, 
-                        400
-                    )
-        
-        hashed_password = generate_password_hash(data_validad["password"])
-        usuario.password = hashed_password
-        usuario.password_changed_at = datetime.now(timezone.utc)
-
-        otp_entry.usado = True
-        session.add(PasswordLog(
-                usuario_id=usuario.id_usuario,
-                password=hashed_password,
-                updated_at=datetime.now(timezone.utc)
-            ))
-
-        session.add(UsuarioLog(
-                usuario_id=usuario.id_usuario,
-                accion="Cambio de password.",
-                detalles="Se cambio el password."
-            ))
-
-        session.commit()
-
-        return (
-                    ResponseStatus.SUCCESS,
-                    "Contraseña actualizada con éxito.",
-                    {"usuario_id": usuario.id_usuario}, 
-                    200
-                )
-#------------------------------------------------------------------------------------------------
-
-    def refresh_token(self, session: Session, usuario_id: int) -> dict:
-        usuario = session.query(Usuario).filter_by(id_usuario=usuario_id).first()
-        if not usuario:
-          return {
-            "status": ResponseStatus.UNAUTHORIZED,
-            "message": "Usuario no encontrado",
-            "data": None,
-            "code": 401
-          }
-
-        rol = (
-           session.query(Rol)
-           .join(RolUsuario, Rol.id_rol == RolUsuario.id_rol)
-           .filter(RolUsuario.id_usuario == usuario.id_usuario)
-           .first()
-        )
-        rol_nombre = rol.nombre_rol if rol else "sin_rol"
-
-        permisos_query = (
-           session.query(Permiso.nombre_permiso)
-           .join(RolPermiso, Permiso.id_permiso == RolPermiso.permiso_id)
-           .filter(RolPermiso.id_rol == rol.id_rol)
-           .all()
-        )
-        permisos = [p.nombre_permiso for p in permisos_query]
-
-        nuevo_access_token = create_access_token(
-            identity=usuario_id,
-            additional_claims={
-               "sub": usuario.id_usuario,
-               "email": usuario.email_usuario,
-               "rol": rol_nombre,
-               "permisos": permisos
-            }
-        )
-
-        return {
-              "status": ResponseStatus.SUCCESS.value,
-              "message": "Nuevo token generado exitosamente.",
-              "data": {"access_token": nuevo_access_token},
-              "code": 200
-        }
+        return ResponseStatus.SUCCESS, "Contraseña actualizada correctamente", None, 200
