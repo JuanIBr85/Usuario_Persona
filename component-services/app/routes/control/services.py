@@ -18,7 +18,7 @@ services_service: ServicioBase = ServicioBase(ServiceModel, ServiceSchema())
 
 
 @bp.route("/all", methods=["GET"])
-@cp_api_access(is_public=False, limiter=["5 per minute"])
+@cp_api_access(is_public=True, limiter=["5 per minute"])
 def get_services():
     try:
         services = services_service.get_all()
@@ -56,22 +56,25 @@ def get_service(id: int):
 @bp.route("/recolect_perms", methods=["GET"])
 @cp_api_access(is_public=True, limiter=["5 per minute"])
 def recolect_perms():
-    services: list[ServiceModel] = services_service.get_all(not_dump=True)
-    perms = []
-    for service in services:
-        logger.info(f"Recolectando permisos de {service.service_name}")
-        info = get_component_info(service.service_url, wait=True)
-        if info is None:
-            logger.error(f"Error al recolectar permisos de {service.service_name}")
-            continue
+    try:
+        services: list[ServiceModel] = services_service.get_all(not_dump=True)
+        perms = []
+        for service in services:
+            logger.info(f"Recolectando permisos de {service.service_name}")
+            info = get_component_info(service.service_url, wait=True)
+            if info is None:
+                logger.error(f"Error al recolectar permisos de {service.service_name}")
+                continue
 
-        perms.extend(info["permissions"])
-    return (
-        make_response(
-            ResponseStatus.SUCCESS, "Permisos recolectados correctamente", perms
-        ),
-        200,
-    )
+            perms.extend(info["permissions"])
+        return (
+            make_response(
+                ResponseStatus.SUCCESS, "Permisos recolectados correctamente", perms
+            ),
+            200,
+        )
+    except Exception as e:
+        return make_response(ResponseStatus.ERROR, str(e)), 500
 
 
 @bp.route("/install_service", methods=["POST"])
