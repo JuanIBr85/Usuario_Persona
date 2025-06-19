@@ -1,7 +1,10 @@
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required, get_jwt_identity, decode_token
+from app.extensions import SessionLocal
 from marshmallow import ValidationError
 from app.services.persona_service import PersonaService
 from app.schema.persona_schema import PersonaSchema
+from app.models.persona_model import Persona
 from common.decorators.api_access import api_access
 from common.utils.response import make_response, ResponseStatus
 from common.models.cache_settings import CacheSettings
@@ -216,7 +219,8 @@ def obtener_persona_usuario(id):
             message="Error al obtener persona",
             data={"server": str(e)}
         ),500
-    
+
+@api_access(access_permissions=[])
 @persona_bp.route('/personas/count', methods=['GET'])
 def contar_personas():
         try:
@@ -232,3 +236,69 @@ def contar_personas():
                 message="Error al contar personas",
                 data={"server": str(e)}
             ), 500
+
+@persona_bp.route('/personas/verify', methods=['POST'])
+@jwt_required()
+def verificar_persona():
+    body = request.get_json() or {}
+    token = body.get('token')
+    datos = body.get('datos')
+
+    if not token or not datos:
+        return make_response(ResponseStatus.FAIL, "Faltan token o datos de persona"), 400
+
+    
+    try:
+        session_claims = decode_token(token)
+    except Exception:
+        return make_response(ResponseStatus.FAIL, "Token invalido o expirado"), 400
+    
+    usuario_id = session_claims.get('sub')
+
+    resultado = persona_service.verificar_o_crear_persona(usuario_id, datos)
+
+    if 'otp_token' in resultado:
+        return make_response(
+            status=ResponseStatus.PENDING,
+            message="Persona encontrada. Se envió código OTP.",
+            data={'otp_token': resultado['otp_token']}
+        ), 200
+
+    return make_response(
+        status=ResponseStatus.SUCCESS,
+        message="Persona creada y vinculada correctamente.",
+        data=resultado['persona']
+    ), 201
+
+
+@persona_bp.route('/personas/verify-otp', methods=['POST'])
+def verificar_otp_persona():
+    
+    body = request.get_json() or {}
+    token = body.get('token')
+    codigo_input = body.get('codigo')
+
+    if not token or not codigo_input:
+        return make_response(ResponseStatus.FAIL, "Faltan token o código"), 400
+
+    try:
+        claims = decode_token(token)
+    except Exception:
+        return make_response(ResponseStatus.FAIL, "Token inválido o expirado"), 400
+
+    persona_id = claims.get('persona_id')
+    otp_guardado = claims.get('otp')
+    usuario_id = claims.get('sub')
+
+    if otp_guardado != codigo_input:
+        return make_response(ResponseStatus.FAIL, "OTP incorrecto"), 400
+    # vincula persona con usuario, actualiza usuario_id
+    session = SessionLocal()
+    try:
+        session.query(Persona)\
+               .filter_by(id_persona=persona_id)\
+               .update({'usuario_id': usuario_id})
+        session.commit()
+        return make_response(ResponseStatus.SUCCESS, "Persona vinculada con usuario"), 200
+    finally:
+        session.close()
