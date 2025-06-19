@@ -6,7 +6,7 @@ from app.services.servicio_base import ServicioBase
 from common.utils.response import make_response, ResponseStatus
 from app.models.service_model import ServiceModel
 from app.schemas.service_schema import ServiceSchema
-from app.utils.get_component_info import get_component_info
+from app.utils.get_health import get_health
 import logging
 
 logger = logging.getLogger(__name__)
@@ -21,6 +21,8 @@ services_service: ServicioBase = ServicioBase(ServiceModel, ServiceSchema())
 def get_services():
     try:
         services = services_service.get_all()
+        for service in services:
+            service["health"] = get_health(service["service_url"])
         return (
             make_response(
                 ResponseStatus.SUCCESS, "Servicios obtenidos correctamente", services
@@ -36,10 +38,10 @@ def get_services():
 def get_service(id: int):
     try:
         service = services_service.get_by_id(id)
-
         if service is None:
             return make_response(ResponseStatus.FAIL, "Servicio no encontrado"), 404
 
+        service["health"] = get_health(service["service_url"])
         return (
             make_response(
                 ResponseStatus.SUCCESS, "Servicio obtenido correctamente", service
