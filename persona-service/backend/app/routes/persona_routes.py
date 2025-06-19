@@ -219,7 +219,8 @@ def obtener_persona_usuario(id):
             message="Error al obtener persona",
             data={"server": str(e)}
         ),500
-    
+
+@api_access(access_permissions=[])
 @persona_bp.route('/personas/count', methods=['GET'])
 def contar_personas():
         try:
