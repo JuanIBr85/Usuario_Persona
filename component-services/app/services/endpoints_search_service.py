@@ -59,6 +59,10 @@ class EndpointsSearchService:
                 # Resetea contador de errores en éxito
                 error_cnt = 0
 
+                self._search_log[service.service_name]["endpoints_count"] = len(
+                    response
+                )
+
                 # Retorna diccionario de endpoints con URLs completas
                 return {
                     k: {**v, "api_url": f"{service_url}{v['api_url']}"}
@@ -92,6 +96,7 @@ class EndpointsSearchService:
                 "success": "in_progress",
                 "start_time": time.time(),
                 "error": None,
+                "endpoints_count": 0,
             }
 
             if self._stop_search:  # Verifica señal de parada
