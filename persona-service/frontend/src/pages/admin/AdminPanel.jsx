@@ -82,7 +82,7 @@ const AdminPanel = () => {
               </CardHeader>
               <CardContent className="flex items-center justify-center">
                 <Button variant="default" className="mt-2 cursor-pointer">
-                  Ir a {option.title}
+                  Ir a {option.title} 
                 </Button>
               </CardContent>
             </Card>

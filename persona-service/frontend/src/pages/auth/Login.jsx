@@ -2,7 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import InputValidate from "@/components/inputValidate/InputValidate";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 import { KeyRound } from "lucide-react";
 import { formSubmitJson } from "@/utils/formUtils";
 import { SimpleDialog, FetchErrorMessage } from "@/components/SimpleDialog";
@@ -32,20 +32,20 @@ function Login() {
    */
   const handleSubmit = async (event) => {
     const formData = await formSubmitJson(event); // Convierte los datos del formulario a JSON
-    document.activeElement.blur(); 
-    setIsLoading(true); 
+    document.activeElement.blur();
+    setIsLoading(true);
 
-    AuthService
-      .login(formData) // Envia los datos al backend para autenticar
+    AuthService.login(formData) // Envia los datos al backend para autenticar
       .then((json) => {
         // Si es exitoso, se muestra un mensaje y se actualiza el contexto global
         setMessage(`Login exitoso. Bienvenido ${json.data.nombre_usuario}!`);
         setIsLogin(true);
         updateData({
           token: json.data.token, // Guarda el token para futuras peticiones
-          user: json.data         // Guarda los datos del usuario logueado
+          user: json.data, // Guarda los datos del usuario logueado
         });
-      }).catch((error) => {
+      })
+      .catch((error) => {
         // Si hay error, se analiza el tipo de error y se muestra mensaje adecuado
         if (error.isJson) {
           if (error.data.error) {
@@ -54,10 +54,29 @@ function Login() {
             setMessage(error.data.message || "Error desconocido");
           }
         } else {
-          setMessage(error.message); 
+          const statusMatch = error.message.match(/error: (\d{3})/);
+          const statusCode = statusMatch ? parseInt(statusMatch[1]) : null;
+
+          if (statusCode === 429) {
+            setMessage(
+              "Demasiados intentos. Por favor, esperá unos segundos e intentá de nuevo."
+            );
+          } else if (statusCode === 500) {
+            setMessage("Error del servidor. Intentá más tarde.");
+          } else if (statusCode === 401 || statusCode === 403) {
+            setMessage("Credenciales inválidas o acceso no autorizado.");
+          } else {
+            setMessage(
+              "Error inesperado. Verificá tu conexión o intentá más tarde."
+            );
+          }
         }
-      }).finally(()=>{setIsLoading(false);setIsOpen(true);});
-  }
+      })
+      .finally(() => {
+        setIsLoading(false);
+        setIsOpen(true);
+      });
+  };
 
   return (
     <>
@@ -70,10 +89,14 @@ function Login() {
         description={dialogMessage}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
-        actionHandle={isLogin ? ()=>setTimeout(()=>navigate('/profile'), 500) : undefined}
+        actionHandle={
+          isLogin
+            ? () => setTimeout(() => navigate("/profile"), 500)
+            : undefined
+        }
         // Si el login fue exitoso, redirige al perfil después de cerrar el diálogo
       />
-      
+
       {/* Layout visual general del formulario de login */}
       <AuthLayout
         title="Inicio de sesión"
@@ -90,7 +113,7 @@ function Login() {
             validateMessage="Email inválido"
             required
           />
-          
+
           {/* Campo para ingresar la contraseña con validación de seguridad */}
           <InputValidate
             id="password"
@@ -101,7 +124,7 @@ function Login() {
             validateMessage="La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula, un número y un carácter especial."
             required
           />
-          
+
           {/* Enlace a recuperación de contraseña */}
           <Button variant="link" asChild className="p-0">
             <Link to="/auth/forgotPassword">¿Olvidaste la contraseña?</Link>
@@ -113,7 +136,9 @@ function Login() {
           </Button>
 
           {/* Botón para enviar el formulario */}
-          <Button type="submit" className="mt-4">Iniciar sesión</Button>
+          <Button type="submit" className="mt-4">
+            Iniciar sesión
+          </Button>
         </form>
       </AuthLayout>
     </>
