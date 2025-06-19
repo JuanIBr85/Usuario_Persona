@@ -8,6 +8,7 @@ from app.models.service_model import ServiceModel
 from app.schemas.service_schema import ServiceSchema
 from app.utils.get_health import get_health
 import logging
+from app.utils.get_component_info import get_component_info
 
 logger = logging.getLogger(__name__)
 
