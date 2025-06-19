@@ -1,5 +1,5 @@
 from typing import Any, Callable, List
-from marshmallow import Schema
+from marshmallow import Schema, EXCLUDE
 from sqlalchemy import exists, and_
 from app.extensions import SessionLocal
 from sqlalchemy.orm import Session, Query
@@ -70,7 +70,7 @@ class ServicioBase:
     ) -> dict | None:
         # Actualiza un registro existente
         if not ignore_schema:
-            schema = self.schema.load(data, partial=True)
+            schema = self.schema.load(data, partial=True, unknown=EXCLUDE)
         else:
             schema = data
 

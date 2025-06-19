@@ -52,35 +52,6 @@ def get_service(id: int):
         return make_response(ResponseStatus.ERROR, str(e)), 500
 
 
-@bp.route("/add_service", methods=["POST"])
-@cp_api_access(is_public=True, limiter=["5 per minute"])
-def add_service():
-    try:
-        data = request.get_json()
-
-        valid, errors = services_service.validate(data)
-        if not valid:
-            return make_response(ResponseStatus.FAIL, "Datos invalidos", errors), 400
-
-        model = services_service.create(data)
-        return (
-            make_response(
-                ResponseStatus.SUCCESS, "Servicio agregado correctamente", model
-            ),
-            200,
-        )
-    except Exception as e:
-        if "IntegrityError" in str(e):
-            return (
-                make_response(
-                    ResponseStatus.FAIL,
-                    "Error: el servicio ya existe en la base de datos",
-                ),
-                400,
-            )
-        return make_response(ResponseStatus.ERROR, str(e)), 500
-
-
 @bp.route("/recolect_perms", methods=["GET"])
 @cp_api_access(is_public=True, limiter=["5 per minute"])
 def recolect_perms():
@@ -195,6 +166,38 @@ def remove_service(id: int):
 
         return (
             make_response(ResponseStatus.SUCCESS, "Servicio removido correctamente"),
+            200,
+        )
+    except Exception as e:
+        return make_response(ResponseStatus.ERROR, str(e)), 500
+
+
+@bp.route("/set_service_available/<int:id>/<int:state>", methods=["GET"])
+@cp_api_access(is_public=True, limiter=["5 per minute"])
+def set_service_available(id: int, state: int):
+    try:
+        service: ServiceModel = services_service.get_by_id(id)
+
+        if service is None:
+            return make_response(ResponseStatus.FAIL, "Servicio no encontrado"), 404
+
+        service["service_available"] = state == 1
+
+        if service["service_wait"] is True:
+            return (
+                make_response(
+                    ResponseStatus.FAIL,
+                    "El servicio es requerido por el servicio de componentes, no puede ser desactivado",
+                ),
+                400,
+            )
+
+        services_service.update(id, service)
+
+        return (
+            make_response(
+                ResponseStatus.SUCCESS, "Servicio actualizado correctamente", service
+            ),
             200,
         )
     except Exception as e:
