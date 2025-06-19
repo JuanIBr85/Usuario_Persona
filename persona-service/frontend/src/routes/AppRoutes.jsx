@@ -18,6 +18,7 @@ import ForgotPassword from '@/pages/auth/ForgotPassword';
 import OTPValidation from '@/pages/auth/OTPValidation';
 import ResetPassword from '@/pages/auth/ResetPassword';
 import PerfilConnect from '@/pages/user/PerfilConnect';
+import AdminServices from '@/pages/admin/AdminServices';
 
 /**
  * Componente que define todas las rutas de la aplicación utilizando react-router-dom.
@@ -35,6 +36,7 @@ function AppRoutes() {
       <Route path="adminpanel" element={<AdminPanel />} />
       <Route path="logs" element={<Logs />} />
       <Route path="adminpersons" element={<AdminPersons />} />
+      <Route path="adminservices" element={<AdminServices />} />
       <Route path="adminroles" element={<AdminRoles />} />
       <Route path="persondetails/:id" element={<PersonDetails />} />
       <Route path="privacypolicy" element={<AboutPrivacyPolicy />} />

@@ -9,7 +9,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, ShieldCheck, FileText } from "lucide-react";
+import { Users, ShieldCheck, FileText, HandPlatter} from "lucide-react";
 import { Fade } from 'react-awesome-reveal'
 
 /**
@@ -41,7 +41,14 @@ const adminOptions = [
     icon: <FileText className="w-14 h-14 text-primary" />,
     path: "/logs",
   },
+  {
+    title: "Gestión de Servicios", 
+    description: "Controlar y administrar servicios activos",
+    icon: <HandPlatter className="w-14 h-14 text-primary" />, 
+    path: "/adminservices", 
+  },
 ];
+
 
 /**
  * Componente `AdminPanel`.
