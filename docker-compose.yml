@@ -42,4 +42,8 @@
         - auth-service
         - persona-backend
 
-
+    redis:
+      image: redis:latest
+      container_name: redis-dev
+      ports:
+        - "6379:6379"
