@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Card,
@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Users, ShieldCheck, FileText, HandPlatter } from "lucide-react";
 import { Fade } from "react-awesome-reveal";
-
+import { jwtDecode } from "jwt-decode";
 /**
  * Lista de opciones disponibles en el panel de administración.
  * Cada opción incluye un título, una descripción, un ícono y la ruta correspondiente.
@@ -60,6 +60,24 @@ const adminOptions = [
 const AdminPanel = () => {
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        if (decoded.rol === "usuario") {
+          navigate("/profile");
+          console.log('usuario no es admin')
+        }
+      } catch (error) {
+        console.error("Token inválido:", error);
+        navigate("/logout"); 
+      }
+    } else {
+      navigate("/logout"); 
+    }
+  }, [navigate]);
+
   return (
     <div className=" py-30 px-5 md:py-20 md:px-10 2xl:pl-[5%] 2xl:pr-[5%]">
       <Fade duration={300} triggerOnce>
@@ -82,7 +100,7 @@ const AdminPanel = () => {
               </CardHeader>
               <CardContent className="flex items-center justify-center">
                 <Button variant="default" className="mt-2 cursor-pointer">
-                  Ir a {option.title} 
+                  Ir a {option.title}
                 </Button>
               </CardContent>
             </Card>
