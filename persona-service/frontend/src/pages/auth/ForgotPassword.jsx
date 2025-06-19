@@ -13,6 +13,7 @@ function ForgotPassword() {
   const [isOpen, setIsOpen] = React.useState(false);
   const [dialogMessage, setMessage] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
+  const [shouldRedirect, setShouldRedirect] = React.useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
@@ -25,8 +26,10 @@ function ForgotPassword() {
       .then((json) => {
         sessionStorage.setItem("email_para_reset", formData.email);
         setMessage("Se ha enviado un codigo de recuperación a tu correo electrónico. Por favor, revisa tu bandeja de entrada.");
+        setShouldRedirect(true);
       })
       .catch((error) => {
+        setShouldRedirect(false);
         if (error.isJson) {
           if (error.data.error) {
             setMessage(FetchErrorMessage(error));
@@ -50,7 +53,7 @@ function ForgotPassword() {
         isOpen={isOpen}
         setIsOpen={(value) => {
           setIsOpen(value);
-          if (!value && dialogMessage.includes("Se ha enviado un codigo")) {
+          if (!value && shouldRedirect) {
             navigate("/auth/otpvalidation");
           }
         }}

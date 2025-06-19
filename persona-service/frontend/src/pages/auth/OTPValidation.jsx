@@ -21,6 +21,7 @@ function OTPValidation() {
   const toRedirect = location.state?.from || "/auth/resetpassword";
   const email = sessionStorage.getItem("email_para_reset");
 
+  const [shouldRedirect, setShouldRedirect] = React.useState(false);
   const [isOpen, setIsOpen] = React.useState(false);
   const [dialogMessage, setMessage] = React.useState("");
   const [isOK, setIsOK] = React.useState(false);
@@ -31,6 +32,32 @@ function OTPValidation() {
       navigate("/auth/login");
     }
   }, [email, navigate]);
+
+  const handleResendOtp = async () => {
+
+    console.log("Reenviando OTP a:", email);
+    if (!email) return;
+    setIsLoading(true);
+
+    AuthService
+      .requestOtp({ email })
+      .then(() => {
+        setMessage("Se ha reenviado el código al correo electrónico.");
+        setIsOK(true);
+        setShouldRedirect(false);
+      })
+      .catch((error) => {
+        setIsOK(false);
+        setMessage(
+          error?.data?.message || error?.message || "No se pudo reenviar el código."
+        );
+      })
+      .finally(() => {
+        setIsLoading(false);
+        setIsOpen(true);
+      });
+  };
+
 
   const handleSubmit = async (event) => {
     const formData = await formSubmitJson(event);
@@ -49,9 +76,11 @@ function OTPValidation() {
           sessionStorage.setItem("email_para_reset", email); // Guardamos el email para usarlo después
           setMessage("Se ha verificado correctamente el código de verificación.");
           setIsOK(true);
+          setShouldRedirect(true);
         } else {
           setMessage("No se recibió el token de verificación.");
           setIsOK(false);
+
         }
       }).catch((error) => {
         console.log(error.data);
@@ -79,13 +108,12 @@ function OTPValidation() {
         title="Verificación"
         description={dialogMessage}
         isOpen={isOpen}
-        setIsOpen={setIsOpen}
-        actionHandle={
-          isOK ? () => {
-            setIsOpen(false);
+        setIsOpen={(value) => {
+          setIsOpen(value);
+          if (!value && shouldRedirect) {
             navigate(toRedirect);
-          } : () => setIsOpen(false)
-        }
+          }
+        }}
       />
 
       <AuthLayout
@@ -112,8 +140,8 @@ function OTPValidation() {
             </div>
           </div>
 
-          <Button variant="link" asChild className="p-0 mt-4">
-            <Link>¿No te llegó el código? Reenviar</Link>
+          <Button type="button" variant="link" className="p-0 mt-4" onClick={handleResendOtp}>
+            ¿No te llegó el código? Reenviar
           </Button>
 
           <Button type="submit" className="mt-4">Validar</Button>
