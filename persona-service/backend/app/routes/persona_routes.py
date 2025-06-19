@@ -9,11 +9,12 @@ from common.decorators.api_access import api_access
 from common.utils.response import make_response, ResponseStatus
 from common.models.cache_settings import CacheSettings
 
+
 persona_bp = Blueprint('persona_bp', __name__)
 persona_service = PersonaService()
 persona_schema= PersonaSchema()
 
-@api_access(cache=CacheSettings(expiration=30))
+@api_access(cache=CacheSettings(expiration=30), access_permissions=[persona.admin.ver_persona])
 @persona_bp.route('/personas', methods=['GET'])
 def listar_personas():
     try:
@@ -31,11 +32,10 @@ def listar_personas():
             message="",
             data={"server": str(e)}
         ),500
-            
-@api_access(cache=CacheSettings(expiration=10))
-@persona_bp.route('/personas/<int:id>', methods=['GET'])
-def obtener_persona(id):
-    try:
+
+
+def _obtener_persona_x_id(id):
+        
         persona = persona_service.listar_persona_id(id)
 
         if persona is None:
@@ -51,6 +51,26 @@ def obtener_persona(id):
             message="Persona obtenida correctamente",
             data=persona
         ), 200
+
+    
+@api_access(cache=CacheSettings(expiration=10))
+@persona_bp.route('/persona_by_id/<int:id>', methods=['GET'])
+def persona_by_id(id):
+    try:
+        return _obtener_persona_x_id(id)
+    
+    except Exception as e:
+        return make_response(
+            status=ResponseStatus.ERROR,
+            message="Error al obtener persona",
+            data={"server": str(e)}
+        ),500 
+            
+@api_access(cache=CacheSettings(expiration=10), access_permissions=[persona.admin.ver_persona])
+@persona_bp.route('/personas/<int:id>', methods=['GET'])
+def obtener_persona(id):
+    try:
+        return _obtener_persona_x_id(id)
     
     except Exception as e:
         return make_response(
@@ -60,7 +80,7 @@ def obtener_persona(id):
         ),500    
 
 #crea una persona
-@api_access(access_permissions=[])
+@api_access(access_permissions=[persona.admin.crear_persona])
 @persona_bp.route('/crear_persona', methods=['POST'])
 def crear_persona():
     try:    
@@ -98,7 +118,7 @@ def crear_persona():
             ),500
     
 # modificar persona, siguiendo el formato json sugerido    
-@api_access(access_permissions=[])
+@api_access(access_permissions=[persona.admin.modificar_persona])
 @persona_bp.route('/modificar_persona/<int:id>', methods=['PUT'])
 def modificar_persona(id):
     try:
@@ -132,7 +152,7 @@ def modificar_persona(id):
         ), 500
 
 #borrar una persona
-@api_access(access_permissions=[])
+@api_access(access_permissions=[persona.admin.eliminar_persona])
 @persona_bp.route('/borrar_persona/<int:id>', methods=['DELETE'])
 def borrar_persona(id):
 
