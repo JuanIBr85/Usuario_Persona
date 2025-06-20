@@ -17,4 +17,5 @@ COPY . .
 # Exponer puerto para mapearlo en docker-compose
 EXPOSE 5000
 
-CMD ["python", "run.py"]
+# Comando para desarrollo con hot reload usando gunicorn
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--reload", "run:app"]
