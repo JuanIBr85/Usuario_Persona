@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Eye, Pencil, MoreVertical } from "lucide-react";
+import { Eye, Pencil, MoreVertical , Activity , CirclePause} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -127,7 +127,7 @@ function ComponentTable({ data }) {
                           }
                         >
                           <span className="mr-2">
-                            {service.service_available ? "❌" : "✅"}
+                          {service.service_available ? <CirclePause /> : <Activity />}                          
                           </span>
                           <span>
                             {service.service_available
