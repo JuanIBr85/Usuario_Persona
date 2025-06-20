@@ -2,7 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import InputValidate from "@/components/inputValidate/InputValidate";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 import { UserPlus } from "lucide-react";
 import { formSubmitJson } from "@/utils/formUtils";
 import { SimpleDialog, FetchErrorMessage } from "@/components/SimpleDialog";
@@ -11,7 +11,7 @@ import Loading from "@/components/loading/Loading";
 import AuthLayout from "@/components/authLayout/AuthLayout";
 import { useNavigate } from "react-router-dom";
 
-/** 
+/**
  * Componente: Sign
  * Permite crear una cuenta ingresando su email, nombre y contraseña.
  * Realiza validaciones de los campos, envía los datos al backend y redirige al login en caso de éxito.
@@ -30,14 +30,15 @@ function Sign() {
     document.activeElement.blur();
     setIsLoading(true);
 
-    AuthService
-      .register(formData) // Llama al servicio para registrar al usuario
+    AuthService.register(formData) // Llama al servicio para registrar al usuario
       .then((json) => {
         // Si fue exitoso, muestra mensaje de éxito y activa bandera isOK
-        setMessage(`La cuenta ha sido creada correctamente. Por favor, verifique su correo electrónico para activar su cuenta.`);
+        setMessage(
+          `La cuenta ha sido creada correctamente. Por favor, verifique su correo electrónico para activar su cuenta.`
+        );
         setIsOK(true);
-      }).catch((error) => {
-        // Si hay error, se maneja según si es error con JSON o error general
+      })
+      .catch((error) => {
         if (error.isJson) {
           if (error.data.error) {
             setMessage(FetchErrorMessage(error));
@@ -45,11 +46,25 @@ function Sign() {
             setMessage(error.data.message || "Error desconocido");
           }
         } else {
-          setMessage(error.message);
+          // Revisa si el error contiene el código 429
+          if (
+            typeof error.message === "string" &&
+            error.message.includes("429")
+          ) {
+            setMessage(
+              "Has hecho demasiadas solicitudes. Intenta nuevamente en un minuto."
+            );
+          } else {
+            setMessage("Ha ocurrido un error inesperado. Intenta más tarde.");
+          }
         }
         setIsOK(false);
-      }).finally(() => {setIsLoading(false);setIsOpen(true);});
-  }
+      })
+      .finally(() => {
+        setIsLoading(false);
+        setIsOpen(true);
+      });
+  };
 
   return (
     <>
@@ -62,7 +77,11 @@ function Sign() {
         description={dialogMessage}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
-        actionHandle={isOK ? ()=>setTimeout(()=>navigate('/auth/login'), 500) : undefined} // Redirige al login si fue exitoso
+        actionHandle={
+          isOK
+            ? () => setTimeout(() => navigate("/auth/login"), 500)
+            : undefined
+        } // Redirige al login si fue exitoso
       />
 
       {/* Layout del formulario de registro */}
@@ -109,7 +128,9 @@ function Sign() {
           </Button>
 
           {/* Botón de envío del formulario */}
-          <Button type="submit" className="mt-4">Registrarse</Button>
+          <Button type="submit" className="mt-4">
+            Registrarse
+          </Button>
         </form>
       </AuthLayout>
     </>
