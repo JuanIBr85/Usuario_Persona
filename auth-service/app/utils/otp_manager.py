@@ -31,6 +31,6 @@ def verificar_token_recuperacion(token: str) -> str | None:
     redis_client = get_redis()
     email = redis_client.get(key)
     if email:
-        redis_client.delete(key)
+        #redis_client.delete(key)
         return email
     return None

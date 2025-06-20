@@ -339,19 +339,32 @@ class UsuarioService(ServicioBase):
     def cambiar_password_con_codigo(
         self, session: Session, data: dict, token: str, email: str
     ) -> dict:
+        
+        try:
+            data_validada = self.schema_reset.load(data)
+        except ValidationError as error:
+            return (
+                ResponseStatus.FAIL,
+                "Error de schema / Bad Request",
+                error.messages,
+                400,
+            )
 
         email_redis = verificar_token_recuperacion(token)
         if not email_redis or email != email_redis:
             return ResponseStatus.FAIL, "Token inválido o expirado", None, 400
 
-        nueva_pass = data.get("confirm_password")
+        nueva_pass = data_validada.get("confirm_password")
         if not nueva_pass:
             return ResponseStatus.FAIL, "Contraseña nueva requerida", None, 400
 
         usuario = session.query(Usuario).filter_by(email_usuario=email).first()
         if not usuario:
             return ResponseStatus.FAIL, "Usuario no encontrado", None, 404
-
+        
+        if check_password_hash(usuario.password,data_validada["confirm_password"]):
+                return ResponseStatus.FAIL,"La contraseña debe ser diferente a la anterior",None,400
+        
         # Aquí actualizas y registras contraseña
         usuario.password = generate_password_hash(nueva_pass)  # tu función de hash
         session.commit()

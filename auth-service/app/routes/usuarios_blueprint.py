@@ -220,7 +220,7 @@ def solicitar_otp():
 @api_access(
     is_public=True,
     limiter=["10 per minute"],
-    cache=CacheSettings(expiration=60, params=["email", "otp"]),
+    cache=CacheSettings(expiration=1, params=["email", "otp"]),
 )
 def verificar_otp():
     session = SessionLocal()
@@ -273,7 +273,13 @@ def reset_con_otp():
                 ),
                 400,
             )
-
+        if not token or token.count(".") != 2:
+            return make_response(
+                    ResponseStatus.UNAUTHORIZED,
+                    "Token inválido o malformado",
+                    error_code="TOKEN_MALFORMED",
+            ), 401
+        
         email_from_token = verificar_token_reset(token)
         if not email_from_token:
             return make_response(
