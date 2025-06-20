@@ -118,7 +118,7 @@ def install_service():
 
 
 @bp.route("/refresh_service/<int:id>", methods=["PUT"])
-@cp_api_access(is_public=True, limiter=["5 per minute"])
+@cp_api_access(is_public=True, limiter=["10 per minute"])
 def refresh_service(id: int):
     try:
         service: ServiceModel = services_service.get_by_id(id)
@@ -185,8 +185,6 @@ def set_service_available(id: int, state: int):
         if service is None:
             return make_response(ResponseStatus.FAIL, "Servicio no encontrado"), 404
 
-        service["service_available"] = state == 1
-
         if service["service_wait"] is True:
             return (
                 make_response(
@@ -196,7 +194,9 @@ def set_service_available(id: int, state: int):
                 400,
             )
 
-        services_service.update(id, service)
+        services_service.update(
+            id, {"id_service": service["id_service"], "service_available": state == 1}
+        )
 
         return (
             make_response(

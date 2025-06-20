@@ -52,7 +52,10 @@ function AuthContextProvider({ children }) {
 
     useEffect(() => {
         checkToken();
-
+        const timeLeft = (new Date(authData.user.expires_in) - new Date()) / 1000;
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = Math.floor(timeLeft % 60);
+        //alert(`Tu sesión expirará en ${minutes} minutos y ${seconds} segundos.`);
         // Verificar expiración del token cada minuto
         const interval = setInterval(checkToken, 1000 * 2); // Verificar cada 2 segundos
         if (!window.location.pathname.includes("/auth/")) {
