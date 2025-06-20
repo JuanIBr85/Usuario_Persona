@@ -14,7 +14,7 @@ persona_bp = Blueprint('persona_bp', __name__)
 persona_service = PersonaService()
 persona_schema= PersonaSchema()
 
-@api_access(cache=CacheSettings(expiration=30), access_permissions=[persona.admin.ver_persona])
+@api_access(cache=CacheSettings(expiration=30), access_permissions=["persona.admin.ver_persona"])
 @persona_bp.route('/personas', methods=['GET'])
 def listar_personas():
     try:
@@ -66,7 +66,7 @@ def persona_by_id(id):
             data={"server": str(e)}
         ),500 
             
-@api_access(cache=CacheSettings(expiration=10), access_permissions=[persona.admin.ver_persona])
+@api_access(cache=CacheSettings(expiration=10), access_permissions=["persona.admin.ver_persona"])
 @persona_bp.route('/personas/<int:id>', methods=['GET'])
 def obtener_persona(id):
     try:
@@ -80,7 +80,7 @@ def obtener_persona(id):
         ),500    
 
 #crea una persona
-@api_access(access_permissions=[persona.admin.crear_persona])
+@api_access(access_permissions=["persona.admin.crear_persona"])
 @persona_bp.route('/crear_persona', methods=['POST'])
 def crear_persona():
     try:    
@@ -118,7 +118,7 @@ def crear_persona():
             ),500
     
 # modificar persona, siguiendo el formato json sugerido    
-@api_access(access_permissions=[persona.admin.modificar_persona])
+@api_access(access_permissions=["persona.admin.modificar_persona"])
 @persona_bp.route('/modificar_persona/<int:id>', methods=['PUT'])
 def modificar_persona(id):
     try:
@@ -152,7 +152,7 @@ def modificar_persona(id):
         ), 500
 
 #borrar una persona
-@api_access(access_permissions=[persona.admin.eliminar_persona])
+@api_access(access_permissions=["persona.admin.eliminar_persona"])
 @persona_bp.route('/borrar_persona/<int:id>', methods=['DELETE'])
 def borrar_persona(id):
 
@@ -179,7 +179,7 @@ def borrar_persona(id):
         ),500       
 
 #Restaurar una persona
-@api_access(access_permissions=[])
+@api_access(access_permissions=["persona.admin.restaurar_persona"])
 @persona_bp.route('/restaurar_persona/<int:id>', methods=['PATCH'])
 def restaurar_persona(id):
 
