@@ -150,6 +150,39 @@ def modificar_persona(id):
             message="Error al modificar persona", 
             data={"server": str(e)}
         ), 500
+    
+@api_access()
+@persona_bp.route('/modificar_persona_restringido/<int:id>', methods=['PUT'])
+def modificar_persona_restringido(id):
+    try:
+        data = request.get_json()
+        if not data:
+            return make_response(
+                status=ResponseStatus.ERROR,
+                message="No se enviaron datos",
+                data=None               
+            ), 400
+
+        persona = persona_service.modificar_persona_restringido(id, data)
+        if persona is None:
+            return make_response(
+                status=ResponseStatus.ERROR,
+                message="Persona no encontrada",
+                data={"id": f"No existe persona con ID {id}"}
+            ), 404
+
+        return make_response(
+            status=ResponseStatus.SUCCESS, 
+            message="Persona modificada correctamente", 
+            data=persona
+        ), 200
+
+    except Exception as e:
+        return make_response(
+            status=ResponseStatus.ERROR, 
+            message="Error al modificar persona", 
+            data={"server": str(e)}
+        ), 500
 
 #borrar una persona
 @api_access(access_permissions=["persona.admin.eliminar_persona"])
