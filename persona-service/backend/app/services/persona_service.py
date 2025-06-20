@@ -132,7 +132,7 @@ class PersonaService(IPersonaInterface):
 
             ''' ejemplo de funcionamiento: si en el json recibe 'domicilio' llama a domiciolio_service
              para modificar ese domicilio, pasa el id existente y los nuevos datos.
-              lo mismo con contacto y tipo_documento '''
+              lo mismo con contacto y persona extendida '''
             
             if 'domicilio' in data:
                 self.domicilio_service.modificar_domicilio(persona.domicilio_id, data['domicilio'], session)
@@ -143,7 +143,6 @@ class PersonaService(IPersonaInterface):
             if 'persona_extendida' in data:
                 if persona.persona_extendida:
                     self.persona_ext_service.modificar_persona_extendida(persona.extendida_id,data['persona_extendida'], session)
-
 
             for field in ['nombre_persona', 'apellido_persona', 'fecha_nacimiento_persona', 'num_doc_persona' , 'tipo_documento']: 
                 if field in data_validada:
@@ -163,7 +162,78 @@ class PersonaService(IPersonaInterface):
 
         finally:
             session.close()
-       
+
+    def modificar_persona_restringido(self, id, data):
+        session = SessionLocal()
+
+        try:
+            persona = (
+                session.query(Persona)
+                .filter(Persona.id_persona == id, Persona.deleted_at.is_(None))
+                .first()
+            )
+
+            if not Persona:
+                return None
+            
+            data_validada = self.schema.load(data, partial=True)
+
+            if 'domicilio' in data:
+                self.domicilio_service.modificar_domicilio(persona.domicilio_id, data['domicilio'], session)
+
+            if 'contacto' in data:
+                self.contacto_service.modificar_contacto(persona.contacto_id, data['contacto'], session)
+
+            if 'persona_extendida' in data:
+                if persona.persona_extendida:
+                    self.persona_ext_service.modificar_persona_extendida(persona.extendida_id,data['persona_extendida'], session)
+
+            # Permiten cambios cada 30 días
+            campos_modificables_cada_30_dias = ['nombre_persona', 'apellido_persona']
+
+            # No deberían cambiarse automáticamente
+            campos_no_modificables = ['fecha_nacimiento_persona', 'num_doc_persona', 'tipo_documento']   
+
+            ahora = datetime.now(timezone.utc)
+
+            #Campos no modificables por el usuario
+            for campo in campos_no_modificables:
+                if campo in data_validada:
+                    raise Exception (f"El campo '{campo}' no puede modificarse directamente. Contacte al administrador.") 
+                
+            #Campos editables con restriccion temporal
+
+            modificar_campos_controlados = any(campo in data for campo in campos_modificables_cada_30_dias)
+
+            if modificar_campos_controlados:
+                ultima_modificacion = persona.updated_at
+
+                if ultima_modificacion:
+                    dias=(ahora - ultima_modificacion).days
+                    if dias < 30:
+                        raise Exception(
+                                f"Los campos personales solo pueden modificarse cada 30 días. "
+                                f"Última modificación: {ultima_modificacion.date()}"
+                        )
+                 #Aplica las modificaciones   
+                for campo in campos_modificables_cada_30_dias:
+                    if campo in data_validada:
+                        setattr(persona, campo, data_validada[campo])
+
+            persona.updated_at = datetime.now(timezone.utc)
+            session.commit()
+            return self.schema.dump(persona)
+        
+        except Exception as e:
+            import traceback
+            print("Error al modificar persona:")
+            print(traceback.format_exc())
+            session.rollback()
+            raise e
+
+        finally:
+            session.close()
+      
     def borrar_persona(self, id_persona): 
         session = SessionLocal()
 

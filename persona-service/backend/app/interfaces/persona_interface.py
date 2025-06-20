@@ -29,3 +29,7 @@ class IPersonaInterface(ABC):
     @abstractmethod
     def listar_persona_usuario_id(self, id):
         pass
+
+    @abstractmethod
+    def modificar_persona_restringido(self, id, data):
+        pass
