@@ -183,7 +183,7 @@ def perfil_usuario():
 
 
 @usuario_bp.route("/solicitar-otp", methods=["POST"])
-@api_access(is_public=True, limiter=["1 per 5 minutes"])
+@api_access(is_public=True, limiter=["10 per 1 minutes"])
 def solicitar_otp():
     session = SessionLocal()
     try:
@@ -219,7 +219,7 @@ def solicitar_otp():
 @usuario_bp.route("/verificar-otp", methods=["POST"])
 @api_access(
     is_public=True,
-    limiter=["3 per minute"],
+    limiter=["10 per minute"],
     cache=CacheSettings(expiration=60, params=["email", "otp"]),
 )
 def verificar_otp():
@@ -258,7 +258,7 @@ def verificar_otp():
 
 
 @usuario_bp.route("/reset-password-con-codigo", methods=["POST"])
-@api_access(is_public=True, limiter=["2 per minute"])
+@api_access(is_public=True, limiter=["10 per minute"])
 def reset_con_otp():
     session = SessionLocal()
     try:

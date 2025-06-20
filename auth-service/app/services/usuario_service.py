@@ -9,7 +9,7 @@ from app.utils.jwt import (
     crear_token_acceso,
     crear_token_refresh,
     generar_token_reset,
-    verificar_token_reset,
+    crear_token_refresh,
 )
 from app.schemas.usuarios_schema import (
     LoginSchema,
@@ -32,13 +32,11 @@ from app.utils.email import (
 from jwt import ExpiredSignatureError, InvalidTokenError
 from app.utils.response import ResponseStatus
 from app.utils.otp_manager import (
-    guardar_otp,
-    verificar_otp,
-    guardar_token_recuperacion,
-    verificar_token_recuperacion,
+    guardar_otp, 
+    verificar_otp_redis, 
+    guardar_token_recuperacion, 
+    verificar_token_recuperacion
 )
-
-
 class UsuarioService(ServicioBase):
     def __init__(self):
         super().__init__(model=Usuario, schema=UsuarioInputSchema())
@@ -323,14 +321,20 @@ class UsuarioService(ServicioBase):
             traceback.print_exc()
             return ResponseStatus.ERROR, "Error interno al solicitar código", None, 500
 
-    def verificar_otp(self, session: Session, email: str, otp: str) -> dict:
-        if not verificar_otp(email, otp):
+
+    def verificar_otp(self, session:Session, email: str, otp: str)->dict:
+        if not verificar_otp_redis(email, otp):
             return ResponseStatus.FAIL, "Código OTP inválido o expirado", None, 400
+        try:
+            token = generar_token_reset(email)
+            guardar_token_recuperacion(email, token)
 
-        token = generar_token_reset(email)
-        guardar_token_recuperacion(email, token)
+            return ResponseStatus.SUCCESS, "OTP válido", {"reset_token": token}, 200
+        except Exception as e:
+            import traceback
 
-        return ResponseStatus.SUCCESS, "OTP válido", {"token": token}, 200
+            traceback.print_exc()
+            return ResponseStatus.ERROR, "Error interno al solicitar código", None, 500
 
     def cambiar_password_con_codigo(
         self, session: Session, data: dict, token: str, email: str
@@ -340,7 +344,7 @@ class UsuarioService(ServicioBase):
         if not email_redis or email != email_redis:
             return ResponseStatus.FAIL, "Token inválido o expirado", None, 400
 
-        nueva_pass = data.get("nueva_password")
+        nueva_pass = data.get("confirm_password")
         if not nueva_pass:
             return ResponseStatus.FAIL, "Contraseña nueva requerida", None, 400
 

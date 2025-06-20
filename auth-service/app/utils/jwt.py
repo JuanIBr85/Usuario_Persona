@@ -34,6 +34,7 @@ def crear_token_reset_password(otp_id: int, usuario_id: int) -> str:
 
 def generar_token_reset(email: str):
     payload = {
+        "sub":email,
         "email": email,
         "type": "reset",
         "exp": datetime.now(timezone.utc) + timedelta(minutes=10),

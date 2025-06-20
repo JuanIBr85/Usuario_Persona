@@ -43,7 +43,6 @@ class UsuarioOutputSchema(Schema):
     id_usuario = fields.Int()
     nombre_usuario = fields.Str()
     email_usuario = fields.Email()
-    persona_id = fields.Int()
     token = fields.Str(
         required=True
     )
