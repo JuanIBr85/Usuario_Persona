@@ -103,9 +103,10 @@ class EndpointsSearchService:
                 "error": None,
                 "endpoints_count": 0,
             }
-
-            if not service.service_available:
+            print(">", service.service_available)
+            if service.service_available is False:
                 self._search_log[service.service_name]["success"] = "not_available"
+                self._search_log[service.service_name]["in_progress"] = False
                 continue
 
             if self._stop_search:  # Verifica señal de parada
