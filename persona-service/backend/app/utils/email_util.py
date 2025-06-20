@@ -10,7 +10,6 @@ def generar_codigo_otp() -> str:
 
 def enviar_codigo_por_email_persona(persona, codigo_otp: str):
 
-    
     expiracion = datetime.now(timezone.utc) + timedelta(minutes=15)
     expiracion_str = expiracion.strftime("%Y-%m-%d %H:%M UTC")
 
@@ -27,3 +26,12 @@ def enviar_codigo_por_email_persona(persona, codigo_otp: str):
     )
 
     mail.send(msg)
+
+# funcion auxiliar para censurar email
+def censurar_email(email: str) -> str:
+    local, _, domain = email.partition('@')
+    if len(local) <= 2:
+        censored_local = local[0] + '*' * (len(local) - 1)
+    else:
+        censored_local = local[0] + '*' * (len(local) - 2) + local[-1]
+    return f"{censored_local}@{domain}"

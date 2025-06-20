@@ -239,45 +239,44 @@ def contar_personas():
 @persona_bp.route('/personas/verify', methods=['POST'])
 @jwt_required()
 def verificar_persona():
-    body = request.get_json() or {}
-    token = body.get('token')
-    datos = body.get('datos')
+    #envia otp si el usuario confirma el mail de contacto de persona
+    """
+    Respuestas:
+      400  Datos faltantes o inválidos
+      404  Documento no registrado
+      400  Email no coincide
+      200 { otp_token }
+    """
+    usuario_id = request.headers.get('X-USER-ID')
+    data = request.get_json() or {}
+    tipo = data.get('tipo_documento')
+    num = data.get('num_doc_persona')
+    email_confirmado = data.get('email_confirmado')
 
-    if not token or not datos:
-        return make_response(ResponseStatus.FAIL, "Faltan token o datos de persona"), 400
+    if not usuario_id or not tipo or not num or not email_confirmado:
+        return make_response(ResponseStatus.FAIL, "Faltan datos necesarios"), 400
 
-    
-    try:
-        session_claims = decode_token(token)
-    except Exception:
-        return make_response(ResponseStatus.FAIL, "Token invalido o expirado"), 400
-    
-    usuario_id = session_claims.get('sub')
+    exists, email, persona_id = persona_service.verificar_documento_mas_get_id(tipo, num)
+    if not exists:
+        return make_response(ResponseStatus.FAIL, "Documento no registrado"), 404
 
-    resultado = persona_service.verificar_o_crear_persona(usuario_id, datos)
+    if email.lower() != email_confirmado.lower():
+        return make_response(ResponseStatus.FAIL, "Email no coincide"), 400
 
-    if 'otp_token' in resultado:
-        return make_response(
-            status=ResponseStatus.PENDING,
-            message="Persona encontrada. Se envió código OTP.",
-            data={'otp_token': resultado['otp_token']}
-        ), 200
+    otp_token = persona_service.enviar_otp(usuario_id, persona_id)
+    return make_response(ResponseStatus.PENDING, "OTP enviado", {"otp_token": otp_token}), 200
 
-    return make_response(
-        status=ResponseStatus.SUCCESS,
-        message="Persona creada y vinculada correctamente.",
-        data=resultado['persona']
-    ), 201
-
-
+#cambios para usar X-USER-ID
+@api_access()
 @persona_bp.route('/personas/verify-otp', methods=['POST'])
 def verificar_otp_persona():
     
-    body = request.get_json() or {}
-    token = body.get('token')
-    codigo_input = body.get('codigo')
+    usuario_id = request.headers.get('X-USER-ID')
+    data = request.get_json() or {}
+    token = data.get('otp_token')
+    codigo_input = data.get('codigo')
 
-    if not token or not codigo_input:
+    if not usuario_id or not token or not codigo_input:
         return make_response(ResponseStatus.FAIL, "Faltan token o código"), 400
 
     try:
@@ -285,19 +284,14 @@ def verificar_otp_persona():
     except Exception:
         return make_response(ResponseStatus.FAIL, "Token inválido o expirado"), 400
 
-    persona_id = claims.get('persona_id')
-    otp_guardado = claims.get('otp')
-    usuario_id = claims.get('sub')
+    if str(claims.get('sub')) != str(usuario_id):
+        return make_response(ResponseStatus.FAIL, "Usuario no autorizado"), 403
 
-    if otp_guardado != codigo_input:
+    if claims.get('otp') != codigo_input:
         return make_response(ResponseStatus.FAIL, "OTP incorrecto"), 400
-    # vincula persona con usuario, actualiza usuario_id
-    session = SessionLocal()
-    try:
-        session.query(Persona)\
-               .filter_by(id_persona=persona_id)\
-               .update({'usuario_id': usuario_id})
-        session.commit()
-        return make_response(ResponseStatus.SUCCESS, "Persona vinculada con usuario"), 200
-    finally:
-        session.close()
+
+    # aca se vincula la persona con el usuario
+    persona_service.vincular_persona(int(usuario_id), claims.get('persona_id'))
+    return make_response(ResponseStatus.SUCCESS, "Persona vinculada con usuario"), 200
+
+

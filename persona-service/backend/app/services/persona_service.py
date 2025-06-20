@@ -248,42 +248,52 @@ class PersonaService(IPersonaInterface):
             session.close()
 
     #VERIFICACION DE PERSONA CON DOCUMENTO
-    def verificar_o_crear_persona(self, usuario_id: int, datos: dict) -> dict:
-        """
-        si la persona no existe la crea
-        si la persona existe, genera un OTP, lo envía y devuelve un JWT con el código
-           en sus claims para que el cliente lo valide luego.
-        """
+    #dividi el verificar_persona en 3
+    #lo cambie para que tambien devuelva el id_persona
+    def verificar_documento_mas_get_id(self, tipo_documento: str, num_doc_persona: str):   
         session = SessionLocal()
         try:
             persona = (
                 session
                 .query(Persona)
                 .filter(
-                    Persona.tipo_documento == datos['tipo_documento'],
-                    Persona.num_doc_persona == datos['num_doc_persona']
+                    Persona.tipo_documento == tipo_documento,
+                    Persona.num_doc_persona == num_doc_persona,
+                    Persona.deleted_at.is_(None)
                 )
                 .first()
             )
+            if not persona:
+                return False, None, None
+            return True, persona.contacto.email_contacto, persona.id_persona
+        finally:
+            session.close()
 
-            if persona is None:
-                datos['usuario_id'] = usuario_id
-                nueva_persona = self.crear_persona(datos)
-                return {'persona': nueva_persona}
+    def enviar_otp(self, usuario_id: int, persona_id: int) -> str:
+    
+        session = SessionLocal()
+        try:
+            persona = session.query(Persona).get(persona_id)
+        finally:
+            session.close()
 
-            
-            codigo = self.otp_service.solicitar_otp(persona)
-
-            # se crea un token que incluye el otp
-            token = create_access_token(
-                identity=usuario_id,
-                additional_claims={
-                    'persona_id': persona.id_persona,
-                    'otp': codigo
-                },
-                expires_delta=timedelta(minutes=15)
-            )
-            return {'otp_token': token}
-
+        codigo = self.otp_service.solicitar_otp(persona)
+        token = create_access_token(
+            identity=usuario_id,
+            additional_claims={
+                'persona_id': persona_id,
+                'otp': codigo
+            },
+            expires_delta=timedelta(minutes=15)
+        )
+        return token
+    
+    def vincular_persona(self, usuario_id: int, persona_id: int):
+        session = SessionLocal()
+        try:
+            session.query(Persona)\
+                .filter_by(id_persona=persona_id)\
+                .update({'usuario_id': usuario_id})
+            session.commit()
         finally:
             session.close()

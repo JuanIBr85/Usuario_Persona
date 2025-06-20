@@ -2,10 +2,14 @@ from flask import Blueprint, jsonify, request
 from common.utils.response import make_response, ResponseStatus
 from config import TIPOS_DOCUMENTO_VALIDOS,REDES_SOCIALES_VALIDAS,OCUPACION,ESTADO_CIVIL,ESTUDIOS_ALCANZADOS
 from app.services.domicilio_postal_service import DomicilioPostalService
+from app.utils.email_util import censurar_email
+from app.services.persona_service import PersonaService
 from common.decorators.api_access import api_access
 from common.models.cache_settings import CacheSettings
 
 opciones_bp = Blueprint("opciones_bp", __name__)
+
+service = PersonaService
 
 @api_access(cache=CacheSettings(expiration=60*60))
 @opciones_bp.route("/tipos_documento", methods=['GET'])
@@ -130,5 +134,32 @@ def buscar_domicilio_postal():
             message="Error interno del servidor",
             data={"server": str(e)}
         ),500
+    
+# verificar documento
+@api_access(cache=CacheSettings(expiration=60*60))
+@opciones_bp.route('/opciones/verificar-documento', methods=['POST'])
+def verificar_documento():
+    data = request.get_json() or {}
+    tipo_documento = data.get('tipo_documento')
+    num_doc_persona = data.get('num_doc_persona')
+    if not tipo_documento or not num_doc_persona:
+        return make_response(ResponseStatus.FAIL, "Falta tipo_documento o num_doc_persona"), 400
+
+    exists, email = service.verificar_documento(tipo_documento, num_doc_persona)
+    if not exists:
+        return make_response(
+            status=ResponseStatus.SUCCESS,
+            message="Documento no registrado",
+            data={"exists": False}
+        ), 200
+
+    censored = censurar_email(email)
+    return make_response(
+        status=ResponseStatus.SUCCESS,
+        message="Documento registrado",
+        data={"exists": True, "email": censored}
+    ), 200
+
+
 
 
