@@ -1,5 +1,13 @@
 import React from "react";
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Eye, Pencil, MoreVertical } from "lucide-react";
 import {
@@ -9,10 +17,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { componentService } from "@/services/componentService";
+import { useNavigate } from "react-router-dom";
+
 
 function ComponentTable({ data }) {
+
+  const navigate = useNavigate();
   const handleToggleService = (id_service, state) => {
-    componentService.set_service_available(id_service, state? 0 : 1)
+    componentService
+      .set_service_available(id_service, state ? 0 : 1)
       .then((response) => {
         console.log(response);
       })
@@ -21,7 +34,8 @@ function ComponentTable({ data }) {
       });
   };
   const handleDeleteService = (id_service) => {
-    componentService.delete_service(id_service)
+    componentService
+      .delete_service(id_service)
       .then((response) => {
         console.log(response);
       })
@@ -29,6 +43,11 @@ function ComponentTable({ data }) {
         console.log(error);
       });
   };
+
+  const handleViewDetails = (id_service) => {
+    navigate(`/adminservices/components/${id_service}`);
+  };
+
   return (
     <Table>
       <TableCaption>Información del servicio de personas</TableCaption>
@@ -48,21 +67,37 @@ function ComponentTable({ data }) {
         {data && data.length > 0 ? (
           data.map((service) => (
             <TableRow key={service.id_service}>
-              <TableCell className="font-medium">{service.id_service}</TableCell>
+              <TableCell className="font-medium">
+                {service.id_service}
+              </TableCell>
               <TableCell>{service.service_name}</TableCell>
               <TableCell>{service.service_description}</TableCell>
               <TableCell>{service.service_url}</TableCell>
               <TableCell>
-                <span className={`px-2 py-1 rounded-full text-xs ${service.health ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                  {service.health ? 'Activo' : 'Inactivo'}
+                <span
+                  className={`px-2 py-1 rounded-full text-xs ${
+                    service.health
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                  }`}
+                >
+                  {service.health ? "Activo" : "Inactivo"}
                 </span>
               </TableCell>
               <TableCell>
-                <span className={`px-2 py-1 rounded-full text-xs ${service.service_available ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                  {service.service_available ? 'Sí' : 'No'}
+                <span
+                  className={`px-2 py-1 rounded-full text-xs ${
+                    service.service_available
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                  }`}
+                >
+                  {service.service_available ? "Sí" : "No"}
                 </span>
               </TableCell>
-              <TableCell>{new Date(service.updated_at).toLocaleString()}</TableCell>
+              <TableCell>
+                {new Date(service.updated_at).toLocaleString()}
+              </TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end">
                   <DropdownMenu>
@@ -73,17 +108,46 @@ function ComponentTable({ data }) {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      {!service.service_wait &&
-                      <DropdownMenuItem onClick={() => handleToggleService(service.id_service, service.service_available)}>
+                      {/* ✅ Ver detalles */}
+                      <DropdownMenuItem
+                        onClick={() => handleViewDetails(service.id_service)}
+                      >
                         <Eye className="mr-2 h-4 w-4" />
-                        <span>{service.service_available ? 'Desactivar' : 'Activar'}</span>
-                      </DropdownMenuItem>}
-                      {!service.service_core &&
-                      <DropdownMenuItem onClick={() => handleDeleteService(service.id_service)}>
-                        <Eye className="mr-2 h-4 w-4" />
-                        <span>Eliminar</span>
-                      </DropdownMenuItem>}
+                        <span>Ver detalles</span>
+                      </DropdownMenuItem>
 
+                      {/* Activar/Desactivar */}
+                      {!service.service_wait && (
+                        <DropdownMenuItem
+                          onClick={() =>
+                            handleToggleService(
+                              service.id_service,
+                              service.service_available
+                            )
+                          }
+                        >
+                          <span className="mr-2">
+                            {service.service_available ? "❌" : "✅"}
+                          </span>
+                          <span>
+                            {service.service_available
+                              ? "Desactivar"
+                              : "Activar"}
+                          </span>
+                        </DropdownMenuItem>
+                      )}
+
+                      {/* Eliminar */}
+                      {!service.service_core && (
+                        <DropdownMenuItem
+                          onClick={() =>
+                            handleDeleteService(service.id_service)
+                          }
+                        >
+                          <span className="mr-2">🗑️</span>
+                          <span>Eliminar</span>
+                        </DropdownMenuItem>
+                      )}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -93,7 +157,9 @@ function ComponentTable({ data }) {
         ) : (
           <TableRow>
             <TableCell colSpan={7} className="text-center">
-              {data && data.length === 0 ? 'No hay servicios disponibles' : 'No hay datos disponibles del servicio.'}
+              {data && data.length === 0
+                ? "No hay servicios disponibles"
+                : "No hay datos disponibles del servicio."}
             </TableCell>
           </TableRow>
         )}

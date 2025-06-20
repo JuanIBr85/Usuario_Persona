@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Fade } from "react-awesome-reveal";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Loading from '@/components/loading/Loading';
+import Loading from "@/components/loading/Loading";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import ComponentTable from "@/components/component/ComponentTable";
 import { componentService } from "@/services/componentService";
@@ -25,9 +25,10 @@ function ComponentServices() {
   const refreshGateway = () => {
     gatewayService.startResearch().then((response) => {
       console.log(response);
-      alert(response.message)
+      alert(response.message);
     });
   };
+
 
   // Carga inicial de servicios al montar el componente
   useEffect(() => {
@@ -35,7 +36,7 @@ function ComponentServices() {
 
     const interval = setInterval(() => {
       refreshServices();
-    }, 1000*10);
+    }, 1000 * 10);
 
     return () => clearInterval(interval);
   }, []);
@@ -52,10 +53,13 @@ function ComponentServices() {
               <Wrench className="w-5 h-5 text-primary" />
               Servicios Disponibles
             </CardTitle>
-            <Button variant="outline" onClick={refreshGateway}>Aplicar cambios</Button>
+            <Button variant="outline" onClick={refreshGateway}>
+              Aplicar cambios
+            </Button>
           </CardHeader>
           <CardContent>
-            <ComponentTable data={services}  />
+            <ComponentTable data={services} />
+          
           </CardContent>
         </Card>
       </Fade>
