@@ -59,7 +59,6 @@ function AdminUsers() {
   const navigate = useNavigate();
 
   const [newUser, setNewUser] = useState({});
-  const [isAddingUser, setIsAddingUser] = useState(false);
 
   // Estado para usuario en edición
   const [editingUser, setEditingUser] = useState(null);
@@ -167,18 +166,41 @@ function AdminUsers() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  }
-  
+    const body = {
+      nombre_persona: newUser.nombre_persona || "",
+      apellido_persona: newUser.apellido_persona || "",
+      fecha_nacimiento_persona: newUser.fecha_nacimiento_persona || "",
+      tipo_documento: newUser.tipo_documento || "DNI",
+      num_doc_persona: newUser.num_doc_persona || "",
+      usuario_id: newUser.usuario_id || null,
+      domicilio: {
+        domicilio_calle: newUser.domicilio?.domicilio_calle || "",
+        domicilio_numero: newUser.domicilio?.domicilio_numero || "",
+        domicilio_piso: newUser.domicilio?.domicilio_piso || "",
+        domicilio_dpto: newUser.domicilio?.domicilio_dpto || "",
+        domicilio_referencia: newUser.domicilio?.domicilio_referencia || "",
+        codigo_postal: {
+          codigo_postal: newUser.domicilio?.codigo_postal?.codigo_postal || "",
+          localidad: newUser.domicilio?.codigo_postal?.localidad || "",
+        },
+      },
+      contacto: {
+        telefono_fijo: newUser.contacto?.telefono_fijo || "",
+        telefono_movil: newUser.contacto?.telefono_movil || "",
+        red_social_contacto: newUser.contacto?.red_social_contacto || "",
+        red_social_nombre: newUser.contacto?.red_social_nombre || "",
+        email_contacto: newUser.contacto?.email_contacto || "",
+        observacion_contacto: newUser.contacto?.observacion_contacto || "",
+      },
+    };
+    PersonaService.crear(body);
+  };
+
   const handleChange = (event) => {
     const name = event.target.name;
     const value = event.target.value;
 
     setNewUser((prevValues) => ({ ...prevValues, [name]: value }));
-  };
-
-  const handleAddUser = () => {
-    setIsAddingUser((prevState) => !prevState);
-    console.log(isAddingUser);
   };
 
   // Muestra loader si aún no hay usuarios cargados
@@ -228,7 +250,9 @@ function AdminUsers() {
               <Dialog>
                 <form onSubmit={handleSubmit}>
                   <DialogTrigger asChild>
-                    <Button variant="outline"><Plus /> Agregar Persona</Button>
+                    <Button variant="outline">
+                      <Plus /> Agregar Persona
+                    </Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[425px] max-h-[80vh] overflow-auto">
                     <DialogHeader>
