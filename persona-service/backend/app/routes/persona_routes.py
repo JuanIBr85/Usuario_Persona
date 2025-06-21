@@ -9,11 +9,12 @@ from common.decorators.api_access import api_access
 from common.utils.response import make_response, ResponseStatus
 from common.models.cache_settings import CacheSettings
 
+
 persona_bp = Blueprint('persona_bp', __name__)
 persona_service = PersonaService()
 persona_schema= PersonaSchema()
 
-@api_access(cache=CacheSettings(expiration=30))
+@api_access(cache=CacheSettings(expiration=30), access_permissions=["persona.admin.ver_persona"])
 @persona_bp.route('/personas', methods=['GET'])
 def listar_personas():
     try:
@@ -31,11 +32,10 @@ def listar_personas():
             message="",
             data={"server": str(e)}
         ),500
-            
-@api_access(cache=CacheSettings(expiration=10))
-@persona_bp.route('/personas/<int:id>', methods=['GET'])
-def obtener_persona(id):
-    try:
+
+
+def _obtener_persona_x_id(id):
+        
         persona = persona_service.listar_persona_id(id)
 
         if persona is None:
@@ -51,6 +51,26 @@ def obtener_persona(id):
             message="Persona obtenida correctamente",
             data=persona
         ), 200
+
+    
+@api_access(cache=CacheSettings(expiration=10))
+@persona_bp.route('/persona_by_id/<int:id>', methods=['GET'])
+def persona_by_id(id):
+    try:
+        return _obtener_persona_x_id(id)
+    
+    except Exception as e:
+        return make_response(
+            status=ResponseStatus.ERROR,
+            message="Error al obtener persona",
+            data={"server": str(e)}
+        ),500 
+            
+@api_access(cache=CacheSettings(expiration=10), access_permissions=["persona.admin.ver_persona"])
+@persona_bp.route('/personas/<int:id>', methods=['GET'])
+def obtener_persona(id):
+    try:
+        return _obtener_persona_x_id(id)
     
     except Exception as e:
         return make_response(
@@ -60,7 +80,7 @@ def obtener_persona(id):
         ),500    
 
 #crea una persona
-@api_access(access_permissions=[])
+@api_access(access_permissions=["persona.admin.crear_persona"])
 @persona_bp.route('/crear_persona', methods=['POST'])
 def crear_persona():
     try:    
@@ -98,7 +118,7 @@ def crear_persona():
             ),500
     
 # modificar persona, siguiendo el formato json sugerido    
-@api_access(access_permissions=[])
+@api_access(access_permissions=["persona.admin.modificar_persona"])
 @persona_bp.route('/modificar_persona/<int:id>', methods=['PUT'])
 def modificar_persona(id):
     try:
@@ -130,9 +150,42 @@ def modificar_persona(id):
             message="Error al modificar persona", 
             data={"server": str(e)}
         ), 500
+    
+@api_access()
+@persona_bp.route('/modificar_persona_restringido/<int:id>', methods=['PUT'])
+def modificar_persona_restringido(id):
+    try:
+        data = request.get_json()
+        if not data:
+            return make_response(
+                status=ResponseStatus.ERROR,
+                message="No se enviaron datos",
+                data=None               
+            ), 400
+
+        persona = persona_service.modificar_persona_restringido(id, data)
+        if persona is None:
+            return make_response(
+                status=ResponseStatus.ERROR,
+                message="Persona no encontrada",
+                data={"id": f"No existe persona con ID {id}"}
+            ), 404
+
+        return make_response(
+            status=ResponseStatus.SUCCESS, 
+            message="Persona modificada correctamente", 
+            data=persona
+        ), 200
+
+    except Exception as e:
+        return make_response(
+            status=ResponseStatus.ERROR, 
+            message="Error al modificar persona", 
+            data={"server": str(e)}
+        ), 500
 
 #borrar una persona
-@api_access(access_permissions=[])
+@api_access(access_permissions=["persona.admin.eliminar_persona"])
 @persona_bp.route('/borrar_persona/<int:id>', methods=['DELETE'])
 def borrar_persona(id):
 
@@ -159,7 +212,7 @@ def borrar_persona(id):
         ),500       
 
 #Restaurar una persona
-@api_access(access_permissions=[])
+@api_access(access_permissions=["persona.admin.restaurar_persona"])
 @persona_bp.route('/restaurar_persona/<int:id>', methods=['PATCH'])
 def restaurar_persona(id):
 
@@ -219,7 +272,8 @@ def obtener_persona_usuario(id):
             message="Error al obtener persona",
             data={"server": str(e)}
         ),500
-    
+
+@api_access(access_permissions=[])
 @persona_bp.route('/personas/count', methods=['GET'])
 def contar_personas():
         try:

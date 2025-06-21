@@ -2,19 +2,11 @@
     "services": [
         {
             "service_name": "persona-backend",
-            "service_url": "http://persona-backend:5001",
-            "service_available": true,
-            "service_description": "Backend para el manejo de personas",
-            "service_core": true,
-            "service_wait": false
+            "service_url": "http://persona-backend:5001"
         },
         {
             "service_name": "auth-service",
-            "service_url": "http://auth-service:5000",
-            "service_available": true,
-            "service_description": "Backend para el manejo de autenticación",
-            "service_core": true,
-            "service_wait": true
+            "service_url": "http://auth-service:5000"
         }
     ]
 }

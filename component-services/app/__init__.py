@@ -5,7 +5,6 @@ from app.extensions import engine, Base
 from app.routes import register_blueprints
 from app.decorators.cp_api_access import cp_api_access
 from flask_jwt_extended import JWTManager
-from common.utils.component_service import component_service
 from app.extensions import limiter, jwt
 from app.services.endpoints_search_service import EndpointsSearchService
 from app.services.services_serch_service import ServicesSearchService

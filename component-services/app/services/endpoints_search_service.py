@@ -59,6 +59,10 @@ class EndpointsSearchService:
                 # Resetea contador de errores en éxito
                 error_cnt = 0
 
+                self._search_log[service.service_name]["endpoints_count"] = len(
+                    response
+                )
+
                 # Retorna diccionario de endpoints con URLs completas
                 return {
                     k: {**v, "api_url": f"{service_url}{v['api_url']}"}
@@ -73,6 +77,11 @@ class EndpointsSearchService:
                     logger.error(f"Error conectando con {service.service_name}")
                 self._search_log[service.service_name]["success"] = "error"
                 self._search_log[service.service_name]["error"] = str(e)
+
+                if not service.service_wait and error_cnt > 10:
+                    self._search_log[service.service_name]["success"] = "timeout"
+                    return None
+
                 # Espera 1 segundo entre reintentos
                 time.sleep(1)
 
@@ -92,7 +101,13 @@ class EndpointsSearchService:
                 "success": "in_progress",
                 "start_time": time.time(),
                 "error": None,
+                "endpoints_count": 0,
             }
+            print(">", service.service_available)
+            if service.service_available is False:
+                self._search_log[service.service_name]["success"] = "not_available"
+                self._search_log[service.service_name]["in_progress"] = False
+                continue
 
             if self._stop_search:  # Verifica señal de parada
                 self._search_log[service.service_name]["in_progress"] = False
@@ -116,11 +131,13 @@ class EndpointsSearchService:
                 logger.info(
                     f"{service.service_name} - {len(service_endpoints)} endpoints cargados"
                 )
+
+                self._search_log[service.service_name]["success"] = "success"
             except Exception as e:
                 logger.error(f"Error cargando {service.service_name}: {str(e)}")
                 self._search_log[service.service_name]["error"] = str(e)
-            self._search_log[service.service_name]["in_progress"] = False
-            self._search_log[service.service_name]["success"] = "success"
+                self._search_log[service.service_name]["success"] = "error"
+        self._search_log[service.service_name]["in_progress"] = False
         # Finalización de la carga
         self._search_in_progress = False
         logger.info(f"Carga completada. Total de endpoints: {len(self._endpoints)}")

@@ -1,15 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { Fade } from "react-awesome-reveal";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Users, Plus } from "lucide-react";
 
-import { Users } from "lucide-react";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import PersonFilter from "@/components/people/PersonFilter";
-import Loading from '@/components/loading/Loading';
+import Loading from "@/components/loading/Loading";
 
 import { PersonaService } from "@/services/personaService";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import PersonTable from "@/components/people/PersonTable";
 import PersonEditDialog from "@/components/people/PersonEditDialog";
 import PersonBreadcrumb from "@/components/people/PersonBreadcrumb";
@@ -17,25 +30,25 @@ import PersonBreadcrumb from "@/components/people/PersonBreadcrumb";
 /**
  * Componente AdminUsers
  * ---------------------
- * Este componente muestra una lista de usuarios registrados, 
- * con funcionalidades para filtrarlos, editar sus datos, 
+ * Este componente muestra una lista de usuarios registrados,
+ * con funcionalidades para filtrarlos, editar sus datos,
  * ver detalles y eliminarlos.
- * 
+ *
  * Estado:
  * - editingUser: usuario que se está editando (null si no hay ninguno).
  * - users: lista completa de usuarios obtenida desde el servicio.
  * - mostrarFiltroAvanzado: controla si se muestra o no el filtro avanzado.
  * - filtro: texto para filtrar usuarios por nombre o email.
- * 
+ *
  * Efectos:
  * - Al montar, carga la lista completa de usuarios desde PersonaService.
- * 
+ *
  * Funcionalidades principales:
  * - Filtrado dinámico de usuarios según texto ingresado.
  * - Eliminación de usuarios con actualización inmediata de la lista.
  * - Navegación a pantalla de detalles de un usuario.
  * - Edición rápida de usuario mediante diálogo modal.
- * 
+ *
  * Componentes hijos usados:
  * - PersonFilter: formulario para filtrar usuarios.
  * - PersonTable: tabla que muestra la lista filtrada con botones de acción.
@@ -45,6 +58,8 @@ import PersonBreadcrumb from "@/components/people/PersonBreadcrumb";
 function AdminUsers() {
   const navigate = useNavigate();
 
+  const [newUser, setNewUser] = useState({});
+
   // Estado para usuario en edición
   const [editingUser, setEditingUser] = useState(null);
   // Lista completa de usuarios
@@ -53,40 +68,41 @@ function AdminUsers() {
   const [mostrarFiltroAvanzado, setMostrarFiltroAvanzado] = useState(false);
   // Texto del filtro
   const [filtro, setFiltro] = useState("");
-
-  const [alert, setAlert] = useState(null)
+  const [alert, setAlert] = useState(null);
 
   // Carga inicial de usuarios al montar el componente
   useEffect(() => {
     PersonaService.get_all()
-      .then(res => {
+      .then((res) => {
         if (res && res.data && Array.isArray(res.data)) {
-          const mappedUsers = res.data.map(persona => ({
+          const mappedUsers = res.data.map((persona) => ({
             id: persona.id_persona,
             nombre: persona.nombre_persona,
             apellido: persona.apellido_persona,
             tipo_documento: persona.tipo_documento,
             nro_documento: persona.num_doc_persona,
             fecha_nacimiento: persona.fecha_nacimiento_persona,
-            usuario_id: persona.usuario_id
+            usuario_id: persona.usuario_id,
           }));
           console.log("mappedUsers:", mappedUsers);
           setUsers(mappedUsers);
         }
       })
-      .catch(err => {
+      .catch((err) => {
         console.error("Error obteniendo usuarios:", err);
       });
   }, []);
 
   // Filtra usuarios según texto en nombre, apellido o email (insensible a mayúsculas)
-  const usuariosFiltrados = users.filter(user => {
+  const usuariosFiltrados = users.filter((user) => {
     const textoMatch =
-      `${user.nombre} ${user.apellido}`.toLowerCase().includes(filtro.toLowerCase()) ||
+      `${user.nombre} ${user.apellido}`
+        .toLowerCase()
+        .includes(filtro.toLowerCase()) ||
       user.nro_documento.toLowerCase().includes(filtro.toLowerCase());
     return textoMatch;
   });
-  console.log("usuariosFiltrados", usuariosFiltrados)
+  console.log("usuariosFiltrados", usuariosFiltrados);
 
   /**
    * Elimina un usuario por id.
@@ -96,9 +112,9 @@ function AdminUsers() {
   const handleDelete = (id) => {
     PersonaService.borrar(id)
       .then(() => {
-        setUsers(users.filter(user => user.id !== id));
+        setUsers(users.filter((user) => user.id !== id));
       })
-      .catch(err => {
+      .catch((err) => {
         console.error("Error eliminando usuario:", err);
       });
   };
@@ -111,7 +127,6 @@ function AdminUsers() {
     navigate(`/persondetails/${id}`);
   };
 
-
   /**
    * Maneja el envío del formulario de edición.
    * Actualiza el usuario en la lista local y hace petición para actualizar en backend.
@@ -120,34 +135,91 @@ function AdminUsers() {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
 
-
     // Construye el body con todos los campos para enviar al backend
     const body = {
-      nombre_persona: editingUser.nombre || '',
-      apellido_persona: editingUser.apellido || '',
-      tipo_documento: editingUser.tipo_documento || 'DNI',
-      num_doc_persona: editingUser.nro_documento || '',
-      fecha_nacimiento_persona: editingUser.fecha_nacimiento || '',
-      usuario_id: editingUser.usuario_id || null
+      nombre_persona: editingUser.nombre || "",
+      apellido_persona: editingUser.apellido || "",
+      tipo_documento: editingUser.tipo_documento || "DNI",
+      num_doc_persona: editingUser.nro_documento || "",
+      fecha_nacimiento_persona: editingUser.fecha_nacimiento || "",
+      usuario_id: editingUser.usuario_id || null,
     };
 
     try {
       await PersonaService.editar(editingUser.id, body);
 
       // Actualiza el estado local solo si la petición fue exitosa
-      setUsers(users.map(u => u.id === editingUser.id ? editingUser : u));
+      setUsers(users.map((u) => (u.id === editingUser.id ? editingUser : u)));
       setEditingUser(null);
     } catch (err) {
-
       console.error("Error actualizando usuario:", err);
 
-      const message = err?.response?.data?.message || err.message || "Error desconocido";
+      const message =
+        err?.response?.data?.message || err.message || "Error desconocido";
 
       setAlert({
         title: "Error al actualizar usuario",
         description: message,
       });
     }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const body = {
+      nombre_persona: newUser.nombre || "",
+      apellido_persona: newUser.apellido || "",
+      fecha_nacimiento_persona: newUser.fecha_nacimiento || "",
+      tipo_documento: newUser.tipo_documento || "DNI",
+      num_doc_persona: newUser.nro_documento || "",
+      usuario_id: newUser.usuario_id || null,
+      domicilio: {
+        domicilio_calle: newUser.domicilio_calle || "",
+        domicilio_numero: newUser.domicilio_numero || "",
+        domicilio_piso: newUser.domicilio_piso || "",
+        domicilio_dpto: newUser.domicilio_dpto || "",
+        domicilio_referencia: newUser.domicilio_referencia || "",
+        codigo_postal: {
+          codigo_postal: newUser.codigo_postal || "",
+          localidad: newUser.localidad || "",
+        },
+      },
+      contacto: {
+        telefono_fijo: newUser.telefono_fijo || "",
+        telefono_movil: newUser.telefono_movil || "",
+        red_social_contacto: newUser.red_social_contacto || "",
+        red_social_nombre: newUser.red_social_nombre || "",
+        email_contacto: newUser.email_contacto || "",
+        observacion_contacto: newUser.observacion_contacto || "",
+      },
+    };
+
+    // Crear el objeto que realmente se va a mostrar en la tabla
+    const newUserForTable = {
+      id: null,
+      nombre: newUser.nombre || "",
+      apellido: newUser.apellido || "",
+      tipo_documento: newUser.tipo_documento || "DNI",
+      nro_documento: newUser.nro_documento || "",
+      fecha_nacimiento: newUser.fecha_nacimiento || "",
+      usuario_id: newUser.usuario_id || null,
+    };
+
+    setUsers((prevUsers) => [...prevUsers, newUserForTable]);
+    try {
+      await PersonaService.crear(body);
+      setNewUser({});
+    } catch (error) {
+      console.error("Error al crear persona:", error);
+    }
+  };
+
+  const handleChange = (event) => {
+    const name = event.target.name;
+    const value = event.target.value;
+
+    setNewUser((prevValues) => ({ ...prevValues, [name]: value }));
   };
 
   // Muestra loader si aún no hay usuarios cargados
@@ -195,6 +267,162 @@ function AdminUsers() {
                 onDelete={handleDelete}
               />
             </div>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" className={"mt-5"}> <Plus /> Crear Persona</Button>
+              </DialogTrigger>
+
+              <DialogContent className="sm:max-w-[600px] overflow-y-auto max-h-[90vh]">
+                <DialogHeader>
+                  <DialogTitle>Nueva Persona</DialogTitle>
+                  <DialogDescription>
+                    Completá los campos y guarda la persona.
+                  </DialogDescription>
+                </DialogHeader>
+
+                <form onSubmit={handleSubmit} className="grid gap-4">
+                  {/* Datos personales */}
+                  <div className="grid gap-3">
+                    <Label>Nombre</Label>
+                    <Input
+                      name="nombre"
+                      value={newUser.nombre || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Apellido</Label>
+                    <Input
+                      name="apellido"
+                      value={newUser.apellido || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Fecha de nacimiento</Label>
+                    <Input
+                      type="date"
+                      name="fecha_nacimiento"
+                      value={newUser.fecha_nacimiento || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Tipo de documento</Label>
+                    <Input
+                      name="tipo_documento"
+                      value={newUser.tipo_documento || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Nro. documento</Label>
+                    <Input
+                      name="nro_documento"
+                      value={newUser.nro_documento || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>ID Usuario</Label>
+                    <Input
+                      name="usuario_id"
+                      value={newUser.usuario_id || ""}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  {/* Domicilio */}
+                  <hr />
+                  <div className="grid gap-3">
+                    <Label>Calle</Label>
+                    <Input
+                      name="domicilio_calle"
+                      value={newUser.domicilio_calle || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Número</Label>
+                    <Input
+                      name="domicilio_numero"
+                      value={newUser.domicilio_numero || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Piso</Label>
+                    <Input
+                      name="domicilio_piso"
+                      value={newUser.domicilio_piso || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Dpto</Label>
+                    <Input
+                      name="domicilio_dpto"
+                      value={newUser.domicilio_dpto || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Referencia</Label>
+                    <Input
+                      name="domicilio_referencia"
+                      value={newUser.domicilio_referencia || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Código Postal</Label>
+                    <Input
+                      name="codigo_postal"
+                      value={newUser.codigo_postal || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Localidad</Label>
+                    <Input
+                      name="localidad"
+                      value={newUser.localidad || ""}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  {/* Contacto */}
+                  <hr />
+                  <div className="grid gap-3">
+                    <Label>Teléfono fijo</Label>
+                    <Input
+                      name="telefono_fijo"
+                      value={newUser.telefono_fijo || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Teléfono móvil</Label>
+                    <Input
+                      name="telefono_movil"
+                      value={newUser.telefono_movil || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Red social</Label>
+                    <Input
+                      name="red_social_contacto"
+                      value={newUser.red_social_contacto || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Nombre red social</Label>
+                    <Input
+                      name="red_social_nombre"
+                      value={newUser.red_social_nombre || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Email contacto</Label>
+                    <Input
+                      name="email_contacto"
+                      value={newUser.email_contacto || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Observación</Label>
+                    <Input
+                      name="observacion_contacto"
+                      value={newUser.observacion_contacto || ""}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <DialogFooter className="pt-4">
+                    <DialogClose asChild>
+                      <Button type="button" variant="outline">
+                        Cancelar
+                      </Button>
+                    </DialogClose>
+                    <DialogClose asChild>
+                      <Button type="submit">Guardar</Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
           </CardContent>
         </Card>
 

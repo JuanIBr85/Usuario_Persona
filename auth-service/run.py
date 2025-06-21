@@ -60,7 +60,7 @@ index._security_metadata ={
 }
 
 def init_app():
-    FORZAR_RESET = True  # poner True para resetear cada vez que se cree (solo para desarrollo)
+    FORZAR_RESET = False  # poner True para resetear cada vez que se cree (solo para desarrollo)
     db_path = os.path.join("auth_data", "auth.db")
     if FORZAR_RESET or not os.path.exists(db_path):
         print("[i] Reiniciando base de datos y datos iniciales...")

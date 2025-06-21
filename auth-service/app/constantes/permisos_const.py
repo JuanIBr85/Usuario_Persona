@@ -1,29 +1,31 @@
 PERMISOS = [
-    "crear_usuario",
-    "ver_usuario",
-    "modificar_usuario",
-    "eliminar_usuario",
-    "crear_rol",
-    "asignar_rol",
-    "ver_roles",
-    "ver_permisos",
-    "crear_permiso",
-    "asignar_permiso",
-    "crear_usuario_con_rol",
-    "asignar_permisos_rol",
-    "modificar_admin",
-    "logout",
-    "obtener_roles",
-    "borrar_rol",
-    "obtener_permisos",
-    "modificar_rol",
+    "auth.admin.crear_usuario",
+    "auth.admin.ver_usuario",
+    "auth.admin.modificar_usuario",
+    "auth.admin.eliminar_usuario",
+    "auth.admin.crear_rol",
+    "auth.admin.asignar_rol",
+    "auth.admin.ver_roles",
+    "auth.admin.ver_permisos",
+    "auth.admin.crear_permiso",
+    "auth.admin.asignar_permiso",
+    "auth.admin.crear_usuario_con_rol",
+    "auth.admin.asignar_permisos_rol",
+    "auth.admin.modificar_admin",
+    "auth.admin.logout",
+    "auth.admin.obtener_roles",
+    "auth.admin.borrar_rol",
+    "auth.admin.obtener_permisos",
+    "auth.admin.modificar_rol",
+    "persona.admin.crear_persona",
+    "persona.admin.ver_persona",
+    "persona.admin.modificar_persona",
+    "persona.admin.eliminar_persona",
+    "persona.admin.restaurar_persona"
 ]
 
 # Permisos por rol
 PERMISOS_POR_ROL = {
     "superadmin": PERMISOS,
-    "usuario": [
-        "ver_usuario",
-        "logout"
-    ],
+    "usuario": ["auth.admin.ver_usuario", "auth.admin.logout"],
 }

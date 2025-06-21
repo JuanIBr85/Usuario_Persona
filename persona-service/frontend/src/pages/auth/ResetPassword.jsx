@@ -54,9 +54,12 @@ const ResetPassword = () => {
       sessionStorage.removeItem("reset_token"); // Eliminamos el token ya usado
       sessionStorage.removeItem("email_para_reset");
     } catch (error) {
-      // Si hay error, mostramos el mensaje correspondiente
       console.error("Error:", error);
-      setDialogMessage(FetchErrorMessage(error)); // Manejador centralizado de errores
+
+      const mensaje =
+        error?.data?.message || error?.message || "Ocurrió un error inesperado.";
+
+      setDialogMessage(mensaje);
     } finally {
       // Cerramos el loading y abrimos el diálogo
       setIsLoading(false);

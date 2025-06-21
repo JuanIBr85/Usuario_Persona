@@ -3,9 +3,44 @@ from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
 from app.services.endpoints_search_service import EndpointsSearchService
 from common.models.endpoint_route_model import EndpointRouteModel
 import logging
+import ipaddress
+from config import RUN_ON_DOCKER
 
 logger = logging.getLogger(__name__)
 endpoints_search_service = EndpointsSearchService()
+
+
+def is_local_connection():
+    """
+    Detecta si la conexión viene de localhost o de la misma red local/Docker.
+
+    Returns:
+        bool: True si es conexión local/Docker, False si viene de internet
+    """
+    # Obtener la IP del cliente
+    try:
+        ip_obj = ipaddress.ip_address(request.remote_addr)
+
+        if RUN_ON_DOCKER:
+            logger.warning(
+                "Trabajando en red local, la seguridad de component service esta desactivada en control"
+            )
+
+        # Verificar si es localhost (127.0.0.1 o ::1)
+        if ip_obj.is_loopback and not RUN_ON_DOCKER:
+            return True
+
+        # Verificar si es una IP privada (incluye redes Docker)
+        # Redes privadas: 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16
+        if ip_obj.is_private and RUN_ON_DOCKER:
+            return True
+
+        # Si llegamos aquí, es una IP pública
+        return False
+
+    except ValueError:
+        # Si no se puede parsear la IP, asumir que es externa
+        return False
 
 
 def authenticate_config(app):
@@ -22,6 +57,10 @@ def authenticate_config(app):
         if request.endpoint.startswith("gateway."):
             service_route = core_endpoints()
         else:
+
+            if is_local_connection():
+                return
+
             service_route = component_endpoints()
 
         # Guardo el endpoint en el contexto

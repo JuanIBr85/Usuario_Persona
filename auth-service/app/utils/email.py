@@ -46,6 +46,9 @@ def enviar_codigo_por_email(usuario, codigo_otp):
     )
     mail.send(msg)
 
+
+
+
 def generar_token_dispositivo(email, user_agent, ip):
     payload = {
         "email": email,

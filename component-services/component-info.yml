@@ -1,0 +1,13 @@
+service:
+  service_name: component-service
+  service_prefix: control
+  service_available: true
+  service_description: Backend para el manejo de componentes
+  service_core: true
+  service_wait: true
+
+permissions:
+  - component.admin.crear_componente
+  - component.admin.ver_componente
+  - component.admin.modificar_componente
+  - component.admin.eliminar_componente

@@ -5,11 +5,14 @@ from datetime import datetime, timezone
 from app.extensions import SessionLocal
 
 class ContactoService(IContactoInterface):
+    """Gestiona las operaciones CRUD sobre el modelo "Contacto" ."""
 
     def __init__(self):
+        """Inicializa el esquema de validación."""
         self.schema=ContactoSchema()
 
     def crear_contacto(self, data, session = None):
+        """Crea un contacto y lo asocia a la sesión dada."""
 
         cerrar = False
         if session is None:
@@ -34,9 +37,12 @@ class ContactoService(IContactoInterface):
                 session.close()
 
     def listar_contacto_id(self, id):
+        """No implementado en la versión actual."""
         return
 
     def modificar_contacto(self, id_contacto, data, session):
+        """Actualiza campos editables de un contacto existente."""
+
         contacto = session.query(Contacto).get(id_contacto)
         if not contacto:
             raise ValueError("Contacto no encontrado")
@@ -55,6 +61,7 @@ class ContactoService(IContactoInterface):
     
 
     def borrar_contacto(self, id_contacto, session=None):
+        """Marca un contacto, eliminandolo de forma lógica."""
 
         cerrar=False
 
@@ -82,6 +89,8 @@ class ContactoService(IContactoInterface):
                 session.commit()
 
     def restaurar_contacto(self, id, session=None):
+        """Revierte el borrado lógico de un contacto."""
+
         cerrar = False
 
         if session is  None:
@@ -104,16 +113,4 @@ class ContactoService(IContactoInterface):
             if cerrar:
                 session.commit()      
                 session.close()
-
     
-
-
-
-
-
-
-   
-
-
-    
-        
