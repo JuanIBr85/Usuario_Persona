@@ -117,7 +117,8 @@ def crear_persona():
             data={"server": str(e)}
             ),500
     
-# modificar persona, siguiendo el formato json sugerido    
+# modificar persona
+# solo pueden acceder usuarios con el permiso persona.admin.modificar_persona   
 @api_access(access_permissions=["persona.admin.modificar_persona"])
 @persona_bp.route('/modificar_persona/<int:id>', methods=['PUT'])
 def modificar_persona(id):
