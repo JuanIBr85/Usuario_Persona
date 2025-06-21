@@ -3,7 +3,11 @@
 # Nombre del entorno virtual
 VENV_DIR=".venv"
 
-
+# Eliminar entorno virtual si existe
+if [ -d "$VENV_DIR" ]; then
+    echo "Eliminando entorno virtual existente..."
+    rm -rf "$VENV_DIR"
+fi
 
 # Crear el entorno virtual
 echo "Creando entorno virtual en el directorio $VENV_DIR..."
@@ -19,6 +23,9 @@ fi
 echo "Actualizando pip dentro del entorno virtual..."
 "$VENV_DIR/bin/pip" install --upgrade pip
 
+# Limpiar cache de pip
+echo "Limpiando cache de pip..."
+"$VENV_DIR/bin/pip" cache purge
 
 # Verificar que existe requirements.txt
 if [ ! -f "requirements.txt" ]; then
