@@ -1,4 +1,5 @@
 from datetime import datetime, timezone, timedelta
+import traceback
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import Session
 from app.models.usuarios import Usuario, PasswordLog, UsuarioLog
@@ -32,11 +33,15 @@ from app.utils.email import (
 from jwt import ExpiredSignatureError, InvalidTokenError
 from app.utils.response import ResponseStatus
 from app.utils.otp_manager import (
-    guardar_otp, 
-    verificar_otp_redis, 
-    guardar_token_recuperacion, 
-    verificar_token_recuperacion
+    guardar_otp,
+    verificar_otp_redis,
+    guardar_token_recuperacion,
+    verificar_token_recuperacion,
 )
+from flask_jwt_extended import decode_token
+from app.extensions import get_redis
+
+
 class UsuarioService(ServicioBase):
     def __init__(self):
         super().__init__(model=Usuario, schema=UsuarioInputSchema())
@@ -219,9 +224,10 @@ class UsuarioService(ServicioBase):
             )
         else:
             # Crear token con permisos incluidos
-            token, expires_in = crear_token_acceso(
+            token, expires_in, expires_seconds = crear_token_acceso(
                 usuario.id_usuario, usuario.email_usuario, rol_nombre, permisos_lista
             )
+
             refresh_token, refresh_expires = crear_token_refresh(usuario.id_usuario)
             # Registrar log de login
             session.add(
@@ -234,6 +240,14 @@ class UsuarioService(ServicioBase):
             session.commit()
 
             usuario_data = self.schema_out.dump(usuario)
+            try:
+                # tomo el identificador unico del token y lo guardo en redis con sus permisos
+                decoded = decode_token(token)
+                get_redis().rpush(decoded["jti"], *permisos_lista)
+                get_redis().expire(decoded["jti"], expires_seconds)
+            except Exception as e:
+                traceback.print_exc()
+
             usuario_data["token"] = token
             usuario_data["expires_in"] = expires_in
             usuario_data["refresh_token"] = refresh_token
@@ -321,8 +335,7 @@ class UsuarioService(ServicioBase):
             traceback.print_exc()
             return ResponseStatus.ERROR, "Error interno al solicitar código", None, 500
 
-
-    def verificar_otp(self, session:Session, email: str, otp: str)->dict:
+    def verificar_otp(self, session: Session, email: str, otp: str) -> dict:
         if not verificar_otp_redis(email, otp):
             return ResponseStatus.FAIL, "Código OTP inválido o expirado", None, 400
         try:
@@ -339,7 +352,7 @@ class UsuarioService(ServicioBase):
     def cambiar_password_con_codigo(
         self, session: Session, data: dict, token: str, email: str
     ) -> dict:
-        
+
         try:
             data_validada = self.schema_reset.load(data)
         except ValidationError as error:
@@ -361,10 +374,15 @@ class UsuarioService(ServicioBase):
         usuario = session.query(Usuario).filter_by(email_usuario=email).first()
         if not usuario:
             return ResponseStatus.FAIL, "Usuario no encontrado", None, 404
-        
-        if check_password_hash(usuario.password,data_validada["confirm_password"]):
-                return ResponseStatus.FAIL,"La contraseña debe ser diferente a la anterior",None,400
-        
+
+        if check_password_hash(usuario.password, data_validada["confirm_password"]):
+            return (
+                ResponseStatus.FAIL,
+                "La contraseña debe ser diferente a la anterior",
+                None,
+                400,
+            )
+
         # Aquí actualizas y registras contraseña
         usuario.password = generate_password_hash(nueva_pass)  # tu función de hash
         session.commit()
