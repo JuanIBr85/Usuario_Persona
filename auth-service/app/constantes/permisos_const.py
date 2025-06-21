@@ -17,6 +17,11 @@ PERMISOS = [
     "auth.admin.borrar_rol",
     "auth.admin.obtener_permisos",
     "auth.admin.modificar_rol",
+    "persona.admin.crear_persona",
+    "persona.admin.ver_persona",
+    "persona.admin.modificar_persona",
+    "persona.admin.eliminar_persona",
+    "persona.admin.restaurar_persona"
 ]
 
 # Permisos por rol

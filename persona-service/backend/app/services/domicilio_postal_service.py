@@ -4,12 +4,15 @@ from app.interfaces.domicilio_postal_interface import IDomicilioPostalInterface
 from app.extensions import SessionLocal
 
 class DomicilioPostalService(IDomicilioPostalInterface):
+    
 
     def __init__(self):
+        """Inicializa los esquemas de serialización."""
         self.schema=DomicilioPostalSchema()
         self.varios_schema=DomicilioPostalSchema(many=True)
 
     def listar_domicilio_postal_id(self, id):
+        """Obtiene un domicilio postal por su ID."""
         session = SessionLocal()
 
         try:
@@ -26,6 +29,7 @@ class DomicilioPostalService(IDomicilioPostalInterface):
 
 
     def obtener_domicilio_postal_por_cod_postal_localidad(self, codigo_postal, localidad, session=None):
+        """Busca un domicilio postal por código postal y localidad."""
 
         cerrar=False
         if session is None:
@@ -44,8 +48,8 @@ class DomicilioPostalService(IDomicilioPostalInterface):
             if cerrar:
                 session.close()     
 
-# Devuelve una lista de localidades para un determinado Codigo Postal
     def buscar_localidades_por_codigo_postal(self, codigo_postal, session=None):
+        """Devuelve una lista de localidades para un determinado Codigo Postal."""
         
         cerrar=False
         if session is None:
@@ -66,7 +70,9 @@ class DomicilioPostalService(IDomicilioPostalInterface):
             if cerrar:
                 session.close()                 
 
+    #No se utiliza
     def crear_domicilio_postal(self, data, session=None):
+        """Crea un nuevo registro de domicilio postal."""
 
         cerrar = False
         if session is None:    

@@ -9,10 +9,6 @@ import json
 
 import os
 
-# Elimino la base de datos si existe
-if os.path.exists("components.db"):
-    os.remove("components.db")
-
 engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=True, future=True)
 Base = declarative_base()
 SessionLocal = scoped_session(
