@@ -166,34 +166,53 @@ function AdminUsers() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const body = {
-      nombre_persona: newUser.nombre_persona || "",
-      apellido_persona: newUser.apellido_persona || "",
-      fecha_nacimiento_persona: newUser.fecha_nacimiento_persona || "",
+      nombre_persona: newUser.nombre || "",
+      apellido_persona: newUser.apellido || "",
+      fecha_nacimiento_persona: newUser.fecha_nacimiento || "",
       tipo_documento: newUser.tipo_documento || "DNI",
-      num_doc_persona: newUser.num_doc_persona || "",
+      num_doc_persona: newUser.nro_documento || "",
       usuario_id: newUser.usuario_id || null,
       domicilio: {
-        domicilio_calle: newUser.domicilio?.domicilio_calle || "",
-        domicilio_numero: newUser.domicilio?.domicilio_numero || "",
-        domicilio_piso: newUser.domicilio?.domicilio_piso || "",
-        domicilio_dpto: newUser.domicilio?.domicilio_dpto || "",
-        domicilio_referencia: newUser.domicilio?.domicilio_referencia || "",
+        domicilio_calle: newUser.domicilio_calle || "",
+        domicilio_numero: newUser.domicilio_numero || "",
+        domicilio_piso: newUser.domicilio_piso || "",
+        domicilio_dpto: newUser.domicilio_dpto || "",
+        domicilio_referencia: newUser.domicilio_referencia || "",
         codigo_postal: {
-          codigo_postal: newUser.domicilio?.codigo_postal?.codigo_postal || "",
-          localidad: newUser.domicilio?.codigo_postal?.localidad || "",
+          codigo_postal: newUser.codigo_postal || "",
+          localidad: newUser.localidad || "",
         },
       },
       contacto: {
-        telefono_fijo: newUser.contacto?.telefono_fijo || "",
-        telefono_movil: newUser.contacto?.telefono_movil || "",
-        red_social_contacto: newUser.contacto?.red_social_contacto || "",
-        red_social_nombre: newUser.contacto?.red_social_nombre || "",
-        email_contacto: newUser.contacto?.email_contacto || "",
-        observacion_contacto: newUser.contacto?.observacion_contacto || "",
+        telefono_fijo: newUser.telefono_fijo || "",
+        telefono_movil: newUser.telefono_movil || "",
+        red_social_contacto: newUser.red_social_contacto || "",
+        red_social_nombre: newUser.red_social_nombre || "",
+        email_contacto: newUser.email_contacto || "",
+        observacion_contacto: newUser.observacion_contacto || "",
       },
     };
-    PersonaService.crear(body);
+
+    // Crear el objeto que realmente se va a mostrar en la tabla
+    const newUserForTable = {
+      id: null,
+      nombre: newUser.nombre || "",
+      apellido: newUser.apellido || "",
+      tipo_documento: newUser.tipo_documento || "DNI",
+      nro_documento: newUser.nro_documento || "",
+      fecha_nacimiento: newUser.fecha_nacimiento || "",
+      usuario_id: newUser.usuario_id || null,
+    };
+
+    setUsers((prevUsers) => [...prevUsers, newUserForTable]);
+    try {
+      await PersonaService.crear(body);
+      setNewUser({});
+    } catch (error) {
+      console.error("Error al crear persona:", error);
+    }
   };
 
   const handleChange = (event) => {
@@ -247,262 +266,163 @@ function AdminUsers() {
                 onSeeDetails={handleSeeDetails}
                 onDelete={handleDelete}
               />
-              <Dialog>
-                <form onSubmit={handleSubmit}>
-                  <DialogTrigger asChild>
-                    <Button variant="outline">
-                      <Plus /> Agregar Persona
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px] max-h-[80vh] overflow-auto">
-                    <DialogHeader>
-                      <DialogTitle>Agregar Persona</DialogTitle>
-                      <DialogDescription>
-                        Agrega una persona a la base de datos.
-                      </DialogDescription>
-                    </DialogHeader>
-
-                    <div className="grid gap-4">
-                      {/* Nombre */}
-                      <div className="grid gap-3">
-                        <Label htmlFor="nombre_persona">Nombre</Label>
-                        <Input
-                          id="nombre_persona"
-                          name="nombre_persona"
-                          type="text"
-                          value={newUser.nombre_persona || ""}
-                          onChange={handleChange}
-                        />
-                      </div>
-
-                      {/* Apellido */}
-                      <div className="grid gap-3">
-                        <Label htmlFor="apellido_persona">Apellido</Label>
-                        <Input
-                          id="apellido_persona"
-                          name="apellido_persona"
-                          type="text"
-                          value={newUser.apellido_persona || ""}
-                          onChange={handleChange}
-                        />
-                      </div>
-
-                      {/* Fecha de nacimiento */}
-                      <div className="grid gap-3">
-                        <Label htmlFor="fecha_nacimiento_persona">
-                          Fecha de nacimiento
-                        </Label>
-                        <Input
-                          id="fecha_nacimiento_persona"
-                          name="fecha_nacimiento_persona"
-                          type="date"
-                          value={newUser.fecha_nacimiento_persona || ""}
-                          onChange={handleChange}
-                        />
-                      </div>
-
-                      {/* Tipo de documento */}
-                      <div className="grid gap-3">
-                        <Label htmlFor="tipo_documento">
-                          Tipo de documento
-                        </Label>
-                        <Input
-                          id="tipo_documento"
-                          name="tipo_documento"
-                          type="text"
-                          value={newUser.tipo_documento || ""}
-                          onChange={handleChange}
-                        />
-                      </div>
-
-                      {/* Número de documento */}
-                      <div className="grid gap-3">
-                        <Label htmlFor="num_doc_persona">
-                          Número de documento
-                        </Label>
-                        <Input
-                          id="num_doc_persona"
-                          name="num_doc_persona"
-                          type="text"
-                          value={newUser.num_doc_persona || ""}
-                          onChange={handleChange}
-                        />
-                      </div>
-
-                      {/* Usuario ID */}
-                      <div className="grid gap-3">
-                        <Label htmlFor="usuario_id">Usuario ID</Label>
-                        <Input
-                          id="usuario_id"
-                          name="usuario_id"
-                          type="number"
-                          value={newUser.usuario_id || ""}
-                          onChange={handleChange}
-                        />
-                      </div>
-
-                      {/* Domicilio */}
-                      <h3 className="mt-4 font-semibold">Domicilio</h3>
-
-                      <div className="grid gap-3">
-                        <Label htmlFor="domicilio_calle">Calle</Label>
-                        <Input
-                          id="domicilio_calle"
-                          name="domicilio.domicilio_calle"
-                          type="text"
-                          value={newUser.domicilio?.domicilio_calle || ""}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div className="grid gap-3">
-                        <Label htmlFor="domicilio_numero">Número</Label>
-                        <Input
-                          id="domicilio_numero"
-                          name="domicilio.domicilio_numero"
-                          type="text"
-                          value={newUser.domicilio?.domicilio_numero || ""}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div className="grid gap-3">
-                        <Label htmlFor="domicilio_piso">Piso</Label>
-                        <Input
-                          id="domicilio_piso"
-                          name="domicilio.domicilio_piso"
-                          type="text"
-                          value={newUser.domicilio?.domicilio_piso || ""}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div className="grid gap-3">
-                        <Label htmlFor="domicilio_dpto">Departamento</Label>
-                        <Input
-                          id="domicilio_dpto"
-                          name="domicilio.domicilio_dpto"
-                          type="text"
-                          value={newUser.domicilio?.domicilio_dpto || ""}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div className="grid gap-3">
-                        <Label htmlFor="domicilio_referencia">Referencia</Label>
-                        <Input
-                          id="domicilio_referencia"
-                          name="domicilio.domicilio_referencia"
-                          type="text"
-                          value={newUser.domicilio?.domicilio_referencia || ""}
-                          onChange={handleChange}
-                        />
-                      </div>
-
-                      {/* Código postal y localidad */}
-                      <div className="grid gap-3">
-                        <Label htmlFor="codigo_postal">Código Postal</Label>
-                        <Input
-                          id="codigo_postal"
-                          name="domicilio.codigo_postal.codigo_postal"
-                          type="text"
-                          value={
-                            newUser.domicilio?.codigo_postal?.codigo_postal ||
-                            ""
-                          }
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div className="grid gap-3">
-                        <Label htmlFor="localidad">Localidad</Label>
-                        <Input
-                          id="localidad"
-                          name="domicilio.codigo_postal.localidad"
-                          type="text"
-                          value={
-                            newUser.domicilio?.codigo_postal?.localidad || ""
-                          }
-                          onChange={handleChange}
-                        />
-                      </div>
-
-                      {/* Contacto */}
-                      <h3 className="mt-4 font-semibold">Contacto</h3>
-
-                      <div className="grid gap-3">
-                        <Label htmlFor="telefono_fijo">Teléfono fijo</Label>
-                        <Input
-                          id="telefono_fijo"
-                          name="contacto.telefono_fijo"
-                          type="text"
-                          value={newUser.contacto?.telefono_fijo || ""}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div className="grid gap-3">
-                        <Label htmlFor="telefono_movil">Teléfono móvil</Label>
-                        <Input
-                          id="telefono_movil"
-                          name="contacto.telefono_movil"
-                          type="text"
-                          value={newUser.contacto?.telefono_movil || ""}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div className="grid gap-3">
-                        <Label htmlFor="red_social_contacto">
-                          Red social (usuario)
-                        </Label>
-                        <Input
-                          id="red_social_contacto"
-                          name="contacto.red_social_contacto"
-                          type="text"
-                          value={newUser.contacto?.red_social_contacto || ""}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div className="grid gap-3">
-                        <Label htmlFor="red_social_nombre">
-                          Red social (nombre)
-                        </Label>
-                        <Input
-                          id="red_social_nombre"
-                          name="contacto.red_social_nombre"
-                          type="text"
-                          value={newUser.contacto?.red_social_nombre || ""}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div className="grid gap-3">
-                        <Label htmlFor="email_contacto">Email</Label>
-                        <Input
-                          id="email_contacto"
-                          name="contacto.email_contacto"
-                          type="email"
-                          value={newUser.contacto?.email_contacto || ""}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div className="grid gap-3">
-                        <Label htmlFor="observacion_contacto">
-                          Observaciones
-                        </Label>
-                        <Input
-                          id="observacion_contacto"
-                          name="contacto.observacion_contacto"
-                          type="text"
-                          value={newUser.contacto?.observacion_contacto || ""}
-                          onChange={handleChange}
-                        />
-                      </div>
-                    </div>
-
-                    <DialogFooter>
-                      <DialogClose asChild>
-                        <Button variant="outline">Cancelar</Button>
-                      </DialogClose>
-                      <Button type="submit">Agregar</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </form>
-              </Dialog>
             </div>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" className={"mt-5"}> <Plus /> Crear Persona</Button>
+              </DialogTrigger>
+
+              <DialogContent className="sm:max-w-[600px] overflow-y-auto max-h-[90vh]">
+                <DialogHeader>
+                  <DialogTitle>Nueva Persona</DialogTitle>
+                  <DialogDescription>
+                    Completá los campos y guarda la persona.
+                  </DialogDescription>
+                </DialogHeader>
+
+                <form onSubmit={handleSubmit} className="grid gap-4">
+                  {/* Datos personales */}
+                  <div className="grid gap-3">
+                    <Label>Nombre</Label>
+                    <Input
+                      name="nombre"
+                      value={newUser.nombre || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Apellido</Label>
+                    <Input
+                      name="apellido"
+                      value={newUser.apellido || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Fecha de nacimiento</Label>
+                    <Input
+                      type="date"
+                      name="fecha_nacimiento"
+                      value={newUser.fecha_nacimiento || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Tipo de documento</Label>
+                    <Input
+                      name="tipo_documento"
+                      value={newUser.tipo_documento || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Nro. documento</Label>
+                    <Input
+                      name="nro_documento"
+                      value={newUser.nro_documento || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>ID Usuario</Label>
+                    <Input
+                      name="usuario_id"
+                      value={newUser.usuario_id || ""}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  {/* Domicilio */}
+                  <hr />
+                  <div className="grid gap-3">
+                    <Label>Calle</Label>
+                    <Input
+                      name="domicilio_calle"
+                      value={newUser.domicilio_calle || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Número</Label>
+                    <Input
+                      name="domicilio_numero"
+                      value={newUser.domicilio_numero || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Piso</Label>
+                    <Input
+                      name="domicilio_piso"
+                      value={newUser.domicilio_piso || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Dpto</Label>
+                    <Input
+                      name="domicilio_dpto"
+                      value={newUser.domicilio_dpto || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Referencia</Label>
+                    <Input
+                      name="domicilio_referencia"
+                      value={newUser.domicilio_referencia || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Código Postal</Label>
+                    <Input
+                      name="codigo_postal"
+                      value={newUser.codigo_postal || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Localidad</Label>
+                    <Input
+                      name="localidad"
+                      value={newUser.localidad || ""}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  {/* Contacto */}
+                  <hr />
+                  <div className="grid gap-3">
+                    <Label>Teléfono fijo</Label>
+                    <Input
+                      name="telefono_fijo"
+                      value={newUser.telefono_fijo || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Teléfono móvil</Label>
+                    <Input
+                      name="telefono_movil"
+                      value={newUser.telefono_movil || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Red social</Label>
+                    <Input
+                      name="red_social_contacto"
+                      value={newUser.red_social_contacto || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Nombre red social</Label>
+                    <Input
+                      name="red_social_nombre"
+                      value={newUser.red_social_nombre || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Email contacto</Label>
+                    <Input
+                      name="email_contacto"
+                      value={newUser.email_contacto || ""}
+                      onChange={handleChange}
+                    />
+                    <Label>Observación</Label>
+                    <Input
+                      name="observacion_contacto"
+                      value={newUser.observacion_contacto || ""}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <DialogFooter className="pt-4">
+                    <DialogClose asChild>
+                      <Button type="button" variant="outline">
+                        Cancelar
+                      </Button>
+                    </DialogClose>
+                    <DialogClose asChild>
+                      <Button type="submit">Guardar</Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
           </CardContent>
         </Card>
 
