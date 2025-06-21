@@ -1,15 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { Fade } from "react-awesome-reveal";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Users, Plus } from "lucide-react";
 
-import { Users } from "lucide-react";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import PersonFilter from "@/components/people/PersonFilter";
-import Loading from '@/components/loading/Loading';
+import Loading from "@/components/loading/Loading";
 
 import { PersonaService } from "@/services/personaService";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import PersonTable from "@/components/people/PersonTable";
 import PersonEditDialog from "@/components/people/PersonEditDialog";
 import PersonBreadcrumb from "@/components/people/PersonBreadcrumb";
@@ -17,25 +30,25 @@ import PersonBreadcrumb from "@/components/people/PersonBreadcrumb";
 /**
  * Componente AdminUsers
  * ---------------------
- * Este componente muestra una lista de usuarios registrados, 
- * con funcionalidades para filtrarlos, editar sus datos, 
+ * Este componente muestra una lista de usuarios registrados,
+ * con funcionalidades para filtrarlos, editar sus datos,
  * ver detalles y eliminarlos.
- * 
+ *
  * Estado:
  * - editingUser: usuario que se está editando (null si no hay ninguno).
  * - users: lista completa de usuarios obtenida desde el servicio.
  * - mostrarFiltroAvanzado: controla si se muestra o no el filtro avanzado.
  * - filtro: texto para filtrar usuarios por nombre o email.
- * 
+ *
  * Efectos:
  * - Al montar, carga la lista completa de usuarios desde PersonaService.
- * 
+ *
  * Funcionalidades principales:
  * - Filtrado dinámico de usuarios según texto ingresado.
  * - Eliminación de usuarios con actualización inmediata de la lista.
  * - Navegación a pantalla de detalles de un usuario.
  * - Edición rápida de usuario mediante diálogo modal.
- * 
+ *
  * Componentes hijos usados:
  * - PersonFilter: formulario para filtrar usuarios.
  * - PersonTable: tabla que muestra la lista filtrada con botones de acción.
@@ -45,6 +58,9 @@ import PersonBreadcrumb from "@/components/people/PersonBreadcrumb";
 function AdminUsers() {
   const navigate = useNavigate();
 
+  const [newUser, setNewUser] = useState({});
+  const [isAddingUser, setIsAddingUser] = useState(false);
+
   // Estado para usuario en edición
   const [editingUser, setEditingUser] = useState(null);
   // Lista completa de usuarios
@@ -53,40 +69,41 @@ function AdminUsers() {
   const [mostrarFiltroAvanzado, setMostrarFiltroAvanzado] = useState(false);
   // Texto del filtro
   const [filtro, setFiltro] = useState("");
-
-  const [alert, setAlert] = useState(null)
+  const [alert, setAlert] = useState(null);
 
   // Carga inicial de usuarios al montar el componente
   useEffect(() => {
     PersonaService.get_all()
-      .then(res => {
+      .then((res) => {
         if (res && res.data && Array.isArray(res.data)) {
-          const mappedUsers = res.data.map(persona => ({
+          const mappedUsers = res.data.map((persona) => ({
             id: persona.id_persona,
             nombre: persona.nombre_persona,
             apellido: persona.apellido_persona,
             tipo_documento: persona.tipo_documento,
             nro_documento: persona.num_doc_persona,
             fecha_nacimiento: persona.fecha_nacimiento_persona,
-            usuario_id: persona.usuario_id
+            usuario_id: persona.usuario_id,
           }));
           console.log("mappedUsers:", mappedUsers);
           setUsers(mappedUsers);
         }
       })
-      .catch(err => {
+      .catch((err) => {
         console.error("Error obteniendo usuarios:", err);
       });
   }, []);
 
   // Filtra usuarios según texto en nombre, apellido o email (insensible a mayúsculas)
-  const usuariosFiltrados = users.filter(user => {
+  const usuariosFiltrados = users.filter((user) => {
     const textoMatch =
-      `${user.nombre} ${user.apellido}`.toLowerCase().includes(filtro.toLowerCase()) ||
+      `${user.nombre} ${user.apellido}`
+        .toLowerCase()
+        .includes(filtro.toLowerCase()) ||
       user.nro_documento.toLowerCase().includes(filtro.toLowerCase());
     return textoMatch;
   });
-  console.log("usuariosFiltrados", usuariosFiltrados)
+  console.log("usuariosFiltrados", usuariosFiltrados);
 
   /**
    * Elimina un usuario por id.
@@ -96,9 +113,9 @@ function AdminUsers() {
   const handleDelete = (id) => {
     PersonaService.borrar(id)
       .then(() => {
-        setUsers(users.filter(user => user.id !== id));
+        setUsers(users.filter((user) => user.id !== id));
       })
-      .catch(err => {
+      .catch((err) => {
         console.error("Error eliminando usuario:", err);
       });
   };
@@ -111,7 +128,6 @@ function AdminUsers() {
     navigate(`/persondetails/${id}`);
   };
 
-
   /**
    * Maneja el envío del formulario de edición.
    * Actualiza el usuario en la lista local y hace petición para actualizar en backend.
@@ -120,34 +136,49 @@ function AdminUsers() {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
 
-
     // Construye el body con todos los campos para enviar al backend
     const body = {
-      nombre_persona: editingUser.nombre || '',
-      apellido_persona: editingUser.apellido || '',
-      tipo_documento: editingUser.tipo_documento || 'DNI',
-      num_doc_persona: editingUser.nro_documento || '',
-      fecha_nacimiento_persona: editingUser.fecha_nacimiento || '',
-      usuario_id: editingUser.usuario_id || null
+      nombre_persona: editingUser.nombre || "",
+      apellido_persona: editingUser.apellido || "",
+      tipo_documento: editingUser.tipo_documento || "DNI",
+      num_doc_persona: editingUser.nro_documento || "",
+      fecha_nacimiento_persona: editingUser.fecha_nacimiento || "",
+      usuario_id: editingUser.usuario_id || null,
     };
 
     try {
       await PersonaService.editar(editingUser.id, body);
 
       // Actualiza el estado local solo si la petición fue exitosa
-      setUsers(users.map(u => u.id === editingUser.id ? editingUser : u));
+      setUsers(users.map((u) => (u.id === editingUser.id ? editingUser : u)));
       setEditingUser(null);
     } catch (err) {
-
       console.error("Error actualizando usuario:", err);
 
-      const message = err?.response?.data?.message || err.message || "Error desconocido";
+      const message =
+        err?.response?.data?.message || err.message || "Error desconocido";
 
       setAlert({
         title: "Error al actualizar usuario",
         description: message,
       });
     }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  }
+  
+  const handleChange = (event) => {
+    const name = event.target.name;
+    const value = event.target.value;
+
+    setNewUser((prevValues) => ({ ...prevValues, [name]: value }));
+  };
+
+  const handleAddUser = () => {
+    setIsAddingUser((prevState) => !prevState);
+    console.log(isAddingUser);
   };
 
   // Muestra loader si aún no hay usuarios cargados
@@ -194,6 +225,259 @@ function AdminUsers() {
                 onSeeDetails={handleSeeDetails}
                 onDelete={handleDelete}
               />
+              <Dialog>
+                <form onSubmit={handleSubmit}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline"><Plus /> Agregar Persona</Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px] max-h-[80vh] overflow-auto">
+                    <DialogHeader>
+                      <DialogTitle>Agregar Persona</DialogTitle>
+                      <DialogDescription>
+                        Agrega una persona a la base de datos.
+                      </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="grid gap-4">
+                      {/* Nombre */}
+                      <div className="grid gap-3">
+                        <Label htmlFor="nombre_persona">Nombre</Label>
+                        <Input
+                          id="nombre_persona"
+                          name="nombre_persona"
+                          type="text"
+                          value={newUser.nombre_persona || ""}
+                          onChange={handleChange}
+                        />
+                      </div>
+
+                      {/* Apellido */}
+                      <div className="grid gap-3">
+                        <Label htmlFor="apellido_persona">Apellido</Label>
+                        <Input
+                          id="apellido_persona"
+                          name="apellido_persona"
+                          type="text"
+                          value={newUser.apellido_persona || ""}
+                          onChange={handleChange}
+                        />
+                      </div>
+
+                      {/* Fecha de nacimiento */}
+                      <div className="grid gap-3">
+                        <Label htmlFor="fecha_nacimiento_persona">
+                          Fecha de nacimiento
+                        </Label>
+                        <Input
+                          id="fecha_nacimiento_persona"
+                          name="fecha_nacimiento_persona"
+                          type="date"
+                          value={newUser.fecha_nacimiento_persona || ""}
+                          onChange={handleChange}
+                        />
+                      </div>
+
+                      {/* Tipo de documento */}
+                      <div className="grid gap-3">
+                        <Label htmlFor="tipo_documento">
+                          Tipo de documento
+                        </Label>
+                        <Input
+                          id="tipo_documento"
+                          name="tipo_documento"
+                          type="text"
+                          value={newUser.tipo_documento || ""}
+                          onChange={handleChange}
+                        />
+                      </div>
+
+                      {/* Número de documento */}
+                      <div className="grid gap-3">
+                        <Label htmlFor="num_doc_persona">
+                          Número de documento
+                        </Label>
+                        <Input
+                          id="num_doc_persona"
+                          name="num_doc_persona"
+                          type="text"
+                          value={newUser.num_doc_persona || ""}
+                          onChange={handleChange}
+                        />
+                      </div>
+
+                      {/* Usuario ID */}
+                      <div className="grid gap-3">
+                        <Label htmlFor="usuario_id">Usuario ID</Label>
+                        <Input
+                          id="usuario_id"
+                          name="usuario_id"
+                          type="number"
+                          value={newUser.usuario_id || ""}
+                          onChange={handleChange}
+                        />
+                      </div>
+
+                      {/* Domicilio */}
+                      <h3 className="mt-4 font-semibold">Domicilio</h3>
+
+                      <div className="grid gap-3">
+                        <Label htmlFor="domicilio_calle">Calle</Label>
+                        <Input
+                          id="domicilio_calle"
+                          name="domicilio.domicilio_calle"
+                          type="text"
+                          value={newUser.domicilio?.domicilio_calle || ""}
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <div className="grid gap-3">
+                        <Label htmlFor="domicilio_numero">Número</Label>
+                        <Input
+                          id="domicilio_numero"
+                          name="domicilio.domicilio_numero"
+                          type="text"
+                          value={newUser.domicilio?.domicilio_numero || ""}
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <div className="grid gap-3">
+                        <Label htmlFor="domicilio_piso">Piso</Label>
+                        <Input
+                          id="domicilio_piso"
+                          name="domicilio.domicilio_piso"
+                          type="text"
+                          value={newUser.domicilio?.domicilio_piso || ""}
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <div className="grid gap-3">
+                        <Label htmlFor="domicilio_dpto">Departamento</Label>
+                        <Input
+                          id="domicilio_dpto"
+                          name="domicilio.domicilio_dpto"
+                          type="text"
+                          value={newUser.domicilio?.domicilio_dpto || ""}
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <div className="grid gap-3">
+                        <Label htmlFor="domicilio_referencia">Referencia</Label>
+                        <Input
+                          id="domicilio_referencia"
+                          name="domicilio.domicilio_referencia"
+                          type="text"
+                          value={newUser.domicilio?.domicilio_referencia || ""}
+                          onChange={handleChange}
+                        />
+                      </div>
+
+                      {/* Código postal y localidad */}
+                      <div className="grid gap-3">
+                        <Label htmlFor="codigo_postal">Código Postal</Label>
+                        <Input
+                          id="codigo_postal"
+                          name="domicilio.codigo_postal.codigo_postal"
+                          type="text"
+                          value={
+                            newUser.domicilio?.codigo_postal?.codigo_postal ||
+                            ""
+                          }
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <div className="grid gap-3">
+                        <Label htmlFor="localidad">Localidad</Label>
+                        <Input
+                          id="localidad"
+                          name="domicilio.codigo_postal.localidad"
+                          type="text"
+                          value={
+                            newUser.domicilio?.codigo_postal?.localidad || ""
+                          }
+                          onChange={handleChange}
+                        />
+                      </div>
+
+                      {/* Contacto */}
+                      <h3 className="mt-4 font-semibold">Contacto</h3>
+
+                      <div className="grid gap-3">
+                        <Label htmlFor="telefono_fijo">Teléfono fijo</Label>
+                        <Input
+                          id="telefono_fijo"
+                          name="contacto.telefono_fijo"
+                          type="text"
+                          value={newUser.contacto?.telefono_fijo || ""}
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <div className="grid gap-3">
+                        <Label htmlFor="telefono_movil">Teléfono móvil</Label>
+                        <Input
+                          id="telefono_movil"
+                          name="contacto.telefono_movil"
+                          type="text"
+                          value={newUser.contacto?.telefono_movil || ""}
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <div className="grid gap-3">
+                        <Label htmlFor="red_social_contacto">
+                          Red social (usuario)
+                        </Label>
+                        <Input
+                          id="red_social_contacto"
+                          name="contacto.red_social_contacto"
+                          type="text"
+                          value={newUser.contacto?.red_social_contacto || ""}
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <div className="grid gap-3">
+                        <Label htmlFor="red_social_nombre">
+                          Red social (nombre)
+                        </Label>
+                        <Input
+                          id="red_social_nombre"
+                          name="contacto.red_social_nombre"
+                          type="text"
+                          value={newUser.contacto?.red_social_nombre || ""}
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <div className="grid gap-3">
+                        <Label htmlFor="email_contacto">Email</Label>
+                        <Input
+                          id="email_contacto"
+                          name="contacto.email_contacto"
+                          type="email"
+                          value={newUser.contacto?.email_contacto || ""}
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <div className="grid gap-3">
+                        <Label htmlFor="observacion_contacto">
+                          Observaciones
+                        </Label>
+                        <Input
+                          id="observacion_contacto"
+                          name="contacto.observacion_contacto"
+                          type="text"
+                          value={newUser.contacto?.observacion_contacto || ""}
+                          onChange={handleChange}
+                        />
+                      </div>
+                    </div>
+
+                    <DialogFooter>
+                      <DialogClose asChild>
+                        <Button variant="outline">Cancelar</Button>
+                      </DialogClose>
+                      <Button type="submit">Agregar</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </form>
+              </Dialog>
             </div>
           </CardContent>
         </Card>
