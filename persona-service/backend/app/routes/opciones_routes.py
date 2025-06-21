@@ -135,7 +135,7 @@ def buscar_domicilio_postal():
             data={"server": str(e)}
         ),500
     
-# verificar documento
+# verificar documento de persona por tipo_documento y num_doc_persona
 @api_access(cache=CacheSettings(expiration=60*60))
 @opciones_bp.route('/opciones/verificar-documento', methods=['POST'])
 def verificar_documento():
@@ -145,6 +145,8 @@ def verificar_documento():
     if not tipo_documento or not num_doc_persona:
         return make_response(ResponseStatus.FAIL, "Falta tipo_documento o num_doc_persona"), 400
 
+    # llama a verificar_documento para ver si existe esa persona
+    # si la persona no existe sigue el camino para crearla
     exists, email = service.verificar_documento(tipo_documento, num_doc_persona)
     if not exists:
         return make_response(
@@ -153,6 +155,7 @@ def verificar_documento():
             data={"exists": False}
         ), 200
 
+    # si la persona existe censura el mail para enviarlo al frontend
     censored = censurar_email(email)
     return make_response(
         status=ResponseStatus.SUCCESS,
