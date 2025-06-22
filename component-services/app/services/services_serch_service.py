@@ -1,6 +1,8 @@
 from app.models.service_model import ServiceModel
 from app.services.servicio_base import ServicioBase
 from app.schemas.service_schema import ServiceSchema
+from app.utils.get_component_info import get_component_info
+from app.extensions import logger
 
 services_service: ServicioBase = ServicioBase(ServiceModel, ServiceSchema())
 
@@ -15,3 +17,17 @@ class ServicesSearchService:
 
     def get_services(self) -> list[ServiceModel]:
         return services_service.get_all(not_dump=True)
+
+    def get_permissions(self):
+        services: list[ServiceModel] = services_service.get_all(not_dump=True)
+        perms = []
+        for service in services:
+            logger.info(f"Recolectando permisos de {service.service_name}")
+            info = get_component_info(service.service_url, wait=True)
+            if info is None:
+                logger.error(f"Error al recolectar permisos de {service.service_name}")
+                continue
+
+            perms.extend(info["permissions"])
+
+        return perms

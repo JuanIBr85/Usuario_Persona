@@ -1,0 +1,6 @@
+gunicorn==21.2.0
+Flask==3.1.1
+
+
+# Instalación del paquete component-services(common) desde archivo tar.gz local
+./component_services.tar.gz

@@ -18,7 +18,7 @@ class ResponseStatus(Enum):
 # Función para construir una respuesta JSON estandarizada
 def make_response(
     status: ResponseStatus,
-    message: str,
+    message: str | Dict,
     data: Any = None,
     error_code: Optional[str] = None,
 ) -> Dict:

@@ -5,7 +5,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from config import SQLALCHEMY_DATABASE_URI, SERVICES_CONFIG_FILE
 from diskcache import FanoutCache
-import json
+import logging
 
 import os
 
@@ -26,6 +26,8 @@ cache = FanoutCache(
     shards=4,  # Número de shards para mejor concurrencia
     timeout=1,  # Timeout para operaciones
 )
+
+logger = logging.getLogger(__name__)
 
 # Inicializar la base de datos
 import app.database
