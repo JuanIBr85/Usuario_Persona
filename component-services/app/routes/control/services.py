@@ -7,10 +7,8 @@ from common.utils.response import make_response, ResponseStatus
 from app.models.service_model import ServiceModel
 from app.schemas.service_schema import ServiceSchema
 from app.utils.get_health import get_health
-import logging
 from app.utils.get_component_info import get_component_info
-
-logger = logging.getLogger(__name__)
+from app.extensions import logger
 
 
 bp = Blueprint("services", __name__, cli_group="control", url_prefix="/services")
@@ -53,23 +51,30 @@ def get_service(id: int):
         return make_response(ResponseStatus.ERROR, str(e)), 500
 
 
-@bp.route("/recolect_perms", methods=["GET"])
+@bp.route("/refresh_service/<int:id>", methods=["PUT"])
 @cp_api_access(is_public=True, limiter=["5 per minute"])
-def recolect_perms():
+def refresh_service(id: int):
     try:
-        services: list[ServiceModel] = services_service.get_all(not_dump=True)
-        perms = []
-        for service in services:
-            logger.info(f"Recolectando permisos de {service.service_name}")
-            info = get_component_info(service.service_url, wait=True)
-            if info is None:
-                logger.error(f"Error al recolectar permisos de {service.service_name}")
-                continue
+        service: ServiceModel = services_service.get_by_id(id)
 
-            perms.extend(info["permissions"])
+        if service is None:
+            return make_response(ResponseStatus.FAIL, "Servicio no encontrado"), 404
+
+        info = get_component_info(service["service_url"], wait=True)
+
+        if info is None:
+            return (
+                make_response(ResponseStatus.FAIL, "Error al conectar con el servicio"),
+                400,
+            )
+
+        model = {**info["service"], "service_url": service["service_url"]}
+
+        services_service.update(id, model, ignore_schema=True)
+
         return (
             make_response(
-                ResponseStatus.SUCCESS, "Permisos recolectados correctamente", perms
+                ResponseStatus.SUCCESS, "Servicio actualizado correctamente", model
             ),
             200,
         )
@@ -110,37 +115,6 @@ def install_service():
         return (
             make_response(
                 ResponseStatus.SUCCESS, "Servicio instalado correctamente", model
-            ),
-            200,
-        )
-    except Exception as e:
-        return make_response(ResponseStatus.ERROR, str(e)), 500
-
-
-@bp.route("/refresh_service/<int:id>", methods=["PUT"])
-@cp_api_access(is_public=True, limiter=["10 per minute"])
-def refresh_service(id: int):
-    try:
-        service: ServiceModel = services_service.get_by_id(id)
-
-        if service is None:
-            return make_response(ResponseStatus.FAIL, "Servicio no encontrado"), 404
-
-        info = get_component_info(service["service_url"], wait=True)
-
-        if info is None:
-            return (
-                make_response(ResponseStatus.FAIL, "Error al conectar con el servicio"),
-                400,
-            )
-
-        model = {**info["service"], "service_url": service["service_url"]}
-
-        services_service.update(id, model, ignore_schema=True)
-
-        return (
-            make_response(
-                ResponseStatus.SUCCESS, "Servicio actualizado correctamente", model
             ),
             200,
         )

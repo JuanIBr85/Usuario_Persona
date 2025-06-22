@@ -21,18 +21,13 @@ def is_local_connection():
     try:
         ip_obj = ipaddress.ip_address(request.remote_addr)
 
-        if RUN_ON_DOCKER:
-            logger.warning(
-                "Trabajando en red local, la seguridad de component service esta desactivada en control"
-            )
-
         # Verificar si es localhost (127.0.0.1 o ::1)
-        if ip_obj.is_loopback and not RUN_ON_DOCKER:
+        if ip_obj.is_loopback:
             return True
 
         # Verificar si es una IP privada (incluye redes Docker)
         # Redes privadas: 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16
-        if ip_obj.is_private and RUN_ON_DOCKER:
+        if ip_obj.is_private:
             return True
 
         # Si llegamos aquí, es una IP pública
@@ -50,17 +45,18 @@ def authenticate_config(app):
         if request.method == "OPTIONS":
             return
 
-        # Probablemente ya no sea necesario
+        # Si es una peticion local, no se verifica la autenticacion
+        if request.path.startswith("/internal") and is_local_connection():
+            return
+
+        # Si es una peticion a un endpoint que no existe, aborto con 404
         if not request.path.startswith("/api") or request.endpoint is None:
             abort(404, description=f"El endpoint <{request.path}> no existe")
 
+        # Si es una peticion al endpoint de gateway, obtengo el endpoint
         if request.endpoint.startswith("gateway."):
             service_route = core_endpoints()
         else:
-
-            if is_local_connection():
-                return
-
             service_route = component_endpoints()
 
         # Guardo el endpoint en el contexto

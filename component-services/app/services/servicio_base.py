@@ -1,4 +1,5 @@
 from typing import Any, Callable, List
+from datetime import datetime, timezone
 from marshmallow import Schema, EXCLUDE
 from sqlalchemy import exists, and_
 from app.extensions import SessionLocal
@@ -83,6 +84,9 @@ class ServicioBase:
             # Actualizar sólo los campos que vienen en data
             for key, value in schema.items():
                 setattr(instance, key, value)
+
+            # Forzar la actualización del campo updated_at
+            instance.updated_at = datetime.now(timezone.utc)
 
             session.commit()
             session.refresh(instance)
