@@ -1,4 +1,5 @@
 import os
+from pickle import FALSE
 from dotenv import load_dotenv
 
 # carga las variables de entorno desde .env
@@ -13,13 +14,12 @@ load_dotenv()
 # host= os.environ['MYSQL_HOST']
 # database= os.environ['MYSQL_DATABASE']
 
-RUN_ON_DOCKER = os.environ.get("RUN_ON_DOCKER", False)
 
 SQLALCHEMY_DATABASE_URI: str = (
     os.environ.get("SQLALCHEMY_DATABASE_URI") or "sqlite:///components.db"
 )
 SQLALCHEMY_TRACK_MODIFICATIONS = False
-
+SQLALCHEMY_ECHO = FALSE
 # CONFIGURACIONES JWT
 
 JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")

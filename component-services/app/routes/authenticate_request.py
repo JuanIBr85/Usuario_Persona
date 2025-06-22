@@ -4,7 +4,6 @@ from app.services.endpoints_search_service import EndpointsSearchService
 from common.models.endpoint_route_model import EndpointRouteModel
 import logging
 import ipaddress
-from config import RUN_ON_DOCKER
 
 logger = logging.getLogger(__name__)
 endpoints_search_service = EndpointsSearchService()
