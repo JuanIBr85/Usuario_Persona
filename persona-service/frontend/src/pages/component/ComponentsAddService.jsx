@@ -7,6 +7,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { componentService } from "@/services/componentService";
 
 function ComponentsAddService() {
   const [formData, setFormData] = useState({
@@ -26,7 +27,9 @@ function ComponentsAddService() {
     setResponse(null);
 
     try {
-      const res = await fetch(
+      const data = await componentService.install_service(formData.service_url);
+      setResponse(data);
+      /*const res = await fetch(
         "http://localhost:5002/api/control/services/install_service",
         {
           method: "POST",
@@ -44,9 +47,9 @@ function ComponentsAddService() {
         setResponse({ error: data.message || "Error desconocido" });
       } else {
         setResponse(data);
-      }
+      }*/
     } catch (error) {
-      setResponse({ error: error.message });
+      setResponse(error.data.message);
     } finally {
       setLoading(false);
     }
