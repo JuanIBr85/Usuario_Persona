@@ -195,33 +195,58 @@ class PersonaService(IPersonaInterface):
             campos_no_modificables = ['fecha_nacimiento_persona', 'num_doc_persona', 'tipo_documento']   
 
             ahora = datetime.now(timezone.utc)
+            dias_restriccion=30 
 
             #Campos no modificables por el usuario
             for campo in campos_no_modificables:
                 if campo in data_validada:
-                    raise Exception (f"El campo '{campo}' no puede modificarse directamente. Contacte al administrador.") 
-                
+                    valor_actual = getattr(persona, campo)
+                    nuevo_valor = data_validada[campo]   
+
+                    if str(nuevo_valor).strip() != str(valor_actual).strip():
+                        raise Exception(f"El campo '{campo}' no puede modificarse directamente. Contacte al administrador.")
+                     
             #Campos editables con restriccion temporal
+            evaluar_restriccion = False
+            cambios_realizados = []
 
-            modificar_campos_controlados = any(campo in data for campo in campos_modificables_cada_30_dias)
+            for campo in campos_modificables_cada_30_dias:
+                if campo in data_validada:
+                    actual = getattr(persona, campo)
+                    nuevo = data_validada[campo]
+                    if str(nuevo).strip() != str(actual).strip():
+                        evaluar_restriccion = True
+                        cambios_realizados.append(campo)
 
-            if modificar_campos_controlados:
+
+            if evaluar_restriccion:
                 ultima_modificacion = persona.updated_at
 
-                if ultima_modificacion:
-                    dias=(ahora - ultima_modificacion).days
-                    if dias < 30:
-                        raise Exception(
-                                f"Los campos personales solo pueden modificarse cada 30 días. "
-                                f"Última modificación: {ultima_modificacion.date()}"
-                        )
-                 #Aplica las modificaciones   
-                for campo in campos_modificables_cada_30_dias:
-                    if campo in data_validada:
-                        setattr(persona, campo, data_validada[campo])
+                if not ultima_modificacion:
+                    ultima_modificacion = ahora - timedelta(days=31)
+                elif ultima_modificacion.tzinfo is None:
+                    ultima_modificacion = ultima_modificacion.replace(tzinfo=timezone.utc)
 
-            persona.updated_at = datetime.now(timezone.utc)
-            session.commit()
+                dias=(ahora - ultima_modificacion).days
+                evaluar_restriccion = False 
+
+                if dias < dias_restriccion:
+                    raise Exception(
+                            f"Los campos Nombre y Apellido solo pueden modificarse cada {dias_restriccion} días. Si es necesario contacte a un administrador. "
+                            f"Última modificación: {ultima_modificacion.date()}"
+                        )
+                 #Aplica las modificaciones 
+            hubo_cambios = False  
+            for campo in cambios_realizados:
+                setattr(persona, campo, data_validada[campo])
+                hubo_cambios = True
+
+            if hubo_cambios:
+                persona.updated_at = ahora
+                session.commit()
+            else:
+                session.flush()
+
             return self.schema.dump(persona)
         
         except Exception as e:
@@ -268,6 +293,7 @@ class PersonaService(IPersonaInterface):
 
     def restaurar_persona(self, id):
         session = SessionLocal()
+
         try:
             persona = session.query(Persona).get(id)
 
