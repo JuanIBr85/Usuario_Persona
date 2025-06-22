@@ -1,4 +1,8 @@
 import React from "react";
+import { useState } from "react";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { AlertCircleIcon, CheckCircle2Icon, PopcornIcon } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -9,7 +13,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Eye, Pencil, MoreVertical , Activity , CirclePause} from "lucide-react";
+import {
+  Eye,
+  Pencil,
+  MoreVertical,
+  Activity,
+  CirclePause,
+  Plus,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,9 +29,26 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { componentService } from "@/services/componentService";
 import { useNavigate } from "react-router-dom";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 function ComponentTable({ data }) {
+  const [formData, setFormData] = useState({
+    newService_url: "",
+  });
+
+  const [response, setResponse] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   const handleToggleService = (id_service, state) => {
@@ -48,6 +76,41 @@ function ComponentTable({ data }) {
     navigate(`/adminservices/components/${id_service}`);
   };
 
+  const handleChange = (e) => {
+    setFormData({ newService_url: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setResponse(null);
+
+    try {
+      const res = await fetch(
+        "http://localhost:5002/api/control/services/install_service",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+          body: JSON.stringify({ url: formData.newService_url }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setResponse({ error: data.message || "Error desconocido" });
+      } else {
+        setResponse(data);
+      }
+    } catch (error) {
+      setResponse({ error: error.message });
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <Table>
       <TableCaption>Información del servicio de personas</TableCaption>
@@ -127,7 +190,11 @@ function ComponentTable({ data }) {
                           }
                         >
                           <span className="mr-2">
-                          {service.service_available ? <CirclePause /> : <Activity />}                          
+                            {service.service_available ? (
+                              <CirclePause />
+                            ) : (
+                              <Activity />
+                            )}
                           </span>
                           <span>
                             {service.service_available
@@ -164,6 +231,61 @@ function ComponentTable({ data }) {
           </TableRow>
         )}
       </TableBody>
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button variant="outline" className={"mt-5"}>
+            {" "}
+            <Plus /> Instalar Servicio
+          </Button>
+        </DialogTrigger>
+
+        <DialogContent className="sm:max-w-[600px] overflow-y-auto max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>Instalar Servicio</DialogTitle>
+            <DialogDescription>Instalar Servicio</DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleSubmit} className="grid gap-4">
+            {/* Datos personales */}
+            <div className="grid gap-3">
+              <Label>URL</Label>
+              <Input
+                name="nombre"
+                value={formData.newService_url || ""}
+                onChange={handleChange}
+              />
+            </div>
+
+            <DialogFooter className="pt-4">
+              <DialogClose asChild>
+                <Button type="button" variant="outline">
+                  Cancelar
+                </Button>
+              </DialogClose>
+              <DialogClose asChild>
+                <Button type="submit">Guardar</Button>
+              </DialogClose>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      {response && (
+        <div className="grid w-full max-w-xl items-start gap-4 mt-5">
+          {response.error ? (
+            <Alert variant="destructive">
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{response.error}</AlertDescription>
+            </Alert>
+          ) : (
+            <Alert>
+              <AlertTitle>Éxito</AlertTitle>
+              <AlertDescription>
+                {response.message || "Servicio instalado correctamente."}
+              </AlertDescription>
+            </Alert>
+          )}
+        </div>
+      )}
     </Table>
   );
 }
