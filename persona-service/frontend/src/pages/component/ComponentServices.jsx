@@ -15,10 +15,10 @@ function ComponentServices() {
 
   // Lista completa de servicios
   const [services, setServices] = useState(null);
-
   const refreshServices = () => {
     componentService.get_all().then((response) => {
       setServices([...response.data]);
+      console.log(response);
     });
   };
 
@@ -28,7 +28,6 @@ function ComponentServices() {
       alert(response.message);
     });
   };
-
 
   // Carga inicial de servicios al montar el componente
   useEffect(() => {
@@ -58,8 +57,7 @@ function ComponentServices() {
             </Button>
           </CardHeader>
           <CardContent>
-            <ComponentTable data={services} />
-          
+            <ComponentTable data={services} setData={setServices} />
           </CardContent>
         </Card>
       </Fade>

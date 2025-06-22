@@ -2,7 +2,6 @@ import React from "react";
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { AlertCircleIcon, CheckCircle2Icon, PopcornIcon } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -20,6 +19,7 @@ import {
   Activity,
   CirclePause,
   Plus,
+  Trash2,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -43,7 +43,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-function ComponentTable({ data }) {
+function ComponentTable({ data, setData }) {
   const [formData, setFormData] = useState({
     newService_url: "",
   });
@@ -53,10 +53,21 @@ function ComponentTable({ data }) {
 
   const navigate = useNavigate();
   const handleToggleService = (id_service, state) => {
+    const newState = state ? 0 : 1;
+
     componentService
-      .set_service_available(id_service, state ? 0 : 1)
+      .set_service_available(id_service, newState)
       .then((response) => {
         console.log(response);
+
+        setData((prevServices) =>
+          prevServices.map((service) =>
+            service.id_service === id_service
+              ? { ...service, service_available: newState }
+              : service
+          )
+        );
+
       })
       .catch((error) => {
         console.log(error);
@@ -64,7 +75,7 @@ function ComponentTable({ data }) {
   };
   const handleDeleteService = (id_service) => {
     componentService
-      .delete_service(id_service)
+      .remove_service(id_service)
       .then((response) => {
         console.log("response", response);
       })
@@ -85,10 +96,16 @@ function ComponentTable({ data }) {
     e.preventDefault();
     setLoading(true);
     setResponse(null);
-    componentService.install_service(formData.newService_url)
-    .then((data) => setResponse(data))
-    .catch((error) => setResponse({status: "fail", message: error.data?.message ?? "Ocurrió un error inesperado"}))
-    .finally(() => setLoading(false));
+    componentService
+      .install_service(formData.newService_url)
+      .then((data) => setResponse(data))
+      .catch((error) =>
+        setResponse({
+          status: "fail",
+          message: error.data?.message ?? "Ocurrió un error inesperado",
+        })
+      )
+      .finally(() => setLoading(false));
     /*try {
       const data = await componentService.install_service(
         formData.newService_url
@@ -101,6 +118,7 @@ function ComponentTable({ data }) {
       setLoading(false);
     }*/
   };
+
   return (
     <Table>
       <TableCaption>Información del servicio de personas</TableCaption>
@@ -170,6 +188,10 @@ function ComponentTable({ data }) {
                       </DropdownMenuItem>
 
                       {/* Activar/Desactivar */}
+                      {console.log(
+                        `${service.service_name} → service_wait:`,
+                        service.service_wait
+                      )}
                       {!service.service_wait && (
                         <DropdownMenuItem
                           onClick={() =>
@@ -195,13 +217,17 @@ function ComponentTable({ data }) {
                       )}
 
                       {/* Eliminar */}
+                      {console.log(
+                        `${service.service_name} → service_core:`,
+                        service.service_core
+                      )}
                       {!service.service_core && (
                         <DropdownMenuItem
                           onClick={() =>
                             handleDeleteService(service.id_service)
                           }
                         >
-                          <span className="mr-2">🗑️</span>
+                          <Trash2 className="mr-2 h-4 w-4" />
                           <span>Eliminar</span>
                         </DropdownMenuItem>
                       )}
