@@ -92,18 +92,7 @@ function ComponentTable({ data }) {
       );
       setResponse(data);
     } catch (error) {
-      let mensaje = "Ocurrió un error inesperado";
-
-      try {
-        const match = error.message.match(/Datos:\s+({.*})/s);
-        if (match && match[1]) {
-          const parsed = JSON.parse(match[1]);
-          mensaje = parsed.message || mensaje;
-        }
-      } catch (e) {
-        console.error("Error al parsear el mensaje:", e);
-      }
-
+      let mensaje = error.data?.message ?? "Ocurrió un error inesperado";
       setResponse({ status: "fail", message: mensaje });
     } finally {
       setLoading(false);
