@@ -5,27 +5,16 @@ import React, { useState, useEffect } from "react";
 // así como asignarles permisos.  Se apoya en `roleService` y `permisoService`
 /* -------------------------------------------------------------------------- */
 
-import RolesBreadcrumb from "@/components/roles/RolesBreadcrumb"
+import RolesBreadcrumb from "@/components/roles/RolesBreadcrumb";
 import RolesDeleteDialog from "@/components/roles/RolesDeleteDialog";
 import RolesErrorDialog from "@/components/roles/RolesErrorDialog";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // Utilidades de UI (botones, inputs, íconos, animaciones)
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Trash2,
-  Plus,
-  Pencil,
-  ShieldCheck,
-  Users,
-} from "lucide-react";
+import { Trash2, Plus, Pencil, ShieldCheck, Users } from "lucide-react";
 
 import { Fade } from "react-awesome-reveal";
 
@@ -46,11 +35,13 @@ export default function AdminRoles() {
   const [availablePermissions, setAvailablePermissions] = useState([]); // Permisos disponibles
 
   /* --------------------------- Utilidades UI --------------------------- */
-  const showError = (message) => { // Muestra un diálogo de error con un mensaje específico
+  const showError = (message) => {
+    // Muestra un diálogo de error con un mensaje específico
     setErrorDialog({ open: true, message });
   };
 
-  const resetForm = () => { // Resetea el formulario 
+  const resetForm = () => {
+    // Resetea el formulario
     setNewRoleName("");
     setSelectedPermissions([]);
     setShowNewRoleForm(false);
@@ -68,14 +59,14 @@ export default function AdminRoles() {
     });
   };
 
-
   // Crea un nuevo rol
   const handleAddRole = async () => {
-    if (!newRoleName.trim()) return showError("El nombre del rol no puede estar vacío");
+    if (!newRoleName.trim())
+      return showError("El nombre del rol no puede estar vacío");
 
     // Evita duplicados
     const exists = roles.some(
-      role => role.name.toLowerCase() === newRoleName.trim().toLowerCase()
+      (role) => role.name.toLowerCase() === newRoleName.trim().toLowerCase()
     );
     if (exists) return showError("Ya existe un rol con ese nombre");
 
@@ -94,7 +85,7 @@ export default function AdminRoles() {
       const newRoleId = response.id_rol;
 
       // 3. transformamos selectedPermissions a array solo con nombres para que el json cumpla las condiciones del backend
-      const permisosNombres = selectedPermissions.map(p => p.name);
+      const permisosNombres = selectedPermissions.map((p) => p.name);
 
       // 4. se asigna permisos usando el servicio
       await permisoService.asignarPermisos(newRoleId, permisosNombres);
@@ -108,7 +99,6 @@ export default function AdminRoles() {
 
       setRoles([...roles, newRole]);
       resetForm();
-
     } catch (error) {
       showError("Error al crear el rol y asignar permisos.");
       console.error(error);
@@ -129,9 +119,9 @@ export default function AdminRoles() {
     setShowNewRoleForm(true);
   };
 
-
   const handleSaveChanges = async () => {
-    if (!newRoleName.trim()) return showError("El nombre del rol no puede estar vacío");
+    if (!newRoleName.trim())
+      return showError("El nombre del rol no puede estar vacío");
 
     // Verifica que no haya duplicado el nombre
     const exists = roles.some(
@@ -149,7 +139,7 @@ export default function AdminRoles() {
       });
 
       // 2) Enviar permisos actualizados
-      const permisosNombres = selectedPermissions.map(p => p.name || p);
+      const permisosNombres = selectedPermissions.map((p) => p.name || p);
       await permisoService.asignarPermisos(editRoleId, permisosNombres);
 
       // 3) Actualiza el estado local
@@ -160,7 +150,7 @@ export default function AdminRoles() {
       );
 
       setRoles(updatedRoles);
-      console.log(updatedRoles)
+      console.log(updatedRoles);
       resetForm();
     } catch (error) {
       showError("Error al actualizar el rol o los permisos.");
@@ -168,13 +158,14 @@ export default function AdminRoles() {
     }
   };
 
-
-  const openDeleteConfirmDialog = (role) => {  // Abre el diálogo de confirmación para eliminar un rol específico
+  const openDeleteConfirmDialog = (role) => {
+    // Abre el diálogo de confirmación para eliminar un rol específico
     setRoleToDelete(role); // Guarda el rol que se desea eliminar
     setOpenDeleteDialog(true); // Muestra el diálogo de confirmación
   };
 
-  const confirmDeleteRole = async () => { // Confirma y elimina el rol previamente seleccionado
+  const confirmDeleteRole = async () => {
+    // Confirma y elimina el rol previamente seleccionado
     if (!roleToDelete) return;
 
     try {
@@ -190,12 +181,22 @@ export default function AdminRoles() {
   };
 
   function formatPermissionName(permission) {
-    if (typeof permission !== 'string') return ''; // Evita errores si permission es undefined o no es string
+    if (typeof permission !== "string") return "";
 
-    return permission
-      .split('_')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
+    // 1. Buscamos la última posición del punto (.) en el string
+    //    Ejemplo: "Auth.admin.crear_Usuario" => la última posición del punto es antes de "crear_Usuario"
+    const lastPart = permission.substring(permission.lastIndexOf(".") + 1);
+
+    // 2. Reemplazamos los guiones bajos (_) por espacios
+    //    "crear_Usuario" => "crear Usuario"
+    const replaced = lastPart.replace(/_/g, " ");
+
+    // 3. Capitalizamos cada palabra para que quede más amigable
+    //    "crear Usuario" => "Crear Usuario"
+    return replaced
+      .split(" ") // Separa en palabras
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Primera letra mayúscula
+      .join(" "); // Une todo en una frase
   }
 
   /* ------------------------------ Efectos ------------------------------ */
@@ -265,7 +266,9 @@ export default function AdminRoles() {
                       {role.name}
                       <div className="text-xs text-gray-500">
                         {role.permissions?.length > 0
-                          ? role.permissions.map(formatPermissionName).join(", ")
+                          ? role.permissions
+                              .map(formatPermissionName)
+                              .join(", ")
                           : "Sin permisos asignados"}
                       </div>
                     </div>
@@ -274,7 +277,6 @@ export default function AdminRoles() {
                   {/*Botón de editar*/}
                   <Button
                     variant="outline"
-
                     onClick={() => handleEditClick(role)}
                   >
                     <Pencil className="w-4 h-4" />
@@ -284,7 +286,6 @@ export default function AdminRoles() {
                   {/*Botón de borrar*/}
                   <Button
                     variant="outline"
-
                     onClick={() => openDeleteConfirmDialog(role)}
                   >
                     <Trash2 className="w-4 h-4" />
@@ -317,23 +318,33 @@ export default function AdminRoles() {
 
                     {/* Checkboxes de permisos */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      {availablePermissions && availablePermissions.map((permission) => (
-                        <label key={permission.id} className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            checked={selectedPermissions.some(p => p.id === permission.id)}
-                            onChange={() => handlePermissionToggle(permission)}
-                          />
-                          <span className="text-sm">
-                            {formatPermissionName(permission.name)}
-                          </span>
-                        </label>
-                      ))}
+                      {availablePermissions &&
+                        availablePermissions.map((permission) => (
+                          <label
+                            key={permission.id}
+                            className="flex items-center gap-2"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedPermissions.some(
+                                (p) => p.id === permission.id
+                              )}
+                              onChange={() =>
+                                handlePermissionToggle(permission)
+                              }
+                            />
+                            <span className="text-sm">
+                              {formatPermissionName(permission.name)}
+                            </span>
+                          </label>
+                        ))}
                     </div>
 
                     <div className="flex gap-2">
                       {editRoleId ? (
-                        <Button onClick={handleSaveChanges}>Guardar Cambios</Button>
+                        <Button onClick={handleSaveChanges}>
+                          Guardar Cambios
+                        </Button>
                       ) : (
                         <Button onClick={handleAddRole}>Agregar Rol</Button>
                       )}
@@ -358,8 +369,8 @@ export default function AdminRoles() {
 
         {/* Diálogo genérico de error */}
         <RolesErrorDialog
-        errorDialog={errorDialog}
-        setErrorDialog={setErrorDialog}
+          errorDialog={errorDialog}
+          setErrorDialog={setErrorDialog}
         ></RolesErrorDialog>
 
         {/* Breadcrumb de navegación */}
