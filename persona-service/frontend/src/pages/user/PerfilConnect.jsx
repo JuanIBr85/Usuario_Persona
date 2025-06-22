@@ -10,25 +10,42 @@ import { useEffect, useState } from "react";
 import React from "react";
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/components/ui/input-otp";
 import { Label } from "@/components/ui/label";
-import { jwtDecode } from "jwt-decode";
-
-
-
+import { PersonaService } from "@/services/personaService";
+import { formSubmitJson } from "@/utils/formUtils";
+import SimpleSelect from "@/components/SimpleSelect"
+import { SelectItem } from "@/components/ui/select"
 function PerfilConnect() {
     const [loading, setLoading] = useState(false);
     const [dialog, setDialog] = useState(null);
     const [api, setApi] = useState();
     const [email, setEmail] = useState(null)
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        const decoded = jwtDecode(token);
-        console.log("decoded",decoded)
-        if(decoded){
-            setEmail(decoded.email)
-        }
+    const [tipoDocumento, setTipoDocumento] = useState([])
 
-        if (!api) return;
-    }, [api]);
+    useEffect(() => {
+        PersonaService.get_tipos_documentos()
+            .then(response => {
+                setTipoDocumento(response.data)
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    }, [])
+
+    const handleDNIVerificacion = async (event) => {
+        const formData = await formSubmitJson(event);
+        setLoading(true);
+        PersonaService.verificar_documento(formData)
+            .then(response => {
+                setEmail(response.data.email)
+                api?.scrollNext()
+            })
+            .catch(error => {
+                console.log(error)
+            })
+            .finally(() => {
+                setLoading(false)
+            })
+    }
 
 
     return (
@@ -56,22 +73,37 @@ function PerfilConnect() {
 
 
                             <SimpleCarousel setApi={setApi}>
-                                <CardContent className="h-full overflow-y-auto flex flex-col gap-8">
-                                    <InputValidate
-                                        id="documento"
-                                        type="text"
-                                        labelText="Ingresa el número de documento"
-                                        placeholder="Nº de documento"
-                                        containerClassName="sm:col-span-3"
-                                        required
-                                    />
-                                    <Button type="submit" className="w-full" onClick={() => api?.scrollNext()}>
-                                        Siguiente
-                                    </Button>
+                                <CardContent className="h-full overflow-y-auto ">
+                                    <form onSubmit={handleDNIVerificacion} className="flex flex-col gap-8">
+                                        <SimpleSelect
+                                            name="tipo_documento"
+                                            label="Tipo de documento"
+                                            placeholder="Selecciona un tipo de documento"
+                                            required
+                                        >
+                                            {tipoDocumento.map((tipo) => (
+                                            <SelectItem key={tipo} value={tipo}>
+                                                {tipo}
+                                            </SelectItem>
+                                            ))}
+                                        </SimpleSelect>
+                                        <InputValidate
+                                            id="num_doc_persona"
+                                            type="number"
+                                            labelText="Ingresa el número de documento"
+                                            placeholder="Nº de documento"
+                                            containerClassName="sm:col-span-3"
+                                            required
+                                        />
+                                        <Button type="submit" className="w-full">
+                                            Siguiente
+                                        </Button>
+                                    </form>
                                 </CardContent>
 
 
-                                <CardContent className="h-full overflow-y-auto flex flex-col gap-4">
+                                <CardContent className="h-full overflow-y-auto">
+                                <form onSubmit={handleDNIVerificacion} className="flex flex-col gap-4">
                                     <InputValidate
                                         type="text"
                                         labelText="¿Es este tu email?"
@@ -79,12 +111,19 @@ function PerfilConnect() {
                                         containerClassName="sm:col-span-3"
                                         readOnly
                                     />
+                                    <InputValidate
+                                        type="text"
+                                        labelText="Escribe tu email"
+                                        placeholder={email}
+                                        containerClassName="sm:col-span-3"
+                                    />
                                     <Button type="submit" className="w-full" onClick={() => api?.scrollNext()}>
                                         Siguiente
                                     </Button>
-                                    <Button type="submit" className="w-full" onClick={() => api?.scrollTo(3)}>
+                                    <Button className="w-full" onClick={() => api?.scrollTo(3)}>
                                         No es mi correo / Ya no uso ese correo
                                     </Button>
+                                    </form>
                                 </CardContent>
 
                                 <CardContent className="h-full overflow-y-auto flex flex-col gap-8">

@@ -12,10 +12,12 @@ from app.utils.email_util import censurar_email
 from app.services.persona_service import PersonaService
 from common.decorators.api_access import api_access
 from common.models.cache_settings import CacheSettings
+from app.schema.persona_vincular_schema import ValidarDocumentoSchema
 
 opciones_bp = Blueprint("opciones_bp", __name__)
 
 service = PersonaService()
+validar_documento_schema = ValidarDocumentoSchema()
 
 
 @api_access(cache=CacheSettings(expiration=60 * 60))
@@ -191,20 +193,25 @@ def buscar_domicilio_postal():
 
 
 # verificar documento
-@api_access()
+@api_access(
+    # limiter=["3 per minute"],
+)
 @opciones_bp.route("/opciones/verificar-documento", methods=["POST"])
 def verificar_documento():
     try:
         data = request.get_json() or {}
-        tipo_documento = data.get("tipo_documento")
-        num_doc_persona = data.get("num_doc_persona")
-        if not tipo_documento or not num_doc_persona:
+        print(data)
+        error = validar_documento_schema.validate(data)
+        if error:
             return (
-                make_response(
-                    ResponseStatus.FAIL, "Falta tipo_documento o num_doc_persona"
-                ),
+                make_response(ResponseStatus.FAIL, error),
                 400,
             )
+
+        validated_data = validar_documento_schema.load(data)
+
+        tipo_documento = validated_data["tipo_documento"]
+        num_doc_persona = validated_data["num_doc_persona"]
 
         exists, email, id_persona = service.verificar_documento_mas_get_id(
             tipo_documento, num_doc_persona
@@ -216,7 +223,7 @@ def verificar_documento():
                     message="Documento no registrado",
                     data={"exists": False},
                 ),
-                200,
+                404,
             )
 
         censored = censurar_email(email)

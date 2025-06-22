@@ -92,10 +92,6 @@ export function useProfile() {
   };
 
   useEffect(() => {
-    if (!authData.token) {
-      navigate('/auth/login');
-      return;
-    }
     fetchData();
   }, [authData]);
 

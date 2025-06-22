@@ -124,6 +124,37 @@ export const PersonaService = {
       showError: PersonaService.showError
     });
   },
+  //===========================================
+  //Rutas de verificacion y vinculacion de persona
+  verificar_documento: async (body) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.persona}/api/opciones/verificar-documento`,
+      method: HttpMethod.POST,
+      body: body,
+      useToken: true,
+      showError: PersonaService.showError
+    });
+  },
+
+  verificarPersona: async (body) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.persona}/api/personas/verify`,
+      method: HttpMethod.POST,
+      body: body,
+      useToken: true,
+      showError: PersonaService.showError
+    });
+  },
+
+  verificarOTP: async (body) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.persona}/api/personas/verify-otp`,
+      method: HttpMethod.POST,
+      body: body,
+      useToken: true,
+      showError: PersonaService.showError
+    });
+  }
 
 };
 
