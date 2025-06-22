@@ -408,29 +408,37 @@ def verificar_persona():
       400  Email no coincide
       200 { otp_token }
     """
-    usuario_id = request.headers.get("X-USER-ID")
-    data = request.get_json() or {}
-    tipo = data.get("tipo_documento")
-    num = data.get("num_doc_persona")
-    email_confirmado = data.get("email_confirmado")
+    try:
+        usuario_id = request.headers.get("X-USER-ID")
+        data = request.get_json() or {}
+        tipo = data.get("tipo_documento")
+        num = data.get("num_doc_persona")
+        email_confirmado = data.get("email_confirmado")
 
-    if not usuario_id or not tipo or not num or not email_confirmado:
-        return make_response(ResponseStatus.FAIL, "Faltan datos necesarios"), 400
+        if not usuario_id or not tipo or not num or not email_confirmado:
+            return make_response(ResponseStatus.FAIL, "Faltan datos necesarios"), 400
 
-    exists, email, persona_id = persona_service.verificar_documento_mas_get_id(
-        tipo, num
-    )
-    if not exists:
-        return make_response(ResponseStatus.FAIL, "Documento no registrado"), 404
+        exists, email, persona_id = persona_service.verificar_documento_mas_get_id(
+            tipo, num
+        )
+        if not exists:
+            return make_response(ResponseStatus.FAIL, "Documento no registrado"), 404
 
-    if email.lower() != email_confirmado.lower():
-        return make_response(ResponseStatus.FAIL, "Email no coincide"), 400
+        if email.lower() != email_confirmado.lower():
+            return make_response(ResponseStatus.FAIL, "Email no coincide"), 400
 
-    otp_token = persona_service.enviar_otp(usuario_id, persona_id)
-    return (
-        make_response(ResponseStatus.PENDING, "OTP enviado", {"otp_token": otp_token}),
-        200,
-    )
+        otp_token = persona_service.enviar_otp(usuario_id, persona_id)
+        return (
+            make_response(
+                ResponseStatus.PENDING, "OTP enviado", {"otp_token": otp_token}
+            ),
+            200,
+        )
+    except Exception as e:
+        import traceback
+
+        traceback.print_exc()
+        return make_response(ResponseStatus.FAIL, "Error al verificar persona"), 500
 
 
 # cambios para usar X-USER-ID

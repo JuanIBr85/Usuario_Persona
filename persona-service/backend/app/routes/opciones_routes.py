@@ -191,37 +191,49 @@ def buscar_domicilio_postal():
 
 
 # verificar documento
-@api_access(cache=CacheSettings(expiration=60 * 60))
+@api_access()
 @opciones_bp.route("/opciones/verificar-documento", methods=["POST"])
 def verificar_documento():
-    data = request.get_json() or {}
-    tipo_documento = data.get("tipo_documento")
-    num_doc_persona = data.get("num_doc_persona")
-    if not tipo_documento or not num_doc_persona:
-        return (
-            make_response(
-                ResponseStatus.FAIL, "Falta tipo_documento o num_doc_persona"
-            ),
-            400,
-        )
+    try:
+        data = request.get_json() or {}
+        tipo_documento = data.get("tipo_documento")
+        num_doc_persona = data.get("num_doc_persona")
+        if not tipo_documento or not num_doc_persona:
+            return (
+                make_response(
+                    ResponseStatus.FAIL, "Falta tipo_documento o num_doc_persona"
+                ),
+                400,
+            )
 
-    exists, email = service.verificar_documento(tipo_documento, num_doc_persona)
-    if not exists:
+        exists, email, id_persona = service.verificar_documento_mas_get_id(
+            tipo_documento, num_doc_persona
+        )
+        if not exists:
+            return (
+                make_response(
+                    status=ResponseStatus.SUCCESS,
+                    message="Documento no registrado",
+                    data={"exists": False},
+                ),
+                200,
+            )
+
+        censored = censurar_email(email)
         return (
             make_response(
                 status=ResponseStatus.SUCCESS,
-                message="Documento no registrado",
-                data={"exists": False},
+                message="Documento registrado",
+                data={"exists": True, "email": censored, "id_persona": id_persona},
             ),
             200,
         )
-
-    censored = censurar_email(email)
-    return (
-        make_response(
-            status=ResponseStatus.SUCCESS,
-            message="Documento registrado",
-            data={"exists": True, "email": censored},
-        ),
-        200,
-    )
+    except Exception as e:
+        return (
+            make_response(
+                status=ResponseStatus.ERROR,
+                message="Error interno del servidor",
+                data={"server": str(e)},
+            ),
+            500,
+        )
