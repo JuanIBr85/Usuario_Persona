@@ -7,7 +7,6 @@ SAFE_HEADERS = (
     "ACCEPT-LANGUAGE",
     "CONTENT-TYPE",
     "AUTHORIZATION",
-    "USER-AGENT",
 )
 
 # Headers que SÍ pueden ser reenviados desde los microservicios al cliente (Lista Blanca)

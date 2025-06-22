@@ -13,13 +13,12 @@ load_dotenv()
 # host= os.environ['MYSQL_HOST']
 # database= os.environ['MYSQL_DATABASE']
 
-RUN_ON_DOCKER = os.environ.get("RUN_ON_DOCKER", False)
 
 SQLALCHEMY_DATABASE_URI: str = (
     os.environ.get("SQLALCHEMY_DATABASE_URI") or "sqlite:///components.db"
 )
 SQLALCHEMY_TRACK_MODIFICATIONS = False
-
+SQLALCHEMY_ECHO = False
 # CONFIGURACIONES JWT
 
 JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")

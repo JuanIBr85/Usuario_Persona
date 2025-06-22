@@ -22,6 +22,7 @@
         - ./persona-service/backend/.env
       environment:
         - COMPONENT_SERVICE_HOST=component-service
+        - MYSQL_HOST=mysql
       volumes:
         - ./persona-service/backend:/app
         - ./persona-service/backend/persona.db:/app/persona.db
@@ -67,6 +68,15 @@
         - "3306:3306"  # El 3307 es el puerto en tu máquina host (no pisa XAMPP en 3306)
       volumes:
         - mysql_data:/var/lib/mysql
+
+    #servicio-adicional:
+    #  build: ./servicio-adicional-ejemplo
+    #  ports:
+    #    - "5003:5003"
+    #  volumes:
+    #    - ./servicio-adicional-ejemplo:/app
+    #  environment:
+    #    - COMPONENT_SERVICE_HOST=component-service
 
   volumes:
     mysql_data:
