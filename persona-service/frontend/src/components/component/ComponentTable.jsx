@@ -27,9 +27,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { componentService } from "@/services/componentService";
 import { useNavigate } from "react-router-dom";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
+import { componentService } from "@/services/componentService";
 
 import {
   Dialog,
@@ -65,10 +66,10 @@ function ComponentTable({ data }) {
     componentService
       .delete_service(id_service)
       .then((response) => {
-        console.log(response);
+        console.log("response", response);
       })
       .catch((error) => {
-        console.log(error);
+        console.log("error", error);
       });
   };
 
@@ -86,27 +87,24 @@ function ComponentTable({ data }) {
     setResponse(null);
 
     try {
-      const res = await fetch(
-        "http://localhost:5002/api/control/services/install_service",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-          body: JSON.stringify({ url: formData.newService_url }),
-        }
+      const data = await componentService.install_service(
+        formData.newService_url
       );
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setResponse({ error: data.message || "Error desconocido" });
-      } else {
-        setResponse(data);
-      }
+      setResponse(data);
     } catch (error) {
-      setResponse({ error: error.message });
+      let mensaje = "Ocurrió un error inesperado";
+
+      try {
+        const match = error.message.match(/Datos:\s+({.*})/s);
+        if (match && match[1]) {
+          const parsed = JSON.parse(match[1]);
+          mensaje = parsed.message || mensaje;
+        }
+      } catch (e) {
+        console.error("Error al parsear el mensaje:", e);
+      }
+
+      setResponse({ status: "fail", message: mensaje });
     } finally {
       setLoading(false);
     }
@@ -271,10 +269,10 @@ function ComponentTable({ data }) {
       </Dialog>
       {response && (
         <div className="grid w-full max-w-xl items-start gap-4 mt-5">
-          {response.error ? (
+          {response.status === "fail" ? (
             <Alert variant="destructive">
               <AlertTitle>Error</AlertTitle>
-              <AlertDescription>{response.error}</AlertDescription>
+              <AlertDescription>{response.message}</AlertDescription>
             </Alert>
           ) : (
             <Alert>

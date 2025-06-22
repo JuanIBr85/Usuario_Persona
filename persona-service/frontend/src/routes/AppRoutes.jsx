@@ -21,7 +21,6 @@ import PerfilConnect from "@/pages/user/PerfilConnect";
 import AdminServices from "@/pages/admin/AdminServices";
 import ComponentServices from "@/pages/component/ComponentServices";
 import ComponentServicesDetails from "@/pages/component/ComponentServicesDetails";
-import ComponentsAddService from "@/pages/component/ComponentsAddService";
 /**
  * Componente que define todas las rutas de la aplicación utilizando react-router-dom.
  * Cada ruta se asocia con un componente de página específico para renderizar.
@@ -42,9 +41,6 @@ function AppRoutes() {
       <Route path="adminroles" element={<AdminRoles />} />
       <Route path="adminservices/components" element={<ComponentServices />} />
       <Route path="adminservices/components/:id" element={<ComponentServicesDetails />} />
-
-      <Route path="adminservices/add" element={<ComponentsAddService />} />
-
 
       <Route path="persondetails/:id" element={<PersonDetails />} />
       <Route path="privacypolicy" element={<AboutPrivacyPolicy />} />
