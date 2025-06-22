@@ -7,6 +7,9 @@
         - "5000:5000"
       env_file:
         - ./auth-service/.env
+      environment:
+        - COMPONENT_SERVICE_HOST=component-service
+        - REDIS_HOST=redis
       volumes:
         - ./auth-service:/app
         - ./auth-service/auth_data:/app/auth_data
@@ -16,7 +19,10 @@
       ports:
         - "5001:5001"
       env_file:
-      - ./persona-service/backend/.env
+        - ./persona-service/backend/.env
+      environment:
+        - COMPONENT_SERVICE_HOST=component-service
+        - MYSQL_HOST=mysql
       volumes:
         - ./persona-service/backend:/app
         - ./persona-service/backend/persona.db:/app/persona.db
@@ -38,7 +44,6 @@
         - ./component-services:/app
       environment:
         - SERVICES_CONFIG_FILE=services-docker.json
-        - RUN_ON_DOCKER=True
       depends_on:
         - auth-service
         - persona-backend
@@ -63,6 +68,15 @@
         - "3306:3306"  # El 3307 es el puerto en tu máquina host (no pisa XAMPP en 3306)
       volumes:
         - mysql_data:/var/lib/mysql
+
+    #servicio-adicional:
+    #  build: ./servicio-adicional-ejemplo
+    #  ports:
+    #    - "5003:5003"
+    #  volumes:
+    #    - ./servicio-adicional-ejemplo:/app
+    #  environment:
+    #    - COMPONENT_SERVICE_HOST=component-service
 
   volumes:
     mysql_data:

@@ -70,6 +70,10 @@ function AdminUsers() {
   const [filtro, setFiltro] = useState("");
   const [alert, setAlert] = useState(null);
 
+  const [redesSociales, setRedesSociales] = useState([]);
+  const [localidades, setLocalidades] = useState([]);
+  const [tiposDocumentos, setTiposDocumentos] = useState([]);
+
   // Carga inicial de usuarios al montar el componente
   useEffect(() => {
     PersonaService.get_all()
@@ -77,12 +81,13 @@ function AdminUsers() {
         if (res && res.data && Array.isArray(res.data)) {
           const mappedUsers = res.data.map((persona) => ({
             id: persona.id_persona,
+            usuario_id: persona.usuario_id,
+
             nombre: persona.nombre_persona,
             apellido: persona.apellido_persona,
             tipo_documento: persona.tipo_documento,
             nro_documento: persona.num_doc_persona,
             fecha_nacimiento: persona.fecha_nacimiento_persona,
-            usuario_id: persona.usuario_id,
           }));
           console.log("mappedUsers:", mappedUsers);
           setUsers(mappedUsers);
@@ -92,6 +97,27 @@ function AdminUsers() {
         console.error("Error obteniendo usuarios:", err);
       });
   }, []);
+
+  useEffect(() => {
+    PersonaService.get_redes_sociales().then((res) => {
+      setRedesSociales(res?.data || []);
+    });
+    PersonaService.get_tipos_documentos().then((res) => {
+      setTiposDocumentos(res?.data || []);
+    });
+  }, []);
+  console.log("get_tipos_documentos", tiposDocumentos);
+
+  useEffect(() => {
+    if (newUser.codigo_postal?.length >= 4) {
+      PersonaService.get_localidades_by_codigo_postal(
+        newUser.codigo_postal
+      ).then((res) => {
+        setLocalidades(res?.data || []);
+      });
+    }
+    console.log("localidades", localidades);
+  }, [newUser.codigo_postal]);
 
   // Filtra usuarios según texto en nombre, apellido o email (insensible a mayúsculas)
   const usuariosFiltrados = users.filter((user) => {
@@ -269,7 +295,10 @@ function AdminUsers() {
             </div>
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="outline" className={"mt-5"}> <Plus /> Crear Persona</Button>
+                <Button variant="outline" className={"mt-5"}>
+                  {" "}
+                  <Plus /> Crear Persona
+                </Button>
               </DialogTrigger>
 
               <DialogContent className="sm:max-w-[600px] overflow-y-auto max-h-[90vh]">
@@ -303,11 +332,18 @@ function AdminUsers() {
                       onChange={handleChange}
                     />
                     <Label>Tipo de documento</Label>
-                    <Input
+                    <select
+                      className="border rounded px-2 py-1"
                       name="tipo_documento"
                       value={newUser.tipo_documento || ""}
                       onChange={handleChange}
-                    />
+                    >
+                      {tiposDocumentos.map((doc, i) => (
+                        <option key={i} value={doc}>
+                          {doc}
+                        </option>
+                      ))}
+                    </select>
                     <Label>Nro. documento</Label>
                     <Input
                       name="nro_documento"
@@ -362,11 +398,19 @@ function AdminUsers() {
                       onChange={handleChange}
                     />
                     <Label>Localidad</Label>
-                    <Input
+                    <select
                       name="localidad"
                       value={newUser.localidad || ""}
                       onChange={handleChange}
-                    />
+                      className="border rounded px-2 py-1"
+                    >
+                      <option value="">Selecciona una localidad</option>
+                      {localidades.map((loc, index) => (
+                        <option key={`${loc}-${index}`} value={loc}>
+                          {loc}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   {/* Contacto */}
@@ -385,15 +429,23 @@ function AdminUsers() {
                       onChange={handleChange}
                     />
                     <Label>Red social</Label>
+                    <select
+                      name="red_social_nombre"
+                      value={newUser.red_social_nombre || ""}
+                      onChange={handleChange}
+                      className="border rounded px-2 py-1"
+                    >
+                      <option value="">Selecciona una red social</option>
+                      {redesSociales.map((rs) => (
+                        <option key={rs} value={rs}>
+                          {rs}
+                        </option>
+                      ))}
+                    </select>
+                    <Label>Su usuario de {newUser.red_social_nombre}</Label>
                     <Input
                       name="red_social_contacto"
                       value={newUser.red_social_contacto || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>Nombre red social</Label>
-                    <Input
-                      name="red_social_nombre"
-                      value={newUser.red_social_nombre || ""}
                       onChange={handleChange}
                     />
                     <Label>Email contacto</Label>

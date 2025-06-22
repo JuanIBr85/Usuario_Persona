@@ -1,4 +1,7 @@
 import React from "react";
+import { useState } from "react";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -9,25 +12,62 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Eye, Pencil, MoreVertical , Activity , CirclePause} from "lucide-react";
+import {
+  Eye,
+  Pencil,
+  MoreVertical,
+  Activity,
+  CirclePause,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { componentService } from "@/services/componentService";
 import { useNavigate } from "react-router-dom";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
+import { componentService } from "@/services/componentService";
 
-function ComponentTable({ data }) {
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+function ComponentTable({ data, setData }) {
+  const [formData, setFormData] = useState({
+    newService_url: "",
+  });
+
+  const [response, setResponse] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   const handleToggleService = (id_service, state) => {
+    const newState = state ? 0 : 1;
+
     componentService
-      .set_service_available(id_service, state ? 0 : 1)
+      .set_service_available(id_service, newState)
       .then((response) => {
         console.log(response);
+
+        setData((prevServices) =>
+          prevServices.map((service) =>
+            service.id_service === id_service
+              ? { ...service, service_available: newState }
+              : service
+          )
+        );
+
       })
       .catch((error) => {
         console.log(error);
@@ -35,17 +75,48 @@ function ComponentTable({ data }) {
   };
   const handleDeleteService = (id_service) => {
     componentService
-      .delete_service(id_service)
+      .remove_service(id_service)
       .then((response) => {
-        console.log(response);
+        console.log("response", response);
       })
       .catch((error) => {
-        console.log(error);
+        console.log("error", error);
       });
   };
 
   const handleViewDetails = (id_service) => {
     navigate(`/adminservices/components/${id_service}`);
+  };
+
+  const handleChange = (e) => {
+    setFormData({ newService_url: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setResponse(null);
+    componentService
+      .install_service(formData.newService_url)
+      .then((data) => setResponse(data))
+      .catch((error) =>
+        setResponse({
+          status: "fail",
+          message: error.data?.message ?? "Ocurrió un error inesperado",
+        })
+      )
+      .finally(() => setLoading(false));
+    /*try {
+      const data = await componentService.install_service(
+        formData.newService_url
+      );
+      setResponse(data);
+    } catch (error) {
+      let mensaje = error.data?.message ?? "Ocurrió un error inesperado";
+      setResponse({ status: "fail", message: mensaje });
+    } finally {
+      setLoading(false);
+    }*/
   };
 
   return (
@@ -117,6 +188,10 @@ function ComponentTable({ data }) {
                       </DropdownMenuItem>
 
                       {/* Activar/Desactivar */}
+                      {console.log(
+                        `${service.service_name} → service_wait:`,
+                        service.service_wait
+                      )}
                       {!service.service_wait && (
                         <DropdownMenuItem
                           onClick={() =>
@@ -127,7 +202,11 @@ function ComponentTable({ data }) {
                           }
                         >
                           <span className="mr-2">
-                          {service.service_available ? <CirclePause /> : <Activity />}                          
+                            {service.service_available ? (
+                              <CirclePause />
+                            ) : (
+                              <Activity />
+                            )}
                           </span>
                           <span>
                             {service.service_available
@@ -138,13 +217,17 @@ function ComponentTable({ data }) {
                       )}
 
                       {/* Eliminar */}
+                      {console.log(
+                        `${service.service_name} → service_core:`,
+                        service.service_core
+                      )}
                       {!service.service_core && (
                         <DropdownMenuItem
                           onClick={() =>
                             handleDeleteService(service.id_service)
                           }
                         >
-                          <span className="mr-2">🗑️</span>
+                          <Trash2 className="mr-2 h-4 w-4" />
                           <span>Eliminar</span>
                         </DropdownMenuItem>
                       )}
@@ -164,6 +247,61 @@ function ComponentTable({ data }) {
           </TableRow>
         )}
       </TableBody>
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button variant="outline" className={"mt-5"}>
+            {" "}
+            <Plus /> Instalar Servicio
+          </Button>
+        </DialogTrigger>
+
+        <DialogContent className="sm:max-w-[600px] overflow-y-auto max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>Instalar Servicio</DialogTitle>
+            <DialogDescription>Instalar Servicio</DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleSubmit} className="grid gap-4">
+            {/* Datos personales */}
+            <div className="grid gap-3">
+              <Label>URL</Label>
+              <Input
+                name="nombre"
+                value={formData.newService_url || ""}
+                onChange={handleChange}
+              />
+            </div>
+
+            <DialogFooter className="pt-4">
+              <DialogClose asChild>
+                <Button type="button" variant="outline">
+                  Cancelar
+                </Button>
+              </DialogClose>
+              <DialogClose asChild>
+                <Button type="submit">Guardar</Button>
+              </DialogClose>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      {response && (
+        <div className="grid w-full max-w-xl items-start gap-4 mt-5">
+          {response.status === "fail" ? (
+            <Alert variant="destructive">
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{response.message}</AlertDescription>
+            </Alert>
+          ) : (
+            <Alert>
+              <AlertTitle>Éxito</AlertTitle>
+              <AlertDescription>
+                {response.message || "Servicio instalado correctamente."}
+              </AlertDescription>
+            </Alert>
+          )}
+        </div>
+      )}
     </Table>
   );
 }

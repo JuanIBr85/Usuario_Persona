@@ -5,9 +5,7 @@ from app.services.services_serch_service import ServicesSearchService
 from common.models.endpoint_route_model import EndpointRouteModel
 from app.models.service_model import ServiceModel
 import time
-import logging
-
-logger = logging.getLogger(__name__)
+from app.extensions import logger
 
 
 class EndpointsSearchService:
@@ -103,7 +101,7 @@ class EndpointsSearchService:
                 "error": None,
                 "endpoints_count": 0,
             }
-            print(">", service.service_available)
+
             if service.service_available is False:
                 self._search_log[service.service_name]["success"] = "not_available"
                 self._search_log[service.service_name]["in_progress"] = False

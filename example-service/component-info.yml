@@ -1,0 +1,11 @@
+service:
+  service_name: example-service
+  service_prefix: example
+  service_available: true
+  service_description: Backend de ejemplo
+  service_core: false
+  service_wait: false
+
+permissions:
+  - example.admin.admin_dice
+  - example.user.hola_mundo

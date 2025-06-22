@@ -21,7 +21,8 @@ PERMISOS = [
     "persona.admin.ver_persona",
     "persona.admin.modificar_persona",
     "persona.admin.eliminar_persona",
-    "persona.admin.restaurar_persona"
+    "persona.admin.restaurar_persona",
+    "example.admin.admin_dice",
 ]
 
 # Permisos por rol
