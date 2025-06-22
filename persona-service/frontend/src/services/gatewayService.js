@@ -13,10 +13,10 @@ export const gatewayService = {
    */
   startResearch: async () => {
     return fetchService.fetch({
-      url: `${ServiceURL.auth}/control/gateway/research`,
+      url: `${ServiceURL.auth}/api/control/gateway/research`,
       method: HttpMethod.GET,
       showError: gatewayService.showError,
-      useToken: true
+      useToken: true,
     });
   },
 
@@ -26,10 +26,10 @@ export const gatewayService = {
    */
   getResearchStatus: async () => {
     return fetchService.fetch({
-      url: `${ServiceURL.auth}/control/gateway/research_status`,
+      url: `${ServiceURL.auth}/api/control/gateway/research_status`,
       method: HttpMethod.GET,
       showError: gatewayService.showError,
-      useToken: true
+      useToken: true,
     });
   },
 
@@ -39,10 +39,112 @@ export const gatewayService = {
    */
   stopResearch: async () => {
     return fetchService.fetch({
-      url: `${ServiceURL.auth}/control/gateway/reserch_stop`,
+      url: `${ServiceURL.auth}/api/control/gateway/reserch_stop`,
       method: HttpMethod.GET,
       showError: gatewayService.showError,
-      useToken: true
+      useToken: true,
     });
-  }
+  },
+
+  // ==== Endpoints de servicios ====
+
+  /**
+   * Obtiene todos los servicios registrados con su estado de salud
+   * @returns {Promise}
+   */
+  getAllServices: async () => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/api/control/services/all`,
+      method: HttpMethod.GET,
+      showError: gatewayService.showError,
+      useToken: true,
+    });
+  },
+
+  /**
+   * Obtiene un servicio específico por ID con su estado de salud
+   * @param {number} id ID del servicio
+   * @returns {Promise}
+   */
+  getServiceById: async (id) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/api/control/services/get_service/${id}`,
+      method: HttpMethod.GET,
+      showError: gatewayService.showError,
+      useToken: true,
+    });
+  },
+
+  /**
+   * Recolecta permisos de todos los servicios registrados
+   * @returns {Promise}
+   */
+  collectPermissions: async () => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/api/control/services/recolect_perms`,
+      method: HttpMethod.GET,
+      showError: gatewayService.showError,
+      useToken: true,
+    });
+  },
+
+  /**
+   * Instala un nuevo servicio
+   * @param {object} url url para crear el servicio
+   * @returns {Promise}
+   */
+  installService: async (url) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/api/control/services/install_service`,
+      method: HttpMethod.POST,
+       body: { url },
+      showError: gatewayService.showError,
+      useToken: true,
+    });
+  },
+
+  /**
+   * Actualiza un servicio existente por ID
+   * @param {number} id ID del servicio
+   * @param {object} body Datos para actualizar
+   * @returns {Promise}
+   */
+  refreshService: async (id, body) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/api/control/services/refresh_service/${id}`,
+      method: HttpMethod.PUT,
+      body: body,
+      showError: gatewayService.showError,
+      useToken: true,
+    });
+  },
+
+  /**
+   * Elimina un servicio por ID
+   * @param {number} id ID del servicio
+   * @returns {Promise}
+   */
+  removeService: async (id) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/api/control/services/remove_service/${id}`,
+      method: HttpMethod.DELETE,
+      showError: gatewayService.showError,
+      useToken: true,
+    });
+  },
+
+  /**
+   * Establece la disponibilidad de un servicio
+   * @param {number} id ID del servicio
+   * @param {number} state Estado (1 = disponible, 0 = no disponible)
+   * @returns {Promise}
+   */
+  setServiceAvailable: async (id, state) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/api/control/services/set_available/${id}/${state}`,
+      method: HttpMethod.PUT,
+      showError: gatewayService.showError,
+      useToken: true,
+    });
+  },
 };
