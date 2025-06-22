@@ -3,6 +3,7 @@ from flask import jsonify
 from flask_jwt_extended import create_access_token
 from marshmallow import ValidationError
 from sqlalchemy import and_, func,extract
+from config import DIAS_RESTRICCION_MODIFICACION
 
 #Se importan los modelos
 from app.models.persona_model import Persona
@@ -20,6 +21,7 @@ from app.schema.persona_schema import PersonaSchema,PersonaResumidaSchema
 from app.interfaces.persona_interface import IPersonaInterface
 from app.extensions import SessionLocal
 from app.schema.persona_extendida_schema import PersonaExtendidaSchema
+
 
 class PersonaService(IPersonaInterface):
 
@@ -195,7 +197,9 @@ class PersonaService(IPersonaInterface):
             campos_no_modificables = ['fecha_nacimiento_persona', 'num_doc_persona', 'tipo_documento']   
 
             ahora = datetime.now(timezone.utc)
-            dias_restriccion=30 
+
+
+            dias_restriccion=DIAS_RESTRICCION_MODIFICACION # por defecto son 30 dias
 
             #Campos no modificables por el usuario
             for campo in campos_no_modificables:
