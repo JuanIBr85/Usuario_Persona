@@ -85,8 +85,11 @@ function ComponentTable({ data }) {
     e.preventDefault();
     setLoading(true);
     setResponse(null);
-
-    try {
+    componentService.install_service(formData.newService_url)
+    .then((data) => setResponse(data))
+    .catch((error) => setResponse({status: "fail", message: error.data?.message ?? "Ocurrió un error inesperado"}))
+    .finally(() => setLoading(false));
+    /*try {
       const data = await componentService.install_service(
         formData.newService_url
       );
@@ -96,7 +99,7 @@ function ComponentTable({ data }) {
       setResponse({ status: "fail", message: mensaje });
     } finally {
       setLoading(false);
-    }
+    }*/
   };
   return (
     <Table>
