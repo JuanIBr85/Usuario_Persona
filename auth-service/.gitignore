@@ -22,3 +22,5 @@ env/
 
 .auth_data/
 *.db
+
+auth-service/auth_data/auth.db
