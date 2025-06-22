@@ -6,14 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Users, Plus } from "lucide-react";
 
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
-import {
   Dialog,
   DialogClose,
   DialogContent,
@@ -89,12 +81,13 @@ function AdminUsers() {
         if (res && res.data && Array.isArray(res.data)) {
           const mappedUsers = res.data.map((persona) => ({
             id: persona.id_persona,
+            usuario_id: persona.usuario_id,
+
             nombre: persona.nombre_persona,
             apellido: persona.apellido_persona,
             tipo_documento: persona.tipo_documento,
             nro_documento: persona.num_doc_persona,
             fecha_nacimiento: persona.fecha_nacimiento_persona,
-            usuario_id: persona.usuario_id,
           }));
           console.log("mappedUsers:", mappedUsers);
           setUsers(mappedUsers);
@@ -454,7 +447,6 @@ function AdminUsers() {
                       name="red_social_contacto"
                       value={newUser.red_social_contacto || ""}
                       onChange={handleChange}
-
                     />
                     <Label>Email contacto</Label>
                     <Input
