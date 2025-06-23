@@ -26,6 +26,6 @@ def create_app():
 # Este es un decorador que recibe mensajes de un canal
 # el canal "default" es el canal por defecto
 # esta funcion recibe un mensaje y lo procesa en un hilo separado
-def funcion_que_recibe_mensajes(message: Dict) -> None:
+def funcion_que_recibe_mensajes(message: Dict, app: Flask) -> None:
     logging.warning(message)
     send_message(to_service="auth-service", message={"message": "hola"})

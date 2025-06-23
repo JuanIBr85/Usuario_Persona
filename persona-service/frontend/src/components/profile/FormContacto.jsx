@@ -9,18 +9,7 @@ import { PersonaService } from "@/services/personaService";
 import { useState } from "react";
 import { formSubmitJson } from "@/utils/formUtils";
 import Loading from "@/components/loading/Loading";
-
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import {SimpleDialog} from "@/components/SimpleDialog";
 
 
 export default function FormContacto({
@@ -37,7 +26,7 @@ export default function FormContacto({
     const formData = await formSubmitJson(event);
     document.activeElement.blur();
     setLoading(true);
-    
+
     PersonaService.editar(persona_id, {
       contacto: formData,
     })
@@ -135,28 +124,17 @@ export default function FormContacto({
             Volver
           </Button>
         </div>
-        {error ? (
-          <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle className={`flex align-center gap-1`}>
-                  {" "}
-                  <Ban /> Ocurrió un error
-                </AlertDialogTitle>
-                <AlertDialogDescription>
-                  No se pudieron guardar los datos. Intenta nuevamente.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => setOpenDialog(false)}>
-                  Cerrar
-                </AlertDialogCancel>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        ) : (
-          ``
-        )}
+        {error && <SimpleDialog
+            title={<div className="flex flex-row items-center gap-2"><Ban /> Ocurrió un error</div>}
+            description={"No se pudieron guardar los datos. Intenta nuevamente."}
+            isOpen={openDialog}
+            actionHandle={() => {
+              setOpenDialog(null);
+            }}
+            action="Cerrar"
+          />}
+
+
       </form>
     </>
   );
