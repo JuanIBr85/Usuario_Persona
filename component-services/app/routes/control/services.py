@@ -9,7 +9,9 @@ from app.schemas.service_schema import ServiceSchema
 from app.utils.get_health import get_health
 from app.utils.get_component_info import get_component_info
 from app.extensions import logger
-
+from datetime import datetime, timezone, timedelta
+from flask import current_app
+import time
 
 bp = Blueprint("services", __name__, cli_group="control", url_prefix="/services")
 services_service: ServicioBase = ServicioBase(ServiceModel, ServiceSchema())
@@ -180,3 +182,43 @@ def set_service_available(id: int, state: int):
         )
     except Exception as e:
         return make_response(ResponseStatus.ERROR, str(e)), 500
+
+
+@bp.route("/stop_system", methods=["POST"])
+@cp_api_access(is_public=True)
+def stop_system():
+    try:
+
+        def stop(app):
+            time.sleep(30)
+            # EventService.send_stop_event()
+            # Limpia todas las rutas
+
+            for endpoint in app.view_functions.keys():
+                # Solo permite la comunicacion entre servicios
+                if endpoint == "message.send_message":
+                    continue
+                app.view_functions[endpoint] = sys_detenido
+
+        # EventService.send_start_stop_event()
+        threading.Thread(target=stop, args=(current_app._get_current_object(),)).start()
+
+        return (
+            make_response(
+                ResponseStatus.SUCCESS,
+                {
+                    "message": "Sistema se desconectaran en 30 segundos, una vez detenido espere unos segundos para asegurarse de que los servicios no esten interactuando con la base de datos",
+                    "time": datetime.now(timezone.utc) + timedelta(seconds=30),
+                },
+            ),
+            200,
+        )
+    except Exception as e:
+        return make_response(ResponseStatus.ERROR, str(e)), 500
+
+
+# Este endpoint es el que se usa para reemplazar todos los demas endpoints
+@bp.route("/sys_detenido")
+@cp_api_access(is_public=True)
+def sys_detenido():
+    return "El sistema esta detenido", 503

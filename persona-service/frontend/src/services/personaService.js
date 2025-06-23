@@ -136,7 +136,7 @@ export const PersonaService = {
     });
   },
 
-  verificarPersona: async (body) => {
+  verificar_email: async (body) => {
     return fetchService.fetch({
       url: `${ServiceURL.persona}/api/personas/verify`,
       method: HttpMethod.POST,
@@ -146,7 +146,7 @@ export const PersonaService = {
     });
   },
 
-  verificarOTP: async (body) => {
+  verificar_otp: async (body) => {
     return fetchService.fetch({
       url: `${ServiceURL.persona}/api/personas/verify-otp`,
       method: HttpMethod.POST,

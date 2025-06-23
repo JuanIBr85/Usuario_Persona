@@ -200,7 +200,7 @@ def buscar_domicilio_postal():
 def verificar_documento():
     try:
         data = request.get_json() or {}
-        print(data)
+
         error = validar_documento_schema.validate(data)
         if error:
             return (

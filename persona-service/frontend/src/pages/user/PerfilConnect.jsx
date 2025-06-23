@@ -12,14 +12,18 @@ import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/comp
 import { Label } from "@/components/ui/label";
 import { PersonaService } from "@/services/personaService";
 import { formSubmitJson } from "@/utils/formUtils";
-import SimpleSelect from "@/components/SimpleSelect"
-import { SelectItem } from "@/components/ui/select"
+import SimpleSelect from "@/components/SimpleSelect";
+import { SelectItem } from "@/components/ui/select";
+import { Link } from "react-router-dom";
+
+
 function PerfilConnect() {
     const [loading, setLoading] = useState(false);
     const [dialog, setDialog] = useState(null);
     const [api, setApi] = useState();
     const [email, setEmail] = useState(null)
     const [tipoDocumento, setTipoDocumento] = useState([])
+    const [tempData, setTempData] = useState({})
 
     useEffect(() => {
         PersonaService.get_tipos_documentos()
@@ -36,7 +40,8 @@ function PerfilConnect() {
         setLoading(true);
         PersonaService.verificar_documento(formData)
             .then(response => {
-                setEmail(response.data.email)
+                setEmail(response.data.email);
+                setTempData(formData);
                 api?.scrollNext()
             })
             .catch(error => {
@@ -47,6 +52,42 @@ function PerfilConnect() {
             })
     }
 
+    const handleEmailVerification = async (event) => {
+        const formData = await formSubmitJson(event);
+        setLoading(true);
+        PersonaService.verificar_email({
+            ...tempData,
+            ...formData
+        })
+        .then(response => {
+            setTempData({...response.data});
+            api?.scrollNext()
+        })
+        .catch(error => {
+            console.error(error)
+        })
+        .finally(() => {
+            setLoading(false)
+        })
+    }
+
+    const handleOTPVerification = async (event) => {
+        const formData = await formSubmitJson(event);
+        setLoading(true);
+        PersonaService.verificar_otp({
+            ...tempData,
+            ...formData
+        })
+        .then(response => {
+            console.log(response)
+        })
+        .catch(error => {
+            console.error(error)
+        })
+        .finally(() => {
+            setLoading(false)
+        })
+    }
 
     return (
         <>
@@ -79,6 +120,7 @@ function PerfilConnect() {
                                             name="tipo_documento"
                                             label="Tipo de documento"
                                             placeholder="Selecciona un tipo de documento"
+                                            value="DNI"
                                             required
                                         >
                                             {tipoDocumento.map((tipo) => (
@@ -90,6 +132,7 @@ function PerfilConnect() {
                                         <InputValidate
                                             id="num_doc_persona"
                                             type="number"
+                                            value="28455678"
                                             labelText="Ingresa el número de documento"
                                             placeholder="Nº de documento"
                                             containerClassName="sm:col-span-3"
@@ -101,9 +144,8 @@ function PerfilConnect() {
                                     </form>
                                 </CardContent>
 
-
                                 <CardContent className="h-full overflow-y-auto">
-                                <form onSubmit={handleDNIVerificacion} className="flex flex-col gap-4">
+                                <form onSubmit={handleEmailVerification} className="flex flex-col gap-4">
                                     <InputValidate
                                         type="text"
                                         labelText="¿Es este tu email?"
@@ -112,12 +154,14 @@ function PerfilConnect() {
                                         readOnly
                                     />
                                     <InputValidate
+                                        id="email_confirmado"
                                         type="text"
                                         labelText="Escribe tu email"
                                         placeholder={email}
+                                        value="ezequiel.ramirez@example.com"
                                         containerClassName="sm:col-span-3"
                                     />
-                                    <Button type="submit" className="w-full" onClick={() => api?.scrollNext()}>
+                                    <Button type="submit" className="w-full">
                                         Siguiente
                                     </Button>
                                     <Button className="w-full" onClick={() => api?.scrollTo(3)}>
@@ -127,10 +171,10 @@ function PerfilConnect() {
                                 </CardContent>
 
                                 <CardContent className="h-full overflow-y-auto flex flex-col gap-8">
-                                    <div className="grid w-full items-center justify-center gap-4">
-                                        <Label htmlFor="otp" className="inline-block w-full text-center">Código de verificación</Label>
+                                    <form onSubmit={handleOTPVerification} className="grid w-full items-center justify-center gap-4">
+                                        <Label htmlFor="codigo" className="inline-block w-full text-center">Código de verificación</Label>
                                         <div className="relative">
-                                            <InputOTP name="otp" maxLength={6} containerClassName="justify-center">
+                                            <InputOTP name="codigo" maxLength={6} containerClassName="justify-center">
                                                 <InputOTPGroup>
                                                     <InputOTPSlot className="bg-gray-100" index={0} />
                                                     <InputOTPSlot className="bg-gray-100" index={1} />
@@ -144,10 +188,10 @@ function PerfilConnect() {
                                                 </InputOTPGroup>
                                             </InputOTP>
                                         </div>
-                                    </div>
-                                    <Button type="submit" className="w-full" onClick={() => api?.scrollNext()}>
-                                        Siguiente
-                                    </Button>
+                                        <Button type="submit" className="w-full"  asChild>
+                                            <Link to="/root">Siguiente</Link>
+                                        </Button>
+                                    </form>
                                 </CardContent>
 
                                 <CardContent className="h-full overflow-y-auto flex flex-col gap-4">

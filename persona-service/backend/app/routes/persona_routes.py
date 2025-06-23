@@ -3,6 +3,10 @@ from flask_jwt_extended import jwt_required, get_jwt_identity, decode_token
 from app.extensions import SessionLocal
 from marshmallow import ValidationError
 from app.services.persona_service import PersonaService
+from app.schema.persona_vincular_schema import (
+    ValidarDocumentoEmailSchema,
+    ValidarOtpSchema,
+)
 from app.schema.persona_schema import PersonaSchema
 from app.models.persona_model import Persona
 from common.decorators.api_access import api_access
@@ -13,6 +17,8 @@ from common.models.cache_settings import CacheSettings
 persona_bp = Blueprint("persona_bp", __name__)
 persona_service = PersonaService()
 persona_schema = PersonaSchema()
+validar_otp_schema = ValidarOtpSchema()
+validar_documento_email_schema = ValidarDocumentoEmailSchema()
 
 
 @api_access(
@@ -411,12 +417,18 @@ def verificar_persona():
     try:
         usuario_id = request.headers.get("X-USER-ID")
         data = request.get_json() or {}
-        tipo = data.get("tipo_documento")
-        num = data.get("num_doc_persona")
-        email_confirmado = data.get("email_confirmado")
 
-        if not usuario_id or not tipo or not num or not email_confirmado:
-            return make_response(ResponseStatus.FAIL, "Faltan datos necesarios"), 400
+        error = validar_documento_email_schema.validate(data)
+        if error:
+            return (
+                make_response(ResponseStatus.FAIL, error),
+                400,
+            )
+
+        validated_data = validar_documento_email_schema.load(data)
+        tipo = validated_data["tipo_documento"]
+        num = validated_data["num_doc_persona"]
+        email_confirmado = validated_data["email_confirmado"]
 
         exists, email, persona_id = persona_service.verificar_documento_mas_get_id(
             tipo, num
@@ -448,11 +460,17 @@ def verificar_otp_persona():
 
     usuario_id = request.headers.get("X-USER-ID")
     data = request.get_json() or {}
-    token = data.get("otp_token")
-    codigo_input = data.get("codigo")
 
-    if not usuario_id or not token or not codigo_input:
-        return make_response(ResponseStatus.FAIL, "Faltan token o código"), 400
+    error = validar_otp_schema.validate(data)
+    if error:
+        return (
+            make_response(ResponseStatus.FAIL, error),
+            400,
+        )
+
+    validated_data = validar_otp_schema.load(data)
+    token = validated_data["otp_token"]
+    codigo_input = validated_data["codigo"]
 
     try:
         claims = decode_token(token)
