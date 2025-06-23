@@ -10,6 +10,7 @@
       environment:
         - COMPONENT_SERVICE_HOST=component-service
         - REDIS_HOST=redis
+        - MAIL_SERVER=mailpit
       volumes:
         - ./auth-service:/app
         - ./auth-service/auth_data:/app/auth_data
@@ -23,6 +24,7 @@
       environment:
         - COMPONENT_SERVICE_HOST=component-service
         - MYSQL_HOST=mysql
+        - MAIL_SERVER=mailpit
       volumes:
         - ./persona-service/backend:/app
         - ./persona-service/backend/persona.db:/app/persona.db
@@ -48,6 +50,16 @@
         - auth-service
         - persona-backend
 
+    api-creus:
+      build: ./api_creus
+      ports:
+        - "5004:5004"
+      volumes:
+        - ./api_creus:/app
+      environment:
+        - FLASK_ENV=development
+        - COMPONENT_SERVICE_HOST=component-service
+      
     redis:
       image: redis:latest
       container_name: redis-dev
@@ -79,11 +91,11 @@
     #    - COMPONENT_SERVICE_HOST=component-service
 
     #alternativa a mailtrap en local!!!
-    #mailpit:
-    #  image: axllent/mailpit:latest
-    #  ports:
-    #    - "1025:1025"  # SMTP
-    #    - "8025:8025"  # Web UI
+    mailpit:
+      image: axllent/mailpit:latest
+      ports:
+        - "1025:1025"  # SMTP
+        - "8025:8025"  # Web UI
 
   volumes:
     mysql_data:
