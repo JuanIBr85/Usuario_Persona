@@ -26,6 +26,9 @@ import {
   ShieldMinus,
   ShieldCheck,
   OctagonMinus,
+  AlertCircleIcon,
+  CheckCircle2Icon,
+  PopcornIcon,Loader2Icon
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -37,6 +40,7 @@ import { useNavigate } from "react-router-dom";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 import { componentService } from "@/services/componentService";
+
 
 import {
   Dialog,
@@ -57,7 +61,8 @@ function ComponentTable({ data, setData }) {
   const [response, setResponse] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const [countdown, setCountdown] = useState(3);
+  const [countdown, setCountdown] = useState(null);
+  const [isStopping, setIsStopping] = useState(false);
   const [canStop, setCanStop] = useState(false);
 
   const navigate = useNavigate();
@@ -97,6 +102,8 @@ function ComponentTable({ data, setData }) {
   };
 
   const handleStopSystem = async () => {
+    setCountdown(30)
+    setIsStopping(true)
     try {
       const response = await componentService.stop_system();
       console.log(" Sistema será detenido en 30 segundos:", response);
@@ -148,6 +155,9 @@ function ComponentTable({ data, setData }) {
     }
 
     return () => clearInterval(interval);
+    if (countdown == 0 && isStopping == true){
+      setIsStopping(false)
+    }
   }, [countdown]);
 
   return (
@@ -327,6 +337,7 @@ function ComponentTable({ data, setData }) {
         <Dialog>
           <DialogTrigger asChild>
             <Button
+              disabled={isStopping}
               variant="destructive"
               className={"mt-5 ml-2"}
               onClick={() => {
@@ -382,6 +393,16 @@ function ComponentTable({ data, setData }) {
             </Alert>
           )}
         </div>
+      )}
+      {countdown !== null && isStopping &&(
+        <Alert variant="destructive" className={"mt-5"}>
+          <AlertCircleIcon />
+          <AlertTitle>Deteniendo todos los servicios</AlertTitle>
+          <AlertDescription>
+            Los servicios se detendrán en <strong>{countdown}</strong>{" "}
+            segundos...
+          </AlertDescription>
+        </Alert>
       )}
     </Table>
   );
