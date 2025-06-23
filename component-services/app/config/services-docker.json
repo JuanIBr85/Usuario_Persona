@@ -7,6 +7,10 @@
         {
             "service_name": "auth-service",
             "service_url": "http://auth-service:5000"
+        },
+        {
+            "service_name": "api-creus",
+            "service_url": "http://api-creus:5004"
         }
     ]
 }

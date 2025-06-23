@@ -4,7 +4,7 @@ service:
   service_available: true
   service_description: Backend para el manejo de creus
   service_core: false
-  service_wait: false
+  service_wait: true
 
 permissions:
   - api_creus.admin.crear_api_creus
