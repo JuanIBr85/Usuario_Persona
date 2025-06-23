@@ -19,7 +19,7 @@ const defaultData = Object.freeze({
 const _authData = localStorage.getItem("authData");
 const saveAuthData = _authData ? JSON.parse(_authData) : defaultData;
 
-const tempAuthData = {};
+const tempAuthData = {...saveAuthData};
 
 function AuthContextProvider({ children }) {
     const [authData, setAuthData] = useState(saveAuthData);
@@ -116,6 +116,7 @@ export const hasRole = (role) => {
 }
 
 export const isAdmin = () => {
+    alert(tempAuthData?.user?.rol)
     return hasRole("admin") || hasRole("superadmin");
 }
 
