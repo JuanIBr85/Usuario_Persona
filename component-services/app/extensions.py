@@ -9,11 +9,17 @@ import logging
 
 import os
 
-engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=True, future=True)
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URI, echo=False, echo_pool=False, future=True
+)
 Base = declarative_base()
 SessionLocal = scoped_session(
     sessionmaker(autocommit=False, autoflush=False, bind=engine)
 )
+
+# Inicializar la base de datos
+import app.database
+
 
 jwt = JWTManager()
 
@@ -28,6 +34,3 @@ cache = FanoutCache(
 )
 
 logger = logging.getLogger(__name__)
-
-# Inicializar la base de datos
-import app.database
