@@ -1,3 +1,4 @@
+import { href } from "react-router";
 
 export const ServiceURL = Object.freeze({
     auth: "http://localhost:5002/api",
@@ -125,11 +126,17 @@ export const fetchService = {
         })
         .catch((error) => {
             if(showError)console.error(`Fetch [${url}] error:`, error);
-            
+
+            if(error.statusCode===503){
+                window.location.href="/*"; 
+                alert("El sistema esta en mantenimiento, no se puede usar la pagina");               
+            }
+
             if(error instanceof FetchError) {
                 // Si ya es un FetchError, lo volvemos a lanzar
                 throw error;
             }
+
 
             throw new FetchError(
                 `Fetch [${url}] error: ${error.message}`, 

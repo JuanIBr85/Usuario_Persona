@@ -38,14 +38,16 @@ class MessageService:
         # Si el servicio no esta disponible
         if not service.service_available:
             return None, 400, "Servicio no disponible"
-
-        # Enviamos el mensaje
-        response = requests.post(
-            f"{service.service_url}/component_service/receiver",
-            json=message,
-            timeout=2,
-        )
-        if response.status_code != 200:
-            return None, response.status_code, "Error al enviar mensaje"
+        try:
+            # Enviamos el mensaje
+            response = requests.post(
+                f"{service.service_url}/component_service/receiver",
+                json=message,
+                timeout=2,
+            )
+            if response.status_code != 200:
+                return None, response.status_code, "Error al enviar mensaje"
+        except Exception as e:
+            return None, 500, str(e)
 
         return response.text, response.status_code, None

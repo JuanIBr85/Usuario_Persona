@@ -43,7 +43,13 @@ def receiver():
         if not receiver_func:
             return "Error no existe el canal", 404
 
-        threading.Thread(target=receiver_func, args=(data,)).start()
+        threading.Thread(
+            target=receiver_func,
+            args=(
+                data,
+                current_app._get_current_object(),
+            ),
+        ).start()
 
         return "OK", 200
     except Exception as e:
