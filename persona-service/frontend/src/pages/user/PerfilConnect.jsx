@@ -14,7 +14,7 @@ import { PersonaService } from "@/services/personaService";
 import { formSubmitJson } from "@/utils/formUtils";
 import SimpleSelect from "@/components/SimpleSelect";
 import { SelectItem } from "@/components/ui/select";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 
 function PerfilConnect() {
@@ -24,6 +24,8 @@ function PerfilConnect() {
     const [email, setEmail] = useState(null)
     const [tipoDocumento, setTipoDocumento] = useState([])
     const [tempData, setTempData] = useState({})
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         PersonaService.get_tipos_documentos()
@@ -79,7 +81,7 @@ function PerfilConnect() {
             ...formData
         })
         .then(response => {
-            console.log(response)
+            navigate('/profile')
         })
         .catch(error => {
             console.error(error)
@@ -120,7 +122,6 @@ function PerfilConnect() {
                                             name="tipo_documento"
                                             label="Tipo de documento"
                                             placeholder="Selecciona un tipo de documento"
-                                            value="DNI"
                                             required
                                         >
                                             {tipoDocumento.map((tipo) => (
@@ -132,7 +133,6 @@ function PerfilConnect() {
                                         <InputValidate
                                             id="num_doc_persona"
                                             type="number"
-                                            value="28455678"
                                             labelText="Ingresa el número de documento"
                                             placeholder="Nº de documento"
                                             containerClassName="sm:col-span-3"
@@ -158,7 +158,6 @@ function PerfilConnect() {
                                         type="text"
                                         labelText="Escribe tu email"
                                         placeholder={email}
-                                        value="ezequiel.ramirez@example.com"
                                         containerClassName="sm:col-span-3"
                                     />
                                     <Button type="submit" className="w-full">
@@ -188,8 +187,8 @@ function PerfilConnect() {
                                                 </InputOTPGroup>
                                             </InputOTP>
                                         </div>
-                                        <Button type="submit" className="w-full"  asChild>
-                                            <Link to="/root">Siguiente</Link>
+                                        <Button type="submit" className="w-full">
+                                            Siguiente
                                         </Button>
                                     </form>
                                 </CardContent>

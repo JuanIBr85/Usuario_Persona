@@ -78,5 +78,12 @@
     #  environment:
     #    - COMPONENT_SERVICE_HOST=component-service
 
+    #alternativa a mailtrap en local!!!
+    #mailpit:
+    #  image: axllent/mailpit:latest
+    #  ports:
+    #    - "1025:1025"  # SMTP
+    #    - "8025:8025"  # Web UI
+
   volumes:
     mysql_data:
