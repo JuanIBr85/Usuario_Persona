@@ -8,18 +8,6 @@ import { formSubmitJson } from "@/utils/formUtils";
 import Loading from "@/components/loading/Loading";
 import { Ban } from "lucide-react";
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-
 export default function FormPersonaExtendida({
   persona_id,
   personaExtendida,
@@ -135,28 +123,15 @@ export default function FormPersonaExtendida({
             Volver
           </Button>
         </div>
-        {error ? (
-          <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle className={`flex align-center gap-1`}>
-                  {" "}
-                  <Ban /> Ocurrió un error
-                </AlertDialogTitle>
-                <AlertDialogDescription>
-                  No se pudieron guardar los datos. Intenta nuevamente.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => setOpenDialog(false)}>
-                  Cerrar
-                </AlertDialogCancel>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        ) : (
-          ``
-        )}
+        {error && <SimpleDialog
+            title={<div className="flex flex-row items-center gap-2"><Ban /> Ocurrió un error</div>}
+            description={"No se pudieron guardar los datos. Intenta nuevamente."}
+            isOpen={openDialog}
+            actionHandle={() => {
+              setOpenDialog(null);
+            }}
+            action="Cerrar"
+          />}
       </form>
     </>
   );

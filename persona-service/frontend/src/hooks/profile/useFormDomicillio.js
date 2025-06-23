@@ -67,6 +67,9 @@ export function useFormDomicilio(domicilio, setPersonaData, persona_id) {
             })
             .catch(error => {
                 console.error('Error updating domicilio:', error.data);
+
+                setOpenDialog(true);
+                setError(true);
             })
             .finally(() => setLoading(false));
     };
