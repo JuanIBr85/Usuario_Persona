@@ -403,7 +403,7 @@ class PersonaService(IPersonaInterface):
         try:
             session.query(Persona).filter_by(id_persona=persona_id).update(
                 {"usuario_id": usuario_id}
-            )
-            session.commit()
+            ) # asocia la persona al usuario
+            session.commit() # guarda los cambios en la base de datos
         finally:
             session.close()

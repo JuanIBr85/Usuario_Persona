@@ -403,6 +403,10 @@ def contar_personas():
         )
 
 
+"""
+ruta para iniciar lqa verificacion de persona mediante codigo otp
+el usuario debe estar autenticado jwt_required
+"""
 @persona_bp.route("/personas/verify", methods=["POST"])
 @api_access()
 def verificar_persona():
@@ -453,6 +457,9 @@ def verificar_persona():
         return make_response(ResponseStatus.FAIL, "Error al verificar persona"), 500
 
 
+"""
+ruta paqra verificar el codigo otp recibido y vincular la persona con el usuario
+"""
 # cambios para usar X-USER-ID
 @api_access()
 @persona_bp.route("/personas/verify-otp", methods=["POST"])
@@ -477,6 +484,8 @@ def verificar_otp_persona():
     except Exception:
         return make_response(ResponseStatus.FAIL, "Token inválido o expirado"), 400
 
+    # aca se verifica que el token fue creado por ese usuario
+    # evita suplantacion de identidad
     if str(claims.get("sub")) != str(usuario_id):
         return make_response(ResponseStatus.FAIL, "Usuario no autorizado"), 403
 

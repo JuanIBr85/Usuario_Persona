@@ -192,7 +192,7 @@ def buscar_domicilio_postal():
         )
 
 
-# verificar documento
+# verificar documento de persona por tipo_documento y num_doc_persona
 @api_access(
     # limiter=["3 per minute"],
 )
@@ -226,7 +226,8 @@ def verificar_documento():
                 404,
             )
 
-        censored = censurar_email(email)
+        # si la persona existe censura el mail para enviarlo al frontend
+    censored = censurar_email(email)
         return (
             make_response(
                 status=ResponseStatus.SUCCESS,
