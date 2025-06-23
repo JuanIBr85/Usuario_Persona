@@ -104,5 +104,18 @@ export const componentService = {
       showError: componentService.showError,
       useToken: true
     });
+  },
+  
+  /*
+   * Detener todo 
+  */ 
+ 
+  stop_system: async () => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/control/stop_system`,
+      method: HttpMethod.POST,
+      showError: componentService.showError,
+      useToken: true
+    });
   }
 };

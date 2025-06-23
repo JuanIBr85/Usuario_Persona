@@ -1,4 +1,5 @@
 import React from "react";
+import { useEffect } from "react";
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -23,7 +24,8 @@ import {
   RouteOff,
   Route,
   ShieldMinus,
-  ShieldCheck
+  ShieldCheck,
+  OctagonMinus,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -54,6 +56,9 @@ function ComponentTable({ data, setData }) {
 
   const [response, setResponse] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const [countdown, setCountdown] = useState(3);
+  const [canStop, setCanStop] = useState(false);
 
   const navigate = useNavigate();
   const handleToggleService = (id_service, state) => {
@@ -91,9 +96,14 @@ function ComponentTable({ data, setData }) {
     navigate(`/adminservices/components/${id_service}`);
   };
 
-  const handleStopSystem = (id_service) =>{
-
-  }
+  const handleStopSystem = async () => {
+    try {
+      const response = await componentService.stop_system();
+      console.log(" Sistema será detenido en 30 segundos:", response);
+    } catch (error) {
+      console.error(" Error al detener el sistema:", error);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({ newService_url: e.target.value });
@@ -125,6 +135,20 @@ function ComponentTable({ data, setData }) {
       setLoading(false);
     }*/
   };
+
+  useEffect(() => {
+    let interval;
+    if (countdown > 0) {
+      interval = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+    } else {
+      setCanStop(true);
+      clearInterval(interval);
+    }
+
+    return () => clearInterval(interval);
+  }, [countdown]);
 
   return (
     <Table>
@@ -194,14 +218,6 @@ function ComponentTable({ data, setData }) {
                         <span>Ver detalles</span>
                       </DropdownMenuItem>
 
-                      {/* Parar toda comunicacion del servicio de componentes */}
-                      <DropdownMenuItem
-                        onClick={() => handleStopSystem(service.id_service)}
-                      >
-                        <RouteOff className="mr-2 h-4 w-4" />
-                        <span>Parar Sistema</span>
-                      </DropdownMenuItem>
-
                       {/* Activar/Desactivar */}
                       {console.log(
                         `${service.service_name} → service_wait:`,
@@ -262,44 +278,94 @@ function ComponentTable({ data, setData }) {
           </TableRow>
         )}
       </TableBody>
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="outline" className={"mt-5"}>
-            {" "}
-            <Plus /> Instalar Servicio
-          </Button>
-        </DialogTrigger>
+      <div className="">
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline" className={"mt-5"}>
+              {" "}
+              <Plus /> Instalar Servicio
+            </Button>
+          </DialogTrigger>
 
-        <DialogContent className="sm:max-w-[600px] overflow-y-auto max-h-[90vh]">
-          <DialogHeader>
-            <DialogTitle>Instalar Servicio</DialogTitle>
-            <DialogDescription>Instalar Servicio</DialogDescription>
-          </DialogHeader>
+          <DialogContent className="sm:max-w-[600px] overflow-y-auto max-h-[90vh]">
+            <DialogHeader>
+              <DialogTitle>Instalar Servicio</DialogTitle>
+              <DialogDescription>Instalar Servicio</DialogDescription>
+            </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="grid gap-4">
-            {/* Datos personales */}
-            <div className="grid gap-3">
-              <Label>URL</Label>
-              <Input
-                name="nombre"
-                value={formData.newService_url || ""}
-                onChange={handleChange}
-              />
-            </div>
+            <form onSubmit={handleSubmit} className="grid gap-4">
+              {/* Datos personales */}
+              <div className="grid gap-3">
+                <Label>URL</Label>
+                <Input
+                  name="nombre"
+                  value={formData.newService_url || ""}
+                  onChange={handleChange}
+                />
+              </div>
 
-            <DialogFooter className="pt-4">
+              <DialogFooter className="sm:justify-start">
+                <DialogClose asChild>
+                  <Button
+                    onClick={async () => {
+                      await handleStopSystem();
+                    }}
+                    type="submit"
+                    variant="secondary"
+                  >
+                    Detener
+                  </Button>
+                </DialogClose>
+
+                <DialogClose asChild>
+                  <Button type="button">Cerrar</Button>
+                </DialogClose>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button
+              variant="destructive"
+              className={"mt-5 ml-2"}
+              onClick={() => {
+                setCountdown(3);
+                setCanStop(false);
+              }}
+            >
+              <OctagonMinus /> Detener los servicios
+            </Button>
+          </DialogTrigger>
+
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Detener todos los servicios</DialogTitle>
+              <DialogDescription>
+                ¿Está seguro que quiere detener todos los servicios?
+              </DialogDescription>
+            </DialogHeader>
+
+            <DialogFooter className="sm:justify-start">
               <DialogClose asChild>
-                <Button type="button" variant="outline">
-                  Cancelar
+                <Button>Cerrar</Button>
+              </DialogClose>
+              <DialogClose asChild>
+                <Button
+                  onClick={async () => {
+                    await handleStopSystem();
+                  }}
+                  type="submit"
+                  variant="secondary"
+                  disabled={!canStop}
+                >
+                  {canStop ? "Detener" : `Esperando ${countdown}s...`}
                 </Button>
               </DialogClose>
-              <DialogClose asChild>
-                <Button type="submit">Guardar</Button>
-              </DialogClose>
             </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+          </DialogContent>
+        </Dialog>
+      </div>
       {response && (
         <div className="grid w-full max-w-xl items-start gap-4 mt-5">
           {response.status === "fail" ? (
