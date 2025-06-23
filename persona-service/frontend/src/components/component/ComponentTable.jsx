@@ -153,11 +153,12 @@ function ComponentTable({ data, setData }) {
       setCanStop(true);
       clearInterval(interval);
     }
-
-    return () => clearInterval(interval);
-    if (countdown == 0 && isStopping == true){
+     if (countdown == 0 && isStopping == true){
       setIsStopping(false)
     }
+    
+    return () => clearInterval(interval);
+   
   }, [countdown]);
 
   return (
