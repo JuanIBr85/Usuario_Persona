@@ -6,6 +6,7 @@ import { PersonaService } from "@/services/personaService";
 import { useState } from "react";
 import { formSubmitJson } from "@/utils/formUtils";
 import Loading from "@/components/loading/Loading";
+import { Ban } from "lucide-react";
 
 import {
   AlertDialog,
