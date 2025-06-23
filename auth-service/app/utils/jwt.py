@@ -5,7 +5,7 @@ from flask_jwt_extended import create_access_token
 import jwt
 
 
-def crear_token_acceso(usuario_id, email, rol, permisos):
+def crear_token_acceso(usuario_id, email):
     expires_seconds = int(getenv("JWT_ACCESS_TOKEN_EXPIRES", 60 * 15))
     expires_delta = timedelta(seconds=expires_seconds)
     expires_at = datetime.now(timezone.utc) + expires_delta
@@ -16,8 +16,8 @@ def crear_token_acceso(usuario_id, email, rol, permisos):
             additional_claims={
                 "sub": str(usuario_id),
                 "email": email,
-                "rol": rol,
-                "permisos": permisos,
+                # "rol": rol,
+                # "permisos": permisos,
                 "exp": expires_at,
             },
             expires_delta=expires_delta,
