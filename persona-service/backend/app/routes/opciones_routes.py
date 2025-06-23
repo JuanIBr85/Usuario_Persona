@@ -227,7 +227,8 @@ def verificar_documento():
             )
 
         # si la persona existe censura el mail para enviarlo al frontend
-    censored = censurar_email(email)
+        censored = censurar_email(email)
+
         return (
             make_response(
                 status=ResponseStatus.SUCCESS,
