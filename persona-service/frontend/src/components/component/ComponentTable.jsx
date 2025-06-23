@@ -41,29 +41,19 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 import { componentService } from "@/services/componentService";
 
-
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { SimpleDialog } from "@/components/SimpleDialog";
+import { formSubmitJson } from "@/utils/formUtils";
+import InputValidate from "../inputValidate/InputValidate";
 
 function ComponentTable({ data, setData }) {
-  const [formData, setFormData] = useState({
-    newService_url: "",
-  });
-
   const [response, setResponse] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [installDialogOpen, setInstallDialogOpen] = useState(false);
 
   const [countdown, setCountdown] = useState(null);
   const [isStopping, setIsStopping] = useState(false);
   const [canStop, setCanStop] = useState(false);
+  const [stopSystemDialogOpen, setStopSystemDialogOpen] = useState(false);
 
   const navigate = useNavigate();
   const handleToggleService = (id_service, state) => {
@@ -110,14 +100,11 @@ function ComponentTable({ data, setData }) {
     } catch (error) {
       console.error(" Error al detener el sistema:", error);
     }
-  };
-
-  const handleChange = (e) => {
-    setFormData({ newService_url: e.target.value });
+    setStopSystemDialogOpen(false);
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    const formData = await formSubmitJson(e);
     setLoading(true);
     setResponse(null);
     componentService
@@ -129,7 +116,7 @@ function ComponentTable({ data, setData }) {
           message: error.data?.message ?? "Ocurrió un error inesperado",
         })
       )
-      .finally(() => setLoading(false));
+      .finally(() => { setLoading(false); setInstallDialogOpen(false); });
     /*try {
       const data = await componentService.install_service(
         formData.newService_url
@@ -161,7 +148,9 @@ function ComponentTable({ data, setData }) {
 
   }, [countdown]);
 
-  return (
+  return (<>
+
+
     <Table>
       <TableHeader>
         <TableRow>
@@ -313,91 +302,69 @@ function ComponentTable({ data, setData }) {
           </AlertDescription>
         </Alert>
       )}
+
+
       <TableCaption>
+        <SimpleDialog
+          title="Instalar Servicio"
+          isOpen={installDialogOpen}
+          description={
+            <form id="installServiceForm" onSubmit={handleSubmit} className="grid gap-4">
+              <div className="grid gap-3">
+                <InputValidate
+                  id="newService_url"
+                  type="text"
+                  placeholder="https://example:port"
+                  labelText="URL del servicio"
+                  validatePattern="^https?:\/\/(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(?:\/[^\s]*)?$"
+                  validateMessage="Por favor, ingresa una URL válida."
+                  required
+                />
+              </div>
+            </form>
+          }
+          actionHandle={() => {
+            const form = document.getElementById("installServiceForm");
+            const submitEvent = new Event('submit', {
+              cancelable: true,
+              bubbles: true
+            });
+            form.dispatchEvent(submitEvent);
+          }}
+        />
+
+        <SimpleDialog
+          title="Detener todos los servicios"
+          description="¿Está seguro que quiere detener todos los servicios?"
+          action={canStop ? "Detener" : `Esperando ${countdown}s...`}
+          cancel="Cerrar"
+          actionHandle={async () => (canStop) && handleStopSystem()}
+          cancelHandle={() => setStopSystemDialogOpen(false)}
+          isOpen={stopSystemDialogOpen}
+          actionDisabled={!canStop}
+        />
         <div className="flex justify-between w-full">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline" className={"mt-5"}>
-                {" "}
-                <Plus /> Instalar Servicio
-              </Button>
-            </DialogTrigger>
+          <Button variant="outline" className={"mt-5"} onClick={() => setInstallDialogOpen(true)}>
+            {" "}
+            <Plus /> Instalar Servicio
+          </Button>
+          <Button
+            disabled={isStopping}
+            variant="destructive"
+            className={"mt-5"}
+            onClick={() => {
+              setCountdown(3);
+              setCanStop(false);
+              setStopSystemDialogOpen(true);
+            }}
+          >
+            <OctagonMinus /> Detener todo el sistema
+          </Button>
 
-            <DialogContent className="sm:max-w-[600px] overflow-y-auto max-h-[90vh]">
-              <DialogHeader>
-                <DialogTitle>Instalar Servicio</DialogTitle>
-                <DialogDescription>Instalar Servicio</DialogDescription>
-              </DialogHeader>
-
-              <form onSubmit={handleSubmit} className="grid gap-4">
-                {/* Datos personales */}
-                <div className="grid gap-3">
-                  <Label>URL</Label>
-                  <Input
-                    name="nombre"
-                    value={formData.newService_url || ""}
-                    onChange={handleChange}
-                  />
-                </div>
-
-                <DialogFooter className="pt-4">
-                  <DialogClose asChild>
-                    <Button type="button" variant="outline">
-                      Cancelar
-                    </Button>
-                  </DialogClose>
-                  <DialogClose asChild>
-                    <Button type="submit">Guardar</Button>
-                  </DialogClose>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button
-                disabled={isStopping}
-                variant="destructive"
-                className={"mt-5"}
-                onClick={() => {
-                  setCountdown(3);
-                  setCanStop(false);
-                }}
-              >
-                <OctagonMinus /> Detener los servicios
-              </Button>
-            </DialogTrigger>
-
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Detener todos los servicios</DialogTitle>
-                <DialogDescription>
-                  ¿Está seguro que quiere detener todos los servicios?
-                </DialogDescription>
-              </DialogHeader>
-
-              <DialogFooter className="sm:justify-start">
-                <DialogClose asChild>
-                  <Button>Cerrar</Button>
-                </DialogClose>
-                <DialogClose asChild>
-                  <Button
-                    onClick={async () => {
-                      await handleStopSystem();
-                    }}
-                    type="submit"
-                    variant="secondary"
-                    disabled={!canStop}
-                  >
-                    {canStop ? "Detener" : `Esperando ${countdown}s...`}
-                  </Button>
-                </DialogClose>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
         </div>
       </TableCaption>
     </Table>
+  </>
   );
 }
 
