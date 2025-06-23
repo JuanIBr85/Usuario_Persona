@@ -28,7 +28,7 @@ import {
   OctagonMinus,
   AlertCircleIcon,
   CheckCircle2Icon,
-  PopcornIcon,Loader2Icon
+  PopcornIcon, Loader2Icon
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -153,17 +153,16 @@ function ComponentTable({ data, setData }) {
       setCanStop(true);
       clearInterval(interval);
     }
-     if (countdown == 0 && isStopping == true){
+    if (countdown == 0 && isStopping == true) {
       setIsStopping(false)
     }
-    
+
     return () => clearInterval(interval);
-   
+
   }, [countdown]);
 
   return (
     <Table>
-      <TableCaption>Información del servicio de personas</TableCaption>
       <TableHeader>
         <TableRow>
           <TableHead>ID</TableHead>
@@ -188,22 +187,20 @@ function ComponentTable({ data, setData }) {
               <TableCell>{service.service_url}</TableCell>
               <TableCell>
                 <span
-                  className={`px-2 py-1 rounded-full text-xs ${
-                    service.health
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
-                  }`}
+                  className={`px-2 py-1 rounded-full text-xs ${service.health
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800"
+                    }`}
                 >
                   {service.health ? "Activo" : "Inactivo"}
                 </span>
               </TableCell>
               <TableCell>
                 <span
-                  className={`px-2 py-1 rounded-full text-xs ${
-                    service.service_available
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
-                  }`}
+                  className={`px-2 py-1 rounded-full text-xs ${service.service_available
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800"
+                    }`}
                 >
                   {service.service_available ? "Sí" : "No"}
                 </span>
@@ -289,95 +286,6 @@ function ComponentTable({ data, setData }) {
           </TableRow>
         )}
       </TableBody>
-      <div className="">
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="outline" className={"mt-5"}>
-              {" "}
-              <Plus /> Instalar Servicio
-            </Button>
-          </DialogTrigger>
-
-          <DialogContent className="sm:max-w-[600px] overflow-y-auto max-h-[90vh]">
-            <DialogHeader>
-              <DialogTitle>Instalar Servicio</DialogTitle>
-              <DialogDescription>Instalar Servicio</DialogDescription>
-            </DialogHeader>
-
-            <form onSubmit={handleSubmit} className="grid gap-4">
-              {/* Datos personales */}
-              <div className="grid gap-3">
-                <Label>URL</Label>
-                <Input
-                  name="nombre"
-                  value={formData.newService_url || ""}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <DialogFooter className="sm:justify-start">
-                <DialogClose asChild>
-                  <Button
-                    onClick={async () => {
-                      await handleStopSystem();
-                    }}
-                    type="submit"
-                    variant="secondary"
-                  >
-                    Detener
-                  </Button>
-                </DialogClose>
-
-                <DialogClose asChild>
-                  <Button type="button">Cerrar</Button>
-                </DialogClose>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button
-              disabled={isStopping}
-              variant="destructive"
-              className={"mt-5 ml-2"}
-              onClick={() => {
-                setCountdown(3);
-                setCanStop(false);
-              }}
-            >
-              <OctagonMinus /> Detener los servicios
-            </Button>
-          </DialogTrigger>
-
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Detener todos los servicios</DialogTitle>
-              <DialogDescription>
-                ¿Está seguro que quiere detener todos los servicios?
-              </DialogDescription>
-            </DialogHeader>
-
-            <DialogFooter className="sm:justify-start">
-              <DialogClose asChild>
-                <Button>Cerrar</Button>
-              </DialogClose>
-              <DialogClose asChild>
-                <Button
-                  onClick={async () => {
-                    await handleStopSystem();
-                  }}
-                  type="submit"
-                  variant="secondary"
-                  disabled={!canStop}
-                >
-                  {canStop ? "Detener" : `Esperando ${countdown}s...`}
-                </Button>
-              </DialogClose>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </div>
       {response && (
         <div className="grid w-full max-w-xl items-start gap-4 mt-5">
           {response.status === "fail" ? (
@@ -395,7 +303,7 @@ function ComponentTable({ data, setData }) {
           )}
         </div>
       )}
-      {countdown !== null && isStopping &&(
+      {countdown !== null && isStopping && (
         <Alert variant="destructive" className={"mt-5"}>
           <AlertCircleIcon />
           <AlertTitle>Deteniendo todos los servicios</AlertTitle>
@@ -405,6 +313,90 @@ function ComponentTable({ data, setData }) {
           </AlertDescription>
         </Alert>
       )}
+      <TableCaption>
+        <div className="flex justify-between w-full">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" className={"mt-5"}>
+                {" "}
+                <Plus /> Instalar Servicio
+              </Button>
+            </DialogTrigger>
+
+            <DialogContent className="sm:max-w-[600px] overflow-y-auto max-h-[90vh]">
+              <DialogHeader>
+                <DialogTitle>Instalar Servicio</DialogTitle>
+                <DialogDescription>Instalar Servicio</DialogDescription>
+              </DialogHeader>
+
+              <form onSubmit={handleSubmit} className="grid gap-4">
+                {/* Datos personales */}
+                <div className="grid gap-3">
+                  <Label>URL</Label>
+                  <Input
+                    name="nombre"
+                    value={formData.newService_url || ""}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <DialogFooter className="pt-4">
+                  <DialogClose asChild>
+                    <Button type="button" variant="outline">
+                      Cancelar
+                    </Button>
+                  </DialogClose>
+                  <DialogClose asChild>
+                    <Button type="submit">Guardar</Button>
+                  </DialogClose>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                disabled={isStopping}
+                variant="destructive"
+                className={"mt-5"}
+                onClick={() => {
+                  setCountdown(3);
+                  setCanStop(false);
+                }}
+              >
+                <OctagonMinus /> Detener los servicios
+              </Button>
+            </DialogTrigger>
+
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Detener todos los servicios</DialogTitle>
+                <DialogDescription>
+                  ¿Está seguro que quiere detener todos los servicios?
+                </DialogDescription>
+              </DialogHeader>
+
+              <DialogFooter className="sm:justify-start">
+                <DialogClose asChild>
+                  <Button>Cerrar</Button>
+                </DialogClose>
+                <DialogClose asChild>
+                  <Button
+                    onClick={async () => {
+                      await handleStopSystem();
+                    }}
+                    type="submit"
+                    variant="secondary"
+                    disabled={!canStop}
+                  >
+                    {canStop ? "Detener" : `Esperando ${countdown}s...`}
+                  </Button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </TableCaption>
     </Table>
   );
 }

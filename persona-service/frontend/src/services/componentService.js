@@ -112,7 +112,7 @@ export const componentService = {
  
   stop_system: async () => {
     return fetchService.fetch({
-      url: `${ServiceURL.auth}/control/stop_system`,
+      url: `${ServiceURL.auth}/control/services/stop_system`,
       method: HttpMethod.POST,
       showError: componentService.showError,
       useToken: true
