@@ -14,7 +14,8 @@
       volumes:
         - ./auth-service:/app
         - ./auth-service/auth_data:/app/auth_data
-
+      depends_on:
+        - redis
     persona-backend:
       build: ./persona-service/backend
       ports:
@@ -27,7 +28,8 @@
         - MAIL_SERVER=mailpit
       volumes:
         - ./persona-service/backend:/app
-        - ./persona-service/backend/persona.db:/app/persona.db
+      depends_on:
+        - mysql
 
     persona-frontend:
       build: ./persona-service/frontend
@@ -49,7 +51,7 @@
       depends_on:
         - auth-service
         - persona-backend
-
+  
     api-creus:
       build: ./api_creus
       ports:
