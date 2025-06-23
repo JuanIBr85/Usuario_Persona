@@ -116,7 +116,6 @@ export const hasRole = (role) => {
 }
 
 export const isAdmin = () => {
-    alert(tempAuthData?.user?.rol)
     return hasRole("admin") || hasRole("superadmin");
 }
 
