@@ -1,0 +1,13 @@
+service:
+  service_name: api_creus
+  service_prefix: api_creus
+  service_available: true
+  service_description: Backend para el manejo de creus
+  service_core: false
+  service_wait: false
+
+permissions:
+  - api_creus.admin.crear_api_creus
+  - api_creus.admin.ver_api_creus
+  - api_creus.admin.modificar_api_creus
+  - api_creus.admin.eliminar_api_creus
