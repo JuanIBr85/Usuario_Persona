@@ -1,14 +1,6 @@
 from marshmallow import Schema, ValidationError, fields, pre_load
 from config import ESTADO_CIVIL,ESTUDIOS_ALCANZADOS,OCUPACION
-
-def permitir_vacios(valores):
-    def validacion(value):
-        if value in (None, ""):
-            return
-        if value not in valores:
-            raise ValidationError(f"Debe ser uno de: {', '.join(valores)}")
-    return validacion
-
+from app.utils.vacios import permitir_vacios
 
 class PersonaExtendidaSchema(Schema):
 

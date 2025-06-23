@@ -11,14 +11,15 @@ const defaultData = Object.freeze({
         id_usuario: 0,
         nombre_usuario: "",
         email_usuario: "",
-        permisos: [],
-        rol: "",
+        rol: [],
         expires_in: null//Date
     },
 });
 
 const _authData = localStorage.getItem("authData");
 const saveAuthData = _authData ? JSON.parse(_authData) : defaultData;
+
+const tempAuthData = {};
 
 function AuthContextProvider({ children }) {
     const [authData, setAuthData] = useState(saveAuthData);
@@ -85,6 +86,7 @@ function AuthContextProvider({ children }) {
             const newData = { ...data, ...values };
             localStorage.setItem("authData", JSON.stringify(newData));
             localStorage.setItem("token", newData.token);
+            Object.assign(tempAuthData, newData);
             return newData;
         });
     };
@@ -108,5 +110,21 @@ function AuthContextProvider({ children }) {
 export const useAuthContext = () => {
     return useContext(AuthContext);
 };
+
+export const hasRole = (role) => {
+    return (tempAuthData?.user?.rol.includes(role)) ?? false;
+}
+
+export const isAdmin = () => {
+    return hasRole("admin") || hasRole("superadmin");
+}
+
+export const isSuperAdmin = () => {
+    return hasRole("superadmin");
+}
+
+export const isUsuario = () => {
+    return hasRole("usuario");
+}
 
 export default AuthContextProvider;

@@ -42,8 +42,6 @@ const ProfileForm = () => {
     return <Loading />;
   }
 
-
-
   return (
     <>
       <SimpleDialog

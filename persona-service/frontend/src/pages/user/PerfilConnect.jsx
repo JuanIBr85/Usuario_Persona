@@ -10,8 +10,11 @@ import { useEffect, useState } from "react";
 import React from "react";
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/components/ui/input-otp";
 import { Label } from "@/components/ui/label";
-import { jwtDecode } from "jwt-decode";
-
+import { PersonaService } from "@/services/personaService";
+import { formSubmitJson } from "@/utils/formUtils";
+import SimpleSelect from "@/components/SimpleSelect";
+import { SelectItem } from "@/components/ui/select";
+import { useNavigate } from "react-router-dom";
 
 
 function PerfilConnect() {
@@ -19,17 +22,74 @@ function PerfilConnect() {
     const [dialog, setDialog] = useState(null);
     const [api, setApi] = useState();
     const [email, setEmail] = useState(null)
+    const [tipoDocumento, setTipoDocumento] = useState([])
+    const [tempData, setTempData] = useState({})
+
+    const navigate = useNavigate();
+
     useEffect(() => {
-        const token = localStorage.getItem("token");
-        const decoded = jwtDecode(token);
-        console.log("decoded",decoded)
-        if(decoded){
-            setEmail(decoded.email)
-        }
+        PersonaService.get_tipos_documentos()
+            .then(response => {
+                setTipoDocumento(response.data)
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    }, [])
 
-        if (!api) return;
-    }, [api]);
+    const handleDNIVerificacion = async (event) => {
+        const formData = await formSubmitJson(event);
+        setLoading(true);
+        PersonaService.verificar_documento(formData)
+            .then(response => {
+                setEmail(response.data.email);
+                setTempData(formData);
+                api?.scrollNext()
+            })
+            .catch(error => {
+                console.log(error)
+            })
+            .finally(() => {
+                setLoading(false)
+            })
+    }
 
+    const handleEmailVerification = async (event) => {
+        const formData = await formSubmitJson(event);
+        setLoading(true);
+        PersonaService.verificar_email({
+            ...tempData,
+            ...formData
+        })
+        .then(response => {
+            setTempData({...response.data});
+            api?.scrollNext()
+        })
+        .catch(error => {
+            console.error(error)
+        })
+        .finally(() => {
+            setLoading(false)
+        })
+    }
+
+    const handleOTPVerification = async (event) => {
+        const formData = await formSubmitJson(event);
+        setLoading(true);
+        PersonaService.verificar_otp({
+            ...tempData,
+            ...formData
+        })
+        .then(response => {
+            navigate('/profile')
+        })
+        .catch(error => {
+            console.error(error)
+        })
+        .finally(() => {
+            setLoading(false)
+        })
+    }
 
     return (
         <>
@@ -56,42 +116,64 @@ function PerfilConnect() {
 
 
                             <SimpleCarousel setApi={setApi}>
-                                <CardContent className="h-full overflow-y-auto flex flex-col gap-8">
-                                    <InputValidate
-                                        id="documento"
-                                        type="text"
-                                        labelText="Ingresa el número de documento"
-                                        placeholder="Nº de documento"
-                                        containerClassName="sm:col-span-3"
-                                        required
-                                    />
-                                    <Button type="submit" className="w-full" onClick={() => api?.scrollNext()}>
-                                        Siguiente
-                                    </Button>
+                                <CardContent className="h-full overflow-y-auto ">
+                                    <form onSubmit={handleDNIVerificacion} className="flex flex-col gap-8">
+                                        <SimpleSelect
+                                            name="tipo_documento"
+                                            label="Tipo de documento"
+                                            placeholder="Selecciona un tipo de documento"
+                                            required
+                                        >
+                                            {tipoDocumento.map((tipo) => (
+                                            <SelectItem key={tipo} value={tipo}>
+                                                {tipo}
+                                            </SelectItem>
+                                            ))}
+                                        </SimpleSelect>
+                                        <InputValidate
+                                            id="num_doc_persona"
+                                            type="number"
+                                            labelText="Ingresa el número de documento"
+                                            placeholder="Nº de documento"
+                                            containerClassName="sm:col-span-3"
+                                            required
+                                        />
+                                        <Button type="submit" className="w-full">
+                                            Siguiente
+                                        </Button>
+                                    </form>
                                 </CardContent>
 
-
-                                <CardContent className="h-full overflow-y-auto flex flex-col gap-4">
+                                <CardContent className="h-full overflow-y-auto">
+                                <form onSubmit={handleEmailVerification} className="flex flex-col gap-4">
                                     <InputValidate
                                         type="text"
                                         labelText="¿Es este tu email?"
-                                        value={email} 
+                                        value=""
                                         containerClassName="sm:col-span-3"
                                         readOnly
                                     />
-                                    <Button type="submit" className="w-full" onClick={() => api?.scrollNext()}>
+                                    <InputValidate
+                                        id="email_confirmado"
+                                        type="text"
+                                        labelText="Escribe tu email"
+                                        placeholder={email}
+                                        containerClassName="sm:col-span-3"
+                                    />
+                                    <Button type="submit" className="w-full">
                                         Siguiente
                                     </Button>
-                                    <Button type="submit" className="w-full" onClick={() => api?.scrollTo(3)}>
+                                    <Button className="w-full" onClick={() => api?.scrollTo(3)}>
                                         No es mi correo / Ya no uso ese correo
                                     </Button>
+                                    </form>
                                 </CardContent>
 
                                 <CardContent className="h-full overflow-y-auto flex flex-col gap-8">
-                                    <div className="grid w-full items-center justify-center gap-4">
-                                        <Label htmlFor="otp" className="inline-block w-full text-center">Código de verificación</Label>
+                                    <form onSubmit={handleOTPVerification} className="grid w-full items-center justify-center gap-4">
+                                        <Label htmlFor="codigo" className="inline-block w-full text-center">Código de verificación</Label>
                                         <div className="relative">
-                                            <InputOTP name="otp" maxLength={6} containerClassName="justify-center">
+                                            <InputOTP name="codigo" maxLength={6} containerClassName="justify-center">
                                                 <InputOTPGroup>
                                                     <InputOTPSlot className="bg-gray-100" index={0} />
                                                     <InputOTPSlot className="bg-gray-100" index={1} />
@@ -105,10 +187,10 @@ function PerfilConnect() {
                                                 </InputOTPGroup>
                                             </InputOTP>
                                         </div>
-                                    </div>
-                                    <Button type="submit" className="w-full" onClick={() => api?.scrollNext()}>
-                                        Siguiente
-                                    </Button>
+                                        <Button type="submit" className="w-full">
+                                            Siguiente
+                                        </Button>
+                                    </form>
                                 </CardContent>
 
                                 <CardContent className="h-full overflow-y-auto flex flex-col gap-4">

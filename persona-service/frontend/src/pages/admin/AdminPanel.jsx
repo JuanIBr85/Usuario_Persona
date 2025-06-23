@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Users, ShieldCheck, FileText, HandPlatter } from "lucide-react";
 import { Fade } from "react-awesome-reveal";
-import { jwtDecode } from "jwt-decode";
+import { isAdmin } from "@/context/AuthContext";
 /**
  * Lista de opciones disponibles en el panel de administración.
  * Cada opción incluye un título, una descripción, un ícono y la ruta correspondiente.
@@ -61,20 +61,9 @@ const AdminPanel = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        if (decoded.rol === "usuario") {
-          navigate("/profile");
-          console.log('usuario no es admin')
-        }
-      } catch (error) {
-        console.error("Token inválido:", error);
-        navigate("/logout"); 
-      }
-    } else {
-      navigate("/logout"); 
+    if (!isAdmin()) {
+      navigate("/profile");
+      console.log('usuario no es admin')
     }
   }, [navigate]);
 

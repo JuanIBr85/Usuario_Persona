@@ -46,31 +46,7 @@ function Login() {
         });
       })
       .catch((error) => {
-        // Si hay error, se analiza el tipo de error y se muestra mensaje adecuado
-        if (error.isJson) {
-          if (error.data.error) {
-            setMessage(FetchErrorMessage(error));
-          } else {
-            setMessage(error.data.message || "Error desconocido");
-          }
-        } else {
-          const statusMatch = error.message.match(/error: (\d{3})/);
-          const statusCode = statusMatch ? parseInt(statusMatch[1]) : null;
-
-          if (statusCode === 429) {
-            setMessage(
-              "Demasiados intentos. Por favor, esperá unos segundos e intentá de nuevo."
-            );
-          } else if (statusCode === 500) {
-            setMessage("Error del servidor. Intentá más tarde.");
-          } else if (statusCode === 401 || statusCode === 403) {
-            setMessage("Credenciales inválidas o acceso no autorizado.");
-          } else {
-            setMessage(
-              "Error inesperado. Verificá tu conexión o intentá más tarde."
-            );
-          }
-        }
+        setMessage(error.data?.message ?? "Ocurrió un error inesperado");
       })
       .finally(() => {
         setIsLoading(false);

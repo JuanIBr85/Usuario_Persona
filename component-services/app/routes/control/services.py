@@ -7,18 +7,18 @@ from common.utils.response import make_response, ResponseStatus
 from app.models.service_model import ServiceModel
 from app.schemas.service_schema import ServiceSchema
 from app.utils.get_health import get_health
-import logging
 from app.utils.get_component_info import get_component_info
-
-logger = logging.getLogger(__name__)
-
+from app.extensions import logger
+from datetime import datetime, timezone, timedelta
+from flask import current_app
+import time
 
 bp = Blueprint("services", __name__, cli_group="control", url_prefix="/services")
 services_service: ServicioBase = ServicioBase(ServiceModel, ServiceSchema())
 
 
 @bp.route("/all", methods=["GET"])
-@cp_api_access(is_public=True, limiter=["5 per minute"])
+@cp_api_access(is_public=True, limiter=["15 per minute"])
 def get_services():
     try:
         services = services_service.get_all()
@@ -35,7 +35,7 @@ def get_services():
 
 
 @bp.route("/get_service/<int:id>", methods=["GET"])
-@cp_api_access(is_public=True, limiter=["5 per minute"])
+@cp_api_access(is_public=True, limiter=["15 per minute"])
 def get_service(id: int):
     try:
         service = services_service.get_by_id(id)
@@ -53,23 +53,30 @@ def get_service(id: int):
         return make_response(ResponseStatus.ERROR, str(e)), 500
 
 
-@bp.route("/recolect_perms", methods=["GET"])
+@bp.route("/refresh_service/<int:id>", methods=["PUT"])
 @cp_api_access(is_public=True, limiter=["5 per minute"])
-def recolect_perms():
+def refresh_service(id: int):
     try:
-        services: list[ServiceModel] = services_service.get_all(not_dump=True)
-        perms = []
-        for service in services:
-            logger.info(f"Recolectando permisos de {service.service_name}")
-            info = get_component_info(service.service_url, wait=True)
-            if info is None:
-                logger.error(f"Error al recolectar permisos de {service.service_name}")
-                continue
+        service: ServiceModel = services_service.get_by_id(id)
 
-            perms.extend(info["permissions"])
+        if service is None:
+            return make_response(ResponseStatus.FAIL, "Servicio no encontrado"), 404
+
+        info = get_component_info(service["service_url"], wait=True)
+
+        if info is None:
+            return (
+                make_response(ResponseStatus.FAIL, "Error al conectar con el servicio"),
+                400,
+            )
+
+        model = {**info["service"], "service_url": service["service_url"]}
+
+        services_service.update(id, model, ignore_schema=True)
+
         return (
             make_response(
-                ResponseStatus.SUCCESS, "Permisos recolectados correctamente", perms
+                ResponseStatus.SUCCESS, "Servicio actualizado correctamente", model
             ),
             200,
         )
@@ -110,37 +117,6 @@ def install_service():
         return (
             make_response(
                 ResponseStatus.SUCCESS, "Servicio instalado correctamente", model
-            ),
-            200,
-        )
-    except Exception as e:
-        return make_response(ResponseStatus.ERROR, str(e)), 500
-
-
-@bp.route("/refresh_service/<int:id>", methods=["PUT"])
-@cp_api_access(is_public=True, limiter=["10 per minute"])
-def refresh_service(id: int):
-    try:
-        service: ServiceModel = services_service.get_by_id(id)
-
-        if service is None:
-            return make_response(ResponseStatus.FAIL, "Servicio no encontrado"), 404
-
-        info = get_component_info(service["service_url"], wait=True)
-
-        if info is None:
-            return (
-                make_response(ResponseStatus.FAIL, "Error al conectar con el servicio"),
-                400,
-            )
-
-        model = {**info["service"], "service_url": service["service_url"]}
-
-        services_service.update(id, model, ignore_schema=True)
-
-        return (
-            make_response(
-                ResponseStatus.SUCCESS, "Servicio actualizado correctamente", model
             ),
             200,
         )
@@ -206,3 +182,43 @@ def set_service_available(id: int, state: int):
         )
     except Exception as e:
         return make_response(ResponseStatus.ERROR, str(e)), 500
+
+
+@bp.route("/stop_system", methods=["POST"])
+@cp_api_access(is_public=True, limiter=["1 per minute"])
+def stop_system():
+    try:
+
+        def stop(app):
+            time.sleep(30)
+            # EventService.send_stop_event()
+            # Limpia todas las rutas
+
+            for endpoint in app.view_functions.keys():
+                # Solo permite la comunicacion entre servicios
+                if endpoint == "message.send_message":
+                    continue
+                app.view_functions[endpoint] = sys_detenido
+
+        # EventService.send_start_stop_event()
+        threading.Thread(target=stop, args=(current_app._get_current_object(),)).start()
+
+        return (
+            make_response(
+                ResponseStatus.SUCCESS,
+                {
+                    "message": "Sistema se desconectaran en 30 segundos, una vez detenido espere unos segundos para asegurarse de que los servicios no esten interactuando con la base de datos",
+                    "time": datetime.now(timezone.utc) + timedelta(seconds=30),
+                },
+            ),
+            200,
+        )
+    except Exception as e:
+        return make_response(ResponseStatus.ERROR, str(e)), 500
+
+
+# Este endpoint es el que se usa para reemplazar todos los demas endpoints
+@bp.route("/sys_detenido", methods=["NONE"])
+@cp_api_access(is_public=True)
+def sys_detenido():
+    return "El sistema esta detenido", 503

@@ -18,7 +18,7 @@ class ResponseStatus(Enum):
 # Función para construir una respuesta JSON estandarizada
 def make_response(
     status: ResponseStatus,
-    message: str,
+    message: str | Dict,
     data: Any = None,
     error_code: Optional[str] = None,
 ) -> Dict:
@@ -47,7 +47,11 @@ def make_response(
     response = {"status": status.value, "message": message or ""}
 
     if data is not None:
-        key = "data" if status == ResponseStatus.SUCCESS else "error"
+        key = (
+            "data"
+            if status == ResponseStatus.SUCCESS or status == ResponseStatus.PENDING
+            else "error"
+        )
         response[key] = data
         if isinstance(data, (list, set, tuple)):
             response["total"] = len(data)

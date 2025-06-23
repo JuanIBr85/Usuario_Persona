@@ -12,7 +12,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Home, ShieldUser } from "lucide-react";
+import { Home, ShieldUser ,Search, Wrench, Eye} from "lucide-react";
 import { Fade } from "react-awesome-reveal";
 
 import {
@@ -128,15 +128,15 @@ function ComponentDetails() {
                   to="/adminservices/components"
                   className="flex items-center gap-1"
                 >
-                  <ShieldUser className="w-4 h-4" />
-                  Componentes
+                  <Wrench className="w-4 h-4" />
+                  Servicios Disponibles
                 </Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbPage className="flex items-center gap-1">
-                <ShieldUser className="w-4 h-4" />
+                <Eye className="w-4 h-4" />
                 Detalles del Componente
               </BreadcrumbPage>
             </BreadcrumbItem>

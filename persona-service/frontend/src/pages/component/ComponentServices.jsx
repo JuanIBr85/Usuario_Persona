@@ -2,16 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Fade } from "react-awesome-reveal";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Wrench } from "lucide-react";
+import { Wrench, Home, User, ShieldUser } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Loading from "@/components/loading/Loading";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import ComponentTable from "@/components/component/ComponentTable";
 import { componentService } from "@/services/componentService";
 import { gatewayService } from "@/services/gatewayService";
-import { Link } from "react-router-dom";
-import { Home, ShieldUser } from "lucide-react";
-
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -20,17 +17,17 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-
+import { Link } from "react-router-dom";
 
 function ComponentServices() {
   const navigate = useNavigate();
 
   // Lista completa de servicios
   const [services, setServices] = useState(null);
-
   const refreshServices = () => {
     componentService.get_all().then((response) => {
       setServices([...response.data]);
+      console.log(response);
     });
   };
 
@@ -69,38 +66,38 @@ function ComponentServices() {
             </Button>
           </CardHeader>
           <CardContent>
-            <ComponentTable data={services} />
+            <ComponentTable data={services} setData={setServices} />
           </CardContent>
         </Card>
-        <Breadcrumb className="mt-auto self-start ">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link to="/adminpanel" className="flex items-center gap-1">
-                  <Home className="w-4 h-4" />
-                  Panel De Administrador
-                </Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link to="/adminservices" className="flex items-center gap-1">
-                  <ShieldUser className="w-4 h-4" />
-                  Gestión de Servicios
-                </Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage className="flex items-center gap-1">
-                <ShieldUser className="w-4 h-4" />
-               Componentes
-              </BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
       </Fade>
+      <Breadcrumb className="mt-auto self-start ">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/adminpanel" className="flex items-center gap-1">
+                <Home className="w-4 h-4" />
+                Panel De Administrador
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/adminservices" className="flex items-center gap-1">
+                <ShieldUser className="w-4 h-4" />
+                Gestión de Servicios
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage className="flex items-center gap-1">
+              <Wrench className="w-4 h-4" />
+              Servicios Disponibles
+            </BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
     </div>
   );
 }

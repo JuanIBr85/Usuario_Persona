@@ -5,15 +5,21 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from config import SQLALCHEMY_DATABASE_URI, SERVICES_CONFIG_FILE
 from diskcache import FanoutCache
-import json
-
+import logging
+import redis
 import os
 
-engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=True, future=True)
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URI, echo=False, echo_pool=False, future=True
+)
 Base = declarative_base()
 SessionLocal = scoped_session(
     sessionmaker(autocommit=False, autoflush=False, bind=engine)
 )
+
+# Inicializar la base de datos
+import app.database
+
 
 jwt = JWTManager()
 
@@ -27,5 +33,19 @@ cache = FanoutCache(
     timeout=1,  # Timeout para operaciones
 )
 
-# Inicializar la base de datos
-import app.database
+logger = logging.getLogger(__name__)
+
+redis_client = None
+
+try:
+    redis_client = redis.StrictRedis(
+        host=os.getenv("REDIS_HOST", "localhost"), 
+        port=int(os.getenv("REDIS_PORT", 6379)),
+        db=0,
+        decode_responses=True
+    )
+    redis_client.ping()  # test de conexión
+    print("[✓] Redis conectado correctamente.")
+except Exception as e:
+    print("[x] Error al conectar con Redis:", e)
+    raise e

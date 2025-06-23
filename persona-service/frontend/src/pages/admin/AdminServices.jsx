@@ -13,6 +13,7 @@ import { Link } from "react-router-dom";
 import { Home, ShieldUser } from "lucide-react";
 import { Fade } from "react-awesome-reveal";
 
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -27,30 +28,11 @@ function AdminServices() {
 
   const options = [
     {
-      title: "Componentes",
+      title: "Servicios Disponibles",
       description: "Controlar el servicio de componentes",
       path: "/adminservices/components",
-    },
-    {
-      title: "API Gateway",
-      description: "Controlar la API Gateway",
-      path: "/adminservices/gateway",
-    },
-    {
-      title: "Servicios activos",
-      description: "Visualizar los servicios actualmente activos",
-      path: "/adminservices/active",
-    },
-    {
-      title: "Agregar servicio",
-      description: "Registrar un nuevo microservicio en el sistema",
-      path: "/adminservices/add",
-    },
-    {
-      title: "Eliminar servicio",
-      description: "Dar de baja un servicio existente",
-      path: "/adminservices/remove",
-    },
+    }
+   
   ];
 
   return (

@@ -6,13 +6,27 @@ import {
 import SimpleSelect from "@/components/SimpleSelect"
 import { useFormDomicilio } from "@/hooks/profile/useFormDomicillio"
 import Loading from "@/components/loading/Loading"
+import {SimpleDialog} from "@/components/SimpleDialog"
+import { Ban } from "lucide-react"
+import { useState } from "react"
 
 export default function FormDomicillio({ domicilio, setPersonaData, persona_id }) {
+    const [error, setError] = useState(false);
+    const [openDialog, setOpenDialog] = useState(false);
     
-    const {handleSubmit, localidades,  codigoPostal, setCodigoPostal, inputCPRef, localidad, loading} = useFormDomicilio(domicilio, setPersonaData, persona_id);
+    const {handleSubmit, localidades,  codigoPostal, setCodigoPostal, inputCPRef, localidad, loading} = useFormDomicilio(domicilio, setPersonaData, persona_id, setOpenDialog, setError);
     
     return (
         <>
+        {error && <SimpleDialog
+            title={<div className="flex flex-row items-center gap-2"><Ban /> Ocurrió un error</div>}
+            description={"No se pudieron guardar los datos. Intenta nuevamente."}
+            isOpen={openDialog}
+            actionHandle={() => {
+              setOpenDialog(null);
+            }}
+            action="Cerrar"
+          />}
         {loading && <Loading isFixed={true} />}
         <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-4 items-end">
