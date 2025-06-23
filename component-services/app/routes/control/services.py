@@ -185,7 +185,7 @@ def set_service_available(id: int, state: int):
 
 
 @bp.route("/stop_system", methods=["POST"])
-@cp_api_access(is_public=True)
+@cp_api_access(is_public=True, limiter=["1 per minute"])
 def stop_system():
     try:
 
