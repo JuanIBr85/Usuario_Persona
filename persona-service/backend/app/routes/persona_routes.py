@@ -3,6 +3,10 @@ from flask_jwt_extended import jwt_required, get_jwt_identity, decode_token
 from app.extensions import SessionLocal
 from marshmallow import ValidationError
 from app.services.persona_service import PersonaService
+from app.schema.persona_vincular_schema import (
+    ValidarDocumentoEmailSchema,
+    ValidarOtpSchema,
+)
 from app.schema.persona_schema import PersonaSchema
 from app.models.persona_model import Persona
 from common.decorators.api_access import api_access
@@ -10,348 +14,475 @@ from common.utils.response import make_response, ResponseStatus
 from common.models.cache_settings import CacheSettings
 
 
-persona_bp = Blueprint('persona_bp', __name__)
+persona_bp = Blueprint("persona_bp", __name__)
 persona_service = PersonaService()
-persona_schema= PersonaSchema()
+persona_schema = PersonaSchema()
+validar_otp_schema = ValidarOtpSchema()
+validar_documento_email_schema = ValidarDocumentoEmailSchema()
 
-@api_access(cache=CacheSettings(expiration=30), access_permissions=["persona.admin.ver_persona"])
-@persona_bp.route('/personas', methods=['GET'])
+
+@api_access(
+    cache=CacheSettings(expiration=30), access_permissions=["persona.admin.ver_persona"]
+)
+@persona_bp.route("/personas", methods=["GET"])
 def listar_personas():
     try:
-        personas =persona_service.listar_personas()
+        personas = persona_service.listar_personas()
 
-        return make_response(
-            status=ResponseStatus.SUCCESS, 
-            message="Lista de personas obtenida" if personas else "No se encontraron resultados", 
-            data=personas or []
-        ), 200
-    
+        return (
+            make_response(
+                status=ResponseStatus.SUCCESS,
+                message=(
+                    "Lista de personas obtenida"
+                    if personas
+                    else "No se encontraron resultados"
+                ),
+                data=personas or [],
+            ),
+            200,
+        )
+
     except Exception as e:
-        return make_response(
-            status=ResponseStatus.ERROR,
-            message="",
-            data={"server": str(e)}
-        ),500
+        return (
+            make_response(
+                status=ResponseStatus.ERROR, message="", data={"server": str(e)}
+            ),
+            500,
+        )
 
 
 def _obtener_persona_x_id(id):
-        
-        persona = persona_service.listar_persona_id(id)
 
-        if persona is None:
-             
-             return make_response(
-                 status=ResponseStatus.ERROR,
-                 message="Persona no encontrada",
-                 data={"id": f"No existe persona con ID {id}"}
-             ), 404
-        
-        return make_response(
+    persona = persona_service.listar_persona_id(id)
+
+    if persona is None:
+
+        return (
+            make_response(
+                status=ResponseStatus.ERROR,
+                message="Persona no encontrada",
+                data={"id": f"No existe persona con ID {id}"},
+            ),
+            404,
+        )
+
+    return (
+        make_response(
             status=ResponseStatus.SUCCESS,
             message="Persona obtenida correctamente",
-            data=persona
-        ), 200
+            data=persona,
+        ),
+        200,
+    )
 
-    
+
 @api_access(cache=CacheSettings(expiration=10))
-@persona_bp.route('/persona_by_id/<int:id>', methods=['GET'])
+@persona_bp.route("/persona_by_id/<int:id>", methods=["GET"])
 def persona_by_id(id):
     try:
         return _obtener_persona_x_id(id)
-    
+
     except Exception as e:
-        return make_response(
-            status=ResponseStatus.ERROR,
-            message="Error al obtener persona",
-            data={"server": str(e)}
-        ),500 
-            
-@api_access(cache=CacheSettings(expiration=10), access_permissions=["persona.admin.ver_persona"])
-@persona_bp.route('/personas/<int:id>', methods=['GET'])
+        return (
+            make_response(
+                status=ResponseStatus.ERROR,
+                message="Error al obtener persona",
+                data={"server": str(e)},
+            ),
+            500,
+        )
+
+
+@api_access(
+    cache=CacheSettings(expiration=10), access_permissions=["persona.admin.ver_persona"]
+)
+@persona_bp.route("/personas/<int:id>", methods=["GET"])
 def obtener_persona(id):
     try:
         return _obtener_persona_x_id(id)
-    
-    except Exception as e:
-        return make_response(
-            status=ResponseStatus.ERROR,
-            message="Error al obtener persona",
-            data={"server": str(e)}
-        ),500    
 
-#crea una persona
+    except Exception as e:
+        return (
+            make_response(
+                status=ResponseStatus.ERROR,
+                message="Error al obtener persona",
+                data={"server": str(e)},
+            ),
+            500,
+        )
+
+
+# crea una persona
 @api_access(access_permissions=["persona.admin.crear_persona"])
-@persona_bp.route('/crear_persona', methods=['POST'])
+@persona_bp.route("/crear_persona", methods=["POST"])
 def crear_persona():
-    try:    
-        data= request.get_json()
+    try:
+        data = request.get_json()
 
         if not data:
-         return make_response(
-             status=ResponseStatus.ERROR,
-             message="No se enviaron los datos",
-             data=None
-         ),400
-        
-        errors= persona_schema.validate(data)
+            return (
+                make_response(
+                    status=ResponseStatus.ERROR,
+                    message="No se enviaron los datos",
+                    data=None,
+                ),
+                400,
+            )
+
+        errors = persona_schema.validate(data)
 
         if errors:
-            return make_response(
-                status=ResponseStatus.ERROR,
-                message="Error de validacion",
-                data=errors
-            ),400
-    
+            return (
+                make_response(
+                    status=ResponseStatus.ERROR,
+                    message="Error de validacion",
+                    data=errors,
+                ),
+                400,
+            )
+
         persona = persona_service.crear_persona(data)
 
-        return make_response(
-            status= ResponseStatus.SUCCESS,
-            message="Recurso creado correctamente",
-            data={"id": persona.id_persona}
-        ),201
-    
+        return (
+            make_response(
+                status=ResponseStatus.SUCCESS,
+                message="Recurso creado correctamente",
+                data={"id": persona.id_persona},
+            ),
+            201,
+        )
+
     except Exception as e:
-        return make_response(
-            status=ResponseStatus.ERROR, 
-            message="Error interno del servidor", 
-            data={"server": str(e)}
-            ),500
-    
-# modificar persona, siguiendo el formato json sugerido    
+        return (
+            make_response(
+                status=ResponseStatus.ERROR,
+                message="Error interno del servidor",
+                data={"server": str(e)},
+            ),
+            500,
+        )
+
+
+# modificar persona, siguiendo el formato json sugerido
 @api_access(access_permissions=["persona.admin.modificar_persona"])
-@persona_bp.route('/modificar_persona/<int:id>', methods=['PUT'])
+@persona_bp.route("/modificar_persona/<int:id>", methods=["PUT"])
 def modificar_persona(id):
     try:
         data = request.get_json()
         if not data:
-            return make_response(
-                status=ResponseStatus.ERROR,
-                message="No se enviaron datos",
-                data=None               
-            ), 400
+            return (
+                make_response(
+                    status=ResponseStatus.ERROR,
+                    message="No se enviaron datos",
+                    data=None,
+                ),
+                400,
+            )
 
         persona = persona_service.modificar_persona(id, data)
         if persona is None:
-            return make_response(
-                status=ResponseStatus.ERROR,
-                message="Persona no encontrada",
-                data={"id": f"No existe persona con ID {id}"}
-            ), 404
+            return (
+                make_response(
+                    status=ResponseStatus.ERROR,
+                    message="Persona no encontrada",
+                    data={"id": f"No existe persona con ID {id}"},
+                ),
+                404,
+            )
 
-        return make_response(
-            status=ResponseStatus.SUCCESS, 
-            message="Persona modificada correctamente", 
-            data=persona
-        ), 200
+        return (
+            make_response(
+                status=ResponseStatus.SUCCESS,
+                message="Persona modificada correctamente",
+                data=persona,
+            ),
+            200,
+        )
 
     except Exception as e:
-        return make_response(
-            status=ResponseStatus.ERROR, 
-            message="Error al modificar persona", 
-            data={"server": str(e)}
-        ), 500
-    
+        return (
+            make_response(
+                status=ResponseStatus.ERROR,
+                message="Error al modificar persona",
+                data={"server": str(e)},
+            ),
+            500,
+        )
+
+
 @api_access()
-@persona_bp.route('/modificar_persona_restringido/<int:id>', methods=['PUT'])
+@persona_bp.route("/modificar_persona_restringido/<int:id>", methods=["PUT"])
 def modificar_persona_restringido(id):
     try:
         data = request.get_json()
         if not data:
-            return make_response(
-                status=ResponseStatus.ERROR,
-                message="No se enviaron datos",
-                data=None               
-            ), 400
+            return (
+                make_response(
+                    status=ResponseStatus.ERROR,
+                    message="No se enviaron datos",
+                    data=None,
+                ),
+                400,
+            )
 
         persona = persona_service.modificar_persona_restringido(id, data)
         if persona is None:
-            return make_response(
-                status=ResponseStatus.ERROR,
-                message="Persona no encontrada",
-                data={"id": f"No existe persona con ID {id}"}
-            ), 404
+            return (
+                make_response(
+                    status=ResponseStatus.ERROR,
+                    message="Persona no encontrada",
+                    data={"id": f"No existe persona con ID {id}"},
+                ),
+                404,
+            )
 
-        return make_response(
-            status=ResponseStatus.SUCCESS, 
-            message="Persona modificada correctamente", 
-            data=persona
-        ), 200
+        return (
+            make_response(
+                status=ResponseStatus.SUCCESS,
+                message="Persona modificada correctamente",
+                data=persona,
+            ),
+            200,
+        )
 
     except Exception as e:
-        return make_response(
-            status=ResponseStatus.ERROR, 
-            message="Error al modificar persona", 
-            data={"server": str(e)}
-        ), 500
+        return (
+            make_response(
+                status=ResponseStatus.ERROR,
+                message="Error al modificar persona",
+                data={"server": str(e)},
+            ),
+            500,
+        )
 
-#borrar una persona
+
+# borrar una persona
 @api_access(access_permissions=["persona.admin.eliminar_persona"])
-@persona_bp.route('/borrar_persona/<int:id>', methods=['DELETE'])
+@persona_bp.route("/borrar_persona/<int:id>", methods=["DELETE"])
 def borrar_persona(id):
 
     try:
-        borrado_persona= persona_service.borrar_persona(id)
+        borrado_persona = persona_service.borrar_persona(id)
 
         if borrado_persona is None:
-            return make_response(
-                status=ResponseStatus.ERROR, 
-                message="Persona no encontrada", 
-                data={"id": f"No existe persona con ID {id}"}
-            ),404
+            return (
+                make_response(
+                    status=ResponseStatus.ERROR,
+                    message="Persona no encontrada",
+                    data={"id": f"No existe persona con ID {id}"},
+                ),
+                404,
+            )
 
-        return  make_response(
-            status=ResponseStatus.SUCCESS, 
-            message="Persona eliminada correctamente"
-        ),200
+        return (
+            make_response(
+                status=ResponseStatus.SUCCESS, message="Persona eliminada correctamente"
+            ),
+            200,
+        )
 
     except Exception as e:
-        return make_response(
-            status=ResponseStatus.ERROR, 
-            message="Error al eliminar persona", 
-            data={"server": str(e)}
-        ),500       
+        return (
+            make_response(
+                status=ResponseStatus.ERROR,
+                message="Error al eliminar persona",
+                data={"server": str(e)},
+            ),
+            500,
+        )
 
-#Restaurar una persona
+
+# Restaurar una persona
 @api_access(access_permissions=["persona.admin.restaurar_persona"])
-@persona_bp.route('/restaurar_persona/<int:id>', methods=['PATCH'])
+@persona_bp.route("/restaurar_persona/<int:id>", methods=["PATCH"])
 def restaurar_persona(id):
 
     try:
         restaura_persona = persona_service.restaurar_persona(id)
 
         if restaura_persona is None:
-            return make_response(
-                status=ResponseStatus.ERROR, 
-                message="Persona no encontrada", 
-                data={"id": f"No existe persona con ID {id}"}
-            ),404
-        
+            return (
+                make_response(
+                    status=ResponseStatus.ERROR,
+                    message="Persona no encontrada",
+                    data={"id": f"No existe persona con ID {id}"},
+                ),
+                404,
+            )
+
         if restaura_persona is False:
-            return make_response(
-                status=ResponseStatus.ERROR, 
-                message="La persona no está eliminada", 
-                data={"id": f"La persona con ID {id} no está marcada como eliminada"}
-            ),400
-               
-        return make_response(
-            status=ResponseStatus.SUCCESS, 
-            message="Persona restaurada correctamente"
-        ),200
-    
+            return (
+                make_response(
+                    status=ResponseStatus.ERROR,
+                    message="La persona no está eliminada",
+                    data={
+                        "id": f"La persona con ID {id} no está marcada como eliminada"
+                    },
+                ),
+                400,
+            )
+
+        return (
+            make_response(
+                status=ResponseStatus.SUCCESS,
+                message="Persona restaurada correctamente",
+            ),
+            200,
+        )
+
     except Exception as e:
-        return make_response(
-            status=ResponseStatus.ERROR, 
-            message="Error al restaurar persona", 
-            data={"server": str(e)}
-        ),500
+        return (
+            make_response(
+                status=ResponseStatus.ERROR,
+                message="Error al restaurar persona",
+                data={"server": str(e)},
+            ),
+            500,
+        )
+
 
 @api_access(access_permissions=[])
-@persona_bp.route('/personas_by_usuario/<int:id>', methods=['GET'])
+@persona_bp.route("/personas_by_usuario/<int:id>", methods=["GET"])
 def obtener_persona_usuario(id):
     try:
 
         persona = persona_service.listar_persona_usuario_id(id)
 
         if persona is None:
-             
-             return make_response(
-                 status=ResponseStatus.ERROR,
-                 message="Persona no encontrada",
-                 data={"id": f"No existe persona con ID {id}"}
-             ), 404
-        
-        return make_response(
-            status=ResponseStatus.SUCCESS,
-            message="Persona obtenida correctamente",
-            data=persona
-        ), 200
-    
+
+            return (
+                make_response(
+                    status=ResponseStatus.ERROR,
+                    message="Persona no encontrada",
+                    data={"id": f"No existe persona con ID {id}"},
+                ),
+                404,
+            )
+
+        return (
+            make_response(
+                status=ResponseStatus.SUCCESS,
+                message="Persona obtenida correctamente",
+                data=persona,
+            ),
+            200,
+        )
+
     except Exception as e:
-        return make_response(
-            status=ResponseStatus.ERROR,
-            message="Error al obtener persona",
-            data={"server": str(e)}
-        ),500
+        return (
+            make_response(
+                status=ResponseStatus.ERROR,
+                message="Error al obtener persona",
+                data={"server": str(e)},
+            ),
+            500,
+        )
+
 
 @api_access(access_permissions=[])
-@persona_bp.route('/personas/count', methods=['GET'])
+@persona_bp.route("/personas/count", methods=["GET"])
 def contar_personas():
-        try:
-            total = persona_service.contar_personas()
-            return make_response(
+    try:
+        total = persona_service.contar_personas()
+        return (
+            make_response(
                 status=ResponseStatus.SUCCESS,
                 message="Cantidad de personas obtenida",
-                data={"total": total}
-            ), 200
-        except Exception as e:
-            return make_response(
+                data={"total": total},
+            ),
+            200,
+        )
+    except Exception as e:
+        return (
+            make_response(
                 status=ResponseStatus.ERROR,
                 message="Error al contar personas",
-                data={"server": str(e)}
-            ), 500
+                data={"server": str(e)},
+            ),
+            500,
+        )
 
-@persona_bp.route('/personas/verify', methods=['POST'])
-@jwt_required()
+
+@persona_bp.route("/personas/verify", methods=["POST"])
+@api_access()
 def verificar_persona():
-    body = request.get_json() or {}
-    token = body.get('token')
-    datos = body.get('datos')
-
-    if not token or not datos:
-        return make_response(ResponseStatus.FAIL, "Faltan token o datos de persona"), 400
-
-    
+    # envia otp si el usuario confirma el mail de contacto de persona
+    """
+    Respuestas:
+      400  Datos faltantes o inválidos
+      404  Documento no registrado
+      400  Email no coincide
+      200 { otp_token }
+    """
     try:
-        session_claims = decode_token(token)
-    except Exception:
-        return make_response(ResponseStatus.FAIL, "Token invalido o expirado"), 400
-    
-    usuario_id = session_claims.get('sub')
+        usuario_id = request.headers.get("X-USER-ID")
+        data = request.get_json() or {}
 
-    resultado = persona_service.verificar_o_crear_persona(usuario_id, datos)
+        error = validar_documento_email_schema.validate(data)
+        if error:
+            return (
+                make_response(ResponseStatus.FAIL, error),
+                400,
+            )
 
-    if 'otp_token' in resultado:
-        return make_response(
-            status=ResponseStatus.PENDING,
-            message="Persona encontrada. Se envió código OTP.",
-            data={'otp_token': resultado['otp_token']}
-        ), 200
+        validated_data = validar_documento_email_schema.load(data)
+        tipo = validated_data["tipo_documento"]
+        num = validated_data["num_doc_persona"]
+        email_confirmado = validated_data["email_confirmado"]
 
-    return make_response(
-        status=ResponseStatus.SUCCESS,
-        message="Persona creada y vinculada correctamente.",
-        data=resultado['persona']
-    ), 201
+        exists, email, persona_id = persona_service.verificar_documento_mas_get_id(
+            tipo, num
+        )
+        if not exists:
+            return make_response(ResponseStatus.FAIL, "Documento no registrado"), 404
+
+        if email.lower() != email_confirmado.lower():
+            return make_response(ResponseStatus.FAIL, "Email no coincide"), 400
+
+        otp_token = persona_service.enviar_otp(usuario_id, persona_id)
+        return (
+            make_response(
+                ResponseStatus.PENDING, "OTP enviado", {"otp_token": otp_token}
+            ),
+            200,
+        )
+    except Exception as e:
+        import traceback
+
+        traceback.print_exc()
+        return make_response(ResponseStatus.FAIL, "Error al verificar persona"), 500
 
 
-@persona_bp.route('/personas/verify-otp', methods=['POST'])
+# cambios para usar X-USER-ID
+@api_access()
+@persona_bp.route("/personas/verify-otp", methods=["POST"])
 def verificar_otp_persona():
-    
-    body = request.get_json() or {}
-    token = body.get('token')
-    codigo_input = body.get('codigo')
 
-    if not token or not codigo_input:
-        return make_response(ResponseStatus.FAIL, "Faltan token o código"), 400
+    usuario_id = request.headers.get("X-USER-ID")
+    data = request.get_json() or {}
+
+    error = validar_otp_schema.validate(data)
+    if error:
+        return (
+            make_response(ResponseStatus.FAIL, error),
+            400,
+        )
+
+    validated_data = validar_otp_schema.load(data)
+    token = validated_data["otp_token"]
+    codigo_input = validated_data["codigo"]
 
     try:
         claims = decode_token(token)
     except Exception:
         return make_response(ResponseStatus.FAIL, "Token inválido o expirado"), 400
 
-    persona_id = claims.get('persona_id')
-    otp_guardado = claims.get('otp')
-    usuario_id = claims.get('sub')
+    if str(claims.get("sub")) != str(usuario_id):
+        return make_response(ResponseStatus.FAIL, "Usuario no autorizado"), 403
 
-    if otp_guardado != codigo_input:
+    if claims.get("otp") != codigo_input:
         return make_response(ResponseStatus.FAIL, "OTP incorrecto"), 400
-    # vincula persona con usuario, actualiza usuario_id
-    session = SessionLocal()
-    try:
-        session.query(Persona)\
-               .filter_by(id_persona=persona_id)\
-               .update({'usuario_id': usuario_id})
-        session.commit()
-        return make_response(ResponseStatus.SUCCESS, "Persona vinculada con usuario"), 200
-    finally:
-        session.close()
+
+    # aca se vincula la persona con el usuario
+    persona_service.vincular_persona(int(usuario_id), claims.get("persona_id"))
+    return make_response(ResponseStatus.SUCCESS, "Persona vinculada con usuario"), 200
