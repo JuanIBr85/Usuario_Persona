@@ -35,7 +35,7 @@ def get_services():
 
 
 @bp.route("/get_service/<int:id>", methods=["GET"])
-@cp_api_access(is_public=True, limiter=["5 per minute"])
+@cp_api_access(is_public=True, limiter=["15 per minute"])
 def get_service(id: int):
     try:
         service = services_service.get_by_id(id)

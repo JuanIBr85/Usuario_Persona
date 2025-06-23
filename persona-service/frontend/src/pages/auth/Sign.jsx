@@ -39,25 +39,7 @@ function Sign() {
         setIsOK(true);
       })
       .catch((error) => {
-        if (error.isJson) {
-          if (error.data.error) {
-            setMessage(FetchErrorMessage(error));
-          } else {
-            setMessage(error.data.message || "Error desconocido");
-          }
-        } else {
-          // Revisa si el error contiene el código 429
-          if (
-            typeof error.message === "string" &&
-            error.message.includes("429")
-          ) {
-            setMessage(
-              "Has hecho demasiadas solicitudes. Intenta nuevamente en un minuto."
-            );
-          } else {
-            setMessage("Ha ocurrido un error inesperado. Intenta más tarde.");
-          }
-        }
+        setMessage(error.data?.message ?? "Ocurrió un error inesperado")
         setIsOK(false);
       })
       .finally(() => {

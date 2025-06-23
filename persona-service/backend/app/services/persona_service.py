@@ -254,8 +254,12 @@ class PersonaService(IPersonaInterface):
                     if campo in data_validada:
                         setattr(persona, campo, data_validada[campo])
 
-            persona.updated_at = datetime.now(timezone.utc)
-            session.commit()
+            if hubo_cambios:
+                persona.updated_at = ahora
+                session.commit()
+            else:
+                session.flush()
+
             return self.schema.dump(persona)
 
         except Exception as e:
@@ -306,6 +310,7 @@ class PersonaService(IPersonaInterface):
 
     def restaurar_persona(self, id):
         session = SessionLocal()
+
         try:
             persona = session.query(Persona).get(id)
 

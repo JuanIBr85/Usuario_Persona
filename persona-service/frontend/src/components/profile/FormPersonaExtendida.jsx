@@ -6,7 +6,7 @@ import { PersonaService } from "@/services/personaService";
 import { useState } from "react";
 import { formSubmitJson } from "@/utils/formUtils";
 import Loading from "@/components/loading/Loading";
-import {Ban} from "lucide-react"
+import { Ban } from "lucide-react";
 
 import {
   AlertDialog,
@@ -139,7 +139,10 @@ export default function FormPersonaExtendida({
           <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle className={`flex align-center gap-1`}> <Ban /> Ocurrió un error</AlertDialogTitle>
+                <AlertDialogTitle className={`flex align-center gap-1`}>
+                  {" "}
+                  <Ban /> Ocurrió un error
+                </AlertDialogTitle>
                 <AlertDialogDescription>
                   No se pudieron guardar los datos. Intenta nuevamente.
                 </AlertDialogDescription>

@@ -8,4 +8,14 @@ service:
 
 permissions:
   - example.admin.admin_dice
-  - example.user.hola_mundo
+  - example.user.modificar
+
+#Una idea de como resolver el redirect del login
+redirect:
+  to_login:
+    code: aleatorio_de_16_caracteres
+    url: "https://google.com"
+  to_logout:
+    code: aleatorio_de_16_caracteres
+    url: "https://google.com"
+    

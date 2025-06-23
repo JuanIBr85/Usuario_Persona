@@ -6,6 +6,7 @@ import logging
 # Estos paquetes vienen del modulo common del servicio de componentes
 from common.decorators.receiver import receiver
 from common.utils.component_service import component_service
+from common.services.send_message_service import send_message
 
 
 def create_app():
@@ -27,3 +28,4 @@ def create_app():
 # esta funcion recibe un mensaje y lo procesa en un hilo separado
 def funcion_que_recibe_mensajes(message: Dict) -> None:
     logging.warning(message)
+    send_message(to_service="auth-service", message={"message": "hola"})
