@@ -71,10 +71,10 @@ const AdminPanel = () => {
         }
       } catch (error) {
         console.error("Token inválido:", error);
-        navigate("/logout"); 
+        navigate("/profile");
       }
     } else {
-      navigate("/logout"); 
+      navigate("/profile");
     }
   }, [navigate]);
 

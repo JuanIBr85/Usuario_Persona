@@ -10,23 +10,13 @@ import { useEffect, useState } from "react";
 import React from "react";
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/components/ui/input-otp";
 import { Label } from "@/components/ui/label";
-import { jwtDecode } from "jwt-decode";
-
-
 
 function PerfilConnect() {
     const [loading, setLoading] = useState(false);
     const [dialog, setDialog] = useState(null);
     const [api, setApi] = useState();
-    const [email, setEmail] = useState(null)
+  
     useEffect(() => {
-        const token = localStorage.getItem("token");
-        const decoded = jwtDecode(token);
-        console.log("decoded",decoded)
-        if(decoded){
-            setEmail(decoded.email)
-        }
-
         if (!api) return;
     }, [api]);
 
@@ -75,7 +65,7 @@ function PerfilConnect() {
                                     <InputValidate
                                         type="text"
                                         labelText="¿Es este tu email?"
-                                        value={email} 
+                                        value=""
                                         containerClassName="sm:col-span-3"
                                         readOnly
                                     />

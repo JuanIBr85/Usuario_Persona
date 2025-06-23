@@ -20,6 +20,10 @@ import {
   CirclePause,
   Plus,
   Trash2,
+  RouteOff,
+  Route,
+  ShieldMinus,
+  ShieldCheck
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -67,7 +71,6 @@ function ComponentTable({ data, setData }) {
               : service
           )
         );
-
       })
       .catch((error) => {
         console.log(error);
@@ -87,6 +90,10 @@ function ComponentTable({ data, setData }) {
   const handleViewDetails = (id_service) => {
     navigate(`/adminservices/components/${id_service}`);
   };
+
+  const handleStopSystem = (id_service) =>{
+
+  }
 
   const handleChange = (e) => {
     setFormData({ newService_url: e.target.value });
@@ -187,6 +194,14 @@ function ComponentTable({ data, setData }) {
                         <span>Ver detalles</span>
                       </DropdownMenuItem>
 
+                      {/* Parar toda comunicacion del servicio de componentes */}
+                      <DropdownMenuItem
+                        onClick={() => handleStopSystem(service.id_service)}
+                      >
+                        <RouteOff className="mr-2 h-4 w-4" />
+                        <span>Parar Sistema</span>
+                      </DropdownMenuItem>
+
                       {/* Activar/Desactivar */}
                       {console.log(
                         `${service.service_name} → service_wait:`,
@@ -203,9 +218,9 @@ function ComponentTable({ data, setData }) {
                         >
                           <span className="mr-2">
                             {service.service_available ? (
-                              <CirclePause />
+                              <ShieldMinus />
                             ) : (
-                              <Activity />
+                              <ShieldCheck />
                             )}
                           </span>
                           <span>
