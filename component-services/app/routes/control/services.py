@@ -218,7 +218,7 @@ def stop_system():
 
 
 # Este endpoint es el que se usa para reemplazar todos los demas endpoints
-@bp.route("/sys_detenido")
+@bp.route("/sys_detenido", methods=["NONE"])
 @cp_api_access(is_public=True)
 def sys_detenido():
     return "El sistema esta detenido", 503
