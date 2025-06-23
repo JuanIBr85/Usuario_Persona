@@ -149,7 +149,7 @@ function PerfilConnect() {
                                     <InputValidate
                                         type="text"
                                         labelText="¿Es este tu email?"
-                                        value={email} 
+                                        value=""
                                         containerClassName="sm:col-span-3"
                                         readOnly
                                     />
