@@ -77,10 +77,11 @@ def _obtener_persona_x_id(id):
 
 
 @api_access(cache=CacheSettings(expiration=10))
-@persona_bp.route("/persona_by_id/<int:id>", methods=["GET"])
-def persona_by_id(id):
+@persona_bp.route("/persona_by_id", methods=["GET"])
+def persona_by_id():
     try:
-        return _obtener_persona_x_id(id)
+        usuario_id = request.headers.get("X-USER-ID")
+        return _obtener_persona_x_id(usuario_id)
 
     except Exception as e:
         return (
@@ -208,52 +209,6 @@ def modificar_persona(id):
             ),
             500,
         )
-'''   
-@api_access()
-@persona_bp.route("/modificar_persona_restringido/<int:id>", methods=["PUT"])
-def modificar_persona_restringido(id):
-    try:
-        data = request.get_json()
-        if not data:
-            return (
-                make_response(
-                    status=ResponseStatus.ERROR,
-                    message="No se enviaron datos",
-                    data=None,
-                ),
-                400,
-            )
-
-        persona = persona_service.modificar_persona_restringido(id, data)
-        if persona is None:
-            return (
-                make_response(
-                    status=ResponseStatus.ERROR,
-                    message="Persona no encontrada",
-                    data={"id": f"No existe persona con ID {id}"},
-                ),
-                404,
-            )
-
-        return (
-            make_response(
-                status=ResponseStatus.SUCCESS,
-                message="Persona modificada correctamente",
-                data=persona,
-            ),
-            200,
-        )
-
-    except Exception as e:
-        return (
-            make_response(
-                status=ResponseStatus.ERROR,
-                message="Error al modificar persona",
-                data={"server": str(e)},
-            ),
-            500,
-        )
-'''
 
 @api_access()
 @persona_bp.route("/modificar_persona_restringido", methods=["PUT"])
