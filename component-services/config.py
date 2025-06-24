@@ -8,15 +8,17 @@ load_dotenv()
 
 # CONFIGURACIONES BASE DE DATOS
 
-# user= os.environ['MYSQL_USER']
-# password= os.environ['MYSQL_PASSWORD']
-# host= os.environ['MYSQL_HOST']
-# database= os.environ['MYSQL_DATABASE']
+DB_USER = os.environ.get("DB_USER", "componentes_user")
+DB_PASSWORD = os.environ.get("DB_PASSWORD", "componentes_pass")
+DB_HOST = os.environ.get("DB_HOST", "localhost")
+DB_PORT = int(os.environ.get("DB_PORT", 5432))
+DB_DATABASE = os.environ.get("DB_DATABASE", "componentes_db")
 
+SQLALCHEMY_DATABASE_URI: str = os.environ.get("SQLALCHEMY_DATABASE_URI", "")
 
-SQLALCHEMY_DATABASE_URI: str = (
-    os.environ.get("SQLALCHEMY_DATABASE_URI") or "sqlite:///components.db"
-)
+if SQLALCHEMY_DATABASE_URI == "":
+    SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_DATABASE}"
+
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 SQLALCHEMY_ECHO = False
 # CONFIGURACIONES JWT

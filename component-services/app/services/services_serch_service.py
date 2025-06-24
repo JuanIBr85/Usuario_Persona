@@ -15,6 +15,7 @@ class ServicesSearchService:
     Implementa el patrón Singleton para asegurar una única instancia.
     Mantiene un caché de redirecciones para acceso rápido.
     """
+
     _instance = None
     _redirect_list: Dict[str, str] = {}
 
@@ -27,7 +28,7 @@ class ServicesSearchService:
     def get_services(self) -> list[ServiceModel]:
         """
         Obtiene todos los servicios registrados en el sistema.
-        
+
         Returns:
             list[ServiceModel]: Lista de modelos de servicios
         """
@@ -36,10 +37,10 @@ class ServicesSearchService:
     def get_redirect(self, code: str) -> str | None:
         """
         Obtiene la URL de redirección asociada a un código.
-        
+
         Args:
             code (str): Código de redirección
-            
+
         Returns:
             str | None: URL de redirección o None si no existe
         """
@@ -48,7 +49,7 @@ class ServicesSearchService:
     def get_redirect_list(self) -> Dict[str, str]:
         """
         Obtiene el diccionario completo de códigos de redirección.
-        
+
         Returns:
             Dict[str, str]: Diccionario con códigos como clave y URLs como valor
         """
@@ -59,11 +60,15 @@ class ServicesSearchService:
         Actualiza la lista de redirecciones consultando a cada servicio.
         Obtiene información de cada servicio y extrae sus reglas de redirección.
         """
-        services: list[ServiceModel] = services_service.get_all(not_dump=True)
+
+        services: list[ServiceModel] = services_service.query(
+            lambda query: query.filter(ServiceModel.service_available == True).all(),
+            not_dump=True,
+        )
         redirect_list = []
         for service in services:
             # Obtiene información del componente/servicio
-            info = get_component_info(service.service_url, wait=True)
+            info = get_component_info(service.service_url, wait=False)
             if info is None:
                 continue
 
@@ -77,7 +82,7 @@ class ServicesSearchService:
     def _update_redirect_list(self, redirect_list: list[Dict]):
         """
         Actualiza internamente la lista de redirecciones.
-        
+
         Args:
             redirect_list (list[Dict]): Lista de diccionarios con reglas de redirección
         """
@@ -91,14 +96,14 @@ class ServicesSearchService:
     def get_permissions(self):
         """
         Recolecta y consolida los permisos de todos los servicios registrados.
-        
+
         Returns:
             list: Lista consolidada de todos los permisos de los servicios
         """
         services: list[ServiceModel] = services_service.get_all(not_dump=True)
         perms = []
         redirect = []
-        
+
         # Itera sobre cada servicio para recolectar permisos
         for service in services:
             logger.info(f"Recolectando permisos de {service.service_name}")
