@@ -3,7 +3,7 @@ from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
 from app.services.endpoints_search_service import EndpointsSearchService
 from common.models.endpoint_route_model import EndpointRouteModel
 import logging
-from app.extensions import jwt, redis_client
+from app.extensions import jwt, redis_client_auth
 from app.utils.is_local_connection import is_local_connection
 from cachetools import TTLCache
 
@@ -20,7 +20,7 @@ def get_jwt_permissions(jti):
     if jti in jwt_cache:
         return jwt_cache[jti]
 
-    permissions: list = redis_client.lrange(jti, 1, -1)
+    permissions: list = redis_client_auth.lrange(jti, 1, -1)
     # Si no esta en el cache compruebo si esta en redis
     if permissions:
         # Si esta en redis lo guardo en el cache

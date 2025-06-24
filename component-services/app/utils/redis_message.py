@@ -1,6 +1,6 @@
 import threading
 from flask import Flask
-from app.extensions import redis_client as r, WORKER_ID, logger
+from app.extensions import redis_client_core as r, WORKER_ID, logger
 import json
 
 # component-service-internal-events

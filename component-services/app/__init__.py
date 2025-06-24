@@ -71,6 +71,7 @@ def research(app: Flask, message_data: dict):
     endpoints_search_service.refresh_endpoints()
 
 
+# Detiene todo el sistema
 @register_redis_receiver("stop_services")
 def stop_services(app: Flask, message_data: dict):
     logger.warning("Deteniendo servicios")

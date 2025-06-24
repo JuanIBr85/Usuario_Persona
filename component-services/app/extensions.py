@@ -37,17 +37,26 @@ cache = FanoutCache(
 logger = logging.getLogger(__name__)
 
 # Configuracion de redis
-redis_client = None
-
+redis_client_auth = None
+redis_client_core = None
 try:
-    redis_client = redis.StrictRedis(
+    redis_client_auth = redis.StrictRedis(
         host=os.getenv("REDIS_HOST", "localhost"),
         port=int(os.getenv("REDIS_PORT", 6379)),
         db=0,
         decode_responses=True,
     )
-    redis_client.ping()  # test de conexión
-    print("[✓] Redis conectado correctamente.")
+    redis_client_auth.ping()  # test de conexión
+    print("[✓] Redis auth conectado correctamente.")
+
+    redis_client_core = redis.StrictRedis(
+        host=os.getenv("REDIS_HOST", "localhost"),
+        port=int(os.getenv("REDIS_PORT", 6379)),
+        db=1,
+        decode_responses=True,
+    )
+    redis_client_core.ping()  # test de conexión
+    print("[✓] Redis core conectado correctamente.")
 except Exception as e:
     print("[x] Error al conectar con Redis:", e)
     raise e
