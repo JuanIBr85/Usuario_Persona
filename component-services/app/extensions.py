@@ -31,21 +31,26 @@ cache = FanoutCache(
     "cache-db",
     shards=4,  # Número de shards para mejor concurrencia
     timeout=1,  # Timeout para operaciones
+    size_limit=2**30,  # Limita el tamaño de la cache 1GB
 )
 
 logger = logging.getLogger(__name__)
 
+# Configuracion de redis
 redis_client = None
 
 try:
     redis_client = redis.StrictRedis(
-        host=os.getenv("REDIS_HOST", "localhost"), 
+        host=os.getenv("REDIS_HOST", "localhost"),
         port=int(os.getenv("REDIS_PORT", 6379)),
         db=0,
-        decode_responses=True
+        decode_responses=True,
     )
     redis_client.ping()  # test de conexión
     print("[✓] Redis conectado correctamente.")
 except Exception as e:
     print("[x] Error al conectar con Redis:", e)
     raise e
+
+# IDENTIFICADOR UNICO DEL WORKER GUNICORN
+WORKER_ID = f"COMPONENT-SERVICE-ID-{os.getpid()}"

@@ -6,7 +6,7 @@ from app.services.services_serch_service import ServicesSearchService
 from common.utils.response import make_response, ResponseStatus
 from app.services.message_service import MessageService
 import uuid
-from common.schemas.message_schema import MessageSchema
+from app.utils.redis_message import send_event
 
 bp = Blueprint("gateway", __name__, cli_group="control", url_prefix="/gateway")
 endpoints_search_service = EndpointsSearchService()
@@ -25,10 +25,7 @@ def research():
             202,
         )
 
-    # Iniciar el refresco en segundo plano
-    thread = threading.Thread(target=endpoints_search_service.refresh_endpoints)
-    thread.daemon = True  # El hilo se cerrará cuando el programa principal termine
-    thread.start()
+    send_event("research", {})
 
     message_service = MessageService()
     for service in ServicesSearchService().get_services():
