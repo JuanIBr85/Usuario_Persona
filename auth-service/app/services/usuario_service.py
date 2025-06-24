@@ -24,9 +24,9 @@ from app.services.servicio_base import ServicioBase
 from app.models.permisos import Permiso
 from app.models.otp_reset_password_model import OtpResetPassword
 from app.utils.email import (
-    enviar_email_verificacion,
     generar_codigo_otp,
     enviar_codigo_por_email,
+    enviar_codigo_por_email_registro,
     decodificar_token_verificacion,
     enviar_email_validacion_dispositivo,
 )
@@ -37,6 +37,8 @@ from app.utils.otp_manager import (
     verificar_otp_redis,
     guardar_token_recuperacion,
     verificar_token_recuperacion,
+    guardar_datos_registro_temporal,
+    obtener_datos_registro_temporal,
 )
 from flask_jwt_extended import decode_token
 from app.extensions import get_redis
@@ -54,74 +56,64 @@ class UsuarioService(ServicioBase):
     # REGISTRO Y VERIFICACIÓN
     # -----------------------------------------------------------------------------------------------------------------------------
 
-    def registrar_usuario(self, session: Session, data: dict) -> dict:
+    def iniciar_registro(self, session: Session, data: dict) -> tuple:
         try:
             data_validada = self.schema.load(data)
-        except ValidationError as error:
-            return (
-                ResponseStatus.FAIL,
-                "Error de schema / Bad Request",
-                error.messages,
-                400,
-            )
+        except ValidationError as e:
+            return ResponseStatus.FAIL, "Error en los datos de entrada", e.messages, 400
 
-        if (
-            session.query(Usuario)
-            .filter(
-                (Usuario.nombre_usuario == data_validada["nombre_usuario"])
-                | (Usuario.email_usuario == data_validada["email_usuario"])
-            )
-            .first()
-        ):
-            return (
-                ResponseStatus.ERROR,
-                "El nombre de usuario o el email ya están registrados",
-                None,
-                400,
-            )
+        # Verificar si el usuario ya existe
+        if session.query(Usuario).filter(
+            (Usuario.nombre_usuario == data_validada["nombre_usuario"]) |
+            (Usuario.email_usuario == data_validada["email_usuario"])
+        ).first():
+            return ResponseStatus.FAIL, "El nombre de usuario o email ya están registrados", None, 400
 
-        password_hash = generate_password_hash(data_validada["password"])
-        data_validada["password"] = password_hash
+        # Generar y guardar OTP
+        email = data_validada["email_usuario"]
+        codigo_otp = generar_codigo_otp()
+        guardar_otp(email, codigo_otp)
+        guardar_datos_registro_temporal(email, data_validada)
+        enviar_codigo_por_email_registro(email, codigo_otp)
 
-        nuevo_usuario = self.create(session, data_validada)
-        session.flush()
-        enviar_email_verificacion(nuevo_usuario)
+        return ResponseStatus.SUCCESS, "OTP enviado al correo para completar el registro", None, 200
 
-        rol_por_defecto = get_rol_por_nombre(session, "usuario")
-        if not rol_por_defecto:
-            return ResponseStatus.NOT_FOUND, "Rol no encontrado.", None, 404
+    def confirmar_registro(self, session: Session, email: str, otp: str, user_agent: str) -> tuple:
+        if not verificar_otp_redis(email, otp):
+            return ResponseStatus.FAIL, "OTP incorrecto o expirado", None, 400
 
-        session.add(
-            RolUsuario(
-                id_usuario=nuevo_usuario.id_usuario, id_rol=rol_por_defecto.id_rol
-            )
-        )
+        datos_registro = obtener_datos_registro_temporal(email)
+        if not datos_registro:
+            return ResponseStatus.FAIL, "Registro expirado o no iniciado", None, 400
 
-        session.add(
-            PasswordLog(
-                usuario_id=nuevo_usuario.id_usuario,
-                password=password_hash,
-                updated_at=datetime.now(timezone.utc),
-            )
-        )
+        try:
+            password_hash = generate_password_hash(datos_registro["password"])
+            datos_registro["password"] = password_hash
 
-        session.add(
-            UsuarioLog(
-                usuario_id=nuevo_usuario.id_usuario,
-                accion="registro",
-                detalles="El usuario se registró correctamente",
-            )
-        )
+            nuevo_usuario = Usuario(**datos_registro)
+            nuevo_usuario.marcar_email_verificado()
+            session.add(nuevo_usuario)
+            session.flush()
 
-        session.commit()
-        return (
-            ResponseStatus.SUCCESS,
-            "Usuario se registrado con exito, se ha enviado un mail de verificación.",
-            self.schema_out.dump(nuevo_usuario),
-            200,
-        )
+            rol = get_rol_por_nombre(session, "usuario")
+            if not rol:
+                return ResponseStatus.NOT_FOUND, "Rol no encontrado", None, 404
+
+            session.add(RolUsuario(id_usuario=nuevo_usuario.id_usuario, id_rol=rol.id_rol))
+            session.add(PasswordLog(usuario_id=nuevo_usuario.id_usuario, password=password_hash, updated_at=datetime.now(timezone.utc)))
+            session.add(UsuarioLog(usuario_id=nuevo_usuario.id_usuario, accion="registro", detalles="Registro con OTP"))
+            session.add(DispositivoConfiable(usuario_id=nuevo_usuario.id_usuario, user_agent=user_agent, fecha_expira=datetime.now(timezone.utc) + timedelta(days=365)))
+            
+            
+            session.commit()
+
+            return ResponseStatus.SUCCESS, "Usuario registrado exitosamente", self.schema_out.dump(nuevo_usuario), 200
+        except Exception as e:
+            session.rollback()
+            return ResponseStatus.ERROR, "Error interno al registrar usuario", str(e), 500
 
     # -----------------------------------------------------------------------------------------------------------------------------
+    '''
     def verificar_email(self, session: Session, token: str) -> dict:
         if not token:
             return (ResponseStatus.NOT_FOUND, "Token no encontrado.", None, 404)
@@ -139,6 +131,7 @@ class UsuarioService(ServicioBase):
         except InvalidTokenError as error:
             return (ResponseStatus.UNAUTHORIZED, "El token es invalido.", error, 401)
         return (ResponseStatus.SUCCESS, "Email verificado correctamente.", None, 200)
+    '''
 
     # -----------------------------------------------------------------------------------------------------------------------------
     # LOGIN Y LOGOUT

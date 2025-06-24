@@ -46,6 +46,14 @@ def enviar_codigo_por_email(usuario, codigo_otp):
     )
     mail.send(msg)
 
+def enviar_codigo_por_email_registro(email:str, codigo_otp:str):
+    msg = Message(
+        subject="Código para validar mail",
+        recipients=[email],
+        body=f"Hola,\n\nTu código para validar mail es: {codigo_otp}\n\nEste código expirará en 15 minutos."
+    )
+    mail.send(msg)
+
 
 
 

@@ -27,36 +27,38 @@ usuario_service = UsuarioService()
 
 @usuario_bp.route("/registro", methods=["POST"])
 @api_access(is_public=True, limiter=["2 per minute"])
-def registrar_usuario1():
+def iniciar_registro_usuario():
+    data = request.get_json()
+    if not data:
+        return make_response(ResponseStatus.FAIL, "Datos requeridos", error_code="NO_INPUT")
+
     session = SessionLocal()
     try:
-        data = request.get_json()
-        if not data:
-            return make_response(
-                ResponseStatus.FAIL,
-                "Datos de entrada requeridos",
-                error_code="NO_INPUT",
-            )
+        status, mensaje, contenido, codigo = usuario_service.iniciar_registro(session, data)
+        return make_response(status, mensaje, contenido), codigo
+    finally:
+        session.close()
 
-        status, mensaje, data, code = usuario_service.registrar_usuario(session, data)
-        return make_response(status, mensaje, data, code), code
+@usuario_bp.route("/verificar-email", methods=["POST"])
+@api_access(is_public=True)
+def confirmar_registro_usuario():
+    data = request.get_json()
+    email = data.get("email_usuario")
+    otp = data.get("otp")
+    user_agent = request.headers.get("User-Agent", "desconocido")
 
-    except Exception as e:
-        print(" ERROR INTERNO EN /registro:", str(e))
-        return (
-            make_response(
-                ResponseStatus.ERROR,
-                "Error al registrar usuario",
-                str(e),
-                error_code="REGISTRO_ERROR",
-            ),
-            500,
-        )
+    if not email or not otp:
+        return make_response(ResponseStatus.FAIL, "Email y OTP son requeridos", error_code="OTP_REQUIRED"), 400
 
+    session = SessionLocal()
+    try:
+        status, mensaje, contenido, codigo = usuario_service.confirmar_registro(session, email, otp, user_agent)
+        return make_response(status, mensaje, contenido), codigo
     finally:
         session.close()
 
 
+'''''
 @usuario_bp.route("/verificar-email", methods=["GET"])
 @api_access(is_public=True, limiter=["1 per minute"])
 def verificar_email():
@@ -89,7 +91,7 @@ def verificar_email():
 
     finally:
         session.close()
-
+'''
 
 # -----------------------------------------------------------------------------------------------------------------------------
 # LOGIN Y LOGOUT

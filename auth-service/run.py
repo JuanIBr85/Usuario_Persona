@@ -14,7 +14,7 @@ from app.utils.response import register_error_handlers
 from common.utils.component_service import component_service
 
 load_dotenv()
- 
+
 app = Flask(__name__)
 app.register_blueprint(superadmin_bp, url_prefix='/super-admin')
 app.register_blueprint(admin_micro_bp, url_prefix='/admin-micro')
