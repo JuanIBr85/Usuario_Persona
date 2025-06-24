@@ -109,8 +109,8 @@ def login1():
                 error_code="NO_INPUT",
             )
 
-        user_agent = ComponentRequest().get_user_agent()
-        ip = ComponentRequest().get_ip()
+        user_agent = ComponentRequest.get_user_agent()
+        ip = ComponentRequest.get_ip()
 
         status, mensaje, data, code = usuario_service.login_usuario(
             session, data, user_agent, ip

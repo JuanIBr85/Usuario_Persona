@@ -227,7 +227,7 @@ def modificar_persona_restringido():
                 400,
             )
 
-        usuario_id = ComponentRequest().get_user_id()
+        usuario_id = ComponentRequest.get_user_id()
         persona_usuario = persona_service.listar_persona_usuario_id(usuario_id)
         if persona_usuario is None:
             return (
@@ -428,7 +428,7 @@ def verificar_persona():
       200 { otp_token }
     """
     try:
-        usuario_id = ComponentRequest().get_user_id()
+        usuario_id = ComponentRequest.get_user_id()
         data = request.get_json() or {}
 
         error = validar_documento_email_schema.validate(data)
@@ -476,7 +476,7 @@ ruta paqra verificar el codigo otp recibido y vincular la persona con el usuario
 @persona_bp.route("/personas/verify-otp", methods=["POST"])
 def verificar_otp_persona():
 
-    usuario_id = ComponentRequest().get_user_id()
+    usuario_id = ComponentRequest.get_user_id()
     data = request.get_json() or {}
 
     error = validar_otp_schema.validate(data)
