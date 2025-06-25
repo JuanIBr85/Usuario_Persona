@@ -11,6 +11,9 @@ from app.utils.carga_domicilio_postal import cargar_domicilios_postales_csv
 from common.utils.component_service import component_service
 from common.decorators.receiver import receiver
 
+# Importa receptores de mensajería
+from app.messaging import reciever
+
 
 def create_app():
 
@@ -31,9 +34,6 @@ def create_app():
 
     app.register_blueprint(persona_bp)
     app.register_blueprint(opciones_bp)
-
-    # Importa receptores de mensajería
-    from app.messaging import reciever
 
     # Crear tablas si no existen
 
