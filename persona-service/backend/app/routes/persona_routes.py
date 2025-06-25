@@ -1,3 +1,4 @@
+from common.utils.component_request import ComponentRequest
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity, decode_token
 from app.extensions import SessionLocal
@@ -77,10 +78,11 @@ def _obtener_persona_x_id(id):
 
 
 @api_access(cache=CacheSettings(expiration=10))
-@persona_bp.route("/persona_by_id/<int:id>", methods=["GET"])
-def persona_by_id(id):
+@persona_bp.route("/persona_by_id", methods=["GET"])
+def persona_by_id():
     try:
-        return _obtener_persona_x_id(id)
+        usuario_id = ComponentRequest.get_user_id()
+        return _obtener_persona_x_id(usuario_id)
 
     except Exception as e:
         return (
@@ -211,8 +213,8 @@ def modificar_persona(id):
 
 
 @api_access()
-@persona_bp.route("/modificar_persona_restringido/<int:id>", methods=["PUT"])
-def modificar_persona_restringido(id):
+@persona_bp.route("/modificar_persona_restringido", methods=["PUT"])
+def modificar_persona_restringido():
     try:
         data = request.get_json()
         if not data:
@@ -225,16 +227,21 @@ def modificar_persona_restringido(id):
                 400,
             )
 
-        persona = persona_service.modificar_persona_restringido(id, data)
-        if persona is None:
+        usuario_id = ComponentRequest.get_user_id()
+        persona_usuario = persona_service.listar_persona_usuario_id(usuario_id)
+        if persona_usuario is None:
             return (
                 make_response(
                     status=ResponseStatus.ERROR,
                     message="Persona no encontrada",
-                    data={"id": f"No existe persona con ID {id}"},
+                    data={"id": f"No existe persona con ID {usuario_id}"},
                 ),
                 404,
             )
+
+        persona = persona_service.modificar_persona_restringido(
+            persona_usuario["id_persona"], data
+        )
 
         return (
             make_response(
@@ -403,6 +410,12 @@ def contar_personas():
         )
 
 
+"""
+ruta para iniciar lqa verificacion de persona mediante codigo otp
+el usuario debe estar autenticado jwt_required
+"""
+
+
 @persona_bp.route("/personas/verify", methods=["POST"])
 @api_access()
 def verificar_persona():
@@ -415,7 +428,7 @@ def verificar_persona():
       200 { otp_token }
     """
     try:
-        usuario_id = request.headers.get("X-USER-ID")
+        usuario_id = ComponentRequest.get_user_id()
         data = request.get_json() or {}
 
         error = validar_documento_email_schema.validate(data)
@@ -453,12 +466,17 @@ def verificar_persona():
         return make_response(ResponseStatus.FAIL, "Error al verificar persona"), 500
 
 
+"""
+ruta paqra verificar el codigo otp recibido y vincular la persona con el usuario
+"""
+
+
 # cambios para usar X-USER-ID
 @api_access()
 @persona_bp.route("/personas/verify-otp", methods=["POST"])
 def verificar_otp_persona():
 
-    usuario_id = request.headers.get("X-USER-ID")
+    usuario_id = ComponentRequest.get_user_id()
     data = request.get_json() or {}
 
     error = validar_otp_schema.validate(data)
@@ -477,6 +495,8 @@ def verificar_otp_persona():
     except Exception:
         return make_response(ResponseStatus.FAIL, "Token inválido o expirado"), 400
 
+    # aca se verifica que el token fue creado por ese usuario
+    # evita suplantacion de identidad
     if str(claims.get("sub")) != str(usuario_id):
         return make_response(ResponseStatus.FAIL, "Usuario no autorizado"), 403
 

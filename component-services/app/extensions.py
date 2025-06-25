@@ -6,7 +6,7 @@ from flask_limiter.util import get_remote_address
 from config import SQLALCHEMY_DATABASE_URI, SERVICES_CONFIG_FILE
 from diskcache import FanoutCache
 import logging
-
+import redis
 import os
 
 engine = create_engine(
@@ -31,6 +31,35 @@ cache = FanoutCache(
     "cache-db",
     shards=4,  # Número de shards para mejor concurrencia
     timeout=1,  # Timeout para operaciones
+    size_limit=2**30,  # Limita el tamaño de la cache 1GB
 )
 
 logger = logging.getLogger(__name__)
+
+# Configuracion de redis
+redis_client_auth = None
+redis_client_core = None
+try:
+    redis_client_auth = redis.StrictRedis(
+        host=os.getenv("REDIS_HOST", "localhost"),
+        port=int(os.getenv("REDIS_PORT", 6379)),
+        db=0,
+        decode_responses=True,
+    )
+    redis_client_auth.ping()  # test de conexión
+    print("[✓] Redis auth conectado correctamente.")
+
+    redis_client_core = redis.StrictRedis(
+        host=os.getenv("REDIS_HOST", "localhost"),
+        port=int(os.getenv("REDIS_PORT", 6379)),
+        db=1,
+        decode_responses=True,
+    )
+    redis_client_core.ping()  # test de conexión
+    print("[✓] Redis core conectado correctamente.")
+except Exception as e:
+    print("[x] Error al conectar con Redis:", e)
+    raise e
+
+# IDENTIFICADOR UNICO DEL WORKER GUNICORN
+WORKER_ID = f"COMPONENT-SERVICE-ID-{os.getpid()}"

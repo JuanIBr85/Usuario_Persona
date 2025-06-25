@@ -3,6 +3,7 @@ from flask import jsonify
 from flask_jwt_extended import create_access_token
 from marshmallow import ValidationError
 from sqlalchemy import and_, func, extract
+from config import DIAS_RESTRICCION_MODIFICACION
 
 # Se importan los modelos
 from app.models.persona_model import Persona
@@ -195,64 +196,71 @@ class PersonaService(IPersonaInterface):
 
             if not Persona:
                 return None
-
+            
             data_validada = self.schema.load(data, partial=True)
 
-            if "domicilio" in data:
-                self.domicilio_service.modificar_domicilio(
-                    persona.domicilio_id, data["domicilio"], session
-                )
+            if 'domicilio' in data:
+                self.domicilio_service.modificar_domicilio(persona.domicilio_id, data['domicilio'], session)
 
-            if "contacto" in data:
-                self.contacto_service.modificar_contacto(
-                    persona.contacto_id, data["contacto"], session
-                )
+            if 'contacto' in data:
+                self.contacto_service.modificar_contacto(persona.contacto_id, data['contacto'], session)
 
-            if "persona_extendida" in data:
+            if 'persona_extendida' in data:
                 if persona.persona_extendida:
-                    self.persona_ext_service.modificar_persona_extendida(
-                        persona.extendida_id, data["persona_extendida"], session
-                    )
+                    self.persona_ext_service.modificar_persona_extendida(persona.extendida_id,data['persona_extendida'], session)
 
             # Permiten cambios cada 30 días
-            campos_modificables_cada_30_dias = ["nombre_persona", "apellido_persona"]
+            campos_modificables_cada_30_dias = ['nombre_persona', 'apellido_persona']
 
             # No deberían cambiarse automáticamente
-            campos_no_modificables = [
-                "fecha_nacimiento_persona",
-                "num_doc_persona",
-                "tipo_documento",
-            ]
+            campos_no_modificables = ['fecha_nacimiento_persona', 'num_doc_persona', 'tipo_documento']   
 
             ahora = datetime.now(timezone.utc)
+            dias_restriccion=DIAS_RESTRICCION_MODIFICACION 
 
-            # Campos no modificables por el usuario
+            #Campos no modificables por el usuario
             for campo in campos_no_modificables:
                 if campo in data_validada:
-                    raise Exception(
-                        f"El campo '{campo}' no puede modificarse directamente. Contacte al administrador."
-                    )
+                    valor_actual = getattr(persona, campo)
+                    nuevo_valor = data_validada[campo]   
 
-            # Campos editables con restriccion temporal
+                    if str(nuevo_valor).strip() != str(valor_actual).strip():
+                        raise Exception(f"El campo '{campo}' no puede modificarse directamente. Contacte al administrador.")
+                     
+            #Campos editables con restriccion temporal
+            evaluar_restriccion = False
+            cambios_realizados = []
 
-            modificar_campos_controlados = any(
-                campo in data for campo in campos_modificables_cada_30_dias
-            )
+            for campo in campos_modificables_cada_30_dias:
+                if campo in data_validada:
+                    actual = getattr(persona, campo)
+                    nuevo = data_validada[campo]
+                    if str(nuevo).strip() != str(actual).strip():
+                        evaluar_restriccion = True
+                        cambios_realizados.append(campo)
 
-            if modificar_campos_controlados:
+
+            if evaluar_restriccion:
                 ultima_modificacion = persona.updated_at
 
-                if ultima_modificacion:
-                    dias = (ahora - ultima_modificacion).days
-                    if dias < 30:
-                        raise Exception(
-                            f"Los campos personales solo pueden modificarse cada 30 días. "
+                if not ultima_modificacion:
+                    ultima_modificacion = ahora - timedelta(days=31)
+                elif ultima_modificacion.tzinfo is None:
+                    ultima_modificacion = ultima_modificacion.replace(tzinfo=timezone.utc)
+
+                dias=(ahora - ultima_modificacion).days
+                evaluar_restriccion = False 
+
+                if dias < dias_restriccion:
+                    raise Exception(
+                            f"Los campos Nombre y Apellido solo pueden modificarse cada {dias_restriccion} días. Si es necesario contacte a un administrador. "
                             f"Última modificación: {ultima_modificacion.date()}"
                         )
-                # Aplica las modificaciones
-                for campo in campos_modificables_cada_30_dias:
-                    if campo in data_validada:
-                        setattr(persona, campo, data_validada[campo])
+                 #Aplica las modificaciones 
+            hubo_cambios = False  
+            for campo in cambios_realizados:
+                setattr(persona, campo, data_validada[campo])
+                hubo_cambios = True
 
             if hubo_cambios:
                 persona.updated_at = ahora
@@ -261,10 +269,9 @@ class PersonaService(IPersonaInterface):
                 session.flush()
 
             return self.schema.dump(persona)
-
+        
         except Exception as e:
             import traceback
-
             print("Error al modificar persona:")
             print(traceback.format_exc())
             session.rollback()
@@ -272,6 +279,7 @@ class PersonaService(IPersonaInterface):
 
         finally:
             session.close()
+
 
     def borrar_persona(self, id_persona):
         session = SessionLocal()
@@ -403,7 +411,7 @@ class PersonaService(IPersonaInterface):
         try:
             session.query(Persona).filter_by(id_persona=persona_id).update(
                 {"usuario_id": usuario_id}
-            )
-            session.commit()
+            ) # asocia la persona al usuario
+            session.commit() # guarda los cambios en la base de datos
         finally:
             session.close()

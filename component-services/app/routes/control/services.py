@@ -1,6 +1,6 @@
 import threading
 from flask import Blueprint
-from flask import request
+from flask import request, jsonify
 from app.decorators.cp_api_access import cp_api_access
 from app.services.servicio_base import ServicioBase
 from common.utils.response import make_response, ResponseStatus
@@ -12,9 +12,17 @@ from app.extensions import logger
 from datetime import datetime, timezone, timedelta
 from flask import current_app
 import time
+from app.utils.redis_message import send_event
 
 bp = Blueprint("services", __name__, cli_group="control", url_prefix="/services")
 services_service: ServicioBase = ServicioBase(ServiceModel, ServiceSchema())
+
+
+@bp.route("/echo", methods=["GET"])
+@cp_api_access(is_public=True)
+def echo():
+    send_event("test", {"message": "Bienvenido a la API de Componentes"})
+    return jsonify({"message": "Bienvenido a la API de Componentes"}), 200
 
 
 @bp.route("/all", methods=["GET"])
@@ -189,19 +197,13 @@ def set_service_available(id: int, state: int):
 def stop_system():
     try:
 
-        def stop(app):
+        def stop():
             time.sleep(30)
             # EventService.send_stop_event()
             # Limpia todas las rutas
+            send_event("stop_services", {})
 
-            for endpoint in app.view_functions.keys():
-                # Solo permite la comunicacion entre servicios
-                if endpoint == "message.send_message":
-                    continue
-                app.view_functions[endpoint] = sys_detenido
-
-        # EventService.send_start_stop_event()
-        threading.Thread(target=stop, args=(current_app._get_current_object(),)).start()
+        threading.Thread(target=stop).start()
 
         return (
             make_response(
@@ -215,10 +217,3 @@ def stop_system():
         )
     except Exception as e:
         return make_response(ResponseStatus.ERROR, str(e)), 500
-
-
-# Este endpoint es el que se usa para reemplazar todos los demas endpoints
-@bp.route("/sys_detenido", methods=["NONE"])
-@cp_api_access(is_public=True)
-def sys_detenido():
-    return "El sistema esta detenido", 503

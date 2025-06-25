@@ -1,21 +1,27 @@
+#Define los datos del servicio
 service:
   service_name: example-service
   service_prefix: example
-  service_available: true
+  service_available: true #Si se pone en false al ser "instalado" estara desactivado
   service_description: Backend de ejemplo
-  service_core: false
-  service_wait: false
+  service_core: false #Indica si es un servicio del core, y no puede ser desactivado por ser un servicio crucial
+  service_wait: false #Indica si la api gateway debe de esperar al servicio para iniciar
 
+#Define los permisos del servicio para que el servicio de autenticacion los pueda listar
 permissions:
   - example.admin.admin_dice
   - example.user.modificar
 
-#Una idea de como resolver el redirect del login
+#Esta seccion es opcional, sirve como un metadato para el frontend, para saber hacia donde redirigir
 redirect:
-  to_login:
-    code: aleatorio_de_16_caracteres
+  to_login: #esto es solo por motivos organizativos, para dejar en claro para que es la redireccion, no tiene efectos reales en el codigo ni funcionamiento
+    #Tiene que ser un codigo aleatorio de por lo menos 8 o 16 caracteres para que no haya colisiones con otros servicios, no hay un limite de caracteres real
+    #Tambien tiene que ser un codigo que no se repita en el sistema
+    #Un uuid4 puede ser perfecto para esta funcion
+    code: aleatorio_de_16_caracteres  
+    #La url a la que se redirige el front le metera los datos a redirigir en el query params
     url: "https://google.com"
   to_logout:
-    code: aleatorio_de_16_caracteres
+    code: aleatorio_de_16_caracteres_2
     url: "https://google.com"
     

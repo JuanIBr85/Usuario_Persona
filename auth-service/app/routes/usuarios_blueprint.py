@@ -1,4 +1,6 @@
 import json
+
+from common.utils.component_request import ComponentRequest
 import jwt
 from os import getenv
 from flask import request, Blueprint, Response
@@ -107,8 +109,8 @@ def login1():
                 error_code="NO_INPUT",
             )
 
-        user_agent = request.headers.get("X-CLIENT-USER-AGENT", "")
-        ip = request.headers.get("X-CLIENT-IP", "")
+        user_agent = ComponentRequest.get_user_agent()
+        ip = ComponentRequest.get_ip()
 
         status, mensaje, data, code = usuario_service.login_usuario(
             session, data, user_agent, ip
@@ -274,12 +276,15 @@ def reset_con_otp():
                 400,
             )
         if not token or token.count(".") != 2:
-            return make_response(
+            return (
+                make_response(
                     ResponseStatus.UNAUTHORIZED,
                     "Token inválido o malformado",
                     error_code="TOKEN_MALFORMED",
-            ), 401
-        
+                ),
+                401,
+            )
+
         email_from_token = verificar_token_reset(token)
         if not email_from_token:
             return make_response(
@@ -334,7 +339,7 @@ def verificar_dispositivo():
 
     # Extraer datos
     email = datos["email"]
-    user_agent = datos["user_agent"]
+    user_agent = datos.get("user_agent","")
     ip = datos["ip"]
 
     # Buscar usuario

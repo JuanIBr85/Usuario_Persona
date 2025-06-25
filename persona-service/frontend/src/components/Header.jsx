@@ -1,28 +1,19 @@
 import React, { useState, useRef, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import Hamburger from "hamburger-react";
-import { jwtDecode } from "jwt-decode";
-import { set } from "date-fns";
+
+import {isAdmin} from "@/context/AuthContext";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [_isAdmin, setIsAdmin] = useState(false);
 
   const mobileMenuRef = useRef(null);
   const hamburgerRef = useRef(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
 
-    if (token) {
-      const decoded = jwtDecode(token);
-      console.log(decoded.rol)
-      if (decoded.rol === "usuario") {
-        setIsAdmin(false);
-      } else {
-        setIsAdmin(true);
-      }
-    }
+    setIsAdmin(isAdmin());
 
     function handleClickOutside(e) {
       if (
@@ -72,7 +63,7 @@ const Header = () => {
                 <NavLink
                   to="/adminpanel"
                   className={({ isActive }) =>
-                    `${isAdmin ? "relative" : "hidden"}  text-white transition-all duration-100 ease-in-out
+                    `${_isAdmin ? "relative" : "hidden"}  text-white transition-all duration-100 ease-in-out
                                     ${
                                       isActive
                                         ? "after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-full after:bg-white after:origin-left after:scale-x-100 after:transition-transform after:duration-300"

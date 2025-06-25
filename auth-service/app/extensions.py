@@ -8,9 +8,6 @@ from dotenv import load_dotenv
 limiter = Limiter(key_func=get_remote_address)
 mail = Mail()
 
-
-
-
 # lazy connection a redis. se llama solo cuando se usa.
 _redis_client = None
 
@@ -30,3 +27,4 @@ def get_redis():
             print("[x] Error al conectar con Redis:", e)
             raise
     return _redis_client
+

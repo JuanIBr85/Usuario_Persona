@@ -3,44 +3,49 @@ from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
 from app.services.endpoints_search_service import EndpointsSearchService
 from common.models.endpoint_route_model import EndpointRouteModel
 import logging
-import ipaddress
+from app.extensions import jwt, redis_client_auth
+from app.utils.is_local_connection import is_local_connection
+from cachetools import TTLCache
 
 logger = logging.getLogger(__name__)
 endpoints_search_service = EndpointsSearchService()
 
+# Cache para los permisos de los usuarios para evitar sobre cargar redis
+jwt_cache = TTLCache(maxsize=10000, ttl=20)
 
-def is_local_connection():
-    """
-    Detecta si la conexión viene de localhost o de la misma red local/Docker.
 
-    Returns:
-        bool: True si es conexión local/Docker, False si viene de internet
-    """
-    # Obtener la IP del cliente
-    try:
-        ip_obj = ipaddress.ip_address(request.remote_addr)
+# Obtengo los permisos del usuario
+def get_jwt_permissions(jti):
+    # Si esta en el cache devuelvo los permisos
+    if jti in jwt_cache:
+        return jwt_cache[jti]
 
-        # Verificar si es localhost (127.0.0.1 o ::1)
-        if ip_obj.is_loopback:
-            return True
+    permissions: list = redis_client_auth.lrange(jti, 1, -1)
+    # Si no esta en el cache compruebo si esta en redis
+    if permissions:
+        # Si esta en redis lo guardo en el cache
+        jwt_cache[jti] = set(permissions)
+        return jwt_cache[jti]
+    return None
 
-        # Verificar si es una IP privada (incluye redes Docker)
-        # Redes privadas: 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16
-        if ip_obj.is_private:
-            return True
 
-        # Si llegamos aquí, es una IP pública
+# Comprueba que el token no alla sido revocado
+@jwt.token_in_blocklist_loader
+def check_if_token_is_revoked(jwt_header, jwt_payload: dict):
+    jti = jwt_payload["jti"]
+    # Si esta en el cache es un token valido
+    if jti in jwt_cache:
         return False
 
-    except ValueError:
-        # Si no se puede parsear la IP, asumir que es externa
-        return False
+    # Si no esta en el cache compruebo si esta en redis
+    return get_jwt_permissions(jti) is None
 
 
 def authenticate_config(app):
     @app.before_request
     @jwt_required(optional=True)
     def authenticate_request():
+
         if request.method == "OPTIONS":
             return
 
@@ -78,11 +83,10 @@ def authenticate_config(app):
                     401,
                     description=f"El endpoint <{request.path}> requiere autenticación",
                 )
-
+            # Obtengo los permisos del usuario
+            permisos_usuario = get_jwt_permissions(payload["jti"])
             # Si no tiene los permisos necesario para acceder al endpoint se rechaza el acceso
-            if not service_route.access_permissions.issubset(
-                payload.get("permisos", [])
-            ):
+            if not service_route.access_permissions.issubset(permisos_usuario):
                 abort(
                     403,
                     description=f"Acceso denegado: se requieren permisos {service_route.access_permissions}",

@@ -3,12 +3,16 @@ from datetime import datetime, timedelta, timezone
 
 from flask_mail import Message
 from flask import current_app
-from app.extensions import mail
-
+from app.extensions import mail  
 
 def generar_codigo_otp() -> str:
     return "{:06d}".format(random.randint(0, 999999))
 
+
+# mail que se envia con el codigo otp para verificar la persona
+"""
+AJUSTAR MENSAJE 
+"""
 
 def enviar_codigo_por_email_persona(persona, codigo_otp: str):
 

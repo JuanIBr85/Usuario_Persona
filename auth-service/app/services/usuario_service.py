@@ -40,6 +40,7 @@ from app.utils.otp_manager import (
 )
 from flask_jwt_extended import decode_token
 from app.extensions import get_redis
+from common.services.send_message_service import send_message
 
 
 class UsuarioService(ServicioBase):
@@ -134,10 +135,22 @@ class UsuarioService(ServicioBase):
                 return (ResponseStatus.NOT_FOUND, "Email no encontrado", None, 404)
             usuario.email_verificado = 1
             session.commit()
+
+            # mensaje asincrono para persona-service una vez q fue verificado el mail.
+            send_message(
+                to_service="persona-service",
+                message={
+                    "id_usuario": usuario.id_usuario,
+                    "email": usuario.email_usuario,
+                },
+                event_type="auth_user_register",
+            )
+
         except ExpiredSignatureError as error:
             return (ResponseStatus.UNAUTHORIZED, "El token ha expirado.", error, 401)
         except InvalidTokenError as error:
             return (ResponseStatus.UNAUTHORIZED, "El token es invalido.", error, 401)
+
         return (ResponseStatus.SUCCESS, "Email verificado correctamente.", None, 200)
 
     # -----------------------------------------------------------------------------------------------------------------------------
@@ -191,18 +204,21 @@ class UsuarioService(ServicioBase):
             session.query(Rol)
             .join(RolUsuario)
             .filter(RolUsuario.id_usuario == usuario.id_usuario)
-            .first()
-        )
-        rol_nombre = rol_usuario.nombre_rol if rol_usuario else "sin_rol"
-
-        # Obtener los permisos asociados al rol
-        permisos_query = (
-            session.query(Permiso.nombre_permiso)
-            .join(RolPermiso, Permiso.id_permiso == RolPermiso.permiso_id)
-            .filter(RolPermiso.id_rol == rol_usuario.id_rol)
             .all()
         )
-        permisos_lista = [p.nombre_permiso for p in permisos_query]
+        roles_nombres = [rol.nombre_rol for rol in rol_usuario]
+
+        # Obtener los permisos
+        permisos = (
+            session.query(Permiso.nombre_permiso)
+            .join(RolPermiso, Permiso.id_permiso == RolPermiso.permiso_id)
+            .join(RolUsuario, RolPermiso.id_rol == RolUsuario.id_rol)
+            .filter(RolUsuario.id_usuario == usuario.id_usuario)
+            .distinct()  # Para evitar duplicados
+            .all()
+        )
+
+        permisos_lista = (p.nombre_permiso for p in permisos)
 
         # Verificar si el dispositivo ya está registrado
         dispositivo_confiable = (
@@ -225,7 +241,7 @@ class UsuarioService(ServicioBase):
         else:
             # Crear token con permisos incluidos
             token, expires_in, expires_seconds = crear_token_acceso(
-                usuario.id_usuario, usuario.email_usuario, rol_nombre, permisos_lista
+                usuario.id_usuario, usuario.email_usuario
             )
 
             refresh_token, refresh_expires = crear_token_refresh(usuario.id_usuario)
@@ -252,6 +268,7 @@ class UsuarioService(ServicioBase):
             usuario_data["expires_in"] = expires_in
             usuario_data["refresh_token"] = refresh_token
             usuario_data["refresh_expires"] = refresh_expires.isoformat()
+            usuario_data["rol"] = roles_nombres
 
             return (ResponseStatus.SUCCESS, "Login exitoso.", usuario_data, 200)
 
@@ -358,7 +375,7 @@ class UsuarioService(ServicioBase):
         except ValidationError as error:
             return (
                 ResponseStatus.FAIL,
-                "Error de schema / Bad Request",
+                "Las contraseñas deben coincidir",
                 error.messages,
                 400,
             )

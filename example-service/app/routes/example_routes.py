@@ -1,6 +1,7 @@
 from flask import Blueprint, request
 from common.decorators.api_access import CacheSettings, api_access
 from common.utils.response import make_response, ResponseStatus
+from common.utils.component_request import ComponentRequest
 
 bp = Blueprint("example", __name__, cli_group="example")
 
@@ -9,8 +10,20 @@ bp = Blueprint("example", __name__, cli_group="example")
 @api_access(is_public=True)
 # Esta es una ruta publica, accesible sin autenticacion
 def example():
+
     return (
-        make_response(ResponseStatus.SUCCESS, "Bienvenido a la API de Componentes"),
+        make_response(
+            ResponseStatus.SUCCESS,
+            {
+                "message": "Bienvenido a la API de Componentes",
+                "USER_ID": ComponentRequest.get_user_id()
+                or "No tienes un token de autenticacion",
+                "USER_AGENT": ComponentRequest.get_user_agent()
+                or "No estas entrando con la api gateway",
+                "CLIENT_IP": ComponentRequest.get_ip()
+                or "No estas entrando con la api gateway",
+            },
+        ),
         200,
     )
 
@@ -24,15 +37,12 @@ def ruta_solo_registrado():
             ResponseStatus.SUCCESS,
             {
                 "message": "Bienvenido a la API de Componentes usuario registrado",
-                "USER_ID": request.headers.get(
-                    "X-USER-ID", "No deberias de ver esto, Usa la api gateway"
-                ),
-                "USER_AGENT": request.headers.get(
-                    "X-CLIENT-USER-AGENT", "No deberias de ver esto, Usa la api gateway"
-                ),
-                "CLIENT_IP": request.headers.get(
-                    "X-CLIENT-IP", "No deberias de ver esto, Usa la api gateway"
-                ),
+                "USER_ID": ComponentRequest.get_user_id()
+                or "No deberias de ver esto, Usa la api gateway",
+                "USER_AGENT": ComponentRequest.get_user_agent()
+                or "No deberias de ver esto, Usa la api gateway",
+                "CLIENT_IP": ComponentRequest.get_ip()
+                or "No deberias de ver esto, Usa la api gateway",
             },
         ),
         200,
