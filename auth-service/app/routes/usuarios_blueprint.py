@@ -201,7 +201,7 @@ def perfil_usuario():
 
 
 @usuario_bp.route("/solicitar-otp", methods=["POST"])
-@api_access(is_public=True, limiter=["1 per minute", "3 per day"]])
+@api_access(is_public=True, limiter=["1 per minute", "3 per day"])
 def solicitar_otp():
     session = SessionLocal()
     try:
