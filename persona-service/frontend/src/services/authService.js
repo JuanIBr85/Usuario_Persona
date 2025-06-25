@@ -109,10 +109,7 @@ resetPassword: async (body, token) => {
   return fetchService.fetch({
     url: `${ServiceURL.auth}/reset-password-con-codigo`,
     method: HttpMethod.POST,
-    body: body,
-    headers: {
-      "Authorization": `Bearer ${token}`
-    },
+    body: {...body, token:token},
     showError: AuthService.showError
   });
 }
