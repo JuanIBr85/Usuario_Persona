@@ -32,6 +32,9 @@ def create_app():
     app.register_blueprint(persona_bp, url_prefix="/api")
     app.register_blueprint(opciones_bp, url_prefix="/api")
 
+    # Importa receptores de mensajería
+    from app.messaging import reciever
+
     # Crear tablas si no existen
 
     with app.app_context():
@@ -74,7 +77,7 @@ def create_app():
 """
 Mesaje recibido desde auth
 {'from_service': 'auth-service', 'to_service': 'persona-service', 'channel': 'default', 'event_type': 'auth_user_register', 'message': {'id_usuario': 4, 'email': 'supesradmin@admin.com'}, 'message_id': '69ba74dccf14477c9fe634cf51e06089'}
-"""
+
 
 
 @receiver(channel="default")
@@ -84,3 +87,4 @@ Mesaje recibido desde auth
 def funcion_que_recibe_mensajes(message, app_flask: Flask) -> None:
     logging.warning("[Mensajería] Mensaje recibido:")
     logging.warning(message)
+"""
