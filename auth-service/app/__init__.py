@@ -88,5 +88,6 @@ def init_app():
 # el canal "default" es el canal por defecto
 # esta funcion recibe un mensaje y lo procesa en un hilo separado
 def funcion_que_recibe_mensajes(message: Dict, app_flask: Flask) -> None:
+    logging.warning("[Mensajería] Mensaje recibido:")
     logging.warning(message)
-    send_message(to_service="auth-service", message={"message": "hola"})
+    
