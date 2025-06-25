@@ -22,7 +22,6 @@ from app.schemas.usuarios_schema import (
 from marshmallow import ValidationError
 from app.services.servicio_base import ServicioBase
 from app.models.permisos import Permiso
-from app.models.otp_reset_password_model import OtpResetPassword
 from app.utils.email import (
     generar_codigo_otp,
     enviar_codigo_por_email,
@@ -30,8 +29,6 @@ from app.utils.email import (
     decodificar_token_verificacion,
     enviar_email_validacion_dispositivo,
 )
-from jwt import ExpiredSignatureError, InvalidTokenError
-from app.utils.response import ResponseStatus
 from app.utils.otp_manager import (
     guardar_otp,
     verificar_otp_redis,
@@ -43,7 +40,7 @@ from app.utils.otp_manager import (
 from flask_jwt_extended import decode_token
 from app.extensions import get_redis
 from common.services.send_message_service import send_message
-
+from common.utils.response import ResponseStatus
 
 class UsuarioService(ServicioBase):
     def __init__(self):
@@ -105,6 +102,14 @@ class UsuarioService(ServicioBase):
             session.add(UsuarioLog(usuario_id=nuevo_usuario.id_usuario, accion="registro", detalles="Registro con OTP"))
             session.add(DispositivoConfiable(usuario_id=nuevo_usuario.id_usuario, user_agent=user_agent, fecha_expira=datetime.now(timezone.utc) + timedelta(days=365)))
             
+            send_message(
+                to_service="persona-service",
+                message={
+                    "id_usuario": nuevo_usuario.id_usuario,
+                    "email": nuevo_usuario.email_usuario,
+                },
+                event_type="auth_user_register",
+            )
             
             session.commit()
 
@@ -156,12 +161,8 @@ class UsuarioService(ServicioBase):
         try:
             data_validada = self.schema_login.load(data)
         except ValidationError as error:
-            return (
-                ResponseStatus.FAIL,
-                "Error de schema / Bad Request",
-                error.messages,
-                400,
-            )
+            return ResponseStatus.FAIL, "Error de schema / Bad Request", error.messages, 400
+            
 
         usuario = (
             session.query(Usuario)
@@ -169,28 +170,16 @@ class UsuarioService(ServicioBase):
             .first()
         )
         if not usuario:
-            return (
-                ResponseStatus.UNAUTHORIZED,
-                "Email o contraseña incorrecta",
-                None,
-                401,
-            )
+            return ResponseStatus.UNAUTHORIZED, "Email o contraseña incorrecta", None, 401
+
 
         if not check_password_hash(usuario.password, data_validada["password"]):
-            return (
-                ResponseStatus.UNAUTHORIZED,
-                "Email o contraseña incorrecta",
-                None,
-                401,
-            )
+            return ResponseStatus.UNAUTHORIZED, "Email o contraseña incorrecta", None, 401
+            
 
         if not usuario.email_verificado:
-            return (
-                ResponseStatus.UNAUTHORIZED,
-                "Debe verificar el email antes de loguearse.",
-                None,
-                401,
-            )
+            return ResponseStatus.UNAUTHORIZED, "Debe verificar el email antes de loguearse.", None, 401
+            
 
         # Obtener el rol del usuario
         rol_usuario = (
@@ -220,17 +209,10 @@ class UsuarioService(ServicioBase):
             .first()
         )
 
-        if not dispositivo_confiable or dispositivo_confiable.fecha_expira.replace(
-            tzinfo=timezone.utc
-        ) < datetime.now(timezone.utc):
+        if not dispositivo_confiable or dispositivo_confiable.fecha_expira.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
             # Dispositivo nuevo o expirado → enviar email de validación
             enviar_email_validacion_dispositivo(usuario, user_agent, ip)
-            return (
-                ResponseStatus.PENDING,
-                "Verificación de dispositivo enviada al email. Por favor confírmelo.",
-                None,
-                401,
-            )
+            return ResponseStatus.PENDING, "Verificación de dispositivo enviada al email. Por favor confírmelo.", None, 401
         else:
             # Crear token con permisos incluidos
             token, expires_in, expires_seconds = crear_token_acceso(
@@ -263,7 +245,7 @@ class UsuarioService(ServicioBase):
             usuario_data["refresh_expires"] = refresh_expires.isoformat()
             usuario_data["rol"] = roles_nombres
 
-            return (ResponseStatus.SUCCESS, "Login exitoso.", usuario_data, 200)
+            return ResponseStatus.SUCCESS, "Login exitoso.", usuario_data, 200
 
     # -----------------------------------------------------------------------------------------------------------------------------
     # terminar de modificar con persona-service
@@ -311,7 +293,7 @@ class UsuarioService(ServicioBase):
 
         usuario = session.query(Usuario).filter_by(id_usuario=usuario_id).first()
         if not usuario:
-            return (ResponseStatus.NOT_FOUND, "Usuario no encontrado", None, 404)
+            return ResponseStatus.NOT_FOUND, "Usuario no encontrado", None, 404
 
         # Agregar log de logout
         log = UsuarioLog(
@@ -322,7 +304,7 @@ class UsuarioService(ServicioBase):
         session.add(log)
         session.commit()
 
-        return (ResponseStatus.SUCCESS, "Logout exitoso.", None, 200)
+        return ResponseStatus.SUCCESS, "Logout exitoso.", None, 200
 
     # -----------------------------------------------------------------------------------------------------------------------------
     # RECUPERACION DE PASSWORD CON CODIGO OTP VIA MAIL
@@ -366,12 +348,8 @@ class UsuarioService(ServicioBase):
         try:
             data_validada = self.schema_reset.load(data)
         except ValidationError as error:
-            return (
-                ResponseStatus.FAIL,
-                "Las contraseñas deben coincidir",
-                error.messages,
-                400,
-            )
+            return ResponseStatus.FAIL, "Las contraseñas deben coincidir", error.messages, 400
+            
 
         email_redis = verificar_token_recuperacion(token)
         if not email_redis or email != email_redis:
@@ -386,12 +364,8 @@ class UsuarioService(ServicioBase):
             return ResponseStatus.FAIL, "Usuario no encontrado", None, 404
 
         if check_password_hash(usuario.password, data_validada["confirm_password"]):
-            return (
-                ResponseStatus.FAIL,
-                "La contraseña debe ser diferente a la anterior",
-                None,
-                400,
-            )
+            return ResponseStatus.FAIL, "La contraseña debe ser diferente a la anterior", None, 400
+            
 
         # Aquí actualizas y registras contraseña
         usuario.password = generate_password_hash(nueva_pass)  # tu función de hash

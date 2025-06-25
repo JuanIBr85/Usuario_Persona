@@ -5,7 +5,6 @@ import jwt
 from os import getenv
 from flask import request, Blueprint, Response
 from app.database.session import SessionLocal
-from app.utils.response import ResponseStatus, make_response
 from app.services.usuario_service import UsuarioService
 from app.extensions import limiter
 from app.utils.jwt import verificar_token_reset
@@ -16,6 +15,7 @@ from app.models.dispositivos_confiable import DispositivoConfiable
 from datetime import datetime, timezone, timedelta
 from common.decorators.api_access import api_access
 from common.models.cache_settings import CacheSettings
+from common.utils.response import make_response, ResponseStatus
 
 usuario_bp = Blueprint("usuario", __name__)
 usuario_service = UsuarioService()
@@ -39,7 +39,7 @@ def iniciar_registro_usuario():
         status, mensaje, contenido, codigo = usuario_service.iniciar_registro(
             session, data
         )
-        return make_response(status, mensaje, contenido), codigo
+        return make_response (status, mensaje, contenido, codigo)
     finally:
         session.close()
 
