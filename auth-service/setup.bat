@@ -23,7 +23,7 @@ if not exist "%VENV_DIR%\Scripts\python.exe" (
 
 :: Usar el pip dentro del venv para actualizar e instalar
 echo Actualizando pip dentro del entorno virtual...
-%VENV_DIR%\Scripts\pip.exe install --upgrade pip
+%VENV_DIR%\Scripts\python.exe -m pip install --upgrade pip
 
 :: Limpiar cache de pip
 echo Limpiando cache de pip...

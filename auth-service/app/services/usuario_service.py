@@ -40,7 +40,7 @@ from app.utils.otp_manager import (
 )
 from flask_jwt_extended import decode_token
 from app.extensions import get_redis
-
+from common.services import send_message_service
 
 class UsuarioService(ServicioBase):
     def __init__(self):
@@ -121,24 +121,37 @@ class UsuarioService(ServicioBase):
             200,
         )
 
+
     # -----------------------------------------------------------------------------------------------------------------------------
-    def verificar_email(self, session: Session, token: str) -> dict:
-        if not token:
-            return (ResponseStatus.NOT_FOUND, "Token no encontrado.", None, 404)
-        try:
-            datos = decodificar_token_verificacion(token)
-            usuario = (
-                session.query(Usuario).filter_by(email_usuario=datos["email"]).first()
-            )
-            if not usuario:
-                return (ResponseStatus.NOT_FOUND, "Email no encontrado", None, 404)
-            usuario.email_verificado = 1
-            session.commit()
-        except ExpiredSignatureError as error:
-            return (ResponseStatus.UNAUTHORIZED, "El token ha expirado.", error, 401)
-        except InvalidTokenError as error:
-            return (ResponseStatus.UNAUTHORIZED, "El token es invalido.", error, 401)
-        return (ResponseStatus.SUCCESS, "Email verificado correctamente.", None, 200)
+def verificar_email(self, session: Session, token: str) -> dict:
+    if not token:
+        return (ResponseStatus.NOT_FOUND, "Token no encontrado.", None, 404)
+    try:
+        datos = decodificar_token_verificacion(token)
+        usuario = (
+            session.query(Usuario).filter_by(email_usuario=datos["email"]).first()
+        )
+        if not usuario:
+            return (ResponseStatus.NOT_FOUND, "Email no encontrado", None, 404)
+        usuario.email_verificado = 1
+        session.commit()
+
+        #mensaje asincrono para persona-service una vez q fue verificado el mail.
+        send_message_service(
+            to_service="persona-service",
+            message={
+                "id_usuario": usuario.id_usuario,
+                "email": usuario.email_usuario
+            },
+            event_type="auth_user_register"
+        )
+
+    except ExpiredSignatureError as error:
+        return (ResponseStatus.UNAUTHORIZED, "El token ha expirado.", error, 401)
+    except InvalidTokenError as error:
+        return (ResponseStatus.UNAUTHORIZED, "El token es invalido.", error, 401)
+
+    return (ResponseStatus.SUCCESS, "Email verificado correctamente.", None, 200)
 
     # -----------------------------------------------------------------------------------------------------------------------------
     # LOGIN Y LOGOUT
@@ -360,12 +373,8 @@ class UsuarioService(ServicioBase):
         try:
             data_validada = self.schema_reset.load(data)
         except ValidationError as error:
-            return (
-                ResponseStatus.FAIL,
-                "Error de schema / Bad Request",
-                error.messages,
-                400,
-            )
+            return ResponseStatus.FAIL,"Las contraseñas deben coincidir",error.messages,400
+            
 
         email_redis = verificar_token_recuperacion(token)
         if not email_redis or email != email_redis:

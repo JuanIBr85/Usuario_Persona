@@ -339,7 +339,7 @@ def verificar_dispositivo():
 
     # Extraer datos
     email = datos["email"]
-    user_agent = datos["user_agent"]
+    user_agent = datos.get("user_agent","")
     ip = datos["ip"]
 
     # Buscar usuario
