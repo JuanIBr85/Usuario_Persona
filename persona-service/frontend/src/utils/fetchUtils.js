@@ -1,8 +1,9 @@
 import { href } from "react-router";
 
 export const ServiceURL = Object.freeze({
-    auth: "http://localhost:5002/api",
-    persona: "http://localhost:5002/api",
+    auth: "http://localhost:5002/api/auth",
+    persona: "http://localhost:5002/api/persona",
+    control: "http://localhost:5002/api/control",
     //api gateway
     // "http://localhost:5002/api"
 });

@@ -13,7 +13,7 @@ export const componentService = {
    */
   get_all: async () => {
     return fetchService.fetch({
-      url: `${ServiceURL.auth}/control/services/all`,
+      url: `${ServiceURL.control}/services/all`,
       method: HttpMethod.GET,
       showError: componentService.showError,
       useToken: true
@@ -27,7 +27,7 @@ export const componentService = {
    */
   get_by_id: async (id) => {
     return fetchService.fetch({
-      url: `${ServiceURL.auth}/control/services/get_service/${id}`,
+      url: `${ServiceURL.control}/services/get_service/${id}`,
       method: HttpMethod.GET,
       showError: componentService.showError,
       useToken: true
@@ -41,7 +41,7 @@ export const componentService = {
    */
   install_service: async (url) => {
     return fetchService.fetch({
-      url: `${ServiceURL.auth}/control/services/install_service`,
+      url: `${ServiceURL.control}/services/install_service`,
       method: HttpMethod.POST,
       body: { url },
       showError: componentService.showError,
@@ -56,7 +56,7 @@ export const componentService = {
    */
   refresh_service: async (id) => {
     return fetchService.fetch({
-      url: `${ServiceURL.auth}/control/services/refresh_service/${id}`,
+      url: `${ServiceURL.control}/services/refresh_service/${id}`,
       method: HttpMethod.PUT,
       showError: componentService.showError,
       useToken: true
@@ -70,7 +70,7 @@ export const componentService = {
    */
   remove_service: async (id) => {
     return fetchService.fetch({
-      url: `${ServiceURL.auth}/control/services/remove_service/${id}`,
+      url: `${ServiceURL.control}/services/remove_service/${id}`,
       method: HttpMethod.DELETE,
       showError: componentService.showError,
       useToken: true
@@ -86,7 +86,7 @@ export const componentService = {
   set_service_available: async (id, available) => {
     const state = available ? 1 : 0;
     return fetchService.fetch({
-      url: `${ServiceURL.auth}/control/services/set_service_available/${id}/${state}`,
+      url: `${ServiceURL.control}/services/set_service_available/${id}/${state}`,
       method: HttpMethod.GET,
       showError: componentService.showError,
       useToken: true
@@ -99,7 +99,7 @@ export const componentService = {
  
   stop_system: async () => {
     return fetchService.fetch({
-      url: `${ServiceURL.auth}/control/services/stop_system`,
+      url: `${ServiceURL.control}/services/stop_system`,
       method: HttpMethod.POST,
       showError: componentService.showError,
       useToken: true
@@ -113,7 +113,7 @@ export const componentService = {
 
   get_redirect: async (code) => {
     return fetchService.fetch({
-      url: `${ServiceURL.auth}/control/redirect/get/${code}`,
+      url: `${ServiceURL.control}/redirect/get/${code}`,
       method: HttpMethod.GET,
       showError: componentService.showError,
       useToken: false

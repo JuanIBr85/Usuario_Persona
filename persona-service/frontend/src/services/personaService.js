@@ -7,7 +7,7 @@ export const PersonaService = {
   // ====== CRUD PERSONAS ======
   crear: async (body) => {
     return fetchService.fetch({
-      url: `${ServiceURL.persona}/api/crear_persona`,
+      url: `${ServiceURL.persona}/crear_persona`,
       method: HttpMethod.POST,
       body: body,
       useToken: true,
@@ -17,7 +17,7 @@ export const PersonaService = {
 
   get_all: async () => {
     return fetchService.fetch({
-      url: `${ServiceURL.persona}/api/personas`,
+      url: `${ServiceURL.persona}/personas`,
       method: HttpMethod.GET,
       useToken: true,
       showError: PersonaService.showError
@@ -26,7 +26,7 @@ export const PersonaService = {
 
   get_by_id: async (id) => {
     return fetchService.fetch({
-      url: `${ServiceURL.persona}/api/personas/${id}`,
+      url: `${ServiceURL.persona}/personas/${id}`,
       method: HttpMethod.GET,
       useToken: true,
       showError: PersonaService.showError
@@ -36,7 +36,7 @@ export const PersonaService = {
 
   editar: async (id, body) => {
     return fetchService.fetch({
-      url: `${ServiceURL.persona}/api/modificar_persona/${id}`,
+      url: `${ServiceURL.persona}/modificar_persona/${id}`,
       method: HttpMethod.PUT,
       body: body,
       useToken: true,
@@ -46,7 +46,7 @@ export const PersonaService = {
 
   borrar: async (id) => {
     return fetchService.fetch({
-      url: `${ServiceURL.persona}/api/borrar_persona/${id}`,
+      url: `${ServiceURL.persona}/borrar_persona/${id}`,
       method: HttpMethod.DELETE,
 
       useToken: true,
@@ -57,7 +57,7 @@ export const PersonaService = {
 
   get_by_usuario: async (id) => {
     return fetchService.fetch({
-      url: `${ServiceURL.persona}/api/personas_by_usuario/${id}`,
+      url: `${ServiceURL.persona}/personas_by_usuario/${id}`,
       method: HttpMethod.GET,
       useToken: true,
       showError: PersonaService.showError
@@ -66,7 +66,7 @@ export const PersonaService = {
 
   get_tipos_documentos: async () => {
     return fetchService.fetch({
-      url: `${ServiceURL.persona}/api/tipos_documento`,
+      url: `${ServiceURL.persona}/tipos_documento`,
       method: HttpMethod.GET,
       useToken: true,
       showError: PersonaService.showError
@@ -75,7 +75,7 @@ export const PersonaService = {
 
   get_redes_sociales: async () => {
     return fetchService.fetch({
-      url: `${ServiceURL.persona}/api/redes_sociales`,
+      url: `${ServiceURL.persona}/redes_sociales`,
       method: HttpMethod.GET,
       useToken: true,
       showError: PersonaService.showError
@@ -84,7 +84,7 @@ export const PersonaService = {
 
   get_localidades_by_codigo_postal: async (codigo_postal) => {
     return fetchService.fetch({
-      url: `${ServiceURL.persona}/api/domicilios_postales/localidades?codigo_postal=${codigo_postal}`,
+      url: `${ServiceURL.persona}/domicilios_postales/localidades?codigo_postal=${codigo_postal}`,
       method: HttpMethod.GET,
       useToken: true,
       showError: PersonaService.showError
@@ -93,7 +93,7 @@ export const PersonaService = {
 
   get_count: async () => {
     return fetchService.fetch({
-      url: `${ServiceURL.persona}/api/personas/count`,
+      url: `${ServiceURL.persona}/personas/count`,
       method: HttpMethod.GET,
       useToken: true,
       showError: PersonaService.showError
@@ -102,7 +102,7 @@ export const PersonaService = {
 
   get_estados_civiles: async () => {
     return fetchService.fetch({
-      url: `${ServiceURL.persona}/api/estados_civiles`,
+      url: `${ServiceURL.persona}/estados_civiles`,
       method: HttpMethod.GET,
       useToken: true,
       showError: PersonaService.showError
@@ -110,7 +110,7 @@ export const PersonaService = {
   },
   get_ocupaciones: async () => {
     return fetchService.fetch({
-      url: `${ServiceURL.persona}/api/ocupaciones`,
+      url: `${ServiceURL.persona}/ocupaciones`,
       method: HttpMethod.GET,
       useToken: true,
       showError: PersonaService.showError
@@ -118,7 +118,7 @@ export const PersonaService = {
   },
   get_estudios_alcanzados: async () => {
     return fetchService.fetch({
-      url: `${ServiceURL.persona}/api/estudios_alcanzados`,
+      url: `${ServiceURL.persona}/estudios_alcanzados`,
       method: HttpMethod.GET,
       useToken: true,
       showError: PersonaService.showError
@@ -128,7 +128,7 @@ export const PersonaService = {
   //Rutas de verificacion y vinculacion de persona
   verificar_documento: async (body) => {
     return fetchService.fetch({
-      url: `${ServiceURL.persona}/api/opciones/verificar-documento`,
+      url: `${ServiceURL.persona}/opciones/verificar-documento`,
       method: HttpMethod.POST,
       body: body,
       useToken: true,
@@ -138,7 +138,7 @@ export const PersonaService = {
 
   verificar_email: async (body) => {
     return fetchService.fetch({
-      url: `${ServiceURL.persona}/api/personas/verify`,
+      url: `${ServiceURL.persona}/personas/verify`,
       method: HttpMethod.POST,
       body: body,
       useToken: true,
@@ -148,7 +148,7 @@ export const PersonaService = {
 
   verificar_otp: async (body) => {
     return fetchService.fetch({
-      url: `${ServiceURL.persona}/api/personas/verify-otp`,
+      url: `${ServiceURL.persona}/personas/verify-otp`,
       method: HttpMethod.POST,
       body: body,
       useToken: true,
