@@ -31,10 +31,11 @@ function Sign() {
     setIsLoading(true);
 
     AuthService.register(formData) // Llama al servicio para registrar al usuario
-      .then((json) => {
+      .then(() => {
         // Si fue exitoso, muestra mensaje de éxito y activa bandera isOK
+        sessionStorage.setItem("email_verificar", formData.email_usuario);
         setMessage(
-          `La cuenta ha sido creada correctamente. Por favor, verifique su correo electrónico para activar su cuenta.`
+          `La cuenta ha sido creada correctamente. Por favor, ingrese el codigo que fue enviado a su mail para activar su cuenta.`
         );
         setIsOK(true);
       })
@@ -61,7 +62,7 @@ function Sign() {
         setIsOpen={setIsOpen}
         actionHandle={
           isOK
-            ? () => setTimeout(() => navigate("/auth/login"), 500)
+            ? () => setTimeout(() => navigate("/auth/otpregister"), 500)
             : undefined
         } // Redirige al login si fue exitoso
       />
