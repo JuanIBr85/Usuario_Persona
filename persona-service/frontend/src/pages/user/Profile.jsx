@@ -8,7 +8,6 @@ import FormDatos from "@/components/profile/FormDatos"
 import FormServicios from "@/components/profile/FormServicios"
 import FormContacto from "@/components/profile/FormContacto"
 import FormDomicillio from "@/components/profile/FormDomicillio"
-import ProfilePhoto from "@/components/profile/ProfilePhoto"
 import FormPersonaExtendida from "@/components/profile/FormPersonaExtendida"
 import Loading from '@/components/loading/Loading'
 import { SimpleDialog } from '@/components/SimpleDialog'
@@ -26,22 +25,36 @@ const ProfileForm = () => {
   const {
     isLoading,
     personaData,
-    photoUrl,
     email,
     staticData,
-    handlePhotoChange,
     setPersonaData,
     dialog,
     setDialog,
+    isCriticalError
   } = useProfile();
 
-  const lastUpdate = tiempoTranscurrido(personaData.updated_at);
-  const subscribedServices = ['Residencia', 'Becas', 'Oferta educativa'];
 
   if (isLoading) {
     return <Loading />;
   }
 
+  if (isCriticalError) {
+    return <SimpleDialog
+      title={dialog?.title}
+      description={dialog?.description}
+      isOpen={dialog}
+      actionHandle={() => {
+        setTimeout(() => {
+          console.log(dialog)
+          dialog?.action();
+          setDialog(null);
+        }, 500);
+      }}
+    />
+  }
+
+  const lastUpdate = tiempoTranscurrido(personaData.updated_at);
+  const subscribedServices = ['Residencia', 'Becas', 'Oferta educativa'];
   return (
     <>
       <SimpleDialog
@@ -49,8 +62,10 @@ const ProfileForm = () => {
         description={dialog?.description}
         isOpen={dialog}
         actionHandle={() => {
-          setDialog(null);
-          setTimeout(() => dialog?.action(), 500);
+          setTimeout(() => {
+            setDialog(null);
+            dialog?.action();
+          }, 500);
         }}
       />
       <Fade duration={300} triggerOnce>
