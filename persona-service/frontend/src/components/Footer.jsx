@@ -27,7 +27,7 @@ const Footer = () => {
               Centro Regional De Estudios Universitarios Suarense
             </p>
             <p className="mt-4 text-sm text-gray-800">
-              Lorem, ipsum dolor.
+              
             </p>
           </div>
         </div>

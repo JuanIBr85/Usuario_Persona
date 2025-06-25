@@ -41,27 +41,23 @@ function AdminServices() {
   return (
     <div className="p-6 space-y-6 py-30 px-3 md:px-20 md:pt-10">
       <Fade duration={300} triggerOnce>
-        <h2 className="text-3xl font-bold mb-6 text-center">
+        <h2 className="text-3xl font-bold mb-6 text-center ">
           Gestión de Servicios
         </h2>
         <div>
-          <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 place-items-stretch mb-5">
+          <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 place-items-stretch mb-5 cursor-pointer">
             {options.map((opt) => (
               <Card
                 key={opt.title}
                 className="flex flex-col justify-between h-60"
+                onClick={() => navigate(opt.path)}
               >
                 <CardHeader>
                   <CardTitle>{opt.title}</CardTitle>
                   <CardDescription>{opt.description}</CardDescription>
                 </CardHeader>
                 <CardFooter>
-                  <Button
-                    className="mt-auto w-full"
-                    onClick={() => navigate(opt.path)}
-                  >
-                    Ir a {opt.title}
-                  </Button>
+                  <Button className="mt-auto w-full cursor-pointer">Ir a {opt.title}</Button>
                 </CardFooter>
               </Card>
             ))}
