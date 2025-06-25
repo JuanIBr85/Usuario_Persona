@@ -201,7 +201,7 @@ def perfil_usuario():
 
 
 @usuario_bp.route("/solicitar-otp", methods=["POST"])
-@api_access(is_public=True, limiter=["10 per 1 minutes"])
+@api_access(is_public=True, limiter=["1 per minute", "3 per day"]])
 def solicitar_otp():
     session = SessionLocal()
     try:
@@ -237,8 +237,9 @@ def solicitar_otp():
 @usuario_bp.route("/verificar-otp", methods=["POST"])
 @api_access(
     is_public=True,
-    limiter=["10 per minute"],
-    cache=CacheSettings(expiration=1, params=["email", "otp"]),
+    limiter=["5 per minute", "6 per day"],
+    # 1hs previene que reenvien el token correcto para evitar abusos
+    cache=CacheSettings(expiration=60 * 60, params=["email", "otp"]),
 )
 def verificar_otp():
     session = SessionLocal()
@@ -276,14 +277,11 @@ def verificar_otp():
 
 
 @usuario_bp.route("/reset-password-con-codigo", methods=["POST"])
-@api_access(is_public=True, limiter=["10 per minute"])
+@api_access(is_public=True, limiter=["3 per day"])
 def reset_con_otp():
     session = SessionLocal()
     try:
         data = request.get_json()
-        import logging
-
-        logging.warning("Datos recibidos: %s", data)
         token = data.get("token")
 
         data.pop("token", None)
@@ -364,7 +362,7 @@ def verificar_dispositivo():
 
     # Extraer datos
     email = datos["email"]
-    user_agent = datos.get("user_agent","")
+    user_agent = datos.get("user_agent", "")
     ip = datos["ip"]
 
     # Buscar usuario
@@ -389,7 +387,8 @@ def verificar_dispositivo():
 
 @usuario_bp.route("/refresh", methods=["POST"])
 @api_access(
-    is_public=True
+    is_public=False,
+    limiter=["5 per minute", "5 per hour"],
 )  # solo controla si es pública, pero no te ayuda con el refresh_token
 def refresh_token():
     session = SessionLocal()
