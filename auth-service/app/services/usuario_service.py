@@ -123,35 +123,35 @@ class UsuarioService(ServicioBase):
 
 
     # -----------------------------------------------------------------------------------------------------------------------------
-def verificar_email(self, session: Session, token: str) -> dict:
-    if not token:
-        return (ResponseStatus.NOT_FOUND, "Token no encontrado.", None, 404)
-    try:
-        datos = decodificar_token_verificacion(token)
-        usuario = (
-            session.query(Usuario).filter_by(email_usuario=datos["email"]).first()
-        )
-        if not usuario:
-            return (ResponseStatus.NOT_FOUND, "Email no encontrado", None, 404)
-        usuario.email_verificado = 1
-        session.commit()
+    def verificar_email(self, session: Session, token: str) -> dict:
+        if not token:
+            return (ResponseStatus.NOT_FOUND, "Token no encontrado.", None, 404)
+        try:
+            datos = decodificar_token_verificacion(token)
+            usuario = (
+                session.query(Usuario).filter_by(email_usuario=datos["email"]).first()
+            )
+            if not usuario:
+                return (ResponseStatus.NOT_FOUND, "Email no encontrado", None, 404)
+            usuario.email_verificado = 1
+            session.commit()
 
-        #mensaje asincrono para persona-service una vez q fue verificado el mail.
-        send_message_service(
-            to_service="persona-service",
-            message={
-                "id_usuario": usuario.id_usuario,
-                "email": usuario.email_usuario
-            },
-            event_type="auth_user_register"
-        )
+            #mensaje asincrono para persona-service una vez q fue verificado el mail.
+            send_message_service(
+                to_service="persona-service",
+                message={
+                    "id_usuario": usuario.id_usuario,
+                    "email": usuario.email_usuario
+                },
+                event_type="auth_user_register"
+            )
 
-    except ExpiredSignatureError as error:
-        return (ResponseStatus.UNAUTHORIZED, "El token ha expirado.", error, 401)
-    except InvalidTokenError as error:
-        return (ResponseStatus.UNAUTHORIZED, "El token es invalido.", error, 401)
+        except ExpiredSignatureError as error:
+            return (ResponseStatus.UNAUTHORIZED, "El token ha expirado.", error, 401)
+        except InvalidTokenError as error:
+            return (ResponseStatus.UNAUTHORIZED, "El token es invalido.", error, 401)
 
-    return (ResponseStatus.SUCCESS, "Email verificado correctamente.", None, 200)
+        return (ResponseStatus.SUCCESS, "Email verificado correctamente.", None, 200)
 
     # -----------------------------------------------------------------------------------------------------------------------------
     # LOGIN Y LOGOUT
