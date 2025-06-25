@@ -12,7 +12,7 @@ def component_service(app):
     if not exist_receiver("default"):
         logger.error("No existe el canal default")
         receiver("default")(
-            lambda message: logger.error(
+            lambda message, app: logger.error(
                 f"No existe el canal {message['channel']} message: {message}"
             )
         )

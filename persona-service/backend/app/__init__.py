@@ -1,3 +1,4 @@
+import logging
 from flask import Flask, jsonify
 from flask_cors import CORS
 import os
@@ -8,6 +9,7 @@ from app.models.domicilio_model import Domicilio
 from app.models.domicilio_postal_model import DomicilioPostal
 from app.utils.carga_domicilio_postal import cargar_domicilios_postales_csv
 from common.utils.component_service import component_service
+from common.decorators.receiver import receiver
 
 
 def create_app():
@@ -67,3 +69,18 @@ def create_app():
         return jsonify(output)
 
     return app
+
+
+"""
+Mesaje recibido desde auth
+{'from_service': 'auth-service', 'to_service': 'persona-service', 'channel': 'default', 'event_type': 'auth_user_register', 'message': {'id_usuario': 4, 'email': 'supesradmin@admin.com'}, 'message_id': '69ba74dccf14477c9fe634cf51e06089'}
+"""
+
+
+@receiver(channel="default")
+# Este es un decorador que recibe mensajes de un canal
+# el canal "default" es el canal por defecto
+# esta funcion recibe un mensaje y lo procesa en un hilo separado
+def funcion_que_recibe_mensajes(message, app_flask: Flask) -> None:
+    logging.warning("[Mensajería] Mensaje recibido:")
+    logging.warning(message)
