@@ -49,8 +49,8 @@ def authenticate_config(app):
         return (
             make_response(
                 ResponseStatus.FAIL,
-                f"A intentado ingresar demaciadas veces a esta ruta: {e.description}",
-                {"message": "A intentado ingresar demaciadas veces a esta ruta"},
+                f"Ha intentado ingresar demasiadas veces a esta ruta: {e.description}",
+                {"message": "Ha intentado ingresar demasiadas veces a esta ruta"},
             ),
             429,
         )
