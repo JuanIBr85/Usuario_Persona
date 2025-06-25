@@ -58,6 +58,11 @@ def create_app() -> Flask:
     thread.daemon = True  # El hilo se cerrará cuando el programa principal termine
     thread.start()
 
+    # Cargo el listado de redirecciones
+    thread = threading.Thread(target=ServicesSearchService().update_redirect)
+    thread.daemon = True  # El hilo se cerrará cuando el programa principal termine
+    thread.start()
+
     # Inicializa el servicio de mensajeria
     redis_stream_start(app)
 
@@ -69,6 +74,7 @@ def create_app() -> Flask:
 def research(app: Flask, message_data: dict):
     logger.warning("Recargando endpoints")
     endpoints_search_service.refresh_endpoints()
+    ServicesSearchService().update_redirect()
 
 
 # Detiene todo el sistema

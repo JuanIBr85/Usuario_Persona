@@ -178,66 +178,71 @@ function AdminUsers() {
       setUsers(users.map((u) => (u.id === editingUser.id ? editingUser : u)));
       setEditingUser(null);
     } catch (err) {
-      console.error("Error actualizando usuario:", err);
+      console.error("Error actualizando persona:", err);
 
-      const message =
-        err?.response?.data?.message || err.message || "Error desconocido";
-
+      //const message = err?.response?.data?.message || err.message || "Error desconocido";
       setAlert({
-        title: "Error al actualizar usuario",
-        description: message,
+        title: "Error al actualizar persona",
+        description: "",
       });
     }
+    console.log("message", message);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const body = {
-      nombre_persona: newUser.nombre || "",
-      apellido_persona: newUser.apellido || "",
-      fecha_nacimiento_persona: newUser.fecha_nacimiento || "",
-      tipo_documento: newUser.tipo_documento || "DNI",
-      num_doc_persona: newUser.nro_documento || "",
-      usuario_id: newUser.usuario_id || null,
-      domicilio: {
-        domicilio_calle: newUser.domicilio_calle || "",
-        domicilio_numero: newUser.domicilio_numero || "",
-        domicilio_piso: newUser.domicilio_piso || "",
-        domicilio_dpto: newUser.domicilio_dpto || "",
-        domicilio_referencia: newUser.domicilio_referencia || "",
-        codigo_postal: {
-          codigo_postal: newUser.codigo_postal || "",
-          localidad: newUser.localidad || "",
-        },
-      },
-      contacto: {
-        telefono_fijo: newUser.telefono_fijo || "",
-        telefono_movil: newUser.telefono_movil || "",
-        red_social_contacto: newUser.red_social_contacto || "",
-        red_social_nombre: newUser.red_social_nombre || "",
-        email_contacto: newUser.email_contacto || "",
-        observacion_contacto: newUser.observacion_contacto || "",
-      },
-    };
-
-    // Crear el objeto que realmente se va a mostrar en la tabla
-    const newUserForTable = {
-      id: null,
-      nombre: newUser.nombre || "",
-      apellido: newUser.apellido || "",
-      tipo_documento: newUser.tipo_documento || "DNI",
-      nro_documento: newUser.nro_documento || "",
-      fecha_nacimiento: newUser.fecha_nacimiento || "",
-      usuario_id: newUser.usuario_id || null,
-    };
-
-    setUsers((prevUsers) => [...prevUsers, newUserForTable]);
     try {
+      const body = {
+        nombre_persona: newUser.nombre || "",
+        apellido_persona: newUser.apellido || "",
+        fecha_nacimiento_persona: newUser.fecha_nacimiento || "",
+        tipo_documento: newUser.tipo_documento || "DNI",
+        num_doc_persona: newUser.nro_documento || "",
+        usuario_id: newUser.usuario_id || null,
+        domicilio: {
+          domicilio_calle: newUser.domicilio_calle || "",
+          domicilio_numero: newUser.domicilio_numero || "",
+          domicilio_piso: newUser.domicilio_piso || "",
+          domicilio_dpto: newUser.domicilio_dpto || "",
+          domicilio_referencia: newUser.domicilio_referencia || "",
+          codigo_postal: {
+            codigo_postal: newUser.codigo_postal || "",
+            localidad: newUser.localidad || "",
+          },
+        },
+        contacto: {
+          telefono_fijo: newUser.telefono_fijo || "",
+          telefono_movil: newUser.telefono_movil || "",
+          red_social_contacto: newUser.red_social_contacto || "",
+          red_social_nombre: newUser.red_social_nombre || "",
+          email_contacto: newUser.email_contacto || "",
+          observacion_contacto: newUser.observacion_contacto || "",
+        },
+      };
+
       await PersonaService.crear(body);
+
+      const newUserForTable = {
+        id: null,
+        nombre: newUser.nombre || "",
+        apellido: newUser.apellido || "",
+        tipo_documento: newUser.tipo_documento || "DNI",
+        nro_documento: newUser.nro_documento || "",
+        fecha_nacimiento: newUser.fecha_nacimiento || "",
+        usuario_id: newUser.usuario_id || null,
+      };
+
+      setUsers((prevUsers) => [...prevUsers, newUserForTable]);
       setNewUser({});
     } catch (error) {
       console.error("Error al crear persona:", error);
+      //const message = error?.response?.data?.message || error.message || "Error desconocido";
+
+      setAlert({
+        title: "Error al crear persona",
+        description: "",
+      });
     }
   };
 
@@ -254,18 +259,6 @@ function AdminUsers() {
   return (
     <div className="p-6 space-y-6 py-30 px-3 md:py-25 md:px-15">
       <Fade duration={300} triggerOnce>
-        {alert && (
-          <Alert variant="destructive" className="mb-4">
-            <AlertTitle>{alert.title}</AlertTitle>
-            <AlertDescription>{alert.description}</AlertDescription>
-            <button
-              onClick={() => setAlert(null)}
-              className="ml-auto bg-transparent text-red-600 hover:text-red-800 font-semibold"
-            >
-              Cerrar
-            </button>
-          </Alert>
-        )}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -475,6 +468,19 @@ function AdminUsers() {
                 </form>
               </DialogContent>
             </Dialog>
+
+            {alert && (
+              <Alert variant="destructive" className="mb-4 mt-3">
+                <AlertTitle>{alert.title}</AlertTitle>
+                <AlertDescription>{alert.description}</AlertDescription>
+                <Button variant="outline"
+                  onClick={() => setAlert(null)}
+                  className="ml-auto bg-transparent text-red-600 hover:text-red-800 font-semibold"
+                >
+                  Cerrar
+                </Button>
+              </Alert>
+            )}
           </CardContent>
         </Card>
 

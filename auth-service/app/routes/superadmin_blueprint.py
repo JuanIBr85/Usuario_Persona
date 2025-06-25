@@ -220,7 +220,7 @@ def crear_permiso():
     is_public=False,
     limiter=["6 per minute"],
     access_permissions=["auth.admin.obtener_roles"],
-    cache=CacheSettings(expiration=20),
+    cache=CacheSettings(expiration=5),
 )
 def obtener_roles():
     session = SessionLocal()

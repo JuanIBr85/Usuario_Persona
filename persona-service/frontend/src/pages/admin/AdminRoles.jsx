@@ -132,12 +132,13 @@ export default function AdminRoles() {
     if (exists) return showError("Ya existe otro rol con ese nombre");
 
     try {
+      console.log("Editando:",editRoleId)
       // 1) Actualizar el nombre del rol
-      await roleService.editar(editRoleId, {
+      const data = await roleService.editar(editRoleId, {
         nombre_rol: newRoleName.trim(),
         descripcion: "",
       });
-
+      console.log("data",data)
       // 2) Enviar permisos actualizados
       const permisosNombres = selectedPermissions.map((p) => p.name || p);
       await permisoService.asignarPermisos(editRoleId, permisosNombres);
@@ -170,6 +171,7 @@ export default function AdminRoles() {
 
     try {
       const response = await roleService.borrar(roleToDelete.id);
+      console.log(response)
       setRoles(roles.filter((role) => role.id !== roleToDelete.id));
       if (editRoleId === roleToDelete.id) resetForm();
       setRoleToDelete(null);
@@ -205,7 +207,7 @@ export default function AdminRoles() {
     const fetchRoles = async () => {
       try {
         const data = await roleService.get_all();
-
+        console.log(data)
         const transformedRoles = data.roles.map((role) => ({
           id: role.id_rol,
           name: role.nombre_rol,

@@ -35,19 +35,6 @@ export const componentService = {
   },
 
   /**
-   * Recolectar permisos de todos los servicios
-   * @returns {Promise} Promesa con la lista de permisos recolectados
-   */
-  recolect_perms: async () => {
-    return fetchService.fetch({
-      url: `${ServiceURL.auth}/control/services/recolect_perms`,
-      method: HttpMethod.GET,
-      showError: componentService.showError,
-      useToken: true
-    });
-  },
-
-  /**
    * Instalar un nuevo servicio
    * @param {string} url - URL del servicio a instalar
    * @returns {Promise} Promesa con el resultado de la operación
@@ -116,6 +103,20 @@ export const componentService = {
       method: HttpMethod.POST,
       showError: componentService.showError,
       useToken: true
+    });
+  },
+
+
+  /*
+   * Obtiene los datos del redirect 
+   */
+
+  get_redirect: async (code) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/control/redirect/get/${code}`,
+      method: HttpMethod.GET,
+      showError: componentService.showError,
+      useToken: false
     });
   }
 };

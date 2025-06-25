@@ -51,7 +51,6 @@ class EndpointsSearchService:
             try:
                 # Construye y realiza la petición al servicio
                 service_url = service.service_url
-                logger.warning(f"Conectando con {service}...")
                 response = requests.get(
                     f"{service_url}/component_service/endpoints"
                 ).json()
@@ -70,11 +69,11 @@ class EndpointsSearchService:
                 }
 
             except Exception as e:
-                traceback.print_exc()
+                # traceback.print_exc()
                 # Manejo de errores con reintentos
                 error_cnt += 1
                 # Logea error cada minuto (60 intentos)
-                if error_cnt % (60 * 1) == 0:
+                if error_cnt % (5 * 1) == 0:
                     logger.error(f"Error conectando con {service.service_name}")
                 self._search_log[service.service_name]["success"] = "error"
                 self._search_log[service.service_name]["error"] = str(e)
