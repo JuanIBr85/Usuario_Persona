@@ -23,6 +23,7 @@ import AdminServices from "@/pages/admin/AdminServices";
 import ComponentServices from "@/pages/component/ComponentServices";
 import ComponentServicesDetails from "@/pages/component/ComponentServicesDetails";
 import Redirect from "@/pages/auth/Redirect";
+import EndpointsResearch from "@/pages/endpoints/EndpointsResearch";
 /**
  * Componente que define todas las rutas de la aplicación utilizando react-router-dom.
  * Cada ruta se asocia con un componente de página específico para renderizar.
@@ -43,6 +44,8 @@ function AppRoutes() {
       <Route path="adminroles" element={<AdminRoles />} />
       <Route path="adminservices/components" element={<ComponentServices />} />
       <Route path="adminservices/components/:id" element={<ComponentServicesDetails />} />
+
+      <Route path="adminservices/endpoints-research/" element={<EndpointsResearch />} />
 
       <Route path="persondetails/:id" element={<PersonDetails />} />
       <Route path="privacypolicy" element={<AboutPrivacyPolicy />} />

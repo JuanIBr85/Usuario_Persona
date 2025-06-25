@@ -13,7 +13,6 @@ import { Link } from "react-router-dom";
 import { Home, ShieldUser } from "lucide-react";
 import { Fade } from "react-awesome-reveal";
 
-
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -31,8 +30,12 @@ function AdminServices() {
       title: "Servicios Disponibles",
       description: "Controlar el servicio de componentes",
       path: "/adminservices/components",
-    }
-   
+    },
+    {
+      title: "Monitoreo de Endpoints",
+      description: "Iniciar y controlar el análisis de servicios registrados.",
+      path: "/adminservices/endpoints-research",
+    },
   ];
 
   return (
