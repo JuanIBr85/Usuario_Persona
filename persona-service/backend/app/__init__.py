@@ -29,8 +29,8 @@ def create_app():
     from app.routes.persona_routes import persona_bp
     from app.routes.opciones_routes import opciones_bp
 
-    app.register_blueprint(persona_bp, url_prefix="/api")
-    app.register_blueprint(opciones_bp, url_prefix="/api")
+    app.register_blueprint(persona_bp)
+    app.register_blueprint(opciones_bp)
 
     # Importa receptores de mensajería
     from app.messaging import reciever
