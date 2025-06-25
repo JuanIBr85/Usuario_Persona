@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { SimpleDialog } from '@/components/SimpleDialog';
 import { useNavigate } from 'react-router-dom';
+import {AuthService} from '@/services/authService';
 
 const AuthContext = createContext();
 
@@ -76,9 +77,12 @@ function AuthContextProvider({ children }) {
     }, [authData.user?.expires_in]);
 
     const removeAuthData = () => {
-        setAuthData(defaultData);
-        localStorage.removeItem('authData');
-        localStorage.removeItem('token');
+        AuthService.logout()
+        .finally(()=>{
+            setAuthData(defaultData);
+            localStorage.removeItem('authData');
+            localStorage.removeItem('token');
+        });
     }
 
     const updateData = (values) => {

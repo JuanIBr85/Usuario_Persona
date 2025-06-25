@@ -112,5 +112,14 @@ resetPassword: async (body, token) => {
     body: {...body, token:token},
     showError: AuthService.showError
   });
-}
+},
+
+logout: async () => {
+  return fetchService.fetch({
+    url: `${ServiceURL.auth}/logout`,
+    method: HttpMethod.POST,
+    useToken: true,
+    showError: AuthService.showError
+  });
+},
 };

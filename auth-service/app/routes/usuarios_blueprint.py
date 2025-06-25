@@ -39,7 +39,7 @@ def iniciar_registro_usuario():
         status, mensaje, contenido, codigo = usuario_service.iniciar_registro(
             session, data
         )
-        return make_response (status, mensaje, contenido, codigo)
+        return make_response(status, mensaje, contenido, codigo)
     finally:
         session.close()
 
@@ -146,13 +146,14 @@ def login1():
 
 
 @usuario_bp.route("/logout", methods=["POST"])
-@api_access(is_public=True)
+@api_access(is_public=False)
 def logout_usuario():
     session = SessionLocal()
     try:
-        usuario_id = request.jwt_payload["sub"]
+        jwt_jti = ComponentRequest.get_jti()
+        usuario_id = ComponentRequest.get_user_id()
         status, mensaje, data, code = usuario_service.logout_usuario(
-            session, usuario_id
+            session, usuario_id, jwt_jti
         )
         return make_response(status, mensaje, data, code), code
 
@@ -176,7 +177,7 @@ def logout_usuario():
 def perfil_usuario():
     session = SessionLocal()
     try:
-        usuario_id = request.jwt_payload["sub"]
+        usuario_id = ComponentRequest.get_user_id()
         status, mensaje, data, code = usuario_service.ver_perfil(session, usuario_id)
         return make_response(status, mensaje, data, code), code
 
@@ -346,7 +347,8 @@ def modificar_perfil():
 @api_access(
     is_public=True,
     limiter=["2 per minute"],
-    cache=CacheSettings(expiration=30, params=["token"]),
+    # Cache para evitar abusos
+    cache=CacheSettings(expiration=60 * 30, params=["token"]),
 )
 def verificar_dispositivo():
     token = request.args.get("token")

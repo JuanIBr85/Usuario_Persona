@@ -38,3 +38,13 @@ class ComponentRequest:
             Optional[str]: La dirección IP del cliente si se puede determinar, None en caso contrario.
         """
         return request.headers.get("X-CLIENT-IP")
+
+    @staticmethod
+    def get_jti() -> Optional[str]:
+        """
+        Obtiene el JTI del token JWT desde los headers de la solicitud.
+
+        Returns:
+            Optional[str]: El JTI del token JWT si está presente, None en caso contrario.
+        """
+        return request.headers.get("X-JWT-JTI")
