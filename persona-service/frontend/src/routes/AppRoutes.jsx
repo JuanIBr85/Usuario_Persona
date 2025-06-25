@@ -16,6 +16,7 @@ import AboutPrivacyPolicy from "@/pages/user/AboutPrivacyPolicy";
 import Faq from "@/pages/user/Faq";
 import ForgotPassword from "@/pages/auth/ForgotPassword";
 import OTPValidation from "@/pages/auth/OTPValidation";
+import OTPRegister from "@/pages/auth/OTPRegister";
 import ResetPassword from "@/pages/auth/ResetPassword";
 import PerfilConnect from "@/pages/user/PerfilConnect";
 import AdminServices from "@/pages/admin/AdminServices";
@@ -54,6 +55,8 @@ function AppRoutes() {
       <Route path="auth/sign" element={<Sign />} />
       <Route path="auth/logout" element={<Logout />} />
       <Route path="auth/otpvalidation" element={<OTPValidation />} />
+      <Route path="auth/otpregister" element={<OTPRegister />} />
+
     </Routes>
   );
 }

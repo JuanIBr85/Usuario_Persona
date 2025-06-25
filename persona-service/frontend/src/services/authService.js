@@ -87,6 +87,16 @@ export const AuthService = {
       showError: AuthService.showError
     });
   },
+  
+  verificarEmail: async (body) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/verificar-email`,
+      method: HttpMethod.POST,
+      body: body,
+      
+      showError: AuthService.showError
+    });
+  },
 
   /**
  * Cambia la contraseña usando un token temporal después de verificar OTP.
