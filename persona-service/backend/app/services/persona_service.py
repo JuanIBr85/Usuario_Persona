@@ -142,21 +142,29 @@ class PersonaService(IPersonaInterface):
              para modificar ese domicilio, pasa el id existente y los nuevos datos.
               lo mismo con contacto y persona extendida """
 
+            hubo_cambios = False  
+
             if "domicilio" in data:
-                self.domicilio_service.modificar_domicilio(
+                actualizado = self.domicilio_service.modificar_domicilio(
                     persona.domicilio_id, data["domicilio"], session
                 )
+                if actualizado:
+                    hubo_cambios=True
 
             if "contacto" in data:
-                self.contacto_service.modificar_contacto(
+                actualizado = self.contacto_service.modificar_contacto(
                     persona.contacto_id, data["contacto"], session
                 )
+                if actualizado:
+                    hubo_cambios=True
 
             if "persona_extendida" in data:
                 if persona.persona_extendida:
-                    self.persona_ext_service.modificar_persona_extendida(
+                   actualizado = self.persona_ext_service.modificar_persona_extendida(
                         persona.extendida_id, data["persona_extendida"], session
                     )
+                if actualizado:
+                    hubo_cambios=True
 
             for field in [
                 "nombre_persona",
@@ -166,9 +174,16 @@ class PersonaService(IPersonaInterface):
                 "tipo_documento",
             ]:
                 if field in data_validada:
-                    setattr(persona, field, data_validada[field])
+                    nuevo_valor = data_validada[field]
+                    valor_actual = getattr(persona, field)
 
-            persona.updated_at = datetime.now(timezone.utc)
+                    if nuevo_valor != valor_actual:
+                        setattr(persona, field, nuevo_valor)
+                        hubo_cambios = True
+
+            if hubo_cambios:
+                persona.updated_at = datetime.now(timezone.utc)
+
             session.commit()
             return self.schema.dump(persona)
 
@@ -294,7 +309,8 @@ class PersonaService(IPersonaInterface):
             )
 
             if not persona:
-                return None
+                return None           
+
             if persona.contacto_id:
                 self.contacto_service.borrar_contacto(persona.contacto_id, session)
             if persona.domicilio_id:
@@ -333,9 +349,9 @@ class PersonaService(IPersonaInterface):
             if persona.contacto_id:
                 self.contacto_service.restaurar_contacto(persona.contacto_id, session)
             if persona.domicilio_id:
-                self.domicilio_service.restaurar_domicilio(
-                    persona.domicilio_id, session
-                )
+                self.domicilio_service.restaurar_domicilio(persona.domicilio_id, session)
+            if persona.extendida_id:
+                self.persona_ext_service.restaurar_persona_extendida(persona.extendida_id, session)     
 
             session.commit()
             return True

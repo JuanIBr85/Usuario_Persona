@@ -16,5 +16,5 @@ class PersonaExtendida(Base):
     foto_perfil = Column(String(255), nullable=True)
 
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
-    updated_at = Column(DateTime, onupdate=datetime.now(timezone.utc))
+    updated_at = Column(DateTime, nullable=True)
     deleted_at= Column(DateTime, nullable=True)
