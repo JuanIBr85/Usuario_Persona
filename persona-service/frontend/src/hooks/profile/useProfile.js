@@ -57,9 +57,16 @@ export function useProfile() {
         tipos_documento: tiposDocumentoResponse?.data || [],
         redes_sociales: redes_socialesResponse?.data || []
       });
-      const profileResponse = await PersonaService.get_by_usuario(authData.user.id_usuario);
-      console.log(profileResponse);
+      const profileResponse = await PersonaService.persona_by_usuario();
+      //console.log(profileResponse);
       if (profileResponse?.data) {
+
+        //Si se esta esperando una redireccion, redirigira directamente hacia redirect,
+        //Para que este se encargue de redirigir al usuario a la pagina correcta
+        if(sessionStorage.getItem('_redirect')){
+          navigate("/auth/redirect");
+        }
+
         setPersonaData({
           ...initialPersonaState,
           ...profileResponse.data,
@@ -77,6 +84,7 @@ export function useProfile() {
         });
 
       } else {
+        console.error(error);
         setIsCriticalError(true);
         setDialog({
           title: "Error al cargar los datos",

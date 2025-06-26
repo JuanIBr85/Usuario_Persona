@@ -27,6 +27,8 @@ function AuthContextProvider({ children }) {
     const [dialog, setDialog] = useState(null);
     const navigate = useNavigate();
 
+    const timeLeftToExpire = ()=> (new Date(authData.user.expires_in) - new Date()) / 1000;
+
     const toLogout = () => {
         if (!window.location.pathname.includes("/auth/")) {
             window.location.href = '/auth/logout';
@@ -54,9 +56,9 @@ function AuthContextProvider({ children }) {
 
     useEffect(() => {
         checkToken();
-        const timeLeft = (new Date(authData.user.expires_in) - new Date()) / 1000;
-        const minutes = Math.floor(timeLeft / 60);
-        const seconds = Math.floor(timeLeft % 60);
+        //const timeLeft = (new Date(authData.user.expires_in) - new Date()) / 1000;
+        //const minutes = Math.floor(timeLeft / 60);
+        //const seconds = Math.floor(timeLeft % 60);
         //alert(`Tu sesión expirará en ${minutes} minutos y ${seconds} segundos.`);
         // Verificar expiración del token cada minuto
         const interval = setInterval(checkToken, 1000 * 2); // Verificar cada 2 segundos
@@ -140,7 +142,7 @@ function AuthContextProvider({ children }) {
             const json = new TextDecoder().decode(bytes);
 
             const data = JSON.parse(json);
-            
+
             //Actualizo los datos de auth
             updateData(data);
 
@@ -152,7 +154,7 @@ function AuthContextProvider({ children }) {
     }
 
     return (
-        <AuthContext.Provider value={{ authData, updateData, removeAuthData, encode, decode }}>
+        <AuthContext.Provider value={{ authData, updateData, removeAuthData, encode, decode, timeLeftToExpire }}>
             {dialog && <SimpleDialog
                 title={dialog.title}
                 description={dialog.description}

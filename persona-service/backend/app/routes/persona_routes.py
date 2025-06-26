@@ -82,8 +82,7 @@ def _obtener_persona_x_id(id):
 def persona_by_id():
     try:
         usuario_id = ComponentRequest.get_user_id()
-        return _obtener_persona_x_id(usuario_id)
-
+        return obtener_persona_usuario(usuario_id)
     except Exception as e:
         return (
             make_response(

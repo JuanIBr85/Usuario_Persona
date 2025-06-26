@@ -12,17 +12,17 @@ import './Loading.css';
  * @returns {JSX.Element} Un overlay con una animación de carga moderna y un texto accesible "Cargando...".
  */
 
-function Loading({ isFixed = false }) {
+function Loading({ isFixed = false, text="Cargando..." }) {
     const pos = isFixed 
         ? "fixed z-50 top-0 left-0 right-0 bottom-0 backdrop-blur-sm" 
         : "relative";
     
     return (
         <div 
-            className={`flex items-center justify-center w-full h-screen ${pos}`}
+            className={`flex flex-col items-center select-none justify-center w-full h-screen ${pos}`}
             role="status"
         >
-            <div className="relative w-24 h-24">
+            <div className="relative w-24 h-24 mb-4">
                 {/* Círculo exterior con animación de pulso */}
                 <div className="absolute inset-0 w-full h-full rounded-full bg-indigo-900 pulse-scale" />
                 
@@ -38,6 +38,13 @@ function Loading({ isFixed = false }) {
                 {/* Texto accesible */}
                 <span className="sr-only">Cargando...</span>
             </div>
+            
+            {/* Texto opcional */}
+            {text && (
+                <p className="text-indigo-900 text-center font-medium mt-4">
+                    {text}
+                </p>
+            )}
         </div>
     );
 }
