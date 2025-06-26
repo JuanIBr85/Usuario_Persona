@@ -11,6 +11,7 @@ from app.utils.jwt import (
     crear_token_refresh,
     generar_token_reset,
     crear_token_refresh,
+    create_access_token
 )
 from app.schemas.usuarios_schema import (
     LoginSchema,
@@ -91,8 +92,7 @@ class UsuarioService(ServicioBase):
         )
 
     def confirmar_registro(
-        self, session: Session, email: str, otp: str, user_agent: str
-    ) -> tuple:
+        self, session: Session, email: str, otp: str, user_agent: str) -> tuple:
         if not verificar_otp_redis(email, otp):
             return ResponseStatus.FAIL, "OTP incorrecto o expirado", None, 400
 
@@ -405,3 +405,46 @@ class UsuarioService(ServicioBase):
         session.commit()
 
         return ResponseStatus.SUCCESS, "Contraseña actualizada correctamente", None, 200
+
+    def refresh_token(self, session: Session, usuario_id: int) -> dict:
+        usuario = session.query(Usuario).filter_by(id_usuario=usuario_id).first()
+        if not usuario:
+             return {
+               "status": ResponseStatus.UNAUTHORIZED,
+               "message": "Usuario no encontrado",
+               "data": None,
+               "code": 401
+            }
+
+        rol = (
+           session.query(Rol)
+            .join(RolUsuario, Rol.id_rol == RolUsuario.id_rol)
+            .filter(RolUsuario.id_usuario == usuario.id_usuario)
+            .first()
+        )
+        rol_nombre = rol.nombre_rol if rol else "sin_rol"
+
+        permisos_query = (
+           session.query(Permiso.nombre_permiso)
+           .join(RolPermiso, Permiso.id_permiso == RolPermiso.permiso_id)
+           .filter(RolPermiso.id_rol == rol.id_rol)
+           .all()
+        )
+        permisos = [p.nombre_permiso for p in permisos_query]
+
+        nuevo_access_token = create_access_token(
+           identity=usuario_id,
+           additional_claims={    
+              "sub": usuario.id_usuario,
+              "email": usuario.email_usuario,
+              "rol": rol_nombre,
+              "permisos": permisos
+           }
+        )
+
+        return {
+           "status": ResponseStatus.SUCCESS.value,
+           "message": "Nuevo token generado exitosamente.",
+           "data": {"access_token": nuevo_access_token},
+           "code": 200
+        }

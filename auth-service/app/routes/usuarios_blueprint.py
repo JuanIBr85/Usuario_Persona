@@ -351,7 +351,7 @@ def verificar_dispositivo():
 
 @usuario_bp.route("/refresh", methods=["POST"])
 @api_access(
-    is_public=False,
+    is_public=True,
     limiter=["5 per minute", "5 per hour"],
 )  # solo controla si es pública, pero no te ayuda con el refresh_token
 def refresh_token():
