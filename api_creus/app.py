@@ -6,6 +6,7 @@ from cms.routes import initialize_routes as initialize_cms_routes  # importar ru
 from config import config
 from models.usuario import Usuario
 import os
+from middleware.historial_middleware import register_historial_middleware
 from common.decorators.receiver import receiver
 from common.utils.component_service import component_service
 from flask import jsonify
@@ -17,6 +18,9 @@ def create_app(config_name="default"):
     app.config.from_object(config[config_name])
 
     db.init_app(app)
+
+    #Middleware para registrar historial
+    #register_historial_middleware(app)
 
     # Configuración mejorada de CORS
     CORS(

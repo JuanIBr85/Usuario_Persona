@@ -1,75 +1,83 @@
 from models.titulo_certificacion_model import TituloCertificacion
 from models.propuesta_educativa_model import PropuestaEducativa
 from models import db
-from utils.response_utils import success_list, success_object, success_created, success_empty, error_response
+from utils.response_utils import make_response, ResponseStatus
 from utils.validation_utils import validar_duplicado
+from models.propuesta_educativa_model import PropuestaEducativa
+from utils.validation_utils import validar_relacion_activa
 
 class TituloCertificacionService:
 
     @staticmethod
     def get_all():
         items = TituloCertificacion.query.all()
-        if not items:
-            return success_empty("No hay títulos de certificación disponibles")
-        return success_list([i.to_dict() for i in items], "Lista de títulos de certificación")
+        return make_response(
+            ResponseStatus.SUCCESS,
+            "Lista de títulos-certificación" if items else "No hay títulos o certificaciones disponibles",
+            [i.to_dict() for i in items]
+        )
 
     @staticmethod
     def get_by_id(id):
         item = TituloCertificacion.query.get(id)
         if not item:
-            return error_response("Título de certificación no encontrado", {"id": id})
-        return success_object(item.to_dict(), "Título de certificación encontrado")
+            return make_response(ResponseStatus.FAIL, "Título-Certificación no encontrado", {"id": id})
+        return make_response(ResponseStatus.SUCCESS, "Título-Certificación encontrado", item.to_dict())
 
     @staticmethod
     def create(data):
-        error_dup = validar_duplicado(TituloCertificacion, TituloCertificacion.nombre, data['nombre'].strip().title())
+        nombre_formateado = data['nombre'].strip().title()
+        error_dup = validar_duplicado(TituloCertificacion, TituloCertificacion.nombre, nombre_formateado)
         if error_dup:
-            return error_response("Duplicado", {"nombre": error_dup})
+            return make_response(ResponseStatus.FAIL, "Ya existe un título-certificación con ese nombre", {"nombre": error_dup})
 
         try:
             nuevo = TituloCertificacion(
-                nombre=data.get('nombre', '').title(),
+                nombre=nombre_formateado,
                 observaciones=data.get('observaciones')
             )
             db.session.add(nuevo)
             db.session.commit()
-            return success_created(nuevo.id, "Título de certificación creado")
+            return make_response(ResponseStatus.SUCCESS, "Título-Certificación creado correctamente", {"id": nuevo.id})
         except Exception as e:
-            return error_response("Error al crear título de certificación", {"error": str(e)})
+            db.session.rollback()
+            return make_response(ResponseStatus.ERROR, "Error al crear título-certificación", {"error": str(e)})
 
     @staticmethod
     def update(id, data):
         item = TituloCertificacion.query.get(id)
         if not item:
-            return error_response("No encontrado", {"id": id})
+            return make_response(ResponseStatus.FAIL, "Título-Certificación no encontrado", {"id": id})
 
-        error_dup = validar_duplicado(TituloCertificacion, TituloCertificacion.nombre, data['nombre'].strip().title(), id_actual=id)
+        nombre_formateado = data['nombre'].strip().title()
+        error_dup = validar_duplicado(TituloCertificacion, TituloCertificacion.nombre, nombre_formateado, id_actual=id)
         if error_dup:
-            return error_response("Duplicado", {"nombre": error_dup})
+            return make_response(ResponseStatus.FAIL, "Ya existe un título-certificación con ese nombre", {"nombre": error_dup})
 
         try:
-            item.nombre = data.get('nombre', item.nombre).title()
+            item.nombre = nombre_formateado
             item.observaciones = data.get('observaciones', item.observaciones)
             db.session.commit()
-            return success_object(item.to_dict(), "Actualizado correctamente")
+            return make_response(ResponseStatus.SUCCESS, "Título-Certificación actualizado correctamente", item.to_dict())
         except Exception as e:
-            return error_response("Error al actualizar", {"error": str(e)})
+            db.session.rollback()
+            return make_response(ResponseStatus.ERROR, "Error al actualizar título-certificación", {"error": str(e)})
 
     @staticmethod
     def delete(id):
         item = TituloCertificacion.query.get(id)
         if not item:
-            return error_response("No encontrado", {"id": id})
+            return make_response(ResponseStatus.FAIL, "Título-Certificación no encontrado", {"id": id})
 
-        usado = PropuestaEducativa.query.filter_by(id_titulo_certificacion=id).first()
-        if usado:
-            return error_response("No se puede eliminar", {
-                "detalle": "Este título está asociado a una propuesta educativa"
-            })
+        error_uso = validar_relacion_activa(PropuestaEducativa, PropuestaEducativa.id_titulo_certificacion, id, "No se puede eliminar el título-certificación porque está asociado a una propuesta educativa")
+        if error_uso:
+            return make_response(ResponseStatus.FAIL, error_uso)
 
         try:
             db.session.delete(item)
             db.session.commit()
-            return success_object({"id": id}, "Eliminado correctamente")
+            return make_response(ResponseStatus.SUCCESS, "Título-Certificación eliminado correctamente", {"id": id})
         except Exception as e:
-            return error_response("Error al eliminar", {"error": str(e)})
+            db.session.rollback()
+            return make_response(ResponseStatus.ERROR, "Error al eliminar título-certificación", {"error": str(e)})
+

@@ -2,6 +2,8 @@ from models.area_conocimiento_model import AreaConocimiento
 from models import db
 from utils.validation_utils import validar_duplicado
 from utils.response_utils import make_response, ResponseStatus
+from models.propuesta_educativa_model import PropuestaEducativa
+from utils.validation_utils import validar_relacion_activa
 
 class AreaConocimientoService:
 
@@ -25,7 +27,7 @@ class AreaConocimientoService:
 
         error_dup = validar_duplicado(AreaConocimiento, AreaConocimiento.nombre, nombre_formateado)
         if error_dup:
-            return make_response(ResponseStatus.FAIL, "Duplicado", {"nombre": error_dup})
+            return make_response(ResponseStatus.FAIL, "Ya hay un área de conocimiento con ese nombre", {"nombre": error_dup})
 
         try:
             nuevo = AreaConocimiento(
@@ -48,7 +50,7 @@ class AreaConocimientoService:
         nombre_formateado = data['nombre'].strip().title()
         error_dup = validar_duplicado(AreaConocimiento, AreaConocimiento.nombre, nombre_formateado, id_actual=id)
         if error_dup:
-            return make_response(ResponseStatus.FAIL, "Duplicado", {"nombre": error_dup})
+            return make_response(ResponseStatus.FAIL, "Ya hay un área de conocimiento con ese nombre", {"nombre": error_dup})
 
         try:
             item.nombre = nombre_formateado
@@ -64,6 +66,11 @@ class AreaConocimientoService:
         item = AreaConocimiento.query.get(id)
         if not item:
             return make_response(ResponseStatus.FAIL, "Área de conocimiento no encontrada", {"id": id})
+
+        error_uso = validar_relacion_activa(PropuestaEducativa, PropuestaEducativa.id_area_conocimiento,id, "No se puede eliminar el área de conocimiento porque está asociada a una propuesta educativa")
+        if error_uso:
+            return make_response(ResponseStatus.FAIL, error_uso)
+
         try:
             db.session.delete(item)
             db.session.commit()
@@ -71,73 +78,4 @@ class AreaConocimientoService:
         except Exception as e:
             db.session.rollback()
             return make_response(ResponseStatus.ERROR, "Error al eliminar área de conocimiento", {"error": str(e)})
-
-
-'''from models.area_conocimiento_model import AreaConocimiento
-from models import db
-from utils.response_utils import success_list, success_object, success_created, success_empty, error_response
-from utils.validation_utils import validar_duplicado
-
-class AreaConocimientoService:
-
-    @staticmethod
-    def get_all():
-        items = AreaConocimiento.query.all()
-        if not items:
-            return success_empty("No hay áreas de conocimiento disponibles")
-        return success_list([i.to_dict() for i in items], "Lista de áreas de conocimiento")
-
-    @staticmethod
-    def get_by_id(id):
-        item = AreaConocimiento.query.get(id)
-        if not item:
-            return error_response("Área de conocimiento no encontrada", {"id": id})
-        return success_object(item.to_dict(), "Área de conocimiento encontrada")
-
-    @staticmethod
-    def create(data):
-        error_dup = validar_duplicado(AreaConocimiento, AreaConocimiento.nombre, data['nombre'].strip().title())
-        if error_dup:
-            return error_response("Duplicado", {"nombre": error_dup})
-
-        try:
-            nuevo = AreaConocimiento(
-                nombre=data.get('nombre', '').title(),
-                observaciones=data.get('observaciones')
-            )
-            db.session.add(nuevo)
-            db.session.commit()
-            return success_created(nuevo.id, "Área de conocimiento creada")
-        except Exception as e:
-            return error_response("Error al crear área de conocimiento", {"error": str(e)})
-
-    @staticmethod
-    def update(id, data):
-        item = AreaConocimiento.query.get(id)
-        if not item:
-            return error_response("No encontrada", {"id": id})
-
-        error_dup = validar_duplicado(AreaConocimiento, AreaConocimiento.nombre, data['nombre'].strip().title(), id_actual=id)
-        if error_dup:
-            return error_response("Duplicado", {"nombre": error_dup})
-
-        try:
-            item.nombre = data.get('nombre', item.nombre).title()
-            item.observaciones = data.get('observaciones', item.observaciones)
-            db.session.commit()
-            return success_object(item.to_dict(), "Actualizada correctamente")
-        except Exception as e:
-            return error_response("Error al actualizar", {"error": str(e)})
-
-    @staticmethod
-    def delete(id):
-        item = AreaConocimiento.query.get(id)
-        if not item:
-            return error_response("No encontrada", {"id": id})
-        try:
-            db.session.delete(item)
-            db.session.commit()
-            return success_object({"id": id}, "Eliminada correctamente")
-        except Exception as e:
-            return error_response("Error al eliminar", {"error": str(e)})'''
 

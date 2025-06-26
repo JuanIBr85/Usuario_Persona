@@ -68,7 +68,7 @@ class HorarioAtencionService:
         try:
             horario.visible = False
             db.session.commit()
-            return make_response(ResponseStatus.SUCCESS, "Horario marcado como no visible")
+            return make_response(ResponseStatus.SUCCESS, "Horario marcado como no visible", {"id": id})
 
         except Exception as e:
             db.session.rollback()

@@ -4,7 +4,7 @@ from models import db
 from routes.auth import get_token_required
 from services.egresado_service import EgresadoService
 from schemas.egresado_schema import EgresadoSchema
-from utils.response_utils import error_response
+from utils.response_utils import make_response, ResponseStatus
 
 egresado_bp = Blueprint('egresado', __name__)
 
@@ -22,7 +22,7 @@ def get_by_id(id):
     return EgresadoService.get_by_id(id)
 
 #Traer egresados por el ID  de la cohorte
-@egresado_bp.route('/<int:id_cohorte>', methods = ['GET'])
+@egresado_bp.route('/cohorte/<int:id_cohorte>', methods = ['GET'])
 def get_by_cohorte(id_cohorte):
     return EgresadoService.get_by_cohorte(id_cohorte)
 
@@ -37,7 +37,7 @@ def create_egresado():
     schema = EgresadoSchema()
     errores = schema.validate(data)
     if errores:
-        return error_response("Datos inválidos", errores)
+        return make_response(ResponseStatus.FAIL, "Datos inválidos", errores)
     
     return EgresadoService.create(data)
 
@@ -51,7 +51,7 @@ def update(id):
     schema = EgresadoSchema()
     errores = schema.validate(data)
     if errores:
-        return error_response("Datos inválidos", errores)
+        return make_response(ResponseStatus.FAIL, "Datos inválidos", errores)
     
     return EgresadoService.update(id, data)
 

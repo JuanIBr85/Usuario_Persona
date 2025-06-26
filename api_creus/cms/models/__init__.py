@@ -5,3 +5,6 @@ db = SQLAlchemy()
 from .contacto_model import Contacto
 from .horario_atencion_model import HorarioAtencion
 from .pagina_inicio_model import PaginaInicio
+from .publicacion_propuesta_model import PublicacionPropuesta
+from .categoria_model import Categoria
+from .preguntas_frecuentes_model import PreguntaFrecuente

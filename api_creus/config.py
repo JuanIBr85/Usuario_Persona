@@ -8,7 +8,8 @@ class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY") or "clave-secreta-por-defecto"
 
     SQLALCHEMY_DATABASE_URI = (
-        os.environ.get("DATABASE_URI") or "mysql+pymysql://URL_SERVIDOR_PONER"
+        os.environ.get("DATABASE_URI")
+        or "mysql+pymysql://pps:grupobpps@pps.ftp.sh/sistema_educativo_creus"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

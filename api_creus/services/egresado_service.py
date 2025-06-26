@@ -1,13 +1,7 @@
 from models.egresado_model import Egresado
 from models import db
 from datetime import datetime
-from utils.response_utils import(
-    success_object,
-    success_list,
-    success_empty,
-    success_created,
-    error_response
-)
+from utils.response_utils import (make_response, ResponseStatus)
 
 class EgresadoService:
     @staticmethod
@@ -16,29 +10,29 @@ class EgresadoService:
         egresados = Egresado.query.all()
 
         if not egresados:
-            return success_empty("No hay egresados")
+            return make_response(ResponseStatus.SUCCESS,"No hay egresados", data=[])
         
         data = [e.to_dict() for e in egresados]
-        return success_list (data, "Lista de egresados obtenida con exito.")
+        return make_response (ResponseStatus.SUCCESS, data, "Lista de egresados obtenida con exito.")
     
     @staticmethod
     def get_by_id(id):
         #obtener egresado por id
         egresado = Egresado.query.get(id)
         if not egresado:
-            return error_response(f"No se encontró el egresado con ID: {id}",404)
-        
-        return success_object(egresado.to_dict(), "Egresado encontrado.")
+            return make_response(ResponseStatus.FAIL, f"No se encontró el egresado con ID: {id}", {"id": id})
+            
+        return make_response(ResponseStatus.SUCCESS, "Egresado encontrado.", data = egresado.to_dict())
     
     @staticmethod
     def get_by_cohorte(id_cohorte):
         #Obtener egresado por la cohorte
         egresados = Egresado.query.filter_by(id_cohorte = id_cohorte).all()
         if not egresados:
-            return error_response("No se encontraron egresados", {"id_cohorte": f"No hay registros para el ID {id_cohorte}"})
+            return make_response(ResponseStatus.SUCCESS, "No se encontraron egresados para esa cohorte.", data = [])
         
         data = [e.to_dict() for e in egresados]
-        return success_list (data, f"Lista de egresados por cohorte con ID: {id_cohorte}")
+        return make_response (ResponseStatus.SUCCESS, data, f"Lista de egresados por cohorte con ID: {id_cohorte}")
     
     @staticmethod
     def create(data):
@@ -54,17 +48,17 @@ class EgresadoService:
             )
             db.session.add(nuevo_egresado)
             db.session.commit()
-            return success_created(nuevo_egresado.id, "Egresado creado correctamente.")
+            return make_response(ResponseStatus.SUCCESS, "Egresado creado correctamente.", {"id": nuevo_egresado.id,} )
         
         except Exception as e:
-            return error_response("Error al crear el egresado", {"detalle": str(e)},500)
+            return make_response(ResponseStatus.ERROR, "Error al crear el egresado", {"error": str(e)})
         
     @staticmethod
     def update (id,data):
         egresado = Egresado.query.get(id)
 
         if not egresado:
-            return error_response("No se encontro el egresado", {"id": f"{id}"},404)
+            return make_response(ResponseStatus.FAIL, "No se encontro el egresado", {"id": id})
         
         try:
             egresado.id_persona = data.get('id_persona', egresado.id_persona)
@@ -74,25 +68,25 @@ class EgresadoService:
             egresado.id_estado = data.get('id_estado', egresado.id_estado)
             egresado.observaciones = data.get('observaciones', egresado.observaciones)
         
-            db.session()
-            return success_object({"id": egresado.id}, "Egresado actualizado correctamente")
+            db.session.commit()
+            return make_response(ResponseStatus.SUCCESS, "Egresado actualizado correctamente", {"id": egresado.id} )
         
         except Exception as e:
-            return error_response("Error al actualizar al egresado", {"detalle": str(e)},500)
+            return make_response(ResponseStatus.ERROR, "Error al actualizar al egresado", {"error": str(e)})
         
 
     @staticmethod
     def delete (id):
         egresado = Egresado.query.get(id)
         if not egresado:
-            return error_response("No se encontró el egresado", {"id": f"{id}"},404)
+            return make_response(ResponseStatus.FAIL, "No se encontró el egresado", {"id": id})
         
         if egresado.id_estado == 2:
-            return error_response("El egresado ya esta inactivo", {"estado": "Inactiva"}, 400)
+            return make_response(ResponseStatus.FAIL, "El egresado ya esta inactivo", {"estado": "Inactiva"})
         
         try:
             egresado.id_estado = 2 #borrado logico (id_estado 2 es inactivo)
             db.session.commit()
-            return success_object({"id": egresado.id}, "El egresado fue ocultado correctamente")
+            return make_response(ResponseStatus.SUCCESS, "El egresado fue ocultado correctamente", {"id": egresado.id})
         except Exception as e:
-            return error_response("Error al ocultar al egresado",{"detalle":str(e)},500)
+            return make_response(ResponseStatus.ERROR, "Error al ocultar al egresado",{"error":str(e)})

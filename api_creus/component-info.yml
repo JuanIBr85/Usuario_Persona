@@ -1,6 +1,6 @@
 service:
   service_name: api_creus
-  service_prefix: api_creus
+  service_prefix: creus
   service_available: true
   service_description: Backend para el manejo de creus
   service_core: false
@@ -11,3 +11,13 @@ permissions:
   - api_creus.admin.ver_api_creus
   - api_creus.admin.modificar_api_creus
   - api_creus.admin.eliminar_api_creus
+
+  - creus.admin.ver_archivos
+  - creus.admin.crear_archivo
+  - creus.admin.editar_archivo
+  - creus.admin.borrar_archivo
+
+redirect:
+  to_login: 
+    code: cb10d9ee71b443ab85bfdcb8a407fe01  
+    url: "https://creustest.vercel.app/redirect"

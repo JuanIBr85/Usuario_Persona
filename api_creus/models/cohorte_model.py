@@ -48,35 +48,3 @@ class Cohorte(db.Model):
         return f"<Cohorte {self.numero_cohorte} - {self.anio_inicio}>"
 
 
-
-
-'''from models import db
-
-class Cohorte(db.Model):
-    __tablename__ = 'cohorte'
-
-    id = db.Column(db.Integer, primary_key=True)
-    id_propuesta_educativa = db.Column(db.Integer, db.ForeignKey('propuesta_educativa.id'), nullable=True)
-    numero_cohorte = db.Column(db.Integer, nullable=True)
-    anio_inicio = db.Column(db.Integer, nullable=True)
-    mes_inicio = db.Column(db.String(255), nullable=True)
-
-    fecha_inicio_preinscripcion = db.Column(db.DateTime, nullable=True)
-    fecha_cierre_preinscripcion = db.Column(db.DateTime, nullable=True)
-    fecha_inicio_cursado = db.Column(db.DateTime, nullable=True)
-    fecha_estimada_finalizacion = db.Column(db.DateTime, nullable=True)
-
-    cupos_maximos = db.Column(db.Integer, nullable=True)
-    cupos_ocupados = db.Column(db.Integer, nullable=True)
-
-    id_estado = db.Column(db.Integer, db.ForeignKey('estado.id'), nullable=True)
-    observaciones = db.Column(db.Text, nullable=True)
-
-    id_coordinador = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=True)
-    id_sede_creus = db.Column(db.Integer, db.ForeignKey('sede_creus.id'), nullable=True)
-
-    # Relaciones opcionales
-    propuesta_educativa = db.relationship('PropuestaEducativa', backref='cohortes', lazy=True)
-    estado = db.relationship('Estado', backref='cohortes', lazy=True)
-    #coordinador = db.relationship('Usuario', backref='cohortes', lazy=True)
-    #sede_creus = db.relationship('SedeCreus', backref='cohortes', lazy=True)'''

@@ -1,12 +1,13 @@
-from marshmallow import Schema, fields, validate
+from marshmallow import Schema, fields, validate, validates_schema, ValidationError
+from utils.validation_utils import validar_fechas, SacaEspacios
 
-class ConvenioSchema(Schema):
+class ConvenioSchema(SacaEspacios,Schema):
     id = fields.Int(dump_only=True)
     nombre = fields.Str(
         required=True,
         validate=[
             validate.Length(min=1, max=255, error="El nombre debe tener entre 1 y 255 caracteres"),
-            validate.Regexp(r'^\s*\S.*$', error="El campo no puede estar vacío")
+            validate.Regexp(r'^\s*\S.*$', error="El campo no puede estar vacío o solo espacios")
         ]
     )
     descripcion = fields.Str(required=True)
@@ -16,6 +17,13 @@ class ConvenioSchema(Schema):
     id_institucion = fields.Int(required=True)
     id_estado = fields.Int(required=True)
     observaciones = fields.Str(allow_none=True)
+    
+    @validates_schema
+    def validar_fechas_schema(self, data, **kwargs):
+        try:
+            validar_fechas(data.get('fecha_inicio'), data.get('fecha_fin'))
+        except ValidationError as e:
+            raise ValidationError({"fecha_fin": str(e)})
 
 
 '''from marshmallow import Schema, fields, validate, validates, ValidationError

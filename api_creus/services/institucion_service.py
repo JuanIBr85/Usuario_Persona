@@ -1,150 +1,101 @@
 from models import db
 from models.institucion_model import Institucion
-from sqlalchemy.exc import SQLAlchemyError
-import logging
-
-logger = logging.getLogger(__name__)
+from utils.validation_utils import validar_duplicado
+from utils.response_utils import make_response, ResponseStatus
 
 class InstitucionService:
-    """
-    Servicio para gestionar las operaciones relacionadas con las instituciones.
-    
-    Este servicio proporciona métodos para realizar operaciones CRUD en las instituciones,
-    así como consultas específicas para obtener información de las mismas.
-    """
 
     @staticmethod
     def get_all():
-        """
-        Obtiene todas las instituciones registradas en el sistema.
-        
-        Returns:
-            list: Lista de objetos Institucion.
-        """
-        try:
-            return Institucion.query.all()
-        except SQLAlchemyError as e:
-            logger.error(f"Error al obtener todas las instituciones: {str(e)}")
-            raise
+        items = Institucion.query.all()
+        if not items:
+            return make_response(ResponseStatus.SUCCESS, "No hay instituciones registradas", data=[])
+        return make_response(ResponseStatus.SUCCESS, "Lista de instituciones obtenida con éxito.", [i.to_dict() for i in items])
 
     @staticmethod
-    def get_by_id(institucion_id):
-        """
-        Obtiene una institución por su ID.
-        
-        Args:
-            institucion_id (int): ID de la institución a buscar.
-            
-        Returns:
-            Institucion: Instancia de la institución encontrada o None si no existe.
-        """
-        try:
-            return Institucion.query.get(institucion_id)
-        except SQLAlchemyError as e:
-            logger.error(f"Error al obtener la institución con ID {institucion_id}: {str(e)}")
-            raise
+    def get_by_id(id):
+        item = Institucion.query.get(id)
+        if not item:
+            return make_response(ResponseStatus.FAIL, "Institución no encontrada", {"id": id})
+        return make_response(ResponseStatus.SUCCESS, "Institución encontrada", item.to_dict())
 
     @staticmethod
     def get_activas():
-        """
-        Obtiene todas las instituciones activas en el sistema.
-        
-        Returns:
-            list: Lista de objetos Institucion que están activos.
-        """
-        try:
-            return Institucion.query.filter_by(activo=True).all()
-        except SQLAlchemyError as e:
-            logger.error(f"Error al obtener instituciones activas: {str(e)}")
-            raise
+        items = Institucion.query.filter_by(id_estado=1).all()
+        if not items:
+            return make_response(ResponseStatus.SUCCESS, "No hay instituciones activas", data=[])
+        return make_response(ResponseStatus.SUCCESS, "Lista de instituciones activas obtenida con éxito.", [i.to_dict() for i in items])
 
     @staticmethod
-    def create(institucion_data):
-        """
-        Crea una nueva institución en el sistema.
-        
-        Args:
-            institucion_data (dict): Diccionario con los datos de la institución.
-                Debe contener los campos requeridos del modelo Institucion.
-                
-        Returns:
-            Institucion: La instancia de la institución recién creada.
-            
-        Raises:
-            ValueError: Si los datos proporcionados son inválidos.
-            SQLAlchemyError: Si ocurre un error al guardar en la base de datos.
-        """
+    def create(data):
+        nombre_formateado = data['nombre'].strip().title()
+        error_dup = validar_duplicado(Institucion, Institucion.nombre, nombre_formateado)
+        if error_dup:
+            return make_response(ResponseStatus.FAIL, "Duplicado", {"nombre": error_dup})
+
         try:
-            if not institucion_data or 'nombre' not in institucion_data:
-                raise ValueError("Los datos de la institución son requeridos")
-                
-            institucion = Institucion(**institucion_data)
-            db.session.add(institucion)
+            nueva = Institucion(
+                nombre=nombre_formateado,
+                email=data.get('email'),
+                telefono=data.get('telefono'),
+                pagina_web=data.get('pagina_web'),
+                calle=data.get('calle'),
+                numero=data.get('numero'),
+                ciudad=data.get('ciudad'),
+                provincia=data.get('provincia'),
+                pais=data.get('pais'),
+                codigo_postal=data.get('codigo_postal', ''),
+                id_estado=data.get('id_estado', 1),
+                observaciones=data.get('observaciones', '')
+            )
+            db.session.add(nueva)
             db.session.commit()
-            return institucion
-            
-        except SQLAlchemyError as e:
+            return make_response(ResponseStatus.SUCCESS, "Institución creada correctamente", {"id": nueva.id})
+        except Exception as e:
             db.session.rollback()
-            logger.error(f"Error al crear la institución: {str(e)}")
-            raise
+            return make_response(ResponseStatus.ERROR, "Error al crear la institución", {"error": str(e)})
 
     @staticmethod
-    def update(institucion_id, update_data):
-        """
-        Actualiza los datos de una institución existente.
-        
-        Args:
-            institucion_id (int): ID de la institución a actualizar.
-            update_data (dict): Diccionario con los campos a actualizar.
-                
-        Returns:
-            Institucion: La instancia de la institución actualizada o None si no se encontró.
-            
-        Raises:
-            SQLAlchemyError: Si ocurre un error al actualizar en la base de datos.
-        """
+    def update(id, data):
+        item = Institucion.query.get(id)
+        if not item:
+            return make_response(ResponseStatus.FAIL, "Institución no encontrada", {"id": id})
+
+        nombre_formateado = data['nombre'].strip().title()
+        error_dup = validar_duplicado(Institucion, Institucion.nombre, nombre_formateado, id_actual=id)
+        if error_dup:
+            return make_response(ResponseStatus.FAIL, "Duplicado", {"nombre": error_dup})
+
         try:
-            institucion = Institucion.query.get(institucion_id)
-            if not institucion:
-                return None
-                
-            for key, value in update_data.items():
-                if hasattr(institucion, key):
-                    setattr(institucion, key, value)
-                    
+            item.nombre = nombre_formateado
+            item.email = data.get('email', item.email)
+            item.telefono = data.get('telefono', item.telefono)
+            item.pagina_web = data.get('pagina_web', item.pagina_web)
+            item.calle = data.get('calle', item.calle)
+            item.numero = data.get('numero', item.numero)
+            item.ciudad = data.get('ciudad', item.ciudad)
+            item.provincia = data.get('provincia', item.provincia)
+            item.pais = data.get('pais', item.pais)
+            item.codigo_postal = data.get('codigo_postal', item.codigo_postal)
+            item.id_estado = data.get('id_estado', item.id_estado)
+            item.observaciones = data.get('observaciones', item.observaciones)
             db.session.commit()
-            return institucion
-            
-        except SQLAlchemyError as e:
+            return make_response(ResponseStatus.SUCCESS, "Institución actualizada correctamente", item.to_dict())
+        except Exception as e:
             db.session.rollback()
-            logger.error(f"Error al actualizar la institución con ID {institucion_id}: {str(e)}")
-            raise
+            return make_response(ResponseStatus.ERROR, "Error al actualizar la institución", {"error": str(e)})
 
     @staticmethod
-    def delete(institucion_id):
-        """
-        Elimina una institución del sistema (borrado lógico).
-        
-        Args:
-            institucion_id (int): ID de la institución a eliminar.
-            
-        Returns:
-            bool: True si se eliminó correctamente, False si no se encontró la institución.
-            
-        Raises:
-            SQLAlchemyError: Si ocurre un error al eliminar de la base de datos.
-        """
+    def delete(id):
+        item = Institucion.query.get(id)
+        if not item:
+            return make_response(ResponseStatus.FAIL, "Institución no encontrada", {"id": id})
+        if item.id_estado == 2:
+            return make_response(ResponseStatus.FAIL, "La institución ya está inactiva", {"estado": "Inactiva"})
         try:
-            institucion = Institucion.query.get(institucion_id)
-            if not institucion:
-                return False
-                
-            # Borrado lógico en lugar de físico
-            institucion.id_estado = 2
+            item.id_estado = 2  # Borrado lógico (id_estado 2 es inactivo)
             db.session.commit()
-            return True
-            
-        except SQLAlchemyError as e:
+            return make_response(ResponseStatus.SUCCESS, "La institución fue ocultada correctamente", {"id": item.id})
+        except Exception as e:
             db.session.rollback()
-            logger.error(f"Error al eliminar la institución con ID {institucion_id}: {str(e)}")
-            raise
+            return make_response(ResponseStatus.ERROR, "Error al ocultar la institución", {"error": str(e)})
