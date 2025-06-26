@@ -6,6 +6,7 @@ import logging
 from app.extensions import jwt, redis_client_auth
 from app.utils.is_local_connection import is_local_connection
 from cachetools import TTLCache
+from common.utils.response import make_response, ResponseStatus
 
 logger = logging.getLogger(__name__)
 endpoints_search_service = EndpointsSearchService()
@@ -42,6 +43,18 @@ def check_if_token_is_revoked(jwt_header, jwt_payload: dict):
 
 
 def authenticate_config(app):
+    # Rate limit handler
+    @app.errorhandler(429)
+    def ratelimit_handler(e):
+        return (
+            make_response(
+                ResponseStatus.FAIL,
+                f"Ha intentado ingresar demasiadas veces a esta ruta: {e.description}",
+                {"message": "Ha intentado ingresar demasiadas veces a esta ruta"},
+            ),
+            429,
+        )
+
     @app.before_request
     @jwt_required(optional=True)
     def authenticate_request():

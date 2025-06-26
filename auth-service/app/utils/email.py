@@ -46,6 +46,14 @@ def enviar_codigo_por_email(usuario, codigo_otp):
     )
     mail.send(msg)
 
+def enviar_codigo_por_email_registro(email:str, codigo_otp:str):
+    msg = Message(
+        subject="Código para validar mail",
+        recipients=[email],
+        body=f"Hola,\n\nTu código para validar mail es: {codigo_otp}\n\nEste código expirará en 15 minutos."
+    )
+    mail.send(msg)
+
 
 
 
@@ -66,11 +74,66 @@ def enviar_email_validacion_dispositivo(usuario, user_agent, ip):
     msg = Message(
         subject="Nuevo dispositivo detectado",
         recipients=[usuario.email_usuario],
-        body=(
-            f"Hola {usuario.nombre_usuario},\n\n"
-            f"Detectamos un inicio de sesión desde un nuevo dispositivo.\n\n"
-            f"Para confirmar que fuiste vos, hacé clic en el siguiente enlace:\n\n{enlace}\n\n"
-            f"Este enlace expirará en 30 minutos."
-        )
+        html=f"""
+        <div style="
+        font-family: Arial, sans-serif;
+        background-color: #1C1464;
+        padding: 30px;
+        border-radius: 10px;
+        color: white;
+    ">
+        <p style="  font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;">
+           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope-paper" viewBox="0 0 16 16">
+  <path d="M4 0a2 2 0 0 0-2 2v1.133l-.941.502A2 2 0 0 0 0 5.4V14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V5.4a2 2 0 0 0-1.059-1.765L14 3.133V2a2 2 0 0 0-2-2zm10 4.267.47.25A1 1 0 0 1 15 5.4v.817l-1 .6zm-1 3.15-3.75 2.25L8 8.917l-1.25.75L3 7.417V2a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1zm-11-.6-1-.6V5.4a1 1 0 0 1 .53-.882L2 4.267zm13 .566v5.734l-4.778-2.867zm-.035 6.88A1 1 0 0 1 14 15H2a1 1 0 0 1-.965-.738L8 10.083zM1 13.116V7.383l4.778 2.867L1 13.117Z"/>
+</svg>  Hola <strong>{usuario.nombre_usuario}</strong>,
+        </p>
+
+        <p style="font-size: 15px; margin-top: 10px;">
+            Detectamos un inicio de sesión desde un nuevo dispositivo.
+        </p>
+
+        <p style="font-size: 15px; margin-top: 10px;">
+            Para confirmar que fuiste vos, hacé clic en el siguiente botón:
+        </p>
+
+   <p style="margin-top: 20px; text-align: center;">
+  <a href="{enlace}" style="
+      background-color: white;
+      color: black;
+      padding: 12px 24px;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+  ">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+         style="vertical-align: middle;" viewBox="0 0 16 16">
+      <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/>
+    </svg>
+    Confirmar dispositivo
+  </a>
+</p>
+
+
+        <p style="font-size: 14px; margin-top: 30px;">
+            Si el botón no funciona, copiá y pegá este enlace en tu navegador:
+        </p>
+
+        <p style="font-size: 14px; word-break: break-all;">
+            <a href="{enlace}" style="color: #80bfff; text-decoration: underline;">{enlace}</a>
+        </p>
+
+        <p style="font-size: 13px; margin-top: 20px; color: #cccccc;">
+            Este enlace expirará en 30 minutos.
+        </p>
+    </div>
+"""
+
     )
+
     mail.send(msg)

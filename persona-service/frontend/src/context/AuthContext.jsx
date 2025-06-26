@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { SimpleDialog } from '@/components/SimpleDialog';
 import { useNavigate } from 'react-router-dom';
+import { AuthService } from '@/services/authService';
 
 const AuthContext = createContext();
 
@@ -19,12 +20,14 @@ const defaultData = Object.freeze({
 const _authData = localStorage.getItem("authData");
 const saveAuthData = _authData ? JSON.parse(_authData) : defaultData;
 
-const tempAuthData = {...saveAuthData};
+const tempAuthData = { ...saveAuthData };
 
 function AuthContextProvider({ children }) {
     const [authData, setAuthData] = useState(saveAuthData);
     const [dialog, setDialog] = useState(null);
     const navigate = useNavigate();
+
+    const timeLeftToExpire = ()=> (new Date(authData.user.expires_in) - new Date()) / 1000;
 
     const toLogout = () => {
         if (!window.location.pathname.includes("/auth/")) {
@@ -53,9 +56,9 @@ function AuthContextProvider({ children }) {
 
     useEffect(() => {
         checkToken();
-        const timeLeft = (new Date(authData.user.expires_in) - new Date()) / 1000;
-        const minutes = Math.floor(timeLeft / 60);
-        const seconds = Math.floor(timeLeft % 60);
+        //const timeLeft = (new Date(authData.user.expires_in) - new Date()) / 1000;
+        //const minutes = Math.floor(timeLeft / 60);
+        //const seconds = Math.floor(timeLeft % 60);
         //alert(`Tu sesión expirará en ${minutes} minutos y ${seconds} segundos.`);
         // Verificar expiración del token cada minuto
         const interval = setInterval(checkToken, 1000 * 2); // Verificar cada 2 segundos
@@ -76,9 +79,12 @@ function AuthContextProvider({ children }) {
     }, [authData.user?.expires_in]);
 
     const removeAuthData = () => {
-        setAuthData(defaultData);
-        localStorage.removeItem('authData');
-        localStorage.removeItem('token');
+        AuthService.logout()
+            .finally(() => {
+                setAuthData(defaultData);
+                localStorage.removeItem('authData');
+                localStorage.removeItem('token');
+            });
     }
 
     const updateData = (values) => {
@@ -91,8 +97,64 @@ function AuthContextProvider({ children }) {
         });
     };
 
+    /**
+     * Codifica en Base64URL los datos del autenticacion
+     * @returns {string|null} Cadena Base64URL o null si hay error
+     */
+    const encode = () => {
+        try {
+            const json = JSON.stringify(authData.user);
+            const bytes = new TextEncoder().encode(json);
+            const binary = String.fromCharCode(...bytes);
+            const base64 = btoa(binary);
+
+            return base64
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=/g, '');
+        } catch (error) {
+            console.error("Error de codificación:", error);
+            return null;
+        }
+    };
+
+    /**
+     * Decodifica una cadena Base64URL y actualiza los datos de autenticación
+     * @param {string} base64Url - Cadena Base64URL a decodificar
+     * @returns {any|null} Objeto original o null si hay error
+     */
+    const decode = (base64Url) => {
+        try {
+            // Convertir Base64URL a Base64 estándar
+            let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+
+            // Añadir padding si es necesario
+            const padding = base64.length % 4;
+            if (padding) base64 += '='.repeat(4 - padding);
+
+            // Decodificar
+            const binary = atob(base64);
+            const bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) {
+                bytes[i] = binary.charCodeAt(i);
+            }
+
+            const json = new TextDecoder().decode(bytes);
+
+            const data = JSON.parse(json);
+
+            //Actualizo los datos de auth
+            updateData(data);
+
+            return data;
+        } catch (error) {
+            console.error("Error de decodificación:", error);
+            return null;
+        }
+    }
+
     return (
-        <AuthContext.Provider value={{ authData, updateData, removeAuthData }}>
+        <AuthContext.Provider value={{ authData, updateData, removeAuthData, encode, decode, timeLeftToExpire }}>
             {dialog && <SimpleDialog
                 title={dialog.title}
                 description={dialog.description}

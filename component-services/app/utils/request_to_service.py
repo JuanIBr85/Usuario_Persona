@@ -41,6 +41,7 @@ def request_to_service(url):
     if hasattr(g, "jwt"):
         # Guardo el id del usuario en X-USER-ID en el header
         headers["X-USER-ID"] = g.jwt["sub"]
+        headers["X-JWT-JTI"] = g.jwt["jti"]
 
     headers["X-CLIENT-IP"] = request.remote_addr
     headers["X-CLIENT-USER-AGENT"] = request.user_agent.string

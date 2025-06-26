@@ -51,6 +51,7 @@ class EndpointsSearchService:
             try:
                 # Construye y realiza la petición al servicio
                 service_url = service.service_url
+                service_prefix = service.service_prefix
                 response = requests.get(
                     f"{service_url}/component_service/endpoints"
                 ).json()
@@ -62,9 +63,24 @@ class EndpointsSearchService:
                     response
                 )
 
+                print(
+                    {
+                        k: {
+                            **v,
+                            "api_url": f"{service_url}{v['api_url']}",
+                            "access_url": f"{service_prefix}/{v['access_url']}",
+                        }
+                        for k, v in response.items()
+                    }
+                )
+
                 # Retorna diccionario de endpoints con URLs completas
                 return {
-                    k: {**v, "api_url": f"{service_url}{v['api_url']}"}
+                    f"{service_prefix}/{k}": {
+                        **v,
+                        "api_url": f"{service_url}{v['api_url']}",
+                        "access_url": f"{service_prefix}/{v['access_url']}",
+                    }
                     for k, v in response.items()
                 }
 

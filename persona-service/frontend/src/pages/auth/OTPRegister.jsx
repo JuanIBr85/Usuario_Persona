@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
@@ -15,11 +15,11 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 
-function OTPValidation() {
+function OTPRegister() {
   const navigate = useNavigate();
   const location = useLocation();
-  const toRedirect = location.state?.from || "/auth/resetpassword";
-  const email = sessionStorage.getItem("email_para_reset");
+  const toRedirect = location.state?.from || "/auth/login";
+  const email = sessionStorage.getItem("email_verificar");
 
   const [shouldRedirect, setShouldRedirect] = React.useState(false);
   const [isOpen, setIsOpen] = React.useState(false);
@@ -27,11 +27,7 @@ function OTPValidation() {
   const [isOK, setIsOK] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
 
-  useEffect(() => {
-    if (!email) {
-      navigate("/auth/login");
-    }
-  }, [email, navigate]);
+
 
   const handleResendOtp = async () => {
 
@@ -65,23 +61,16 @@ function OTPValidation() {
     setIsLoading(true);
 
     AuthService
-      .validateOtp({
+      .verificarEmail({
         otp: formData.otp,
-        email: email
+        email_usuario: email
       })
-      .then((json) => {
-        const token = json.data?.reset_token;
-        if (token) {
-          sessionStorage.setItem("reset_token", token); // Guardamos el token para usarlo después
-          sessionStorage.setItem("email_para_reset", email); // Guardamos el email para usarlo después
-          setMessage("Se ha verificado correctamente el código de verificación.");
-          setIsOK(true);
-          setShouldRedirect(true);
-        } else {
-          setMessage("No se recibió el token de verificación.");
-          setIsOK(false);
+      .then(() => {
 
-        }
+        setMessage("Se ha verificado correctamente el código de verificación.");
+        setIsOK(true);
+        setShouldRedirect(true);
+
       }).catch((error) => {
         console.log(error.data);
         setIsOK(false);
@@ -151,4 +140,4 @@ function OTPValidation() {
   );
 }
 
-export default OTPValidation;
+export default OTPRegister;

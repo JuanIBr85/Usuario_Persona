@@ -1,6 +1,7 @@
 
 from datetime import timedelta
 from dotenv import load_dotenv
+import json
 from app.extensions import get_redis
 
 
@@ -17,10 +18,32 @@ def verificar_otp_redis(email: str, codigo: str) -> bool:
     redis_client = get_redis()
     valor = redis_client.get(key)
     if valor and valor == codigo:
-        #redis_client.delete(key)
+        redis_client.delete(key)
         return True
     return False
 
+
+# =====================
+#   Registro temporal
+# =====================
+
+def guardar_datos_registro_temporal(email: str, datos: dict):
+    key = f"registro_temp:{email}"
+    redis_client = get_redis()
+    redis_client.setex(key, OTP_EXPIRATION_SECONDS, json.dumps(datos))
+
+def obtener_datos_registro_temporal(email: str) -> dict | None:
+    key = f"registro_temp:{email}"
+    redis_client = get_redis()
+    valor = redis_client.get(key)
+    if valor:
+        redis_client.delete(key)
+        return json.loads(valor)
+    return None
+
+# =========================
+#   Recuperación por token
+# =========================
 def guardar_token_recuperacion(email: str, token: str):
     key = f"token_recuperacion:{token}"
     redis_client = get_redis()

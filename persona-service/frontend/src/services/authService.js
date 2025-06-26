@@ -87,6 +87,16 @@ export const AuthService = {
       showError: AuthService.showError
     });
   },
+  
+  verificarEmail: async (body) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/verificar-email`,
+      method: HttpMethod.POST,
+      body: body,
+      
+      showError: AuthService.showError
+    });
+  },
 
   /**
  * Cambia la contraseña usando un token temporal después de verificar OTP.
@@ -99,11 +109,17 @@ resetPassword: async (body, token) => {
   return fetchService.fetch({
     url: `${ServiceURL.auth}/reset-password-con-codigo`,
     method: HttpMethod.POST,
-    body: body,
-    headers: {
-      "Authorization": `Bearer ${token}`
-    },
+    body: {...body, token:token},
     showError: AuthService.showError
   });
-}
+},
+
+logout: async () => {
+  return fetchService.fetch({
+    url: `${ServiceURL.auth}/logout`,
+    method: HttpMethod.POST,
+    useToken: true,
+    showError: AuthService.showError
+  });
+},
 };

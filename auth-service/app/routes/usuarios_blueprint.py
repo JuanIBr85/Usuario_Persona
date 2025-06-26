@@ -5,7 +5,6 @@ import jwt
 from os import getenv
 from flask import request, Blueprint, Response
 from app.database.session import SessionLocal
-from app.utils.response import ResponseStatus, make_response
 from app.services.usuario_service import UsuarioService
 from app.extensions import limiter
 from app.utils.jwt import verificar_token_reset
@@ -16,6 +15,7 @@ from app.models.dispositivos_confiable import DispositivoConfiable
 from datetime import datetime, timezone, timedelta
 from common.decorators.api_access import api_access
 from common.models.cache_settings import CacheSettings
+from common.utils.response import make_response, ResponseStatus
 
 usuario_bp = Blueprint("usuario", __name__)
 usuario_service = UsuarioService()
@@ -27,69 +27,48 @@ usuario_service = UsuarioService()
 
 @usuario_bp.route("/registro", methods=["POST"])
 @api_access(is_public=True, limiter=["2 per minute"])
-def registrar_usuario1():
+def iniciar_registro_usuario():
+    data = request.get_json()
+    if not data:
+        return make_response(
+            ResponseStatus.FAIL, "Datos requeridos", error_code="NO_INPUT"
+        )
+
     session = SessionLocal()
     try:
-        data = request.get_json()
-        if not data:
-            return make_response(
+        status, mensaje, contenido, codigo = usuario_service.iniciar_registro(
+            session, data
+        )
+        return make_response(status, mensaje, contenido, codigo)
+    finally:
+        session.close()
+
+
+@usuario_bp.route("/verificar-email", methods=["POST"])
+@api_access(is_public=True)
+def confirmar_registro_usuario():
+    data = request.get_json()
+    email = data.get("email_usuario")
+    otp = data.get("otp")
+    user_agent = ComponentRequest.get_user_agent()
+    if not email or not otp:
+        return (
+            make_response(
                 ResponseStatus.FAIL,
-                "Datos de entrada requeridos",
-                error_code="NO_INPUT",
-            )
-
-        status, mensaje, data, code = usuario_service.registrar_usuario(session, data)
-        return make_response(status, mensaje, data, code), code
-
-    except Exception as e:
-        print(" ERROR INTERNO EN /registro:", str(e))
-        return (
-            make_response(
-                ResponseStatus.ERROR,
-                "Error al registrar usuario",
-                str(e),
-                error_code="REGISTRO_ERROR",
+                "Email y OTP son requeridos",
+                error_code="OTP_REQUIRED",
             ),
-            500,
+            400,
         )
 
-    finally:
-        session.close()
-
-
-@usuario_bp.route("/verificar-email", methods=["GET"])
-@api_access(is_public=True, limiter=["1 per minute"])
-def verificar_email():
     session = SessionLocal()
     try:
-        token = request.args.get("token")
-        if not token:
-            return (
-                make_response(
-                    ResponseStatus.FAIL,
-                    "Token de verificación requerido",
-                    error_code="TOKEN_MISSING",
-                ),
-                400,
-            )
-
-        status, mensaje, data, code = usuario_service.verificar_email(session, token)
-        return make_response(status, mensaje, data, code), code
-
-    except Exception as e:
-        return (
-            make_response(
-                ResponseStatus.ERROR,
-                "Error al verificar email",
-                str(e),
-                error_code="VERIFICACION_ERROR",
-            ),
-            500,
+        status, mensaje, contenido, codigo = usuario_service.confirmar_registro(
+            session, email, otp, user_agent
         )
-
+        return make_response(status, mensaje, contenido), codigo
     finally:
         session.close()
-
 
 # -----------------------------------------------------------------------------------------------------------------------------
 # LOGIN Y LOGOUT
@@ -111,7 +90,6 @@ def login1():
 
         user_agent = ComponentRequest.get_user_agent()
         ip = ComponentRequest.get_ip()
-
         status, mensaje, data, code = usuario_service.login_usuario(
             session, data, user_agent, ip
         )
@@ -130,13 +108,14 @@ def login1():
 
 
 @usuario_bp.route("/logout", methods=["POST"])
-@api_access(is_public=True)
+@api_access(is_public=False)
 def logout_usuario():
     session = SessionLocal()
     try:
-        usuario_id = request.jwt_payload["sub"]
+        jwt_jti = ComponentRequest.get_jti()
+        usuario_id = ComponentRequest.get_user_id()
         status, mensaje, data, code = usuario_service.logout_usuario(
-            session, usuario_id
+            session, usuario_id, jwt_jti
         )
         return make_response(status, mensaje, data, code), code
 
@@ -160,7 +139,7 @@ def logout_usuario():
 def perfil_usuario():
     session = SessionLocal()
     try:
-        usuario_id = request.jwt_payload["sub"]
+        usuario_id = ComponentRequest.get_user_id()
         status, mensaje, data, code = usuario_service.ver_perfil(session, usuario_id)
         return make_response(status, mensaje, data, code), code
 
@@ -185,7 +164,7 @@ def perfil_usuario():
 
 
 @usuario_bp.route("/solicitar-otp", methods=["POST"])
-@api_access(is_public=True, limiter=["10 per 1 minutes"])
+@api_access(is_public=True, limiter=["1 per minute", "3 per day"])
 def solicitar_otp():
     session = SessionLocal()
     try:
@@ -221,8 +200,9 @@ def solicitar_otp():
 @usuario_bp.route("/verificar-otp", methods=["POST"])
 @api_access(
     is_public=True,
-    limiter=["10 per minute"],
-    cache=CacheSettings(expiration=1, params=["email", "otp"]),
+    limiter=["5 per minute", "6 per day"],
+    # 1hs previene que reenvien el token correcto para evitar abusos
+    cache=CacheSettings(expiration=60 * 60, params=["email", "otp"]),
 )
 def verificar_otp():
     session = SessionLocal()
@@ -260,17 +240,20 @@ def verificar_otp():
 
 
 @usuario_bp.route("/reset-password-con-codigo", methods=["POST"])
-@api_access(is_public=True, limiter=["10 per minute"])
+@api_access(is_public=True, limiter=["3 per day"])
 def reset_con_otp():
     session = SessionLocal()
     try:
         data = request.get_json()
-        token = request.headers.get("Authorization", "").replace("Bearer ", "")
-        if not data or not token:
+        token = data.get("token")
+
+        data.pop("token", None)
+
+        if not token:
             return (
                 make_response(
                     ResponseStatus.FAIL,
-                    "Datos requeridos y token requeridos",
+                    "Token requerido",
                     error_code="NO_INPUT",
                 ),
                 400,
@@ -299,6 +282,9 @@ def reset_con_otp():
         return make_response(status, mensaje, data, code), code
 
     except Exception as e:
+        import traceback
+
+        traceback.print_exc()
         return (
             make_response(
                 ResponseStatus.ERROR,
@@ -323,7 +309,8 @@ def modificar_perfil():
 @api_access(
     is_public=True,
     limiter=["2 per minute"],
-    cache=CacheSettings(expiration=30, params=["token"]),
+    # Cache para evitar abusos
+    cache=CacheSettings(expiration=60 * 30, params=["token"]),
 )
 def verificar_dispositivo():
     token = request.args.get("token")
@@ -339,7 +326,7 @@ def verificar_dispositivo():
 
     # Extraer datos
     email = datos["email"]
-    user_agent = datos.get("user_agent","")
+    user_agent = datos.get("user_agent", "")
     ip = datos["ip"]
 
     # Buscar usuario
@@ -364,7 +351,8 @@ def verificar_dispositivo():
 
 @usuario_bp.route("/refresh", methods=["POST"])
 @api_access(
-    is_public=True
+    is_public=True,
+    limiter=["5 per minute", "5 per hour"],
 )  # solo controla si es pública, pero no te ayuda con el refresh_token
 def refresh_token():
     session = SessionLocal()

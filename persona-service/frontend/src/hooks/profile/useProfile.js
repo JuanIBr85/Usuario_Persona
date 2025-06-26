@@ -34,10 +34,11 @@ export function useProfile() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [personaData, setPersonaData] = useState(initialPersonaState);
-  const [photoUrl, setPhotoUrl] = useState('https://i.pravatar.cc/150?img=69');
   const [dialog, setDialog] = useState(null);
   const [staticData, setStaticData] = useState({});
   const [showFormEmailVerify, setShowFormEmailVerify] = useState(false);
+
+  const [isCriticalError, setIsCriticalError] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -56,9 +57,16 @@ export function useProfile() {
         tipos_documento: tiposDocumentoResponse?.data || [],
         redes_sociales: redes_socialesResponse?.data || []
       });
-      const profileResponse = await PersonaService.get_by_usuario(authData.user.id_usuario);
-      console.log(profileResponse);
+      const profileResponse = await PersonaService.persona_by_usuario();
+      //console.log(profileResponse);
       if (profileResponse?.data) {
+
+        //Si se esta esperando una redireccion, redirigira directamente hacia redirect,
+        //Para que este se encargue de redirigir al usuario a la pagina correcta
+        if(sessionStorage.getItem('_redirect')){
+          navigate("/auth/redirect");
+        }
+
         setPersonaData({
           ...initialPersonaState,
           ...profileResponse.data,
@@ -76,14 +84,12 @@ export function useProfile() {
         });
 
       } else {
-        if (!error.data) {
-          alert("A ocurrido un error al comunicarse con el servidor")
-          navigate("/*");
-        }
-
+        console.error(error);
+        setIsCriticalError(true);
         setDialog({
           title: "Error al cargar los datos",
-          description: "Error al cargar los datos del perfil"
+          description: "Error al cargar los datos del perfil",
+          action: () => navigate('/*')
         });
       }
     } finally {
@@ -95,26 +101,17 @@ export function useProfile() {
     fetchData();
   }, [authData]);
 
-  const handlePhotoChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setPhotoUrl(url);
-    }
-  };
-
   return {
     isLoading,
     personaData,
-    photoUrl,
     email: authData.user?.email_usuario || '',
     staticData,
-    handlePhotoChange,
     fetchData,
     setPersonaData,
     dialog,
     showFormEmailVerify,
     setShowFormEmailVerify,
-    setDialog
+    setDialog,
+    isCriticalError
   };
 }

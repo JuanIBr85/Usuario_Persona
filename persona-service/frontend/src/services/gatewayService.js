@@ -13,7 +13,7 @@ export const gatewayService = {
    */
   startResearch: async () => {
     return fetchService.fetch({
-      url: `${ServiceURL.auth}/control/gateway/research`,
+      url: `${ServiceURL.control}/gateway/research`,
       method: HttpMethod.GET,
       showError: gatewayService.showError,
       useToken: true,
@@ -26,7 +26,7 @@ export const gatewayService = {
    */
   getResearchStatus: async () => {
     return fetchService.fetch({
-      url: `${ServiceURL.auth}/control/gateway/research_status`,
+      url: `${ServiceURL.control}/gateway/research_status`,
       method: HttpMethod.GET,
       showError: gatewayService.showError,
       useToken: true,
@@ -39,7 +39,7 @@ export const gatewayService = {
    */
   stopResearch: async () => {
     return fetchService.fetch({
-      url: `${ServiceURL.auth}/control/gateway/reserch_stop`,
+      url: `${ServiceURL.control}/gateway/reserch_stop`,
       method: HttpMethod.GET,
       showError: gatewayService.showError,
       useToken: true,
@@ -54,7 +54,7 @@ export const gatewayService = {
    */
   getAllServices: async () => {
     return fetchService.fetch({
-      url: `${ServiceURL.auth}/control/services/all`,
+      url: `${ServiceURL.control}/services/all`,
       method: HttpMethod.GET,
       showError: gatewayService.showError,
       useToken: true,
@@ -68,7 +68,7 @@ export const gatewayService = {
    */
   getServiceById: async (id) => {
     return fetchService.fetch({
-      url: `${ServiceURL.auth}/control/services/get_service/${id}`,
+      url: `${ServiceURL.control}/services/get_service/${id}`,
       method: HttpMethod.GET,
       showError: gatewayService.showError,
       useToken: true,
@@ -81,7 +81,7 @@ export const gatewayService = {
    */
   collectPermissions: async () => {
     return fetchService.fetch({
-      url: `${ServiceURL.auth}/control/services/recolect_perms`,
+      url: `${ServiceURL.control}/services/recolect_perms`,
       method: HttpMethod.GET,
       showError: gatewayService.showError,
       useToken: true,
@@ -95,7 +95,7 @@ export const gatewayService = {
    */
   installService: async (url) => {
     return fetchService.fetch({
-      url: `${ServiceURL.auth}/control/services/install_service`,
+      url: `${ServiceURL.control}/services/install_service`,
       method: HttpMethod.POST,
        body: { url },
       showError: gatewayService.showError,
@@ -111,7 +111,7 @@ export const gatewayService = {
    */
   refreshService: async (id, body) => {
     return fetchService.fetch({
-      url: `${ServiceURL.auth}/control/services/refresh_service/${id}`,
+      url: `${ServiceURL.control}/services/refresh_service/${id}`,
       method: HttpMethod.PUT,
       body: body,
       showError: gatewayService.showError,
@@ -126,7 +126,7 @@ export const gatewayService = {
    */
   removeService: async (id) => {
     return fetchService.fetch({
-      url: `${ServiceURL.auth}/control/services/remove_service/${id}`,
+      url: `${ServiceURL.control}/services/remove_service/${id}`,
       method: HttpMethod.DELETE,
       showError: gatewayService.showError,
       useToken: true,
@@ -141,7 +141,7 @@ export const gatewayService = {
    */
   setServiceAvailable: async (id, state) => {
     return fetchService.fetch({
-      url: `${ServiceURL.auth}/control/services/set_available/${id}/${state}`,
+      url: `${ServiceURL.control}/services/set_available/${id}/${state}`,
       method: HttpMethod.PUT,
       showError: gatewayService.showError,
       useToken: true,
