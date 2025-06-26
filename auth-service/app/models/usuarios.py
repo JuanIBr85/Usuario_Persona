@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String,DateTime,ForeignKey
+from sqlalchemy import Column, Integer, String,DateTime,ForeignKey,Boolean
 from sqlalchemy.orm import relationship
 from datetime import datetime, timezone,timedelta
 from app.models.base_model import Base
@@ -11,7 +11,7 @@ class Usuario(Base):
     id_usuario = Column(Integer, primary_key=True)
     nombre_usuario = Column(String, nullable=False)
     email_usuario = Column(String, unique=True, nullable=False)
-    email_verificado = Column(Integer, default=0)
+    email_verificado = Column(Boolean, default=0)
     password = Column(String, nullable=False)
     
     created_at = Column(DateTime, default=datetime.now(timezone.utc))

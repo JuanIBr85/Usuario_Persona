@@ -77,13 +77,13 @@ def create_app():
 
 
 def init_app():
-    FORZAR_RESET = True
-    db_path = os.path.join("auth_data", "auth.db")
-    if FORZAR_RESET or not os.path.exists(db_path):
-        print("[i] Reiniciando base de datos y datos iniciales...")
+    FORZAR_RESET = False
+    if FORZAR_RESET:
+        print("[i] Reiniciando base de datos y datos del seed...")
         eliminar_base()
         crear_base()
         seed()
+
     else:
         print("[✓] Base de datos ya existente. No se reinicia.")
 

@@ -10,10 +10,44 @@
       environment:
         - COMPONENT_SERVICE_HOST=component-service
         - REDIS_HOST=redis
+        - POSTGRES_HOST=auth-db
         #- MAIL_SERVER=mailpit
       volumes:
         - ./auth-service:/app
         - ./auth-service/auth_data:/app/auth_data
+      depends_on:
+        auth-db:
+          condition: service_healthy
+
+    auth-db:
+      image: postgres
+      volumes:
+        - postgres_data:/var/lib/postgresql/data
+      restart: unless-stopped
+      shm_size: 128mb
+      ports:
+        - 5432:5432
+      environment:
+        - POSTGRES_USER=usuario
+        - POSTGRES_PASSWORD=pass
+        - POSTGRES_DB=auth_db
+      healthcheck:
+        #se hace un chequeo para que la db inicie antes que el servicio auth
+        # test es un comando de docker, se indica usar cmd con pg_isready(herramienta de postgres)
+        #le indica -U para que utilice el usuario para comprobar conexion
+        #-h indica el nombre del host
+        #-p indica el puerto que estas usando
+        test: ["CMD", "pg_isready", "-U", "usuario", "-h", "auth-db", "-p", "5432"]
+        interval: 5s
+        timeout: 5s
+        retries: 5
+
+    adminer:
+      image: adminer
+      restart: unless-stopped
+      ports:
+        - 8080:8080
+
 
     persona-backend:
       build: ./persona-service/backend
@@ -90,3 +124,4 @@
 
   volumes:
     mysql_data:
+    postgres_data:
