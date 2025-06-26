@@ -25,7 +25,7 @@ export default function FormDatos({
     const { email, ...formData } = await formSubmitJson(event);
     document.activeElement.blur();
     setLoading(true);
-    PersonaService.editar(persona_id, formData)
+    PersonaService.editar_restringido( formData)
       .then((response) => {
         setPersonaData(response.data);
       })

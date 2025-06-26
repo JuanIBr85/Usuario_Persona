@@ -202,7 +202,7 @@ def solicitar_otp():
     is_public=True,
     limiter=["5 per minute", "10 per day"],
     # 1hs previene que reenvien el token correcto para evitar abusos
-    cache=CacheSettings(expiration=60 * 60, params=["email", "otp"]),
+    #cache=CacheSettings(expiration=60 * 60, params=["email", "otp"]),
 )
 def verificar_otp():
     session = SessionLocal()
@@ -310,7 +310,7 @@ def modificar_perfil():
     is_public=True,
     limiter=["2 per minute"],
     # Cache para evitar abusos
-    cache=CacheSettings(expiration=60 * 30, params=["token"]),
+    #cache=CacheSettings(expiration=60 * 30, params=["token"]),
 )
 def verificar_dispositivo():
     token = request.args.get("token")

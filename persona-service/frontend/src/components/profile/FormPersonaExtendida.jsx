@@ -7,13 +7,14 @@ import { useState } from "react";
 import { formSubmitJson } from "@/utils/formUtils";
 import Loading from "@/components/loading/Loading";
 import { Ban } from "lucide-react";
-
+import { SimpleDialog } from "@/components/SimpleDialog";
 export default function FormPersonaExtendida({
   persona_id,
   personaExtendida,
   estadosCiviles,
   ocupaciones,
   estudiosAlcanzados,
+  setPersonaData
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -24,14 +25,14 @@ export default function FormPersonaExtendida({
     document.activeElement.blur();
     setLoading(true);
     console.log(formData);
-    PersonaService.editar(persona_id, {
+    PersonaService.editar_restringido( {
       persona_extendida: formData,
     })
       .then((response) => {
         setPersonaData(response.data);
       })
       .catch((error) => {
-        console.error("Error updating persona extendida:", error.data);
+        console.error("Error updating persona extendida:", error);
         setError(true);
         setOpenDialog(true);
       })

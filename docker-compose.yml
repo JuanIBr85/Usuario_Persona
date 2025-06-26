@@ -106,6 +106,18 @@
       volumes:
         - mysql_data:/var/lib/mysql
 
+    phpmyadmin:
+      image: phpmyadmin/phpmyadmin
+      container_name: phpmyadmin
+      restart: unless-stopped
+      ports:
+      - "8080:80"
+      environment:
+        PMA_HOST: mysql
+        PMA_PORT: 3306
+      depends_on:
+      - mysql    
+
     #servicio-adicional:
     #  build: ./servicio-adicional-ejemplo
     #  ports:
