@@ -164,7 +164,7 @@ def perfil_usuario():
 
 
 @usuario_bp.route("/solicitar-otp", methods=["POST"])
-@api_access(is_public=True, limiter=["1 per minute", "3 per day"])
+@api_access(is_public=True, limiter=["10 per minute", "10 per day"])
 def solicitar_otp():
     session = SessionLocal()
     try:
@@ -200,9 +200,9 @@ def solicitar_otp():
 @usuario_bp.route("/verificar-otp", methods=["POST"])
 @api_access(
     is_public=True,
-    limiter=["5 per minute", "6 per day"],
+    limiter=["5 per minute", "10 per day"],
     # 1hs previene que reenvien el token correcto para evitar abusos
-    cache=CacheSettings(expiration=60 * 60, params=["email", "otp"]),
+    #cache=CacheSettings(expiration=60 * 60, params=["email", "otp"]),
 )
 def verificar_otp():
     session = SessionLocal()

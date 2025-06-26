@@ -193,9 +193,9 @@ class UsuarioService(ServicioBase):
         if not check_password_hash(usuario.password, data_validada["password"]):
             return ResponseStatus.UNAUTHORIZED, "Email o contraseña incorrecta", None, 401
             
-
-        if not usuario.email_verificado:
-            return ResponseStatus.UNAUTHORIZED, "Debe verificar el email antes de loguearse.", None, 401
+        #comprobar si quedo deprecada porque ya no se crea usuario hasta que no se tenga la verificaicon
+        #if not usuario.email_verificado:
+         #   return ResponseStatus.UNAUTHORIZED, "Debe verificar el email antes de loguearse.", None, 401
             
 
         # Obtener el rol del usuario
@@ -351,9 +351,11 @@ class UsuarioService(ServicioBase):
 
             traceback.print_exc()
             return ResponseStatus.ERROR, "Error interno al solicitar código", None, 500
-
+        
     def verificar_otp(self, session: Session, email: str, otp: str) -> dict:
-        if not verificar_otp_redis(email, otp):
+
+        resultado = verificar_otp_redis(email, otp)
+        if not resultado:
             return ResponseStatus.FAIL, "Código OTP inválido o expirado", None, 400
         try:
             token = generar_token_reset(email)
@@ -362,9 +364,44 @@ class UsuarioService(ServicioBase):
             return ResponseStatus.SUCCESS, "OTP válido", {"reset_token": token}, 200
         except Exception as e:
             import traceback
-
             traceback.print_exc()
             return ResponseStatus.ERROR, "Error interno al solicitar código", None, 500
+        
+    '''def verificar_otp(self, session: Session, email: str, otp: str) -> dict:
+        try:
+            resultado = verificar_otp_redis(email, otp)
+            estado = resultado.get("estado")
+
+            # Debug (opcional): logea el resultado de Redis
+            print(f"[DEBUG] OTP verificación Redis → {resultado}")
+
+            if estado == "valido":
+                token = generar_token_reset(email)
+                guardar_token_recuperacion(email, token)
+                return ResponseStatus.SUCCESS, "OTP válido", {"reset_token": token}, 200
+
+            elif estado == "expirado":
+                return ResponseStatus.FAIL, "El código OTP ha expirado", None, 400
+
+            elif estado == "bloqueado":
+                return ResponseStatus.FAIL, "Demasiados intentos fallidos. Solicita uno nuevo.", None, 429
+
+            elif estado == "invalido":
+                intentos_restantes = resultado.get("intentos_restantes", 0)
+                return (
+                    ResponseStatus.FAIL,
+                    f"Código incorrecto. Intentos restantes: {intentos_restantes}",
+                    {"intentos_restantes": intentos_restantes},
+                    400
+                )
+
+            # Estado desconocido, potencial bug interno
+            return ResponseStatus.ERROR, "Error desconocido al verificar OTP", None, 500
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return ResponseStatus.ERROR, "Error interno al solicitar código", None, 500'''
 
     def cambiar_password_con_codigo(
         self, session: Session, data: dict, token: str, email: str
