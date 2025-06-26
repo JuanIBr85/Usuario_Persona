@@ -13,7 +13,7 @@ load_dotenv()
 # DB_HOST = os.getenv("POSTGRES_HOST")
 # DB_PORT = os.getenv("POSTGRES_PORT")
 
-DATABASE_URL = "sqlite:///auth.db"
+DATABASE_URL = "sqlite:///auth_data/auth.db"
 
 
 engine = create_engine(DATABASE_URL)
