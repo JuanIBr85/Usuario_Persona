@@ -44,6 +44,18 @@ export const PersonaService = {
     });
   },
 
+  editar_restringido: async (body) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.persona}/modificar_persona_restringido`,
+      method: HttpMethod.PUT,
+      body: body,
+      useToken: true,
+      showError: PersonaService.showError
+    });
+  },
+
+  
+
   borrar: async (id) => {
     return fetchService.fetch({
       url: `${ServiceURL.persona}/borrar_persona/${id}`,
@@ -151,6 +163,15 @@ export const PersonaService = {
       url: `${ServiceURL.persona}/personas/verify-otp`,
       method: HttpMethod.POST,
       body: body,
+      useToken: true,
+      showError: PersonaService.showError
+    });
+  },
+
+  persona_by_usuario: async () => {
+    return fetchService.fetch({
+      url: `${ServiceURL.persona}/persona_by_id`,
+      method: HttpMethod.GET,
       useToken: true,
       showError: PersonaService.showError
     });

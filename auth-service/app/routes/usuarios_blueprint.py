@@ -50,8 +50,7 @@ def confirmar_registro_usuario():
     data = request.get_json()
     email = data.get("email_usuario")
     otp = data.get("otp")
-    user_agent = request.headers.get("User-Agent", "desconocido")
-
+    user_agent = ComponentRequest.get_user_agent()
     if not email or not otp:
         return (
             make_response(
@@ -70,42 +69,6 @@ def confirmar_registro_usuario():
         return make_response(status, mensaje, contenido), codigo
     finally:
         session.close()
-
-
-"""''
-@usuario_bp.route("/verificar-email", methods=["GET"])
-@api_access(is_public=True, limiter=["1 per minute"])
-def verificar_email():
-    session = SessionLocal()
-    try:
-        token = request.args.get("token")
-        if not token:
-            return (
-                make_response(
-                    ResponseStatus.FAIL,
-                    "Token de verificación requerido",
-                    error_code="TOKEN_MISSING",
-                ),
-                400,
-            )
-
-        status, mensaje, data, code = usuario_service.verificar_email(session, token)
-        return make_response(status, mensaje, data, code), code
-
-    except Exception as e:
-        return (
-            make_response(
-                ResponseStatus.ERROR,
-                "Error al verificar email",
-                str(e),
-                error_code="VERIFICACION_ERROR",
-            ),
-            500,
-        )
-
-    finally:
-        session.close()
-"""
 
 # -----------------------------------------------------------------------------------------------------------------------------
 # LOGIN Y LOGOUT
@@ -127,7 +90,6 @@ def login1():
 
         user_agent = ComponentRequest.get_user_agent()
         ip = ComponentRequest.get_ip()
-
         status, mensaje, data, code = usuario_service.login_usuario(
             session, data, user_agent, ip
         )

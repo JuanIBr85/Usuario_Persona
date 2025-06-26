@@ -27,7 +27,7 @@ export default function FormContacto({
     document.activeElement.blur();
     setLoading(true);
 
-    PersonaService.editar(persona_id, {
+    PersonaService.editar_restringido( {
       contacto: formData,
     })
       .then((response) => {
