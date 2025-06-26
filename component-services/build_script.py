@@ -1,8 +1,29 @@
 #!/usr/bin/env python3
 """
-Script de build y distribución multiplataforma - Versión corregida
+Script de build y distribucin multiplataforma - Versin corregida
 Funciona en Windows y Linux con manejo mejorado de permisos
 """
+
+"""
+Elimine los emojis, por que el profe lo dijo, pero yo los deje por que me gustaban
+Solo para añadirle un poco mas de vida aunque solo se vieran en linux.
+Esto es solo un script para automatizarme la compilacion del modulo common.
+Se puede hacer a mano pero asi me ahorro problemas y tiempo.
+
+De forma resumida hace lo siguiente.
+1 - borra el venv
+2 - crea un nuevo venv
+3 - purga el cache de pip
+4 - instala las dependencias
+5 - incrementa la version en setup.py
+6 - compila el modulo en un paquete, wheel y tag.gz
+7 - renombra el tar.gz a component_services.tar.gz
+8 - distribuye el paquete a todas las carpetas con requirements.txt
+9 - borra los archivos temporales
+
+todo esto se puede hacer a mano solamente que es mas propenso a errores
+"""
+
 
 import os
 import sys
@@ -17,7 +38,7 @@ from pathlib import Path
 
 
 def clear_screen():
-    """Limpia la pantalla según el sistema operativo"""
+    """Limpia la pantalla segn el sistema operativo"""
     os.system("cls" if os.name == "nt" else "clear")
 
 
@@ -67,11 +88,11 @@ def safe_remove_directory(path):
         except Exception as e:
             if attempt < max_attempts - 1:
                 print(
-                    f"   ⚠️ Intento {attempt + 1} fallido, reintentando en 2 segundos..."
+                    f"    Intento {attempt + 1} fallido, reintentando en 2 segundos..."
                 )
                 time.sleep(2)
             else:
-                print(f"   ❌ No se pudo eliminar {path}: {e}")
+                print(f"    No se pudo eliminar {path}: {e}")
                 return False
 
     return False
@@ -174,7 +195,7 @@ def get_venv_pip(venv_dir):
 
 
 def check_admin_privileges():
-    """Verifica si el script se está ejecutando con privilegios de administrador"""
+    """Verifica si el script se est ejecutando con privilegios de administrador"""
     if os.name == "nt":  # Windows
         try:
             import ctypes
@@ -187,11 +208,11 @@ def check_admin_privileges():
 
 
 def update_version():
-    """Incrementa la versión en setup.py"""
-    print("🔍 Actualizando número de versión...")
+    """Incrementa la versin en setup.py"""
+    print(" Actualizando nmero de versin...")
 
     if not os.path.exists("setup.py"):
-        print("❌ Error: No se encontró setup.py")
+        print(" Error: No se encontr setup.py")
         return False, None, None
 
     try:
@@ -202,7 +223,7 @@ def update_version():
         match = re.search(version_pattern, content)
 
         if not match:
-            print("❌ Error: No se pudo encontrar la versión en setup.py")
+            print(" Error: No se pudo encontrar la versin en setup.py")
             return False, None, None
 
         current_version = match.group(1)
@@ -216,11 +237,11 @@ def update_version():
         with open("setup.py", "w", encoding="utf-8") as f:
             f.write(new_content)
 
-        print(f"✅ Versión actualizada de {current_version} a {new_version}")
+        print(f" Versin actualizada de {current_version} a {new_version}")
         return True, current_version, new_version
 
     except Exception as e:
-        print(f"❌ Error al actualizar versión: {e}")
+        print(f" Error al actualizar versin: {e}")
         return False, None, None
 
 
@@ -231,20 +252,20 @@ def create_virtual_environment(venv_dir):
     # Verificar permisos
     current_dir = os.getcwd()
     if not os.access(current_dir, os.W_OK):
-        print(f"❌ Error: No hay permisos de escritura en {current_dir}")
+        print(f" Error: No hay permisos de escritura en {current_dir}")
         if os.name == "nt":
-            print("💡 Sugerencia: Ejecuta PowerShell como Administrador")
+            print(" Sugerencia: Ejecuta PowerShell como Administrador")
         return False
 
     # Limpiar directorio existente de forma segura
     if os.path.exists(venv_dir):
-        print(f"🗑️ Eliminando entorno virtual existente...")
+        print(f" Eliminando entorno virtual existente...")
         if not safe_remove_directory(venv_dir):
-            print(f"❌ No se pudo eliminar el directorio existente {venv_dir}")
+            print(f" No se pudo eliminar el directorio existente {venv_dir}")
             return False
 
     python_exe = get_python_executable()
-    print(f"🐍 Usando Python: {python_exe}")
+    print(f" Usando Python: {python_exe}")
 
     # Crear directorio temporal si es necesario
     temp_dir = None
@@ -254,23 +275,23 @@ def create_virtual_environment(venv_dir):
         success, stdout, stderr = run_command(cmd, shell=os.name == "nt", timeout=120)
 
         if not success:
-            print(f"❌ Error al crear entorno virtual: {stderr}")
+            print(f" Error al crear entorno virtual: {stderr}")
 
             # Intentar con virtualenv como alternativa
-            print("🔄 Intentando instalar virtualenv...")
+            print(" Intentando instalar virtualenv...")
             install_cmd = [python_exe, "-m", "pip", "install", "--user", "virtualenv"]
             install_success, _, install_stderr = run_command(
                 install_cmd, shell=os.name == "nt"
             )
 
             if install_success:
-                print("🔄 Creando entorno virtual con virtualenv...")
+                print(" Creando entorno virtual con virtualenv...")
                 venv_cmd = [python_exe, "-m", "virtualenv", venv_dir]
                 success, stdout, stderr = run_command(venv_cmd, shell=os.name == "nt")
 
             if not success:
-                # Como último recurso, usar directorio temporal
-                print("🔄 Intentando en directorio temporal...")
+                # Como ltimo recurso, usar directorio temporal
+                print(" Intentando en directorio temporal...")
                 temp_dir = tempfile.mkdtemp(prefix="venv_temp_")
                 temp_venv = os.path.join(temp_dir, "venv")
 
@@ -281,13 +302,13 @@ def create_virtual_environment(venv_dir):
                     # Mover el entorno temporal al directorio final
                     try:
                         shutil.move(temp_venv, venv_dir)
-                        print(f"✅ Entorno virtual creado via directorio temporal")
+                        print(f" Entorno virtual creado via directorio temporal")
                     except Exception as e:
-                        print(f"❌ Error moviendo entorno temporal: {e}")
+                        print(f" Error moviendo entorno temporal: {e}")
                         success = False
 
     except Exception as e:
-        print(f"❌ Error inesperado: {e}")
+        print(f" Error inesperado: {e}")
         success = False
 
     finally:
@@ -296,42 +317,42 @@ def create_virtual_environment(venv_dir):
             safe_remove_directory(temp_dir)
 
     if not success:
-        print(f"❌ No se pudo crear el entorno virtual.")
+        print(f" No se pudo crear el entorno virtual.")
         if os.name == "nt":
-            print("💡 Posibles soluciones:")
+            print(" Posibles soluciones:")
             print("   - Ejecutar PowerShell como Administrador")
-            print("   - Verificar que no hay antivirus bloqueando la creación")
+            print("   - Verificar que no hay antivirus bloqueando la creacin")
             print("   - Cerrar IDEs que puedan estar usando archivos de Python")
             print("   - Verificar que tienes permisos en el directorio actual")
         return False
 
-    print("✅ Entorno virtual creado exitosamente")
+    print(" Entorno virtual creado exitosamente")
     return True
 
 
 def install_dependencies(venv_dir):
     """Instala las dependencias en el entorno virtual"""
-    print("🔍 Verificando entorno virtual...")
+    print(" Verificando entorno virtual...")
 
     if not os.path.exists(venv_dir):
-        print(f"❌ Error: No se encontró el entorno virtual en {venv_dir}")
+        print(f" Error: No se encontr el entorno virtual en {venv_dir}")
         return False
 
     venv_pip = get_venv_pip(venv_dir)
 
     if not os.path.exists(venv_pip):
-        print(f"❌ Error: No se encontró pip en {venv_pip}")
+        print(f" Error: No se encontr pip en {venv_pip}")
         return False
 
-    print("🔄 Actualizando pip dentro del entorno virtual...")
+    print(" Actualizando pip dentro del entorno virtual...")
     success, stdout, stderr = run_command(
         [venv_pip, "install", "--upgrade", "pip"], shell=os.name == "nt", timeout=300
     )
 
     if not success:
-        print(f"⚠️ Advertencia al actualizar pip: {stderr}")
+        print(f" Advertencia al actualizar pip: {stderr}")
 
-    print("📦 Instalando herramientas de build...")
+    print(" Instalando herramientas de build...")
     build_packages = ["setuptools>=65.5.1", "wheel>=0.38.4", "build>=0.10.0"]
 
     success, stdout, stderr = run_command(
@@ -341,12 +362,12 @@ def install_dependencies(venv_dir):
     )
 
     if not success:
-        print(f"❌ Error al instalar herramientas de build: {stderr}")
+        print(f" Error al instalar herramientas de build: {stderr}")
         return False
 
     requirements_path = os.path.join(os.getcwd(), "requirements.txt")
     if os.path.exists(requirements_path):
-        print("📋 Instalando dependencias desde requirements.txt...")
+        print(" Instalando dependencias desde requirements.txt...")
         success, stdout, stderr = run_command(
             [venv_pip, "install", "-r", requirements_path],
             shell=os.name == "nt",
@@ -354,100 +375,100 @@ def install_dependencies(venv_dir):
         )
 
         if not success:
-            print(f"❌ Error al instalar requirements.txt: {stderr}")
+            print(f" Error al instalar requirements.txt: {stderr}")
             return False
 
-    print(f"✅ ¡Instalación completada en el entorno virtual {venv_dir}!")
+    print(f" Instalacin completada en el entorno virtual {venv_dir}!")
     return True
 
 
 def clean_build_files():
     """Limpia archivos de build anteriores"""
-    print("🧹 Limpiando archivos temporales anteriores...")
+    print(" Limpiando archivos temporales anteriores...")
 
     dirs_to_clean = ["build", "dist", "component_services.egg-info"]
 
     for dir_name in dirs_to_clean:
         if os.path.exists(dir_name):
             if safe_remove_directory(dir_name):
-                print(f"   🗑️ Eliminado: {dir_name}/")
+                print(f"    Eliminado: {dir_name}/")
             else:
-                print(f"   ⚠️ No se pudo eliminar: {dir_name}/")
+                print(f"    No se pudo eliminar: {dir_name}/")
 
     egg_info_dirs = glob.glob("*.egg-info")
     for egg_dir in egg_info_dirs:
         if os.path.exists(egg_dir):
             if safe_remove_directory(egg_dir):
-                print(f"   🗑️ Eliminado: {egg_dir}/")
+                print(f"    Eliminado: {egg_dir}/")
 
 
 def build_package(venv_dir):
     """Construye el paquete"""
-    print("🔨 Construyendo el paquete...")
+    print(" Construyendo el paquete...")
 
     venv_python = get_venv_python(venv_dir)
 
-    print("   🔍 Verificando herramientas de build...")
+    print("    Verificando herramientas de build...")
     build_tools = ["build", "wheel", "setuptools"]
     for tool in build_tools:
-        print(f"   📦 Instalando/actualizando {tool}...")
+        print(f"    Instalando/actualizando {tool}...")
         success, _, stderr = run_command(
             [venv_python, "-m", "pip", "install", "--upgrade", tool],
             shell=os.name == "nt",
         )
         if not success:
-            print(f"   ❌ Error al instalar {tool}: {stderr}")
+            print(f"    Error al instalar {tool}: {stderr}")
 
-    print("   🏗️  Ejecutando build...")
+    print("     Ejecutando build...")
     success, stdout, stderr = run_command(
         [venv_python, "-m", "build", "--no-isolation"], shell=os.name == "nt"
     )
 
     if not success:
-        print(f"❌ Error al construir el paquete. Detalles:")
+        print(f" Error al construir el paquete. Detalles:")
         if stderr:
             for line in stderr.split("\n"):
                 if line.strip():
-                    print(f"   ❗ {line}")
+                    print(f"    {line}")
         return False, None
 
     if not os.path.exists("dist"):
-        print("❌ Error: No se creó la carpeta 'dist'")
+        print(" Error: No se cre la carpeta 'dist'")
         return False, None
 
     time.sleep(1)
 
     source_files = glob.glob("dist/*.tar.gz")
     if not source_files:
-        print("❌ Error: No se pudo crear el archivo fuente (.tar.gz)")
+        print(" Error: No se pudo crear el archivo fuente (.tar.gz)")
         return False, None
 
     source_file = source_files[0]
     source_name = os.path.basename(source_file)
 
-    print(f"\n✅ ¡Paquete construido exitosamente!")
-    print(f"📦 Archivo generado: {source_name}")
-    print(f"📂 Ubicación: {os.path.abspath(source_file)}")
+    print(f"\n Paquete construido exitosamente!")
+    print(f" Archivo generado: {source_name}")
+    print(f" Ubicacin: {os.path.abspath(source_file)}")
 
     try:
         file_size = os.path.getsize(source_file)
-        print(f"📊 Tamaño: {file_size:,} bytes ({file_size/1024:.1f} KB)")
+        print(f" Tamao: {file_size:,} bytes ({file_size/1024:.1f} KB)")
     except Exception as e:
-        print(f"⚠️  No se pudo obtener el tamaño del archivo: {e}")
+        print(f"  No se pudo obtener el tamao del archivo: {e}")
 
     return True, source_file
 
 
 def distribute_package(source_file):
     """Distribuye el paquete a carpetas con requirements.txt"""
-    print("\n🔍 Buscando carpetas con requirements.txt (profundidad máxima: 3)...")
+    print("\n Buscando carpetas con requirements.txt (profundidad mxima: 3)...")
     print("=" * 66)
 
     current_dir = Path.cwd()
     source_path = Path(source_file)
 
     if not source_path.exists():
-        print(f"❌ Error: No se encuentra el archivo {source_path}")
+        print(f" Error: No se encuentra el archivo {source_path}")
         return False
 
     folders_found = 0
@@ -481,18 +502,18 @@ def distribute_package(source_file):
             unique_dirs.add(target_dir)
 
     for target_dir in unique_dirs:
-        print(f"📁 Carpeta encontrada: {target_dir}")
+        print(f" Carpeta encontrada: {target_dir}")
 
         target_file = target_dir / "component_services.tar.gz"
 
         try:
             shutil.copy2(source_path, target_file)
-            print(f"   ✅ {source_path.name} copiado exitosamente")
+            print(f"    {source_path.name} copiado exitosamente")
             folders_found += 1
         except Exception as e:
-            print(f"   ❌ Error al copiar {source_path.name}: {e}")
+            print(f"    Error al copiar {source_path.name}: {e}")
 
-    print(f"\n📊 Resumen de distribución:")
+    print(f"\n Resumen de distribucin:")
     print(f"   - Carpetas encontradas: {len(unique_dirs)}")
     print(f"   - Archivos distribuidos: {folders_found}")
 
@@ -500,17 +521,18 @@ def distribute_package(source_file):
 
 
 def main():
-    """Función principal"""
+    """Funcin principal"""
     clear_screen()
-    print("🏗️  Iniciando proceso de build y distribución...")
+    print(" Iniciando proceso de build y distribución...")
+    # A mi este no me lo saca nadie
     print("👉 SIEMPRE EJECUTE ESTO SIN UN ENTORNO VIRTUAL ACTIVO 👈")
     print("=" * 49)
 
     # Verificar permisos en Windows
     if os.name == "nt" and not check_admin_privileges():
-        print("⚠️  Nota: No se detectaron privilegios de administrador.")
+        print("  Nota: No se detectaron privilegios de administrador.")
         print(
-            "💡 Si encuentras problemas de permisos, ejecuta PowerShell como Administrador."
+            " Si encuentras problemas de permisos, ejecuta PowerShell como Administrador."
         )
         print()
 
@@ -536,30 +558,30 @@ def main():
         if not distribute_package(source_file):
             return 1
 
-        print("\n🗑️  Limpiando carpetas temporales...")
+        print("\n  Limpiando carpetas temporales...")
         clean_build_files()
 
         if os.path.exists("dist"):
             if safe_remove_directory("dist"):
-                print("✅ Carpeta dist eliminada exitosamente")
+                print(" Carpeta dist eliminada exitosamente")
 
-        print("\n🎉 ¡Proceso completado!")
+        print("\n Proceso completado!")
         print(
-            f"📦 El archivo component_services.tar.gz ha sido distribuido a todas las carpetas con requirements.txt"
+            f" El archivo component_services.tar.gz ha sido distribuido a todas las carpetas con requirements.txt"
         )
 
         return 0
 
     except KeyboardInterrupt:
-        print("\n⚠️ Proceso interrumpido por el usuario")
+        print("\n Proceso interrumpido por el usuario")
         return 1
     except Exception as e:
-        print(f"\n❌ Error inesperado: {e}")
+        print(f"\n Error inesperado: {e}")
         return 1
     finally:
         if os.path.exists(venv_dir):
             if safe_remove_directory(venv_dir):
-                print(f"🗑️ Entorno virtual {venv_dir} eliminado")
+                print(f" Entorno virtual {venv_dir} eliminado")
 
 
 if __name__ == "__main__":
