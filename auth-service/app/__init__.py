@@ -45,7 +45,12 @@ def create_app():
     from app.messaging import receivers
 
 
-    # handlers y db seeds…
+    import logging
+
+    logging.basicConfig(
+        level=logging.INFO,  # También podés usar DEBUG para más detalle
+        format='%(asctime)s %(levelname)s: %(message)s',
+    )
 
     if os.environ.get("WERKZEUG_RUN_MAIN") != "true":
         init_app()

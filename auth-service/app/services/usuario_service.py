@@ -41,8 +41,7 @@ from flask_jwt_extended import decode_token
 from app.extensions import get_redis
 from common.services.send_message_service import send_message
 from common.utils.response import ResponseStatus
-
-
+import logging
 class UsuarioService(ServicioBase):
     def __init__(self):
         super().__init__(model=Usuario, schema=UsuarioInputSchema())
@@ -166,39 +165,6 @@ class UsuarioService(ServicioBase):
             )
 
     # -----------------------------------------------------------------------------------------------------------------------------
-    """
-    def verificar_email(self, session: Session, token: str) -> dict:
-        if not token:
-            return (ResponseStatus.NOT_FOUND, "Token no encontrado.", None, 404)
-        try:
-            datos = decodificar_token_verificacion(token)
-            usuario = (
-                session.query(Usuario).filter_by(email_usuario=datos["email"]).first()
-            )
-            if not usuario:
-                return (ResponseStatus.NOT_FOUND, "Email no encontrado", None, 404)
-            usuario.email_verificado = 1
-            session.commit()
-
-            # mensaje asincrono para persona-service una vez q fue verificado el mail.
-            send_message(
-                to_service="persona-service",
-                message={
-                    "id_usuario": usuario.id_usuario,
-                    "email": usuario.email_usuario,
-                },
-                event_type="auth_user_register",
-            )
-
-        except ExpiredSignatureError as error:
-            return (ResponseStatus.UNAUTHORIZED, "El token ha expirado.", error, 401)
-        except InvalidTokenError as error:
-            return (ResponseStatus.UNAUTHORIZED, "El token es invalido.", error, 401)
-
-        return (ResponseStatus.SUCCESS, "Email verificado correctamente.", None, 200)
-    """
-
-    # -----------------------------------------------------------------------------------------------------------------------------
     # LOGIN Y LOGOUT
     # -----------------------------------------------------------------------------------------------------------------------------
 
@@ -221,28 +187,16 @@ class UsuarioService(ServicioBase):
             .first()
         )
         if not usuario:
-            return (
-                ResponseStatus.UNAUTHORIZED,
-                "Email o contraseña incorrecta",
-                None,
-                401,
-            )
+            return ResponseStatus.UNAUTHORIZED, "Email o contraseña incorrecta", None, 401
+
 
         if not check_password_hash(usuario.password, data_validada["password"]):
-            return (
-                ResponseStatus.UNAUTHORIZED,
-                "Email o contraseña incorrecta",
-                None,
-                401,
-            )
+            return ResponseStatus.UNAUTHORIZED, "Email o contraseña incorrecta", None, 401
+            
 
         if not usuario.email_verificado:
-            return (
-                ResponseStatus.UNAUTHORIZED,
-                "Debe verificar el email antes de loguearse.",
-                None,
-                401,
-            )
+            return ResponseStatus.UNAUTHORIZED, "Debe verificar el email antes de loguearse.", None, 401
+            
 
         # Obtener el rol del usuario
         rol_usuario = (
@@ -271,10 +225,8 @@ class UsuarioService(ServicioBase):
             .filter_by(usuario_id=usuario.id_usuario, user_agent=user_agent)
             .first()
         )
-
-        if not dispositivo_confiable or dispositivo_confiable.fecha_expira.replace(
-            tzinfo=timezone.utc
-        ) < datetime.now(timezone.utc):
+        
+        if not dispositivo_confiable or dispositivo_confiable.fecha_expira.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
             # Dispositivo nuevo o expirado → enviar email de validación
             enviar_email_validacion_dispositivo(usuario, user_agent, ip)
             return (
@@ -289,33 +241,33 @@ class UsuarioService(ServicioBase):
                 usuario.id_usuario, usuario.email_usuario
             )
 
-            refresh_token, refresh_expires = crear_token_refresh(usuario.id_usuario)
+        refresh_token, refresh_expires = crear_token_refresh(usuario.id_usuario)
             # Registrar log de login
-            session.add(
-                UsuarioLog(
+        session.add(
+            UsuarioLog(
                     usuario_id=usuario.id_usuario,
                     accion="login",
                     detalles="El usuario se logueó correctamente",
                 )
             )
-            session.commit()
+        session.commit()
 
-            usuario_data = self.schema_out.dump(usuario)
-            try:
+        usuario_data = self.schema_out.dump(usuario)
+        try:
                 # tomo el identificador unico del token y lo guardo en redis con sus permisos
                 decoded = decode_token(token)
                 get_redis().rpush(decoded["jti"], *permisos_lista)
                 get_redis().expire(decoded["jti"], expires_seconds)
-            except Exception as e:
+        except Exception as e:
                 traceback.print_exc()
 
-            usuario_data["token"] = token
-            usuario_data["expires_in"] = expires_in
-            usuario_data["refresh_token"] = refresh_token
-            usuario_data["refresh_expires"] = refresh_expires.isoformat()
-            usuario_data["rol"] = roles_nombres
+        usuario_data["token"] = token
+        usuario_data["expires_in"] = expires_in
+        usuario_data["refresh_token"] = refresh_token
+        usuario_data["refresh_expires"] = refresh_expires.isoformat()
+        usuario_data["rol"] = roles_nombres
 
-            return ResponseStatus.SUCCESS, "Login exitoso.", usuario_data, 200
+        return ResponseStatus.SUCCESS, "Login exitoso.", usuario_data, 200
 
     # -----------------------------------------------------------------------------------------------------------------------------
     # terminar de modificar con persona-service
