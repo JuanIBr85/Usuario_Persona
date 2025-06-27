@@ -84,14 +84,14 @@
       volumes:
         - mysql_data:/var/lib/mysql
 
-    #servicio-adicional:
-    #  build: ./servicio-adicional-ejemplo
-    #  ports:
-    #    - "5003:5003"
-    #  volumes:
-    #    - ./servicio-adicional-ejemplo:/app
-    #  environment:
-    #    - COMPONENT_SERVICE_HOST=component-service
+    example-service:
+      build: ./example-service
+      ports:
+        - "5003:5003"
+      volumes:
+        - ./example-service:/app
+      environment:
+        - COMPONENT_SERVICE_HOST=component-service
 
     #alternativa a mailtrap en local!!!
     mailpit:
