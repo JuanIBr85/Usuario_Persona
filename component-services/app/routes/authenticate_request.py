@@ -41,6 +41,37 @@ def check_if_token_is_revoked(jwt_header, jwt_payload: dict):
     # Si no esta en el cache compruebo si esta en redis
     return get_jwt_permissions(jti) is None
 
+# Manejo de errores JWT más específico
+@jwt.expired_token_loader
+def expired_token_callback(jwt_header, jwt_payload):
+    return (
+            make_response(
+                ResponseStatus.FAIL,
+                "El token ha expirado. Por favor, inicie sesión nuevamente.",
+                {"message": "Token expirado"},
+            ),
+            401,
+        )
+
+@jwt.invalid_token_loader  
+def invalid_token_callback(error):
+    return (
+            make_response(
+                ResponseStatus.FAIL,
+                "El token proporcionado es inválido.",
+                {"message": "Token inválido"},
+            ),401)
+
+@jwt.unauthorized_loader
+def missing_token_callback(error):
+    return (
+            make_response(
+                ResponseStatus.FAIL,
+                "No se proporcionó un token de autenticación.",
+                {"message": "Token no proporcionado"},
+            ),
+            401,
+        )
 
 def authenticate_config(app):
     # Rate limit handler
