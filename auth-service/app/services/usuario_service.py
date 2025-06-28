@@ -70,12 +70,8 @@ class UsuarioService(ServicioBase):
             )
             .first()
         ):
-            return (
-                ResponseStatus.FAIL,
-                "El nombre de usuario o email ya están registrados",
-                None,
-                400,
-            )
+            return ResponseStatus.FAIL, "El nombre de usuario o email ya están registrados", None, 400
+            
 
         # Generar y guardar OTP
         email = data_validada["email_usuario"]
@@ -174,12 +170,7 @@ class UsuarioService(ServicioBase):
         try:
             data_validada = self.schema_login.load(data)
         except ValidationError as error:
-            return (
-                ResponseStatus.FAIL,
-                "Error de schema / Bad Request",
-                error.messages,
-                400,
-            )
+            return ResponseStatus.FAIL, "Error de schema / Bad Request", error.messages, 400
 
         usuario = (
             session.query(Usuario)
@@ -225,22 +216,20 @@ class UsuarioService(ServicioBase):
             .filter_by(usuario_id=usuario.id_usuario, user_agent=user_agent)
             .first()
         )
-        
-        if not dispositivo_confiable or dispositivo_confiable.fecha_expira.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
-            # Dispositivo nuevo o expirado → enviar email de validación
-            enviar_email_validacion_dispositivo(usuario, user_agent, ip)
-            return (
-                ResponseStatus.PENDING,
-                "Verificación de dispositivo enviada al email. Por favor confírmelo.",
-                None,
-                401,
-            )
-        else:
-            # Crear token con permisos incluidos
-            token, expires_in, expires_seconds = crear_token_acceso(
-                usuario.id_usuario, usuario.email_usuario
-            )
+        try:
+            if not dispositivo_confiable or dispositivo_confiable.fecha_expira.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
+                # Dispositivo nuevo o expirado → enviar email de validación
+                enviar_email_validacion_dispositivo(usuario, user_agent, ip)
+                return ResponseStatus.PENDING, "Verificación de dispositivo enviada al email. Por favor confírmelo.", None, 401,
 
+            else:
+                # Crear token con permisos incluidos
+                token, expires_in, expires_seconds = crear_token_acceso(
+                    usuario.id_usuario, usuario.email_usuario
+                )
+        except Exception as error:
+            return ResponseStatus.FAIL, "error de dispositivo ", error.messages, 400
+        
         refresh_token, refresh_expires = crear_token_refresh(usuario.id_usuario)
             # Registrar log de login
         session.add(
