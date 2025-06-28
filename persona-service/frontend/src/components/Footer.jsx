@@ -10,24 +10,20 @@ const Footer = () => {
           <Link
             to="/"
             aria-label="Ir a inicio"
-            title="CREUS"
+            title="PRISMA"
             className="inline-flex items-center"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-graduation-cap-icon lucide-graduation-cap">
-              <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z" />
-              <path d="M22 10v6" />
-              <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5" />
-            </svg>
+            <svg fill="text-gray-800" className="w-1/12 " viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M1.485,16.857l10,6c.027.016.057.023.084.036s.057.026.087.038a.892.892,0,0,0,.688,0c.03-.012.058-.024.087-.038s.057-.02.084-.036l10-6a1,1,0,0,0,.3-1.438l-10-14c-.013-.018-.035-.024-.049-.04a.962.962,0,0,0-1.53,0c-.014.016-.036.022-.049.04l-10,14a1,1,0,0,0,.3,1.438ZM13,20.234V5.121L20.557,15.7ZM11,5.121V20.234L3.443,15.7Z" /></svg>
             <span className="ml-2 text-xl font-bold tracking-wide text-gray-800 uppercase">
-              CREUS
+              PRISMA
             </span>
           </Link>
           <div className="mt-6 lg:max-w-sm">
             <p className="text-sm text-gray-800 ">
-              Centro Regional De Estudios Universitarios Suarense
+              Plataforma de Registro de Identidades, Servicios y Módulos Asociados
             </p>
             <p className="mt-4 text-sm text-gray-800">
-              <a href="https://www.creus.edu.ar/">creus.edu.ar</a>
+              <a href="https://www.coronelsuarez.gob.ar">coronelsuarez.gob.ar</a>
             </p>
           </div>
         </div>
@@ -38,12 +34,12 @@ const Footer = () => {
           <div className="flex">
             <p className="mr-1 text-gray-800 ">Teléfono:</p>
             <a
-              href="tel:2926451146"
+              href="tel:2926429200"
               aria-label="Nuestro teléfono"
               title="Nuestro teléfono"
               className="transition-colors duration-300 text-deep-purple-accent-400 hover:text-deep-purple-800 mr-1"
             >
-              +54 (2926) 451146
+              +54 (2926) 429200
             </a>
             <a
               href="tel:2926429371"
@@ -65,12 +61,12 @@ const Footer = () => {
           <div className="flex">
             <p className="mr-1 text-gray-800">Correo electrónico:</p>
             <a
-              href="mailto:consultas@creus.edu.ar"
+              href="mailto:comunicaciones@coronelsuarez.gob.ar"
               aria-label="Nuestro correo"
               title="Nuestro correo"
               className="transition-colors duration-300 text-deep-purple-accent-400 hover:text-deep-purple-800"
             >
-              consultas@creus.edu.ar
+              comunicaciones@coronelsuarez.gob.ar
             </a>
           </div>
           <div className="flex">
@@ -83,7 +79,7 @@ const Footer = () => {
               title="Nuestra dirección"
               className="transition-colors duration-300 text-deep-purple-accent-400 hover:text-deep-purple-800"
             >
-              Rodolfo Rey s/n, 7540 Coronel Suárez - Buenos Aires - Argentina
+              Av. Alsina 150 (7540) Coronel Suárez Buenos Aires - Argentina
             </a>
           </div>
         </div>
@@ -93,7 +89,7 @@ const Footer = () => {
           </span>
           <div className="flex items-center mt-1 space-x-3">
             <a
-              href="https://www.instagram.com/suarezcreus/"
+              href="https://www.instagram.com/suarezmunicipio/?hl=es"
               className="text-gray-500 transition-colors duration-300 hover:text-deep-purple-accent-400"
             >
               <svg viewBox="0 0 30 30" fill="currentColor" className="h-6">
@@ -102,7 +98,7 @@ const Footer = () => {
               </svg>
             </a>
             <a
-              href="https://www.facebook.com/suarezcreus/"
+              href="https://www.facebook.com/suarezmunicipio/?locale=es_LA"
               className="text-gray-500 transition-colors duration-300 hover:text-deep-purple-accent-400"
             >
               <svg viewBox="0 0 24 24" fill="currentColor" className="h-5">
@@ -112,7 +108,7 @@ const Footer = () => {
           </div>
           <Separator className="my-4" />
           <p className="mt-4 text-sm text-gray-500">
-            Los contenidos de creus.edu.ar están licenciados bajo Creative Commons Reconocimiento 2.5 Argentina Licenciada
+            Los contenidos de coronelsuarez.gob.ar están licenciados bajo  Creative Commons Reconocimiento 2.5 Argentina License      
           </p>
         </div>
       </div>
