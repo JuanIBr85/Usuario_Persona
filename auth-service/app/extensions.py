@@ -28,3 +28,4 @@ def get_redis():
             raise
     return _redis_client
 
+get_redis()
