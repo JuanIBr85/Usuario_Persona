@@ -9,7 +9,7 @@ class DispositivoConfiable(Base):
 
     id = Column(Integer, primary_key=True)
     usuario_id = Column(Integer, ForeignKey("usuario.id_usuario"))
-    token_dispositivo = Column(String(64), unique=True, index=True)
+    token_dispositivo = Column(String(512), unique=True, index=True)
     user_agent = Column(String(256))
     fecha_registro = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     fecha_expira = Column(DateTime(timezone=True))

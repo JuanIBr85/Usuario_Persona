@@ -1,4 +1,5 @@
 import json
+import traceback
 
 from common.utils.component_request import ComponentRequest
 import jwt
@@ -316,37 +317,40 @@ def verificar_dispositivo():
     token = request.args.get("token")
     if not token:
         return "Token faltante", 400
-
     try:
         datos = decodificar_token_verificacion(token)
+   
+        # Extraer datos
+        email = datos["email"]
+        user_agent = datos.get("user_agent", "")
+        ip = datos["ip"]
+
+        # Buscar usuario
+        session = SessionLocal()
+        usuario = session.query(Usuario).filter_by(email_usuario=email).first()
+        if not usuario:
+            return "Usuario no encontrado.", 404
+
+        # Registrar el dispositivo como confiable
+        nuevo_dispositivo = DispositivoConfiable(
+            usuario_id=usuario.id_usuario,
+            user_agent=user_agent,
+            token_dispositivo=generar_token_dispositivo(email, user_agent, ip),
+            fecha_registro=datetime.now(timezone.utc),
+            fecha_expira=datetime.now(timezone.utc) + timedelta(days=30),
+        )
+        session.add(nuevo_dispositivo)
+        session.commit()
+
+        return "Dispositivo confirmado. Ahora podés volver a iniciar sesión.", 200
     except ExpiredSignatureError:
         return "El enlace ha expirado.", 400
     except InvalidTokenError:
         return "Token inválido.", 400
-
-    # Extraer datos
-    email = datos["email"]
-    user_agent = datos.get("user_agent", "")
-    ip = datos["ip"]
-
-    # Buscar usuario
-    session = SessionLocal()
-    usuario = session.query(Usuario).filter_by(email_usuario=email).first()
-    if not usuario:
-        return "Usuario no encontrado.", 404
-
-    # Registrar el dispositivo como confiable
-    nuevo_dispositivo = DispositivoConfiable(
-        usuario_id=usuario.id_usuario,
-        user_agent=user_agent,
-        token_dispositivo=generar_token_dispositivo(email, user_agent, ip),
-        fecha_registro=datetime.now(timezone.utc),
-        fecha_expira=datetime.now(timezone.utc) + timedelta(days=30),
-    )
-    session.add(nuevo_dispositivo)
-    session.commit()
-
-    return "Dispositivo confirmado. Ahora podés volver a iniciar sesión.", 200
+    except Exception as e:
+        traceback.print_exc()
+        
+        return f"Error al verificar el dispositivo: {str(e)}", 500
 
 
 @usuario_bp.route("/refresh", methods=["POST"])
