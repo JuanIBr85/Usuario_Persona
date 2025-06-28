@@ -20,9 +20,9 @@
           condition: service_healthy
 
     auth-db:
-      image: postgres
-      volumes:
-        - postgres_data:/var/lib/postgresql/data
+      image: postgres:13
+      #volumes:
+        #- postgres_data:/var/lib/postgresql/data
       restart: unless-stopped
       shm_size: 128mb
       ports:
@@ -106,17 +106,17 @@
       volumes:
         - mysql_data:/var/lib/mysql
 
-    phpmyadmin:
-      image: phpmyadmin/phpmyadmin
-      container_name: phpmyadmin
-      restart: unless-stopped
-      ports:
-      - "8080:80"
-      environment:
-        PMA_HOST: mysql
-        PMA_PORT: 3306
-      depends_on:
-      - mysql    
+    #phpmyadmin:
+    #  image: phpmyadmin/phpmyadmin
+    #  container_name: phpmyadmin
+    #  restart: unless-stopped
+    #  ports:
+    #  - "8080:80"
+    #  environment:
+    #    PMA_HOST: mysql
+    #    PMA_PORT: 3306
+    #  depends_on:
+    #  - mysql    
 
     #servicio-adicional:
     #  build: ./servicio-adicional-ejemplo
@@ -128,12 +128,12 @@
     #    - COMPONENT_SERVICE_HOST=component-service
 
     #alternativa a mailtrap en local!!!
-    #mailpit:
-    #  image: axllent/mailpit:latest
-    #  ports:
-    #    - "1025:1025"  # SMTP
-    #    - "8025:8025"  # Web UI
+#    mailpit:
+#      image: axllent/mailpit:latest
+#      ports:
+#        - "1025:1025"  # SMTP
+#        - "8025:8025"  # Web UI
 
   volumes:
     mysql_data:
-    postgres_data:
+    #postgres_data:
