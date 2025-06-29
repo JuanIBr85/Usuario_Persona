@@ -21,7 +21,8 @@ def get_jwt_permissions(jti):
     if jti in jwt_cache:
         return jwt_cache[jti]
 
-    permissions: list = redis_client_auth.lrange(jti, 1, -1)
+    # Recupero la lista de permisos del token
+    permissions: list = redis_client_auth.lrange(jti, 0, -1)
     # Si no esta en el cache compruebo si esta en redis
     if permissions:
         # Si esta en redis lo guardo en el cache
@@ -41,37 +42,43 @@ def check_if_token_is_revoked(jwt_header, jwt_payload: dict):
     # Si no esta en el cache compruebo si esta en redis
     return get_jwt_permissions(jti) is None
 
+
 # Manejo de errores JWT más específico
 @jwt.expired_token_loader
 def expired_token_callback(jwt_header, jwt_payload):
     return (
-            make_response(
-                ResponseStatus.FAIL,
-                "El token ha expirado. Por favor, inicie sesión nuevamente.",
-                {"message": "Token expirado"},
-            ),
-            401,
-        )
+        make_response(
+            ResponseStatus.FAIL,
+            "El token ha expirado. Por favor, inicie sesión nuevamente.",
+            {"message": "Token expirado"},
+        ),
+        401,
+    )
 
-@jwt.invalid_token_loader  
+
+@jwt.invalid_token_loader
 def invalid_token_callback(error):
     return (
-            make_response(
-                ResponseStatus.FAIL,
-                "El token proporcionado es inválido.",
-                {"message": "Token inválido"},
-            ),401)
+        make_response(
+            ResponseStatus.FAIL,
+            "El token proporcionado es inválido.",
+            {"message": "Token inválido"},
+        ),
+        401,
+    )
+
 
 @jwt.unauthorized_loader
 def missing_token_callback(error):
     return (
-            make_response(
-                ResponseStatus.FAIL,
-                "No se proporcionó un token de autenticación.",
-                {"message": "Token no proporcionado"},
-            ),
-            401,
-        )
+        make_response(
+            ResponseStatus.FAIL,
+            "No se proporcionó un token de autenticación.",
+            {"message": "Token no proporcionado"},
+        ),
+        401,
+    )
+
 
 def authenticate_config(app):
     # Rate limit handler
@@ -129,6 +136,7 @@ def authenticate_config(app):
                 )
             # Obtengo los permisos del usuario
             permisos_usuario = get_jwt_permissions(payload["jti"])
+
             # Si no tiene los permisos necesario para acceder al endpoint se rechaza el acceso
             if not service_route.access_permissions.issubset(permisos_usuario):
                 abort(

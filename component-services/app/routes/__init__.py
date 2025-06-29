@@ -2,7 +2,7 @@ from app.routes.api_gateway import bp as api_gateway_bp
 from app.routes.static_routes import bp as static_routes_bp
 from app.routes.component_routes import bp as component_bp
 from app.routes.authenticate_request import authenticate_config
-from app.routes.internal.message import bp as message_bp
+from app.routes.internal import bp as internal_bp
 
 
 def register_blueprints(app):
@@ -10,4 +10,4 @@ def register_blueprints(app):
     app.register_blueprint(api_gateway_bp, url_prefix="/api")
     app.register_blueprint(static_routes_bp)
     app.register_blueprint(component_bp, url_prefix="/api/control")
-    app.register_blueprint(message_bp, url_prefix="/internal")
+    app.register_blueprint(internal_bp, url_prefix="/internal")
