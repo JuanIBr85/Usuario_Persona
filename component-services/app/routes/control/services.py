@@ -13,9 +13,13 @@ from datetime import datetime, timezone, timedelta
 from flask import current_app
 import time
 from app.utils.redis_message import send_event
+from app.services.event_service import EventService
 
 bp = Blueprint("services", __name__, cli_group="control", url_prefix="/services")
 services_service: ServicioBase = ServicioBase(ServiceModel, ServiceSchema())
+
+
+event_service: EventService = EventService()
 
 
 @bp.route("/echo", methods=["GET"])
@@ -203,6 +207,8 @@ def stop_system():
             # Limpia todas las rutas
             send_event("stop_services", {})
 
+        # Envio un evento para indicar que el servicio de componentes se va a parar
+        event_service.component_stop_service()
         threading.Thread(target=stop).start()
 
         return (
