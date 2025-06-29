@@ -83,9 +83,9 @@ function PersonTable({ users, onEdit, onSeeDetails, onDelete }) {
           ))
         ) : (
           <TableRow>
-            <TableCell colSpan={3} className="text-center">
+            <TableCell colSpan={3} className="text-center w-full">
               {isTimeout ? (
-                <div class="text-right">
+                <div class="text-center">
                   <div role="status">
                     <svg
                       aria-hidden="true"
