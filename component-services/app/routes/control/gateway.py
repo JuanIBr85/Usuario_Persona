@@ -71,7 +71,7 @@ def get_research_status():
     )
 
 
-@bp.route("/reserch_stop", methods=["GET"])
+@bp.route("/research_stop", methods=["GET"])
 @cp_api_access(is_public=True, limiter=["2 per minute"])
 def stop_research():
     endpoints_search_service.stop_search()
