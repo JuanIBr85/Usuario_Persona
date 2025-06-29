@@ -110,7 +110,6 @@ def actualizar_permisos():
         f"{COMPONENT_SERVICE_URL}/internal/services/recolect_perms", timeout=5
     )
     if response.status_code == 200:
-        print("[✓] Permisos actualizados correctamente.")
 
         # Extraigo los permisos
         permisos: list[str] = response.json()["data"]
@@ -165,6 +164,10 @@ def actualizar_permisos():
                             RolPermiso(id_rol=rol.id_rol, permiso_id=permiso.id_permiso)
                         )
                 db.commit()
+
+            print("[✓] Permisos actualizados correctamente.")
+        except Exception as e:
+            print(f"[x] Error al actualizar permisos: {e}")
         finally:
             db.close()
 
