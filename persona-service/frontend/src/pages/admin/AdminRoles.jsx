@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 // COMPONENTE: AdminRoles
 // Este componente permite a los administradores crear, editar y eliminar roles,
@@ -23,9 +23,10 @@ import { roleService } from "@/services/roleService";
 import { userService } from "@/services/userService"
 import { permisoService } from "@/services/permisoService";
 
+import { useRoles } from "@/hooks/roles/useRoles";
+
 export default function AdminRoles() {
   /* ------------------------------- Estados ------------------------------ */
-  const [roles, setRoles] = useState([]); // Lista de roles existentes
   const [showNewRoleForm, setShowNewRoleForm] = useState(false); // Mostrar / ocultar formulario
   const [newRoleName, setNewRoleName] = useState(""); // Nombre del nuevo rol o del rol en edición
   const [selectedPermissions, setSelectedPermissions] = useState([]); // Permisos seleccionados
@@ -33,16 +34,27 @@ export default function AdminRoles() {
   const [errorDialog, setErrorDialog] = useState({ open: false, message: "" }); // Diálogo de error
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false); // Diálogo de confirmación de borrado
   const [roleToDelete, setRoleToDelete] = useState(null); // Rol que se va a eliminar
-  const [availablePermissions, setAvailablePermissions] = useState([]); // Permisos disponibles
-  const [selectedUserId, setSelectedUserId] = useState("");
-  const [usuarios, setUsuarios] = useState([]);
-  const [selectedRoleIds, setSelectedRoleIds] = useState([]);
 
-  /* --------------------------- Utilidades UI --------------------------- */
   const showError = (message) => {
-    // Muestra un diálogo de error con un mensaje específico
     setErrorDialog({ open: true, message });
   };
+
+  const {
+    roles,
+    setRoles,
+    usuarios,
+    setUsuarios,
+    availablePermissions,
+    selectedUserId,
+    setSelectedUserId,
+    selectedRoleIds,
+    setSelectedRoleIds,
+    isTimeout,
+    countdown,
+  } = useRoles(showError);
+
+
+  /* --------------------------- Utilidades UI --------------------------- */
 
   const resetForm = () => {
     // Resetea el formulario
@@ -232,100 +244,7 @@ export default function AdminRoles() {
   };
 
 
-
   /* ------------------------------ Efectos ------------------------------ */
-  useEffect(() => {
-    // Trae todos los roles
-    const fetchRoles = async () => {
-      try {
-        const data = await roleService.get_all();
-        console.log(data);
-        const transformedRoles = data.roles.map((role) => ({
-          id: role.id_rol,
-          name: role.nombre_rol,
-          permissions: role.permisos,
-        }));
-
-        setRoles(transformedRoles);
-      } catch (error) {
-        showError("Error al cargar los roles desde el servidor.");
-        console.error(error);
-      }
-    };
-
-   
-
-    const fetchUsuarios = async () => {
-      try {
-        const userData = await userService.getAllUsers()
-        console.log(userData);
-        setUsuarios(Array.isArray(userData) ? userData : []);
-      } catch (error) {
-        console.log(error)
-      }
-    };
-
-    // Trae todos los permisos
-    const fetchPermisos = async () => {
-      try {
-        const data = await permisoService.get_all();
-
-        const transformedPermisos = data.permisos.map((permiso) => ({
-          id: permiso.id_permiso,
-          name: permiso.nombre_permiso,
-        }));
-
-        setAvailablePermissions(transformedPermisos);
-      } catch (error) {
-        showError("Error al cargar los permisos desde el servidor.");
-        console.error(error);
-      }
-    };
-
-    fetchPermisos();
-    fetchRoles();
-    fetchUsuarios();
-  }, []);
-
-   useEffect(() => {
-      if (selectedUserId) {
-        const usuarioSeleccionado = usuarios.find(
-          (u) => u.id === Number(selectedUserId)
-        );
-        if (usuarioSeleccionado) {
-          setSelectedRoleIds(usuarioSeleccionado.roles_ids || []);
-        }
-      } else {
-        setSelectedRoleIds([]); 
-      }
-    }, [selectedUserId, usuarios]);
-    
-  const [isTimeout, setIsTimeout] = useState(true);
-  const [countdown, setCountdown] = useState(3);
-
-  useEffect(() => {
-    let intervalId;
-    if (roles.length > 0) {
-      // Si hay roles, cancelamos el timeout
-      setIsTimeout(false);
-    } else {
-      // Si no hay roles y el countdown > 0, arrancamos el intervalo
-      if (countdown > 0) {
-        intervalId = setInterval(() => {
-          setCountdown((prevCount) => prevCount - 1);
-        }, 1000);
-      } else {
-        // Cuando countdown llega a 0, seteamos timeout en false
-        setIsTimeout(false);
-      }
-    }
-    console.log("countdown: ", countdown);
-
-    // Limpia el intervalo
-    return () => {
-      if (intervalId) clearInterval(intervalId);
-    };
-  }, [roles, countdown]);
 
   /* ------------------------------- UI ---------------------------------- */
   return (
