@@ -101,9 +101,8 @@ function PerfilConnect() {
                 className="sm:max-w-3xl" />
             {loading && <Loading isFixed={true} />}
             <Fade duration={300} triggerOnce>
-                <div className="w-full flex items-center justify-center sm:p-4" >
-                    <div className="w-full h-full sm:h-auto md:max-w-2xl shadow-md rounded-xl overflow-hidden w-full flex items-center justify-center sm:p-4">
-                        <Card className="w-full h-full rounded-xl">
+                <div className="w-full flex items-center justify-center sm:p-4">
+                    <Card className="w-full max-w-2xl shadow-lg rounded-xl overflow-hidden">
                             <CardHeader className="text-center">
                                 <CardTitle className="text-2xl">
                                     Vinculacion de perfil
@@ -243,9 +242,7 @@ function PerfilConnect() {
 
                             <CardFooter className="flex justify-between text-sm text-gray-500 border-t">
                             </CardFooter>
-
                         </Card>
-                    </div>
                 </div>
             </Fade>
         </>

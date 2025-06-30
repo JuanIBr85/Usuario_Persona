@@ -71,9 +71,8 @@ const ProfileForm = () => {
       <Fade duration={300} triggerOnce>
 
 
-        <div className="w-full flex items-center justify-center sm:p-4" >
-          <div className="w-full h-full sm:h-auto md:max-w-7xl shadow-md rounded-xl overflow-hidden w-full flex items-center justify-center sm:p-4">
-            <Card className="w-full h-full rounded-xl">
+        <div className="w-full flex items-center justify-center sm:p-4">
+          <Card className="w-full max-w-7xl shadow-lg rounded-xl overflow-hidden">
               <CardHeader className="text-center">
                 <CardTitle className="text-2xl">
                   Información Personal
@@ -144,7 +143,6 @@ const ProfileForm = () => {
                 <span>Última actualización: hace {lastUpdate}</span>
               </CardFooter>
             </Card>
-          </div>
         </div>
       </Fade>
     </>
