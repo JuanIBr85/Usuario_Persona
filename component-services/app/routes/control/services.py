@@ -164,7 +164,7 @@ def remove_service(id: int):
         return make_response(ResponseStatus.ERROR, str(e)), 500
 
 
-@bp.route("/set_service_available/<int:id>/<int:state>", methods=["GET"])
+@bp.route("/set_service_available/<int:id>/<int:state>", methods=["PUT"])
 @cp_api_access(is_public=True, limiter=["5 per minute"])
 def set_service_available(id: int, state: int):
     try:

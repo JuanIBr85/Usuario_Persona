@@ -1,5 +1,6 @@
 import json
 import traceback
+from flask import render_template_string
 
 from common.utils.component_request import ComponentRequest
 import jwt
@@ -141,7 +142,8 @@ def perfil_usuario():
     session = SessionLocal()
     try:
         usuario_id = ComponentRequest.get_user_id()
-        status, mensaje, data, code = usuario_service.ver_perfil(session, usuario_id)
+        status, mensaje, data, code = usuario_service.ver_perfil(
+            session, usuario_id)
         return make_response(status, mensaje, data, code), code
 
     except Exception as e:
@@ -203,7 +205,7 @@ def solicitar_otp():
     is_public=True,
     limiter=["5 per minute", "10 per day"],
     # 1hs previene que reenvien el token correcto para evitar abusos
-    #cache=CacheSettings(expiration=60 * 60, params=["email", "otp"]),
+    # cache=CacheSettings(expiration=60 * 60, params=["email", "otp"]),
 )
 def verificar_otp():
     session = SessionLocal()
@@ -222,7 +224,8 @@ def verificar_otp():
                 400,
             )
 
-        status, mensaje, data, code = usuario_service.verificar_otp(session, email, otp)
+        status, mensaje, data, code = usuario_service.verificar_otp(
+            session, email, otp)
         return make_response(status, mensaje, data, code), code
 
     except Exception as e:
@@ -319,7 +322,7 @@ def verificar_dispositivo():
         return "Token faltante", 400
     try:
         datos = decodificar_token_verificacion(token)
-   
+
         # Extraer datos
         email = datos["email"]
         user_agent = datos.get("user_agent", "")
@@ -342,15 +345,53 @@ def verificar_dispositivo():
         session.add(nuevo_dispositivo)
         session.commit()
 
-        return "Dispositivo confirmado. Ahora podés volver a iniciar sesión.", 200
+        return render_template_string("""
+        <!DOCTYPE html>
+        <html>
+        <head>
+        <title>Dispositivo confirmado</title>
+        <style>
+            body { font-family: sans-serif; padding: 2rem; text-align: center; }
+        </style>
+        </head>
+        <body>
+        <h1>✅ Dispositivo confirmado</h1>
+        <p>Ahora podés volver a iniciar sesión.</p>
+        </body>
+        </html>
+        """), 200
+    
     except ExpiredSignatureError:
         return "El enlace ha expirado.", 400
     except InvalidTokenError:
         return "Token inválido.", 400
     except Exception as e:
         traceback.print_exc()
-        
-        return f"Error al verificar el dispositivo: {str(e)}", 500
+
+        return render_template_string(f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+        <title>Error al verificar</title>
+        <style>
+            body {{
+            font-family: sans-serif;
+            padding: 2rem;
+            text-align: center;
+            background-color: #fef2f2;
+            color: #991b1b;
+            }}
+            h1 {{
+            font-size: 1.6rem;
+            }}
+        </style>
+        </head>
+        <body>
+        <h1>❌ Error al verificar el dispositivo</h1>
+        <p>{str(e)}</p>
+        </body>
+        </html>
+        """), 500
 
 
 @usuario_bp.route("/refresh", methods=["POST"])
