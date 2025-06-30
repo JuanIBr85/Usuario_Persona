@@ -24,6 +24,7 @@ import ComponentServices from "@/pages/component/ComponentServices";
 import ComponentServicesDetails from "@/pages/component/ComponentServicesDetails";
 import Redirect from "@/pages/auth/Redirect";
 import EndpointsResearch from "@/pages/endpoints/EndpointsResearch";
+import CreatePerfil from "@/pages/user/CreatePerfil";
 /**
  * Componente que define todas las rutas de la aplicación utilizando react-router-dom.
  * Cada ruta se asocia con un componente de página específico para renderizar.
@@ -36,6 +37,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<AdminPanel />} />
       <Route path="profile" element={<Profile />} />
+      <Route path="createperfil" element={<CreatePerfil />} />
       <Route path="perfilconnect" element={<PerfilConnect />} />
       <Route path="adminpanel" element={<AdminPanel />} />
       <Route path="logs" element={<Logs />} />

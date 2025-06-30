@@ -1,0 +1,72 @@
+import React from 'react';
+import InputValidate from '@/components/inputValidate/InputValidate';
+import SimpleSelect from '@/components/SimpleSelect';
+import { SelectItem } from '@/components/ui/select';
+import { REDES_SOCIALES } from '../constants';
+
+const Contacto = () => (
+  <div className="space-y-4">
+    <h3 className="text-lg font-medium">Datos de Contacto</h3>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <InputValidate
+        id="telefono_fijo"
+        name="telefono_fijo"
+        type="tel"
+        placeholder="Ingresa tu teléfono fijo"
+        labelText="Teléfono Fijo"
+        validatePattern="^[\+]?[0-9\-\s\(\)]{10,}$"
+        validateMessage="Ingresa un número de teléfono válido"
+      />
+      <InputValidate
+        id="telefono_movil"
+        name="telefono_movil"
+        type="tel"
+        placeholder="Ingresa tu teléfono móvil"
+        labelText="Teléfono móvil"
+        validatePattern="^[\+]?[0-9\-\s\(\)]{10,}$"
+        validateMessage="Ingresa un número de teléfono válido"
+        required
+      />
+    </div>
+    <div className="grid grid-cols-2 gap-4 items-end">
+      <InputValidate
+        id="red_social_contacto"
+        name="red_social_contacto"
+        type="text"
+        placeholder="Nombre del Usuario"
+        labelText="Red social de contacto"
+      />
+      <SimpleSelect
+        name="red_social_nombre"
+        label="Red social"
+        placeholder="Selecciona una red social"
+        required
+        id="red_social_nombre"
+        onChange={(e) => console.log(e.target.value)}
+      >
+        {REDES_SOCIALES.map((red) => (
+          <SelectItem key={red} value={red}>
+            {red}
+          </SelectItem>
+        ))}
+      </SimpleSelect>
+    </div>
+
+    <InputValidate
+      id="email_contacto"
+      type="email"
+      labelText="Email de contacto"
+      placeholder="Ingresa el email de contacto"
+      validateMessage="Email inválido"
+      required
+    />
+    <InputValidate
+      id="observacion_contacto"
+      type="text"
+      labelText="Observación del contacto"
+      placeholder="Ingresa una observación"
+    />
+  </div>
+);
+
+export default Contacto;
