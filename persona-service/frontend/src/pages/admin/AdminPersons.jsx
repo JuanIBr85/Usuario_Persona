@@ -18,6 +18,8 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import InputValidate from "@/components/inputValidate/InputValidate";
+import SimpleSelect from "@/components/SimpleSelect";
 import PersonFilter from "@/components/people/PersonFilter";
 import Loading from "@/components/loading/Loading";
 
@@ -26,7 +28,9 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import PersonTable from "@/components/people/PersonTable";
 import PersonEditDialog from "@/components/people/PersonEditDialog";
 import PersonBreadcrumb from "@/components/people/PersonBreadcrumb";
-
+import { SelectItem } from "@/components/ui/select";
+import ResponsiveColumnForm from "@/components/ResponsiveColumnForm";
+import { formSubmitJson } from "@/utils/formUtils";
 /**
  * Componente AdminUsers
  * ---------------------
@@ -55,7 +59,7 @@ import PersonBreadcrumb from "@/components/people/PersonBreadcrumb";
  * - PersonEditDialog: diálogo modal para editar datos de usuario.
  * - PersonBreadcrumb: barra de navegación breadcrumb.
  */
-function AdminUsers() {
+function AdminPersons() {
   const navigate = useNavigate();
 
   const [newUser, setNewUser] = useState({});
@@ -73,6 +77,8 @@ function AdminUsers() {
   const [redesSociales, setRedesSociales] = useState([]);
   const [localidades, setLocalidades] = useState([]);
   const [tiposDocumentos, setTiposDocumentos] = useState([]);
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // Carga inicial de usuarios al montar el componente
   useEffect(() => {
@@ -190,34 +196,35 @@ function AdminUsers() {
   };
 
   const handleSubmit = async (e) => {
+    const formData = await formSubmitJson(e);
     e.preventDefault();
 
     try {
       const body = {
-        nombre_persona: newUser.nombre || "",
-        apellido_persona: newUser.apellido || "",
-        fecha_nacimiento_persona: newUser.fecha_nacimiento || "",
-        tipo_documento: newUser.tipo_documento || "DNI",
-        num_doc_persona: newUser.nro_documento || "",
-        usuario_id: newUser.usuario_id || null,
+        nombre_persona: formData.nombre || "",
+        apellido_persona: formData.apellido || "",
+        fecha_nacimiento_persona: formData.fecha_nacimiento || "",
+        tipo_documento: formData.tipo_documento || "DNI",
+        num_doc_persona: formData.nro_documento || "",
+        usuario_id: formData.usuario_id || null,
         domicilio: {
-          domicilio_calle: newUser.domicilio_calle || "",
-          domicilio_numero: newUser.domicilio_numero || "",
-          domicilio_piso: newUser.domicilio_piso || "",
-          domicilio_dpto: newUser.domicilio_dpto || "",
-          domicilio_referencia: newUser.domicilio_referencia || "",
+          domicilio_calle: formData.domicilio_calle || "",
+          domicilio_numero: formData.domicilio_numero || "",
+          domicilio_piso: formData.domicilio_piso || "",
+          domicilio_dpto: formData.domicilio_dpto || "",
+          domicilio_referencia: formData.domicilio_referencia || "",
           codigo_postal: {
-            codigo_postal: newUser.codigo_postal || "",
-            localidad: newUser.localidad || "",
+            codigo_postal: formData.codigo_postal || "",
+            localidad: formData.localidad || "",
           },
         },
         contacto: {
-          telefono_fijo: newUser.telefono_fijo || "",
-          telefono_movil: newUser.telefono_movil || "",
-          red_social_contacto: newUser.red_social_contacto || "",
-          red_social_nombre: newUser.red_social_nombre || "",
-          email_contacto: newUser.email_contacto || "",
-          observacion_contacto: newUser.observacion_contacto || "",
+          telefono_fijo: formData.telefono_fijo || "",
+          telefono_movil: formData.telefono_movil || "",
+          red_social_contacto: formData.red_social_contacto || "",
+          red_social_nombre: formData.red_social_nombre || "",
+          email_contacto: formData.email_contacto || "",
+          observacion_contacto: formData.observacion_contacto || "",
         },
       };
 
@@ -225,16 +232,17 @@ function AdminUsers() {
 
       const newUserForTable = {
         id: null,
-        nombre: newUser.nombre || "",
-        apellido: newUser.apellido || "",
-        tipo_documento: newUser.tipo_documento || "DNI",
-        nro_documento: newUser.nro_documento || "",
-        fecha_nacimiento: newUser.fecha_nacimiento || "",
-        usuario_id: newUser.usuario_id || null,
+        nombre: formData.nombre || "",
+        apellido: formData.apellido || "",
+        tipo_documento: formData.tipo_documento || "DNI",
+        nro_documento: formData.nro_documento || "",
+        fecha_nacimiento: formData.fecha_nacimiento || "",
+        usuario_id: formData.usuario_id || null,
       };
 
       setUsers((prevUsers) => [...prevUsers, newUserForTable]);
       setNewUser({});
+      setIsDialogOpen(false);
     } catch (error) {
       console.error("Error al crear persona:", error);
       //const message = error?.response?.data?.message || error.message || "Error desconocido";
@@ -243,14 +251,24 @@ function AdminUsers() {
         title: "Error al crear persona",
         description: "",
       });
+      setIsDialogOpen(false);
     }
+  };
+
+  const handleChangePostal = (event) => {
+    const name = event.target.name;
+    const value = event.target.value;
+
+    setNewUser((prevValues) => ({ ...prevValues, [name]: value }));
   };
 
   const handleChange = (event) => {
     const name = event.target.name;
     const value = event.target.value;
 
-    setNewUser((prevValues) => ({ ...prevValues, [name]: value }));
+    if (name !== "codigo_postal") {
+      setNewUser((prevValues) => ({ ...prevValues, [name]: value }));
+    }
   };
 
   // Muestra loader si aún no hay usuarios cargados
@@ -286,7 +304,7 @@ function AdminUsers() {
                 onDelete={handleDelete}
               />
             </div>
-            <Dialog>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline" className={"mt-5"}>
                   {" "}
@@ -302,157 +320,215 @@ function AdminUsers() {
                   </DialogDescription>
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit} className="grid gap-4">
+                <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Datos personales */}
-                  <div className="grid gap-3">
-                    <Label>Nombre</Label>
-                    <Input
-                      name="nombre"
-                      value={newUser.nombre || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>Apellido</Label>
-                    <Input
-                      name="apellido"
-                      value={newUser.apellido || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>Fecha de nacimiento</Label>
-                    <Input
-                      type="date"
-                      name="fecha_nacimiento"
-                      value={newUser.fecha_nacimiento || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>Tipo de documento</Label>
-                    <select
-                      className="border rounded px-2 py-1"
-                      name="tipo_documento"
-                      value={newUser.tipo_documento || ""}
-                      onChange={handleChange}
-                    >
-                      {tiposDocumentos.map((doc, i) => (
-                        <option key={i} value={doc}>
-                          {doc}
-                        </option>
-                      ))}
-                    </select>
-                    <Label>Nro. documento</Label>
-                    <Input
-                      name="nro_documento"
-                      value={newUser.nro_documento || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>ID Usuario</Label>
-                    <Input
-                      name="usuario_id"
-                      value={newUser.usuario_id || ""}
-                      onChange={handleChange}
-                    />
+                  <div className="space-y-4">
+                    <h4 className="text-md font-medium">Datos Personales</h4>
+                    <ResponsiveColumnForm className="gap-4">
+                      <InputValidate
+                        id="nombre"
+                        name="nombre"
+                        type="text"
+                        labelText="Nombre"
+                        value={newUser.nombre || ""}
+                        required
+                      />
+                      
+                      <InputValidate
+                        id="apellido"
+                        name="apellido"
+                        type="text"
+                        labelText="Apellido"
+                        value={newUser.apellido || ""}
+                        required
+                      />
+                    </ResponsiveColumnForm>
+
+                    <ResponsiveColumnForm className="gap-4">
+                      <SimpleSelect
+                        name="tipo_documento"
+                        label="Tipo de documento"
+                        value={newUser.tipo_documento || "DNI"}
+                        placeholder="Selecciona un tipo de documento"
+                        onValueChange={(value) => handleChange({ target: { name: 'tipo_documento', value } })}
+                        required
+                      >
+                        {tiposDocumentos.map((doc, i) => (
+                          <SelectItem key={i} value={doc} >
+                            {doc}
+                          </SelectItem>
+                        ))}
+                      </SimpleSelect>
+
+                      <InputValidate
+                        id="nro_documento"
+                        name="nro_documento"
+                        type="text"
+                        labelText="Nro. documento"
+                        value={newUser.nro_documento || ""}
+                        required
+                      />
+                    </ResponsiveColumnForm>
+
+                    <ResponsiveColumnForm className="gap-4">
+                      <InputValidate
+                        id="fecha_nacimiento"
+                        name="fecha_nacimiento"
+                        type="date"
+                        labelText="Fecha de nacimiento"
+                        value={newUser.fecha_nacimiento || ""}
+                        required
+                      />
+                      
+                      <InputValidate
+                        id="usuario_id"
+                        name="usuario_id"
+                        type="text"
+                        labelText="ID Usuario"
+                        value={newUser.usuario_id || ""}
+                      />
+                    </ResponsiveColumnForm>
                   </div>
 
                   {/* Domicilio */}
-                  <hr />
-                  <div className="grid gap-3">
-                    <Label>Calle</Label>
-                    <Input
-                      name="domicilio_calle"
-                      value={newUser.domicilio_calle || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>Número</Label>
-                    <Input
-                      name="domicilio_numero"
-                      value={newUser.domicilio_numero || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>Piso</Label>
-                    <Input
-                      name="domicilio_piso"
-                      value={newUser.domicilio_piso || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>Dpto</Label>
-                    <Input
-                      name="domicilio_dpto"
-                      value={newUser.domicilio_dpto || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>Referencia</Label>
-                    <Input
-                      name="domicilio_referencia"
-                      value={newUser.domicilio_referencia || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>Código Postal</Label>
-                    <Input
-                      name="codigo_postal"
-                      value={newUser.codigo_postal || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>Localidad</Label>
-                    <select
-                      name="localidad"
-                      value={newUser.localidad || ""}
-                      onChange={handleChange}
-                      className="border rounded px-2 py-1"
-                    >
-                      <option value="">Selecciona una localidad</option>
-                      {localidades.map((loc, index) => (
-                        <option key={`${loc}-${index}`} value={loc}>
-                          {loc}
-                        </option>
-                      ))}
-                    </select>
+                  <hr className="my-6" />
+                  <div className="space-y-4">
+                    <h4 className="text-md font-medium">Domicilio</h4>
+                    <ResponsiveColumnForm className="gap-4">
+                      <InputValidate
+                        id="domicilio_calle"
+                        name="domicilio_calle"
+                        type="text"
+                        labelText="Calle"
+                        value={newUser.domicilio_calle || ""}
+                      />
+
+                      <InputValidate
+                        id="domicilio_numero"
+                        name="domicilio_numero"
+                        type="text"
+                        labelText="Número"
+                        value={newUser.domicilio_numero || ""}
+                      />
+                    </ResponsiveColumnForm>
+
+                    <ResponsiveColumnForm className="gap-4">
+                      <InputValidate
+                        id="domicilio_piso"
+                        name="domicilio_piso"
+                        type="text"
+                        labelText="Piso"
+                        value={newUser.domicilio_piso || ""}
+                      />
+                    </ResponsiveColumnForm>
+                    <ResponsiveColumnForm className="gap-4">
+                      <InputValidate
+                        id="domicilio_dpto"
+                        name="domicilio_dpto"
+                        type="text"
+                        labelText="Departamento"
+                        value={newUser.domicilio_dpto || ""}
+                      />
+
+                      <InputValidate
+                        id="codigo_postal"
+                        name="codigo_postal"
+                        type="text"
+                        labelText="Código Postal"
+                        value={newUser.codigo_postal || ""}
+                        onChange={handleChangePostal}
+                        required
+                      />
+                    </ResponsiveColumnForm>
+
+                    <ResponsiveColumnForm className="gap-4">
+                      <SimpleSelect
+                        name="localidad"
+                        label="Localidad"
+                        value={newUser.localidad || ""}
+                        placeholder="Selecciona una localidad"
+                        onValueChange={(value) => handleChange({ target: { name: 'localidad', value } })}
+                        required
+                      >
+                        {localidades.map((loc, index) => (
+                          <SelectItem key={`${loc}-${index}`} value={loc}>
+                            {loc}
+                          </SelectItem>
+                        ))}
+                      </SimpleSelect>
+                      <div /> {/* Espacio vacío para mantener el diseño de dos columnas */}
+                    </ResponsiveColumnForm>
                   </div>
 
                   {/* Contacto */}
-                  <hr />
-                  <div className="grid gap-3">
-                    <Label>Teléfono fijo</Label>
-                    <Input
-                      name="telefono_fijo"
-                      value={newUser.telefono_fijo || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>Teléfono móvil</Label>
-                    <Input
-                      name="telefono_movil"
-                      value={newUser.telefono_movil || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>Red social</Label>
-                    <select
-                      name="red_social_nombre"
-                      value={newUser.red_social_nombre || ""}
-                      onChange={handleChange}
-                      className="border rounded px-2 py-1"
-                    >
-                      <option value="">Selecciona una red social</option>
-                      {redesSociales.map((rs) => (
-                        <option key={rs} value={rs}>
-                          {rs}
-                        </option>
-                      ))}
-                    </select>
-                    <Label>Su usuario de {newUser.red_social_nombre}</Label>
-                    <Input
-                      name="red_social_contacto"
-                      value={newUser.red_social_contacto || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>Email contacto</Label>
-                    <Input
-                      name="email_contacto"
-                      value={newUser.email_contacto || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>Observación</Label>
-                    <Input
-                      name="observacion_contacto"
-                      value={newUser.observacion_contacto || ""}
-                      onChange={handleChange}
-                    />
+                  <hr className="my-6" />
+                  <div className="space-y-4">
+                    <h4 className="text-md font-medium">Contacto</h4>
+                    <ResponsiveColumnForm className="gap-4">
+                      <InputValidate
+                        id="telefono_fijo"
+                        name="telefono_fijo"
+                        type="tel"
+                        labelText="Teléfono fijo"
+                        value={newUser.telefono_fijo || ""}
+                      />
+
+                      <InputValidate
+                        id="telefono_movil"
+                        name="telefono_movil"
+                        type="tel"
+                        labelText="Teléfono móvil"
+                        value={newUser.telefono_movil || ""}
+                      />
+                    </ResponsiveColumnForm>
+
+                    <ResponsiveColumnForm className="gap-4">
+                      <SimpleSelect
+                        name="red_social_nombre"
+                        label="Red social"
+                        value={newUser.red_social_nombre || ""}
+                        placeholder="Selecciona una red social"
+                        onValueChange={(value) => handleChange({ target: { name: 'red_social_nombre', value } })}
+                      >
+                        {redesSociales.map((rs) => (
+                          <SelectItem key={rs} value={rs}>
+                            {rs}
+                          </SelectItem>
+                        ))}
+                      </SimpleSelect>
+
+                      <InputValidate
+                        id="red_social_contacto"
+                        name="red_social_contacto"
+                        type="text"
+                        labelText={`Usuario de ${newUser.red_social_nombre || 'red social'}`}
+                        value={newUser.red_social_contacto || ""}
+                        disabled={!newUser.red_social_nombre}
+                      />
+                    </ResponsiveColumnForm>
+
+                    <ResponsiveColumnForm className="gap-4">
+                      <InputValidate
+                        id="email_contacto"
+                        name="email_contacto"
+                        type="email"
+                        labelText="Email de contacto"
+                        value={newUser.email_contacto || ""}
+                        required
+                      />
+                      <div /> {/* Espacio vacío para mantener el diseño de dos columnas */}
+                    </ResponsiveColumnForm>
+
+                    <div className="w-full">
+                      <InputValidate
+                        id="observacion_contacto"
+                        name="observacion_contacto"
+                        type="text"
+                        labelText="Observaciones de contacto"
+                        value={newUser.observacion_contacto || ""}
+                        className="w-full"
+                      />
+                    </div>
                   </div>
 
                   <DialogFooter className="pt-4">
@@ -461,9 +537,9 @@ function AdminUsers() {
                         Cancelar
                       </Button>
                     </DialogClose>
-                    <DialogClose asChild>
-                      <Button type="submit">Guardar</Button>
-                    </DialogClose>
+                    <Button type="submit">
+                      Guardar
+                    </Button>
                   </DialogFooter>
                 </form>
               </DialogContent>
@@ -493,9 +569,10 @@ function AdminUsers() {
         editingUser={editingUser}
         setEditingUser={setEditingUser}
         onSubmit={handleEditSubmit}
+        tiposDocumentos={tiposDocumentos}
       />
     </div>
   );
 }
 
-export default AdminUsers;
+export default AdminPersons;

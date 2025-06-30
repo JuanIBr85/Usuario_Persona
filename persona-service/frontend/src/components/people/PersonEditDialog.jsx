@@ -4,12 +4,13 @@ import {
   DialogDescription, DialogFooter, DialogClose
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import InputValidate from "@/components/inputValidate/InputValidate";
+import SimpleSelect from "@/components/SimpleSelect";
+import { SelectItem } from "@/components/ui/select";
 
-function PersonEditDialog({ editingUser, setEditingUser, onSubmit }) {
+function PersonEditDialog({ editingUser, setEditingUser, onSubmit, tiposDocumentos = [] }) {
   if (!editingUser) return null;
-
+  
   return (
     <Dialog open={!!editingUser} onOpenChange={(open) => !open && setEditingUser(null)}>
       <DialogContent className="sm:max-w-[425px]">
@@ -22,47 +23,56 @@ function PersonEditDialog({ editingUser, setEditingUser, onSubmit }) {
         <form onSubmit={onSubmit}>
           <div className="grid gap-4 py-4">
 
-            <div className="grid gap-2">
-              <Label htmlFor="nombre">Nombre</Label>
-              <Input
+            <div className="grid gap-4">
+              <InputValidate
                 id="nombre"
-                value={editingUser.nombre}
+                name="nombre"
+                type="text"
+                labelText="Nombre"
+                value={editingUser.nombre || ""}
                 onChange={(e) => setEditingUser({ ...editingUser, nombre: e.target.value })}
+                required
               />
-            </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="apellido">Apellido</Label>
-              <Input
+              <InputValidate
                 id="apellido"
-                value={editingUser.apellido}
+                name="apellido"
+                type="text"
+                labelText="Apellido"
+                value={editingUser.apellido || ""}
                 onChange={(e) => setEditingUser({ ...editingUser, apellido: e.target.value })}
+                required
               />
-            </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="tipo_documento">Tipo de Documento</Label>
-              <Input
-                id="tipo_documento"
-                value={editingUser.tipo_documento || ""}
-                onChange={(e) => setEditingUser({ ...editingUser, tipo_documento: e.target.value })}
-              />
-            </div>
+              <SimpleSelect
+                name="tipo_documento"
+                label="Tipo de documento"
+                value={editingUser.tipo_documento || "DNI"}
+                placeholder="Selecciona un tipo de documento"
+                onValueChange={(value) => setEditingUser({ ...editingUser, tipo_documento: value })}
+                required
+              >
+                {tiposDocumentos.map((doc, i) => (
+                  <SelectItem key={i} value={doc} >
+                    {doc}
+                  </SelectItem>
+                ))}
+              </SimpleSelect>
 
-            <div className="grid gap-2">
-              <Label htmlFor="nro_documento">Número de Documento</Label>
-              <Input
+              <InputValidate
                 id="nro_documento"
+                name="nro_documento"
+                type="text"
+                labelText="Número de Documento"
                 value={editingUser.nro_documento || ""}
                 onChange={(e) => setEditingUser({ ...editingUser, nro_documento: e.target.value })}
               />
-            </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="fecha_nacimiento">Fecha de Nacimiento</Label>
-              <Input
+              <InputValidate
                 id="fecha_nacimiento"
+                name="fecha_nacimiento"
                 type="date"
+                labelText="Fecha de Nacimiento"
                 value={editingUser.fecha_nacimiento || ""}
                 onChange={(e) => setEditingUser({ ...editingUser, fecha_nacimiento: e.target.value })}
               />
