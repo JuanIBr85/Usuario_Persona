@@ -11,7 +11,7 @@ from app.utils.jwt import (
     crear_token_refresh,
     generar_token_reset,
     crear_token_refresh,
-    create_access_token
+    create_access_token,
 )
 from app.schemas.usuarios_schema import (
     LoginSchema,
@@ -43,6 +43,8 @@ from app.extensions import get_redis
 from common.services.send_message_service import send_message
 from common.utils.response import ResponseStatus
 import logging
+
+
 class UsuarioService(ServicioBase):
     def __init__(self):
         super().__init__(model=Usuario, schema=UsuarioInputSchema())
@@ -70,8 +72,12 @@ class UsuarioService(ServicioBase):
             )
             .first()
         ):
-            return ResponseStatus.FAIL, "El nombre de usuario o email ya están registrados", None, 400
-            
+            return (
+                ResponseStatus.FAIL,
+                "El nombre de usuario o email ya están registrados",
+                None,
+                400,
+            )
 
         # Generar y guardar OTP
         email = data_validada["email_usuario"]
@@ -88,7 +94,8 @@ class UsuarioService(ServicioBase):
         )
 
     def confirmar_registro(
-        self, session: Session, email: str, otp: str, user_agent: str) -> tuple:
+        self, session: Session, email: str, otp: str, user_agent: str
+    ) -> tuple:
         if not verificar_otp_redis(email, otp):
             return ResponseStatus.FAIL, "OTP incorrecto o expirado", None, 400
 
@@ -170,7 +177,12 @@ class UsuarioService(ServicioBase):
         try:
             data_validada = self.schema_login.load(data)
         except ValidationError as error:
-            return ResponseStatus.FAIL, "Error de schema / Bad Request", error.messages, 400
+            return (
+                ResponseStatus.FAIL,
+                "Error de schema / Bad Request",
+                error.messages,
+                400,
+            )
 
         usuario = (
             session.query(Usuario)
@@ -178,16 +190,24 @@ class UsuarioService(ServicioBase):
             .first()
         )
         if not usuario:
-            return ResponseStatus.UNAUTHORIZED, "Email o contraseña incorrecta", None, 401
-
+            return (
+                ResponseStatus.UNAUTHORIZED,
+                "Email o contraseña incorrecta",
+                None,
+                400,
+            )
 
         if not check_password_hash(usuario.password, data_validada["password"]):
-            return ResponseStatus.UNAUTHORIZED, "Email o contraseña incorrecta", None, 401
-            
-        #comprobar si quedo deprecada porque ya no se crea usuario hasta que no se tenga la verificaicon
-        #if not usuario.email_verificado:
-         #   return ResponseStatus.UNAUTHORIZED, "Debe verificar el email antes de loguearse.", None, 401
-            
+            return (
+                ResponseStatus.UNAUTHORIZED,
+                "Email o contraseña incorrecta",
+                None,
+                400,
+            )
+
+        # comprobar si quedo deprecada porque ya no se crea usuario hasta que no se tenga la verificaicon
+        # if not usuario.email_verificado:
+        #   return ResponseStatus.UNAUTHORIZED, "Debe verificar el email antes de loguearse.", None, 400
 
         # Obtener el rol del usuario
         rol_usuario = (
@@ -217,10 +237,17 @@ class UsuarioService(ServicioBase):
             .first()
         )
         try:
-            if not dispositivo_confiable or dispositivo_confiable.fecha_expira.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
+            if not dispositivo_confiable or dispositivo_confiable.fecha_expira.replace(
+                tzinfo=timezone.utc
+            ) < datetime.now(timezone.utc):
                 # Dispositivo nuevo o expirado → enviar email de validación
                 enviar_email_validacion_dispositivo(usuario, user_agent, ip)
-                return ResponseStatus.PENDING, "Verificación de dispositivo enviada al email. Por favor confírmelo.", None, 401,
+                return (
+                    ResponseStatus.PENDING,
+                    "Verificación de dispositivo enviada al email. Por favor confírmelo.",
+                    None,
+                    400,
+                )
 
             else:
                 # Crear token con permisos incluidos
@@ -229,26 +256,26 @@ class UsuarioService(ServicioBase):
                 )
         except Exception as error:
             return ResponseStatus.FAIL, "error de dispositivo ", error.messages, 400
-        
+
         refresh_token, refresh_expires = crear_token_refresh(usuario.id_usuario)
-            # Registrar log de login
+        # Registrar log de login
         session.add(
             UsuarioLog(
-                    usuario_id=usuario.id_usuario,
-                    accion="login",
-                    detalles="El usuario se logueó correctamente",
-                )
+                usuario_id=usuario.id_usuario,
+                accion="login",
+                detalles="El usuario se logueó correctamente",
             )
+        )
         session.commit()
 
         usuario_data = self.schema_out.dump(usuario)
         try:
-                # tomo el identificador unico del token y lo guardo en redis con sus permisos
-                decoded = decode_token(token)
-                get_redis().rpush(decoded["jti"], *permisos_lista)
-                get_redis().expire(decoded["jti"], expires_seconds)
+            # tomo el identificador unico del token y lo guardo en redis con sus permisos
+            decoded = decode_token(token)
+            get_redis().rpush(decoded["jti"], *permisos_lista)
+            get_redis().expire(decoded["jti"], expires_seconds)
         except Exception as e:
-                traceback.print_exc()
+            traceback.print_exc()
 
         usuario_data["token"] = token
         usuario_data["expires_in"] = expires_in
@@ -340,7 +367,7 @@ class UsuarioService(ServicioBase):
 
             traceback.print_exc()
             return ResponseStatus.ERROR, "Error interno al solicitar código", None, 500
-        
+
     def verificar_otp(self, session: Session, email: str, otp: str) -> dict:
 
         resultado = verificar_otp_redis(email, otp)
@@ -353,10 +380,11 @@ class UsuarioService(ServicioBase):
             return ResponseStatus.SUCCESS, "OTP válido", {"reset_token": token}, 200
         except Exception as e:
             import traceback
+
             traceback.print_exc()
             return ResponseStatus.ERROR, "Error interno al solicitar código", None, 500
-        
-    '''def verificar_otp(self, session: Session, email: str, otp: str) -> dict:
+
+    """def verificar_otp(self, session: Session, email: str, otp: str) -> dict:
         try:
             resultado = verificar_otp_redis(email, otp)
             estado = resultado.get("estado")
@@ -390,7 +418,7 @@ class UsuarioService(ServicioBase):
         except Exception as e:
             import traceback
             traceback.print_exc()
-            return ResponseStatus.ERROR, "Error interno al solicitar código", None, 500'''
+            return ResponseStatus.ERROR, "Error interno al solicitar código", None, 500"""
 
     def cambiar_password_con_codigo(
         self, session: Session, data: dict, token: str, email: str
@@ -435,15 +463,15 @@ class UsuarioService(ServicioBase):
     def refresh_token(self, session: Session, usuario_id: int) -> dict:
         usuario = session.query(Usuario).filter_by(id_usuario=usuario_id).first()
         if not usuario:
-             return {
-               "status": ResponseStatus.UNAUTHORIZED,
-               "message": "Usuario no encontrado",
-               "data": None,
-               "code": 401
+            return {
+                "status": ResponseStatus.UNAUTHORIZED,
+                "message": "Usuario no encontrado",
+                "data": None,
+                "code": 400,
             }
 
         rol = (
-           session.query(Rol)
+            session.query(Rol)
             .join(RolUsuario, Rol.id_rol == RolUsuario.id_rol)
             .filter(RolUsuario.id_usuario == usuario.id_usuario)
             .first()
@@ -451,26 +479,26 @@ class UsuarioService(ServicioBase):
         rol_nombre = rol.nombre_rol if rol else "sin_rol"
 
         permisos_query = (
-           session.query(Permiso.nombre_permiso)
-           .join(RolPermiso, Permiso.id_permiso == RolPermiso.permiso_id)
-           .filter(RolPermiso.id_rol == rol.id_rol)
-           .all()
+            session.query(Permiso.nombre_permiso)
+            .join(RolPermiso, Permiso.id_permiso == RolPermiso.permiso_id)
+            .filter(RolPermiso.id_rol == rol.id_rol)
+            .all()
         )
         permisos = [p.nombre_permiso for p in permisos_query]
 
         nuevo_access_token = create_access_token(
-           identity=usuario_id,
-           additional_claims={    
-              "sub": usuario.id_usuario,
-              "email": usuario.email_usuario,
-              "rol": rol_nombre,
-              "permisos": permisos
-           }
+            identity=usuario_id,
+            additional_claims={
+                "sub": usuario.id_usuario,
+                "email": usuario.email_usuario,
+                "rol": rol_nombre,
+                "permisos": permisos,
+            },
         )
 
         return {
-           "status": ResponseStatus.SUCCESS.value,
-           "message": "Nuevo token generado exitosamente.",
-           "data": {"access_token": nuevo_access_token},
-           "code": 200
+            "status": ResponseStatus.SUCCESS.value,
+            "message": "Nuevo token generado exitosamente.",
+            "data": {"access_token": nuevo_access_token},
+            "code": 200,
         }

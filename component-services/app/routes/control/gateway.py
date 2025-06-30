@@ -16,7 +16,7 @@ endpoints_search_service = EndpointsSearchService()
 
 
 @bp.route("/research", methods=["GET"])
-@cp_api_access(is_public=True, limiter=["5 per minute"])
+@cp_api_access(is_public=True, limiter=["2 per minute"])
 def research():
 
     if endpoints_search_service.is_search_in_progress():
@@ -42,7 +42,7 @@ def research():
 
 
 @bp.route("/research_status", methods=["GET"])
-@cp_api_access(is_public=True, limiter=["2 per minute"])
+@cp_api_access(is_public=True, limiter=["5 per minute"])
 def get_research_status():
     return (
         make_response(
