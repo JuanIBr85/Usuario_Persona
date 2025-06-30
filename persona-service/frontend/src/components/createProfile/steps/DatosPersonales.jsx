@@ -51,7 +51,6 @@ const DatosPersonales = ({hidden}) => (
         validationMessage="La fecha de nacimiento es requerida"
         required
       />
-      <div /> {/* Espacio vacío para mantener el diseño de dos columnas */}
     </ResponsiveColumnForm>
   </div>
 );
