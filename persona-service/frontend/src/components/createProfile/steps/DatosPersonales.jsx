@@ -5,19 +5,21 @@ import { SelectItem } from '@/components/ui/select';
 import { TIPOS_DOCUMENTO } from '../constants';
 import ResponsiveColumnForm from '@/components/ResponsiveColumnForm';
 
-const DatosPersonales = () => (
-  <div className="space-y-4">
+const DatosPersonales = ({hidden}) => (
+  <div className="space-y-4" hidden={hidden}>
     <h3 className="text-lg font-medium">Datos Personales</h3>
     <ResponsiveColumnForm>
       <InputValidate
         id="nombre_persona"
         type="text"
         labelText="Nombre"
+        required
       />
       <InputValidate
         id="apellido_persona"
         type="text"
         labelText="Apellido"
+        required
       />
     </ResponsiveColumnForm>
     <ResponsiveColumnForm>
@@ -37,6 +39,7 @@ const DatosPersonales = () => (
           id="num_doc_persona"
           type="text"
           labelText="Nº de documento"
+          required
         />
     </ResponsiveColumnForm>
     <ResponsiveColumnForm>

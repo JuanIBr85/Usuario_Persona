@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import Loading from '@/components/loading/Loading';
-import { PersonaService } from "@/services/personaService";
+import {formJson} from '@/utils/formUtils';
 
 // Importar componentes
 import { ProgressBar } from '@/components/createProfile/ProgressBar';
@@ -21,7 +21,13 @@ function CreatePerfil() {
     const navigate = useNavigate();
     const [currentStep, setCurrentStep] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
+    const refForm = useRef(null);
     
+    const handleSubmit = async () => {
+        refForm.current.checkValidity();
+        const formData = await formJson(refForm.current);
+        console.log(formData);
+    };
     
     const nextStep = () => {
         setCurrentStep(prev => prev + 1);
@@ -32,20 +38,13 @@ function CreatePerfil() {
     };
 
     const renderStep = () => {
-        switch (currentStep) {
-            case 0: // Datos personales
-                return <DatosPersonales />;
-            case 1: // Contacto
-                return <Contacto />;
-            case 2: // Domicilio
-                return <Domicilio />;
-            case 3: // Información adicional
-                return <InfoAdicional />;
-            case 4: // Resumen
-                return <Resumen />;
-            default:
-                return null;
-        }
+        return <>
+            <DatosPersonales hidden={currentStep !== 0}/>
+            <Contacto hidden={currentStep !== 1}/>
+            <Domicilio hidden={currentStep !== 2}/>
+            <InfoAdicional hidden={currentStep !== 3}/>
+            <Resumen hidden={currentStep !== 4}/>
+        </>
     };
 
     return (
@@ -64,10 +63,9 @@ function CreatePerfil() {
                             <Loading />
                         </div>
                     ) : (
-                        <form className="flex flex-col h-full" onSubmit={()=>{}}>
+                        <form className="flex flex-col h-full" ref={refForm}>
                             <div className="space-y-8 flex-1">
                                 <ProgressBar currentStep={currentStep} />
-                                {/* Contenido del paso actual */}
                                 <div className="mb-6">
                                     {renderStep()}
                                 </div>
@@ -88,7 +86,7 @@ function CreatePerfil() {
                         </Button>
                         <Button 
                             type={currentStep < 4 ? "button" : "submit"} 
-                            onClick={currentStep < 4 ? nextStep : null}
+                            onClick={currentStep < 4 ? nextStep : handleSubmit}
                         >
                             {currentStep < 4 ? 'Siguiente' : 'Finalizar'}
                         </Button>

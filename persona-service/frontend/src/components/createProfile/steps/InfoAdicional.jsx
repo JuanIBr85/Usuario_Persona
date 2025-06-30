@@ -5,8 +5,8 @@ import { SelectItem } from '@/components/ui/select';
 import { ESTADOS_CIVILES, OCUPACIONES, ESTUDIOS_ALCANZADOS } from '../constants';
 import ResponsiveColumnForm from '@/components/ResponsiveColumnForm';
 
-const InfoAdicional = () => (
-  <div className="space-y-4">
+const InfoAdicional = ({hidden}) => (
+  <div className="space-y-4" hidden={hidden}>
     <h3 className="text-lg font-medium">Información Adicional</h3>
     <ResponsiveColumnForm>
       {/* Estado Civil */}

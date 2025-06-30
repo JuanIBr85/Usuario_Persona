@@ -3,6 +3,7 @@ import InputValidate from '@/components/inputValidate/InputValidate';
 import { useFormDomicilio } from '@/hooks/profile/useFormDomicillio';
 import SimpleSelect from '@/components/SimpleSelect';
 import { SelectItem } from '@/components/ui/select';
+import ResponsiveColumnForm from '@/components/ResponsiveColumnForm';
 
 const DEFAULT = {
   domicilio_postal: {
@@ -10,14 +11,14 @@ const DEFAULT = {
   }
 }
 
-const Domicilio = () => {
+const Domicilio = ({hidden}) => {
   const {localidades,  codigoPostal, setCodigoPostal, inputCPRef, localidad} = useFormDomicilio(DEFAULT, ()=>{}, 0, ()=>{}, ()=>{});
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" hidden={hidden}>
       <h3 className="text-lg font-medium">Domicilio</h3>
       <div className="grid grid-row-1 md:grid-row-2 gap-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-4 items-end">
+        <ResponsiveColumnForm className="md:grid-cols-6">
           {/* Campo Calle */}
           <InputValidate
             id="domicilio_calle"
@@ -60,9 +61,9 @@ const Domicilio = () => {
             validatePattern="^[a-zA-Z0-9]{1,2}$|^$"
             validateMessage="Ingresa un departamento válido (máximo 2 caracteres)"
           />
-        </div>
+        </ResponsiveColumnForm>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
+        <ResponsiveColumnForm>
           {/* Campo Código Postal */}
           <InputValidate
             id="codigo_postal"
@@ -89,7 +90,7 @@ const Domicilio = () => {
               </SelectItem>
             ))}
           </SimpleSelect>
-        </div>
+        </ResponsiveColumnForm>
         {/* Campo Referencia */}
         <InputValidate
           id="domicilio_referencia"

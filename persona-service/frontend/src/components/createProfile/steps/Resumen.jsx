@@ -1,8 +1,8 @@
 import React from 'react';
 import ResponsiveColumnForm from '@/components/ResponsiveColumnForm';
 
-const Resumen = () => (
-  <div className="space-y-4">
+const Resumen = ({hidden}) => (
+  <div className="space-y-4" hidden={hidden}>
     <h3 className="text-lg font-medium">Resumen de tu perfil</h3>
     <ResponsiveColumnForm>
       <div>

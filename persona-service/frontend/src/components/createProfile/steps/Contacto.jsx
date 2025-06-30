@@ -5,8 +5,8 @@ import { SelectItem } from '@/components/ui/select';
 import { REDES_SOCIALES } from '../constants';
 import ResponsiveColumnForm from '@/components/ResponsiveColumnForm';
 
-const Contacto = () => (
-  <div className="space-y-4">
+const Contacto = ({hidden}) => (
+  <div className="space-y-4" hidden={hidden}>
     <h3 className="text-lg font-medium">Datos de Contacto</h3>
     <ResponsiveColumnForm>
       <InputValidate
