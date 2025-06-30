@@ -420,8 +420,6 @@ function AdminPersons() {
                         labelText="Piso"
                         value={newUser.domicilio_piso || ""}
                       />
-                    </ResponsiveColumnForm>
-                    <ResponsiveColumnForm>
                       <InputValidate
                         id="domicilio_dpto"
                         name="domicilio_dpto"
@@ -429,8 +427,10 @@ function AdminPersons() {
                         labelText="Departamento"
                         value={newUser.domicilio_dpto || ""}
                       />
+                    </ResponsiveColumnForm>
 
-                      <InputValidate
+                    <ResponsiveColumnForm>
+                    <InputValidate
                         id="codigo_postal"
                         name="codigo_postal"
                         type="text"
@@ -439,9 +439,6 @@ function AdminPersons() {
                         onChange={handleChangePostal}
                         required
                       />
-                    </ResponsiveColumnForm>
-
-                    <ResponsiveColumnForm>
                       <SimpleSelect
                         name="localidad"
                         label="Localidad"
