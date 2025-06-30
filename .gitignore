@@ -1,1 +1,5 @@
 auth-service/auth_data/auth.db
+venv2/
+venv/
+*.txt
+

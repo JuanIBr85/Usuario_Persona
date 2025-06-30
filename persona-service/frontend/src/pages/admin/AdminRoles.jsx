@@ -20,6 +20,7 @@ import { Fade } from "react-awesome-reveal";
 
 // Import de services
 import { roleService } from "@/services/roleService";
+import { userService } from "@/services/userService"
 import { permisoService } from "@/services/permisoService";
 
 export default function AdminRoles() {
@@ -33,6 +34,9 @@ export default function AdminRoles() {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false); // Diálogo de confirmación de borrado
   const [roleToDelete, setRoleToDelete] = useState(null); // Rol que se va a eliminar
   const [availablePermissions, setAvailablePermissions] = useState([]); // Permisos disponibles
+  const [selectedUserId, setSelectedUserId] = useState("");
+  const [usuarios, setUsuarios] = useState([]);
+  const [selectedRoleId, setSelectedRoleId] = useState("");
 
   /* --------------------------- Utilidades UI --------------------------- */
   const showError = (message) => {
@@ -201,6 +205,24 @@ export default function AdminRoles() {
       .join(" "); // Une todo en una frase
   }
 
+  const handleAsignar = async () => {
+    if (!selectedUserId || !selectedRoleId) {
+      alert("Seleccioná un usuario y un rol.");
+      return;
+    }
+
+    try {
+      await userService.updateUser(selectedUserId, {
+        roles: [selectedRoleId],
+      });
+      alert("Rol asignado correctamente.");
+    } catch (error) {
+      alert("Error al asignar el rol.");
+      console.log(error);
+    }
+  };
+
+
   /* ------------------------------ Efectos ------------------------------ */
   useEffect(() => {
     // Trae todos los roles
@@ -218,6 +240,16 @@ export default function AdminRoles() {
       } catch (error) {
         showError("Error al cargar los roles desde el servidor.");
         console.error(error);
+      }
+    };
+
+    const fetchUsuarios = async () => {
+      try {
+        const userData = await userService.getAllUsers()
+        console.log(userData);
+        setUsuarios(Array.isArray(userData) ? userData : []);
+      } catch (error) {
+        console.log(error)
       }
     };
 
@@ -240,6 +272,7 @@ export default function AdminRoles() {
 
     fetchPermisos();
     fetchRoles();
+    fetchUsuarios();
   }, []);
 
   const [isTimeout, setIsTimeout] = useState(true);
@@ -248,10 +281,10 @@ export default function AdminRoles() {
   useEffect(() => {
     let intervalId;
     if (roles.length > 0) {
-      // Si hay usuarios, cancelamos el timeout
+      // Si hay roles, cancelamos el timeout
       setIsTimeout(false);
     } else {
-      // Si no hay usuarios y el countdown > 0, arrancamos el intervalo
+      // Si no hay roles y el countdown > 0, arrancamos el intervalo
       if (countdown > 0) {
         intervalId = setInterval(() => {
           setCountdown((prevCount) => prevCount - 1);
@@ -319,8 +352,8 @@ export default function AdminRoles() {
                       <div className="text-xs text-gray-500">
                         {role.permissions?.length > 0
                           ? role.permissions
-                              .map(formatPermissionName)
-                              .join(", ")
+                            .map(formatPermissionName)
+                            .join(", ")
                           : "Sin permisos asignados"}
                       </div>
                     </div>
@@ -407,6 +440,39 @@ export default function AdminRoles() {
                   </div>
                 </Fade>
               )}
+            </div>
+
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex items-center gap-2">
+            <ShieldCheck className="w-5 h-5" />
+            <CardTitle>Asignar Rol a Usuario</CardTitle>
+          </CardHeader>
+
+          <CardContent>
+            <div className="flex flex-col gap-3">
+              <select onChange={(e) => setSelectedUserId((e.target.value))} value={selectedUserId}>
+                <option value="">Seleccionar usuario</option>
+                {console.log(usuarios)}
+                {usuarios?.map((u) => (
+                  <option key={u.id_usuario} value={u.id}>
+                    {u.nombre_usuario} ({u.email_usuario}) ({u.id})
+                  </option>
+                ))}
+              </select>
+
+              <select onChange={(e) => setSelectedRoleId(Number(e.target.value))} value={selectedRoleId}>
+                <option value="">Seleccionar rol</option>
+                {console.log(roles)}
+                {
+                  roles.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.name.charAt(0).toUpperCase() + r.name.slice(1)}
+                    </option>
+                  ))}
+              </select>
+              <Button className={"w-[10rem]"} onClick={handleAsignar}>Asignar Rol</Button>
             </div>
           </CardContent>
         </Card>
