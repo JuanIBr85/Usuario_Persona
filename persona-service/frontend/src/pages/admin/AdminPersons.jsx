@@ -475,7 +475,7 @@ function AdminPersons() {
             </Dialog>
 
             {alert && (
-              <div className="fixed bottom-4 right-4 z-50 w-96">
+              <div className="fixed bottom-16 right-4 z-50 w-96">
                 <Alert 
                   variant={alert.variant || "default"}
                   className="animate-in slide-in-from-right-8 duration-300 bg-white border-black"
