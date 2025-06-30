@@ -136,7 +136,7 @@ function EndpointsResearch() {
   }, []);
 
   return (
-    <div className="p-6 space-y-6 py-30 px-3 md:py-25 md:px-15">
+    <div className="p-6 space-y-6 py-30 px-3 md:py-10 md:px-15">
       {/* Botones inicio/detener investigación */}
       <div className="flex gap-4">
         <Button onClick={startResearch} disabled={loading}>

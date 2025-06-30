@@ -8,22 +8,20 @@ import React, { useState } from "react";
 import RolesBreadcrumb from "@/components/roles/RolesBreadcrumb";
 import RolesDeleteDialog from "@/components/roles/RolesDeleteDialog";
 import RolesErrorDialog from "@/components/roles/RolesErrorDialog";
+import RoleAssignment from "@/components/roles/RoleAssignment";
+import RoleForm from "@/components/roles/RoleForm";
+import RoleList from "@/components/roles/RoleList";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-// Utilidades de UI (botones, inputs, íconos, animaciones)
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Trash2, Plus, Pencil, ShieldCheck, Users } from "lucide-react";
 
 import { Fade } from "react-awesome-reveal";
 
-// Import de services
 import { roleService } from "@/services/roleService";
 import { userService } from "@/services/userService"
 import { permisoService } from "@/services/permisoService";
 
 import { useRoles } from "@/hooks/roles/useRoles";
+import { Button } from "@/components/ui/button";
 
 export default function AdminRoles() {
   /* ------------------------------- Estados ------------------------------ */
@@ -244,184 +242,58 @@ export default function AdminRoles() {
   };
 
 
-  /* ------------------------------ Efectos ------------------------------ */
+  /* ----------------------- Función para abrir formulario ----------------------- */
+const openNewRoleForm = () => {
+  setEditRoleId(null);
+  setNewRoleName("");
+  setSelectedPermissions([]);
+  setShowNewRoleForm(true);
+};
 
   /* ------------------------------- UI ---------------------------------- */
   return (
-    <div className="p-6 space-y-6 py-30 px-3 md:py-25 md:px-15">
+    <div className="p-6 space-y-6 py-30 px-3 md:py-10 md:px-15">
       {/* Animación Fade para suavizar la aparición */}
       <Fade duration={300} triggerOnce>
-        {/* Tarjeta principal */}
-        <Card>
-          <CardHeader className="flex items-center gap-2">
-            <ShieldCheck className="w-5 h-5" />
-            <CardTitle>Roles y Permisos</CardTitle>
-          </CardHeader>
 
-          <CardContent>
-            {isTimeout && (
-              <div class="text-center">
-                <div role="status">
-                  <svg
-                    aria-hidden="true"
-                    class="inline w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-gray-800"
-                    viewBox="0 0 100 101"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                      fill="currentColor"
-                    />
-                    <path
-                      d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                      fill="currentFill"
-                    />
-                  </svg>
-                  <span class="sr-only">Cargando...</span>
-                </div>
-              </div>
-            )}
-            <div className="flex flex-col gap-4">
-              {/* Listado de roles */}
-              {roles.map((role) => (
-                <div
-                  key={role.id}
-                  className="flex items-center gap-4 border p-3 rounded-md shadow-sm"
-                >
-                  <span className="flex-1 flex items-start gap-2">
-                    <Users className="w-4 h-4 mt-1 text-muted-foreground" />
-                    <div>
-                      {role.name}
-                      <div className="text-xs text-gray-500">
-                        {role.permissions?.length > 0
-                          ? role.permissions
-                            .map(formatPermissionName)
-                            .join(", ")
-                          : "Sin permisos asignados"}
-                      </div>
-                    </div>
-                  </span>
+        <RoleList
+          roles={roles}
+          onEdit={handleEditClick}
+          onDelete={openDeleteConfirmDialog}
+          formatPermissionName={formatPermissionName}
+        />
 
-                  {/*Botón de editar*/}
-                  <Button
-                    variant="outline"
-                    onClick={() => handleEditClick(role)}
-                  >
-                    <Pencil className="w-4 h-4" />
-                    Editar
-                  </Button>
+        {!showNewRoleForm && (
+          <div>
+            <Button onClick={openNewRoleForm} className="mb-4">
+              Agregar Rol
+            </Button>
+          </div>
+        )}
 
-                  {/*Botón de borrar*/}
-                  <Button
-                    variant="outline"
-                    onClick={() => openDeleteConfirmDialog(role)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    Borrar
-                  </Button>
-                </div>
-              ))}
+        {showNewRoleForm && (
+          <RoleForm
+            isEditing={!!editRoleId}
+            newRoleName={newRoleName}
+            setNewRoleName={setNewRoleName}
+            availablePermissions={availablePermissions}
+            selectedPermissions={selectedPermissions}
+            onTogglePermission={handlePermissionToggle}
+            onSubmit={editRoleId ? handleSaveChanges : handleAddRole}
+            onCancel={resetForm}
+            formatPermissionName={formatPermissionName}
+          />
+        )}
 
-              {/* Botón para crear un nuevo rol */}
-              <Button
-                variant="outline"
-                className="w-fit mt-4"
-                onClick={() => {
-                  resetForm();
-                  setShowNewRoleForm(true);
-                }}
-              >
-                <Plus className="w-4 h-4 mr-2" /> Agregar otro rol
-              </Button>
-
-              {/* Formulario de creación / edición */}
-              {showNewRoleForm && (
-                <Fade duration={300} triggerOnce>
-                  <div className="mt-6 space-y-4 border p-4 rounded-md">
-                    <Input
-                      placeholder="Nombre del rol"
-                      value={newRoleName}
-                      onChange={(e) => setNewRoleName(e.target.value)}
-                    />
-
-                    {/* Checkboxes de permisos */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      {availablePermissions &&
-                        availablePermissions.map((permission) => (
-                          <label
-                            key={permission.id}
-                            className="flex items-center gap-2"
-                          >
-                            <input
-                              type="checkbox"
-                              checked={selectedPermissions.some(
-                                (p) => p.id === permission.id
-                              )}
-                              onChange={() =>
-                                handlePermissionToggle(permission)
-                              }
-                            />
-                            <span className="text-sm">
-                              {formatPermissionName(permission.name)}
-                            </span>
-                          </label>
-                        ))}
-                    </div>
-
-                    <div className="flex gap-2">
-                      {editRoleId ? (
-                        <Button onClick={handleSaveChanges}>
-                          Guardar Cambios
-                        </Button>
-                      ) : (
-                        <Button onClick={handleAddRole}>Agregar Rol</Button>
-                      )}
-                      <Button variant="outline" onClick={resetForm}>
-                        Cancelar
-                      </Button>
-                    </div>
-                  </div>
-                </Fade>
-              )}
-            </div>
-
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex items-center gap-2">
-            <ShieldCheck className="w-5 h-5" />
-            <CardTitle>Asignar Rol a Usuario</CardTitle>
-          </CardHeader>
-
-          <CardContent>
-            <div className="flex flex-col gap-3">
-              <select onChange={(e) => setSelectedUserId((e.target.value))} value={selectedUserId}>
-                <option value="">Seleccionar usuario</option>
-                {console.log(usuarios)}
-                {usuarios?.map((u) => (
-                  <option key={u.id_usuario} value={u.id}>
-                    {u.nombre_usuario} ({u.email_usuario}) ({u.id})
-                  </option>
-                ))}
-              </select>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {roles.map((role) => (
-                  <label key={role.id} className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={selectedRoleIds.includes(role.id)}
-                      onChange={() => handleRoleToggle(role.id)}
-                    />
-                    <span>{role.name.charAt(0).toUpperCase() + role.name.slice(1)}</span>
-                  </label>
-                ))}
-              </div>
-              <Button className={"w-[10rem]"} onClick={handleAsignar}>Asignar Rol</Button>
-            </div>
-          </CardContent>
-        </Card>
+        <RoleAssignment
+          usuarios={usuarios}
+          selectedUserId={selectedUserId}
+          setSelectedUserId={setSelectedUserId}
+          roles={roles}
+          selectedRoleIds={selectedRoleIds}
+          onToggleRole={handleRoleToggle}
+          onAsignar={handleAsignar}
+        />
 
         {/* Diálogo de confirmación de borrado */}
         <RolesDeleteDialog
