@@ -31,8 +31,8 @@ function AuthContextProvider({ children }) {
 
     const timeLeftToExpire = () => (new Date(authData.user.expires_in) - new Date()) / 1000;
 
-    // Función centralizada para limpiar todos los timers
-    const cleanupTimers = useCallback(() => {
+    // Función para limpiar todos los timers
+    const cleanupTimers = () => {
         if (checkTokenInterval) {
             clearInterval(checkTokenInterval);
             setCheckTokenInterval(null);
@@ -41,7 +41,7 @@ function AuthContextProvider({ children }) {
             clearTimeout(logoutTimeout);
             setLogoutTimeout(null);
         }
-    }, [checkTokenInterval, logoutTimeout]);
+    };
 
     // Función mejorada de logout
     const toLogout = () => {
@@ -56,12 +56,12 @@ function AuthContextProvider({ children }) {
     }
 
     // Función para verificar si el usuario está en una ruta de autenticación
-    const isAuthRoute = useCallback(() => {
+    const isAuthRoute = () => {
         return window.location.pathname.includes("/auth/");
-    }, []);
+    };
 
     // Función para verificar si el token es válido
-    const isTokenValid = useCallback(() => {
+    const isTokenValid = () => {
         if (!authData.user?.expires_in) {
             return false;
         }
@@ -70,10 +70,10 @@ function AuthContextProvider({ children }) {
         const expirationDate = new Date(authData.user.expires_in);
 
         return now <= expirationDate;
-    }, [authData.user?.expires_in]);
+    }   ;
 
     // Función para mostrar dialog de sesión expirada
-    const showSessionExpiredDialog = useCallback(() => {
+    const showSessionExpiredDialog = () => {
         // Limpiar cualquier dialog anterior
         setDialog(null);
 
@@ -92,10 +92,10 @@ function AuthContextProvider({ children }) {
             timeout: timeout,
             action: () => navigate('/auth/login')
         });
-    }, [cleanupTimers, toLogout, navigate]);
+    };
 
     // Función para mostrar dialog de usuario no autorizado
-    const showUnauthorizedDialog = useCallback((message = "No tienes permiso para acceder a esta página") => {
+    const showUnauthorizedDialog = (message = "No tienes permiso para acceder a esta página") => {
         // Limpiar cualquier dialog anterior
         setDialog(null);
 
@@ -114,10 +114,10 @@ function AuthContextProvider({ children }) {
             timeout: timeout,
             action: () => navigate('/auth/login')
         });
-    }, [cleanupTimers, toLogout, navigate]);
+    };
 
     // Función principal de verificación de token
-    const checkToken = useCallback(() => {
+    const checkToken = () => {
         // Si está en ruta de autenticación, limpiar flags y no verificar
         if (isAuthRoute()) {
             sessionStorage.removeItem("unauthorized_401");
@@ -142,31 +142,28 @@ function AuthContextProvider({ children }) {
             setDialog(null);
             cleanupTimers();
         }
-    }, [isAuthRoute, isTokenValid, showSessionExpiredDialog, showUnauthorizedDialog, dialog, cleanupTimers]);
+    };
 
     // Función para verificación inicial al cargar la aplicación
-    const performInitialCheck = useCallback(() => {
-        if (isAuthRoute()) {
-            // Eliminar email para reset si sale de la sección de autenticación
-            sessionStorage.removeItem("email_para_reset");
-            return;
-        }
+    const performInitialCheck = () => {
+        if (isAuthRoute()) return;
 
+        // Limpiar email para reset
+        sessionStorage.removeItem("email_para_reset");
+        
         // Si no está en ruta de auth y no tiene token válido, mostrar dialog
         if (!isTokenValid()) {
             showUnauthorizedDialog("Inicia sesión para ingresar");
             return;
         }
 
-        // Limpiar email para reset
-        sessionStorage.removeItem("email_para_reset");
-    }, [isAuthRoute, isTokenValid, showUnauthorizedDialog]);
+    };
 
     useEffect(() => {
         // Realizar verificación inicial
         performInitialCheck();
 
-        // Configurar verificación periódica (cada 30 segundos en lugar de 2)
+        // Configurar verificación periódica 
         const interval = setInterval(checkToken, 30000);
         setCheckTokenInterval(interval);
 
