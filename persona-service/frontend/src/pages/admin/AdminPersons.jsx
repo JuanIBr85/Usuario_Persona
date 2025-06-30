@@ -263,7 +263,7 @@ function AdminUsers() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="w-5 h-5 text-primary" />
-              Usuarios Registrados
+              Personas Cargadas
             </CardTitle>
           </CardHeader>
           <CardContent>
