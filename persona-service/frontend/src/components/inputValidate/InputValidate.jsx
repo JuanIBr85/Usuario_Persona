@@ -11,11 +11,11 @@ import { useEffect } from 'react'
  * @param {string} placeholder - Texto que se muestra como marcador de posición dentro del input.
  * @param {string} labelText - Texto de la etiqueta que se muestra encima del input.
  * @param {string} validatePattern - Expresión regular usada para validar el contenido del input.
- * @param {string} validateMessage - Mensaje que se mostrará debajo del input si la validación falla.
+ * @param {string} validationMessage - Mensaje que se mostrará debajo del input si la validación falla.
  * @param {Object} props - Props adicionales que serán pasadas al componente <Input>.
  * @param {string} containerClassName - Clases adicionales para el contenedor del input.
  */
-export default function InputValidate({ id, type, placeholder, labelText, validatePattern, validateMessage, value, containerClassName, onChange, ...props }) {
+export default function InputValidate({ id, type, placeholder, labelText, validatePattern, validationMessage, value, containerClassName, onChange, required, ...props }) {
     //Este estado sirve para indicar si hubo un error en la validacion del input
     const [error, setError] = React.useState(false)
     //Este estado sirve para indicar si debe o no ocultar la contraseña
@@ -49,7 +49,7 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
 
     return (
         <div className={`grid w-full items-center gap-1.5 ${containerClassName}`}>
-            <Label htmlFor={id}>{labelText}</Label>
+            <Label htmlFor={id}>{labelText}{required && <span className="text-destructive">*</span>}</Label>
             <div className="relative">
                 <Input
                     onInvalid={handleInvalid}
@@ -59,7 +59,9 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
                     name={id}
                     placeholder={placeholder}
                     pattern={validatePattern}
+                    data-validation-message={validationMessage}
                     value={internalValue}
+                    required={required}
                     {...props} />
                 {//Si el input es de tipo contraseña mostrara un boton para ver/ocultar la contraseña
                     type === "password" ? <a className="absolute right-2 top-1.5 text-gray-500 hover:text-gray-700 cursor-pointer select-none" onClick={() => setShowPassword(v => !v)}>@</a> : undefined
@@ -67,7 +69,7 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
             </div>
             
             {//Si ocurre un error en la validacion del input mostrara el error debajo del input
-                error ? <p className="text-destructive text-xs ml-2">{validateMessage}</p> : undefined
+                error ? <p className="text-destructive text-xs ml-2">{validationMessage}</p> : undefined
             }
 
         </div>

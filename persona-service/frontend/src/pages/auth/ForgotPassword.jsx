@@ -72,7 +72,7 @@ function ForgotPassword() {
             type="email"
             placeholder="Email"
             labelText="Email"
-            validateMessage="Email inválido"
+            validationMessage="Email inválido"
             required
           />
           <Button variant="link" asChild className="p-0">

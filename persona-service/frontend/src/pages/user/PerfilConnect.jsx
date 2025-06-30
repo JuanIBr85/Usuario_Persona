@@ -217,7 +217,7 @@ function PerfilConnect() {
                                             type="date"
                                             placeholder="Ingresa tu fecha de nacimiento"
                                             labelText="Fecha de nacimiento"
-                                            validateMessage="La fecha de nacimiento es requerida"
+                                            validationMessage="La fecha de nacimiento es requerida"
                                             required
                                         />
                                         <InputValidate
@@ -227,7 +227,7 @@ function PerfilConnect() {
                                             placeholder="Ingresa tu teléfono móvil"
                                             labelText="Teléfono móvil"
                                             validatePattern="^[\+]?[0-9\-\s\(\)]{10,}$"
-                                            validateMessage="Ingresa un número de teléfono válido"
+                                            validationMessage="Ingresa un número de teléfono válido"
                                             required
                                         />
                                     </div>

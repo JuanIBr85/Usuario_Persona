@@ -48,7 +48,7 @@ const DatosPersonales = ({hidden}) => (
         type="date"
         placeholder="Ingresa tu fecha de nacimiento"
         labelText="Fecha de nacimiento"
-        validateMessage="La fecha de nacimiento es requerida"
+        validationMessage="La fecha de nacimiento es requerida"
         required
       />
       <div /> {/* Espacio vacío para mantener el diseño de dos columnas */}

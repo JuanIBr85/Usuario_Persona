@@ -16,7 +16,7 @@ const Contacto = ({hidden}) => (
         placeholder="Ingresa tu teléfono fijo"
         labelText="Teléfono Fijo"
         validatePattern="^[\+]?[0-9\-\s\(\)]{10,}$"
-        validateMessage="Ingresa un número de teléfono válido"
+        validationMessage="Ingresa un número de teléfono válido"
       />
       <InputValidate
         id="telefono_movil"
@@ -25,7 +25,7 @@ const Contacto = ({hidden}) => (
         placeholder="Ingresa tu teléfono móvil"
         labelText="Teléfono móvil"
         validatePattern="^[\+]?[0-9\-\s\(\)]{10,}$"
-        validateMessage="Ingresa un número de teléfono válido"
+        validationMessage="Ingresa un número de teléfono válido"
         required
       />
     </ResponsiveColumnForm>
@@ -58,7 +58,7 @@ const Contacto = ({hidden}) => (
       type="email"
       labelText="Email de contacto"
       placeholder="Ingresa el email de contacto"
-      validateMessage="Email inválido"
+      validationMessage="Email inválido"
       required
     />
     <InputValidate

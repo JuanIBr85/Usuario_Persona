@@ -38,7 +38,7 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id }
                     labelText="Calle"
                     value={domicilio?.domicilio_calle || ''}
                     validatePattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s,.]{2,50}$"
-                    validateMessage="Ingresa un nombre de calle válido (2-50 caracteres, solo letras, espacios, puntos y comas)"
+                    validationMessage="Ingresa un nombre de calle válido (2-50 caracteres, solo letras, espacios, puntos y comas)"
                     containerClassName="sm:col-span-3"
                     required
                 />
@@ -51,7 +51,7 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id }
                     labelText="Número"
                     value={domicilio?.domicilio_numero || ''}
                     validatePattern="^[0-9]{1,9}[a-zA-Z]?$"
-                    validateMessage="Ingresa un número válido (ej: 1234, 123A)"
+                    validationMessage="Ingresa un número válido (ej: 1234, 123A)"
                     required
                 />
 
@@ -63,7 +63,7 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id }
                     labelText="Piso"
                     value={domicilio?.domicilio_piso || ''}
                     validatePattern="^[0-9]{1,3}$|^$"
-                    validateMessage="Ingresa un piso válido (máximo 3 dígitos)"
+                    validationMessage="Ingresa un piso válido (máximo 3 dígitos)"
                 />
 
                 {/* Campo Departamento (opcional) */}
@@ -74,7 +74,7 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id }
                     labelText="Departamento"
                     value={domicilio?.domicilio_dpto || ''}
                     validatePattern="^[a-zA-Z0-9]{1,2}$|^$"
-                    validateMessage="Ingresa un departamento válido (máximo 2 caracteres)"
+                    validationMessage="Ingresa un departamento válido (máximo 2 caracteres)"
                 />
             </div>
 
@@ -89,7 +89,7 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id }
                     ref={inputCPRef}
                     onChange={(e) => setCodigoPostal(e.target.value)}
                     validatePattern="^(?:[A-Za-z]\d{4}[A-Za-z]{3}|\d{4})$"
-                    validateMessage="Ingrese CP (4 dígitos) o CPA (1 letra + 4 dígitos + 3 letras, todo en mayúsculas)"
+                    validationMessage="Ingrese CP (4 dígitos) o CPA (1 letra + 4 dígitos + 3 letras, todo en mayúsculas)"
                     required
                 />
                 <SimpleSelect
@@ -114,7 +114,7 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id }
                 labelText="Referencia"
                 value={domicilio?.domicilio_referencia || ''}
                 validatePattern=".{0,200}"
-                validateMessage="Máximo 200 caracteres"
+                validationMessage="Máximo 200 caracteres"
             />
 
             <div className="flex flex-col gap-3 pt-4">

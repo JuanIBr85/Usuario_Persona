@@ -54,7 +54,7 @@ export default function FormContacto({
             labelText="Teléfono Fijo"
             value={contacto?.telefono_fijo || ""}
             validatePattern="^[\+]?[0-9\-\s\(\)]{10,}$"
-            validateMessage="Ingresa un número de teléfono válido"
+            validationMessage="Ingresa un número de teléfono válido"
           />
           <InputValidate
             id="telefono_movil"
@@ -64,7 +64,7 @@ export default function FormContacto({
             labelText="Teléfono móvil"
             value={contacto?.telefono_movil || ""}
             validatePattern="^[\+]?[0-9\-\s\(\)]{10,}$"
-            validateMessage="Ingresa un número de teléfono válido"
+            validationMessage="Ingresa un número de teléfono válido"
             required
           />
         </div>
@@ -99,7 +99,7 @@ export default function FormContacto({
           type="email"
           labelText="Email de contacto"
           placeholder="Ingresa el email de contacto"
-          validateMessage="Email inválido"
+          validationMessage="Email inválido"
           value={contacto?.email_contacto || ""}
           required
         />

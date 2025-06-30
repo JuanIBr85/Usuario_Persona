@@ -26,7 +26,7 @@ const Domicilio = ({hidden}) => {
             placeholder="Ingresa el nombre de la calle"
             labelText="Calle"
             validatePattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s,.]{2,50}$"
-            validateMessage="Ingresa un nombre de calle válido (2-50 caracteres, solo letras, espacios, puntos y comas)"
+            validationMessage="Ingresa un nombre de calle válido (2-50 caracteres, solo letras, espacios, puntos y comas)"
             containerClassName="sm:col-span-3"
             required
           />
@@ -38,7 +38,7 @@ const Domicilio = ({hidden}) => {
             placeholder="Número de domicilio"
             labelText="Número"
             validatePattern="^[0-9]{1,9}[a-zA-Z]?$"
-            validateMessage="Ingresa un número válido (ej: 1234, 123A)"
+            validationMessage="Ingresa un número válido (ej: 1234, 123A)"
             required
           />
 
@@ -49,7 +49,7 @@ const Domicilio = ({hidden}) => {
             placeholder="Piso (opcional)"
             labelText="Piso"
             validatePattern="^[0-9]{1,3}$|^$"
-            validateMessage="Ingresa un piso válido (máximo 3 dígitos)"
+            validationMessage="Ingresa un piso válido (máximo 3 dígitos)"
           />
 
           {/* Campo Departamento (opcional) */}
@@ -59,7 +59,7 @@ const Domicilio = ({hidden}) => {
             placeholder="Departamento (opcional)"
             labelText="Departamento"
             validatePattern="^[a-zA-Z0-9]{1,2}$|^$"
-            validateMessage="Ingresa un departamento válido (máximo 2 caracteres)"
+            validationMessage="Ingresa un departamento válido (máximo 2 caracteres)"
           />
         </ResponsiveColumnForm>
 
@@ -74,7 +74,7 @@ const Domicilio = ({hidden}) => {
             ref={inputCPRef}
             onChange={(e) => setCodigoPostal(e.target.value)}
             validatePattern="^(?:[A-Za-z]\d{4}[A-Za-z]{3}|\d{4})$"
-            validateMessage="Ingrese CP (4 dígitos) o CPA (1 letra + 4 dígitos + 3 letras, todo en mayúsculas)"
+            validationMessage="Ingrese CP (4 dígitos) o CPA (1 letra + 4 dígitos + 3 letras, todo en mayúsculas)"
             required
           />
           <SimpleSelect
@@ -98,7 +98,7 @@ const Domicilio = ({hidden}) => {
           placeholder="Referencia (ej: Entre Calles X e Y)"
           labelText="Referencia"
           validatePattern=".{0,200}"
-          validateMessage="Máximo 200 caracteres"
+          validationMessage="Máximo 200 caracteres"
         />
       </div>
     </div>

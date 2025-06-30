@@ -98,7 +98,7 @@ const ResetPassword = () => {
             placeholder="Nueva contraseña"
             labelText="Nueva contraseña"
             validatePattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$"
-            validateMessage="Debe tener al menos 8 caracteres, mayúscula, minúscula, número y un símbolo."
+            validationMessage="Debe tener al menos 8 caracteres, mayúscula, minúscula, número y un símbolo."
             required
           />
           {/* Campo para confirmar contraseña */}
@@ -108,7 +108,7 @@ const ResetPassword = () => {
             type="password"
             placeholder="Confirmar contraseña"
             labelText="Confirmar contraseña"
-            validateMessage="Debe repetir la contraseña."
+            validationMessage="Debe repetir la contraseña."
             required
           />
           {/* Botón para enviar el formulario */}

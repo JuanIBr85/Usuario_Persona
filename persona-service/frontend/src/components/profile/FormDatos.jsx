@@ -89,7 +89,7 @@ export default function FormDatos({
             onChange={(e) =>
               handleChange("fecha_nacimiento_persona", e.target.value)
             }
-            validateMessage="La fecha de nacimiento es requerida"
+            validationMessage="La fecha de nacimiento es requerida"
             required
           />
           <InputValidate
