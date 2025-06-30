@@ -478,7 +478,7 @@ function AdminPersons() {
               <div className="fixed bottom-4 right-4 z-50 w-96">
                 <Alert 
                   variant={alert.variant || "default"}
-                  className="animate-in slide-in-from-right-8 duration-300"
+                  className="animate-in slide-in-from-right-8 duration-300 bg-white border-black"
                 >
                   <AlertTitle>{alert.title}</AlertTitle>
                   {alert.description && (
