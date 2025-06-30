@@ -3,7 +3,7 @@ import { Fade } from "react-awesome-reveal";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Plus } from "lucide-react";
+import { Users, Plus, X } from "lucide-react";
 
 import {
   Dialog,
@@ -18,159 +18,139 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import InputValidate from "@/components/inputValidate/InputValidate";
+import SimpleSelect from "@/components/SimpleSelect";
 import PersonFilter from "@/components/people/PersonFilter";
 import Loading from "@/components/loading/Loading";
 
 import { PersonaService } from "@/services/personaService";
-import { usePersonas } from "@/hooks/people/usePersonas";
-
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import PersonTable from "@/components/people/PersonTable";
 import PersonEditDialog from "@/components/people/PersonEditDialog";
 import PersonBreadcrumb from "@/components/people/PersonBreadcrumb";
-
+import { SelectItem } from "@/components/ui/select";
+import ResponsiveColumnForm from "@/components/ResponsiveColumnForm";
+import { formSubmitJson } from "@/utils/formUtils";
+import { usePersonas } from "@/hooks/people/usePersonas";
 /**
  * Componente AdminUsers
- * =====================
- * Página administrativa para la gestión de personas.
- * Permite visualizar, filtrar, crear, editar y eliminar usuarios.
+ * ---------------------
+ * Este componente muestra una lista de usuarios registrados,
+ * con funcionalidades para filtrarlos, editar sus datos,
+ * ver detalles y eliminarlos.
  *
- * Usa el hook `usePersonas` para centralizar la carga de datos desde el backend.
+ * Estado:
+ * - editingUser: usuario que se está editando (null si no hay ninguno).
+ * - users: lista completa de usuarios obtenida desde el servicio.
+ * - mostrarFiltroAvanzado: controla si se muestra o no el filtro avanzado.
+ * - filtro: texto para filtrar usuarios por nombre o email.
  *
- * Estados locales:
- * - `newUser`: objeto que representa los datos del formulario de nueva persona.
- * - `editingUser`: persona seleccionada para edición.
- * - `mostrarFiltroAvanzado`: alterna el filtro avanzado en la UI.
- * - `filtro`: cadena de texto para buscar personas.
- * - `alert`: objeto de error para mostrar en caso de fallas.
+ * Efectos:
+ * - Al montar, carga la lista completa de usuarios desde PersonaService.
+ *
+ * Funcionalidades principales:
+ * - Filtrado dinámico de usuarios según texto ingresado.
+ * - Eliminación de usuarios con actualización inmediata de la lista.
+ * - Navegación a pantalla de detalles de un usuario.
+ * - Edición rápida de usuario mediante diálogo modal.
+ *
+ * Componentes hijos usados:
+ * - PersonFilter: formulario para filtrar usuarios.
+ * - PersonTable: tabla que muestra la lista filtrada con botones de acción.
+ * - PersonEditDialog: diálogo modal para editar datos de usuario.
+ * - PersonBreadcrumb: barra de navegación breadcrumb.
  */
-function AdminUsers() {
+function AdminPersons() {
   const navigate = useNavigate();
-  // Hook que centraliza toda la carga de datos relacionada con personas
+  const [newUser, setNewUser] = useState({});
+  const [editingUser, setEditingUser] = useState(null);
+  const [mostrarFiltroAvanzado, setMostrarFiltroAvanzado] = useState(false);
+  const [filtro, setFiltro] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  // Usar el hook usePersonas para manejar la lógica de personas
   const {
     users,
     setUsers,
     tiposDocumentos,
     redesSociales,
     localidades,
+    alert,
+    setAlert,
     fetchLocalidadesPorCodigoPostal,
+    handleDelete,
+    handleEditSubmit: handleEditSubmitHook,
+    setLocalidades,
   } = usePersonas();
 
-  const [newUser, setNewUser] = useState({});
-  const [editingUser, setEditingUser] = useState(null);
-  const [mostrarFiltroAvanzado, setMostrarFiltroAvanzado] = useState(false);
-  const [filtro, setFiltro] = useState("");
-  const [alert, setAlert] = useState(null);
-
-  /**
- * Efecto que se dispara cuando cambia el código postal del formulario nuevo.
- * Si es válido, busca localidades asociadas a ese código.
- */
-
+  // Efecto para cargar localidades cuando cambia el código postal
   useEffect(() => {
-    fetchLocalidadesPorCodigoPostal(newUser.codigo_postal);
+    if (newUser.codigo_postal?.length >= 4) {
+      fetchLocalidadesPorCodigoPostal(newUser.codigo_postal);
+    } else {
+      setLocalidades([]);
+    }
   }, [newUser.codigo_postal]);
 
-
- /**
-   * Filtra la lista de usuarios según el texto ingresado.
-   * Se filtra por nombre, apellido o número de documento.
-   */  const usuariosFiltrados = users.filter((user) => {
+  // Filtra usuarios según texto en nombre, apellido o documento (insensible a mayúsculas)
+  const usuariosFiltrados = users.filter((user) => {
     const textoMatch =
       `${user.nombre} ${user.apellido}`
         .toLowerCase()
         .includes(filtro.toLowerCase()) ||
-      user.nro_documento.toLowerCase().includes(filtro.toLowerCase());
+      (user.nro_documento && user.nro_documento.toLowerCase().includes(filtro.toLowerCase()));
     return textoMatch;
   });
-  console.log("usuariosFiltrados", usuariosFiltrados);
-  /**
-   * Elimina una persona del backend y la remueve del estado local.
-   * @param {number} id - ID de la persona a eliminar.
-   */
-  const handleDelete = (id) => {
-    PersonaService.borrar(id)
-      .then(() => {
-        setUsers(users.filter((user) => user.id !== id));
-      })
-      .catch((err) => {
-        console.error("Error eliminando usuario:", err);
-      });
-  };
 
   /**
-   * Redirige a la vista de detalles de una persona.
-   * @param {number} id - ID de la persona a ver.
+   * Navega a la pantalla de detalles del usuario.
+   * @param {number} id - ID del usuario
    */
   const handleSeeDetails = (id) => {
     navigate(`/persondetails/${id}`);
   };
 
   /**
-   * Envía el formulario de edición de persona al backend.
-   * Si tiene éxito, actualiza la persona en el estado local.
-   * @param {Event} e - Evento submit del formulario.
+   * Maneja el envío del formulario de edición.
+   * @param {Event} e - Evento submit del formulario
    */
   const handleEditSubmit = async (e) => {
-    e.preventDefault();
-
-    // Construye el body con todos los campos para enviar al backend
-    const body = {
-      nombre_persona: editingUser.nombre || "",
-      apellido_persona: editingUser.apellido || "",
-      tipo_documento: editingUser.tipo_documento || "DNI",
-      num_doc_persona: editingUser.nro_documento || "",
-      fecha_nacimiento_persona: editingUser.fecha_nacimiento || "",
-      usuario_id: editingUser.usuario_id || null,
-    };
-
-    try {
-      await PersonaService.editar(editingUser.id, body);
-
-      // Actualiza el estado local solo si la petición fue exitosa
-      setUsers(users.map((u) => (u.id === editingUser.id ? editingUser : u)));
+    const result = await handleEditSubmitHook(e, editingUser);
+    if (result?.success) {
       setEditingUser(null);
-    } catch (err) {
-      console.error("Error actualizando persona:", err);
-
-      //const message = err?.response?.data?.message || err.message || "Error desconocido";
-      setAlert({
-        title: "Error al actualizar persona",
-        description: "",
-      });
     }
-    console.log("message", message);
   };
 
   const handleSubmit = async (e) => {
+    const formData = await formSubmitJson(e);
     e.preventDefault();
 
     try {
       const body = {
-        nombre_persona: newUser.nombre || "",
-        apellido_persona: newUser.apellido || "",
-        fecha_nacimiento_persona: newUser.fecha_nacimiento || "",
-        tipo_documento: newUser.tipo_documento || "DNI",
-        num_doc_persona: newUser.nro_documento || "",
-        usuario_id: newUser.usuario_id || null,
+        nombre_persona: formData.nombre || "",
+        apellido_persona: formData.apellido || "",
+        fecha_nacimiento_persona: formData.fecha_nacimiento || "",
+        tipo_documento: formData.tipo_documento || "DNI",
+        num_doc_persona: formData.nro_documento || "",
+        usuario_id: formData.usuario_id || null,
         domicilio: {
-          domicilio_calle: newUser.domicilio_calle || "",
-          domicilio_numero: newUser.domicilio_numero || "",
-          domicilio_piso: newUser.domicilio_piso || "",
-          domicilio_dpto: newUser.domicilio_dpto || "",
-          domicilio_referencia: newUser.domicilio_referencia || "",
+          domicilio_calle: formData.domicilio_calle || "",
+          domicilio_numero: formData.domicilio_numero || "",
+          domicilio_piso: formData.domicilio_piso || "",
+          domicilio_dpto: formData.domicilio_dpto || "",
+          domicilio_referencia: formData.domicilio_referencia || "",
           codigo_postal: {
-            codigo_postal: newUser.codigo_postal || "",
-            localidad: newUser.localidad || "",
+            codigo_postal: formData.codigo_postal || "",
+            localidad: formData.localidad || "",
           },
         },
         contacto: {
-          telefono_fijo: newUser.telefono_fijo || "",
-          telefono_movil: newUser.telefono_movil || "",
-          red_social_contacto: newUser.red_social_contacto || "",
-          red_social_nombre: newUser.red_social_nombre || "",
-          email_contacto: newUser.email_contacto || "",
-          observacion_contacto: newUser.observacion_contacto || "",
+          telefono_fijo: formData.telefono_fijo || "",
+          telefono_movil: formData.telefono_movil || "",
+          red_social_contacto: formData.red_social_contacto || "",
+          red_social_nombre: formData.red_social_nombre || "",
+          email_contacto: formData.email_contacto || "",
+          observacion_contacto: formData.observacion_contacto || "",
         },
       };
 
@@ -178,16 +158,17 @@ function AdminUsers() {
 
       const newUserForTable = {
         id: null,
-        nombre: newUser.nombre || "",
-        apellido: newUser.apellido || "",
-        tipo_documento: newUser.tipo_documento || "DNI",
-        nro_documento: newUser.nro_documento || "",
-        fecha_nacimiento: newUser.fecha_nacimiento || "",
-        usuario_id: newUser.usuario_id || null,
+        nombre: formData.nombre || "",
+        apellido: formData.apellido || "",
+        tipo_documento: formData.tipo_documento || "DNI",
+        nro_documento: formData.nro_documento || "",
+        fecha_nacimiento: formData.fecha_nacimiento || "",
+        usuario_id: formData.usuario_id || null,
       };
 
       setUsers((prevUsers) => [...prevUsers, newUserForTable]);
       setNewUser({});
+      setIsDialogOpen(false);
     } catch (error) {
       console.error("Error al crear persona:", error);
       //const message = error?.response?.data?.message || error.message || "Error desconocido";
@@ -196,21 +177,31 @@ function AdminUsers() {
         title: "Error al crear persona",
         description: "",
       });
+      setIsDialogOpen(false);
     }
   };
 
-  const handleChange = (event) => {
+  const handleChangePostal = (event) => {
     const name = event.target.name;
     const value = event.target.value;
 
     setNewUser((prevValues) => ({ ...prevValues, [name]: value }));
   };
 
+  const handleChange = (event) => {
+    const name = event.target.name;
+    const value = event.target.value;
+
+    if (name !== "codigo_postal") {
+      setNewUser((prevValues) => ({ ...prevValues, [name]: value }));
+    }
+  };
+
   // Muestra loader si aún no hay usuarios cargados
   if (!users) return <Loading />;
 
   return (
-    <div className="p-6 space-y-6 py-25 px-3 md:py-10 md:px-15">
+    <div className="p-6 space-y-6 py-30 px-3 md:py-25 md:px-15">
       <Fade duration={300} triggerOnce>
         <Card>
           <CardHeader>
@@ -234,12 +225,15 @@ function AdminUsers() {
             <div className="overflow-auto border p-3 rounded-md shadow-sm">
               <PersonTable
                 users={usuariosFiltrados}
-                onEdit={setEditingUser}
-                onSeeDetails={handleSeeDetails}
+                onEdit={(user) => {
+                  setEditingUser(user);
+                  setAlert(null); // Limpiar alertas previas
+                }}
                 onDelete={handleDelete}
+                onSeeDetails={handleSeeDetails}
               />
             </div>
-            <Dialog>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline" className={"mt-5"}>
                   {" "}
@@ -255,159 +249,215 @@ function AdminUsers() {
                   </DialogDescription>
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit} className="grid gap-4">
+                <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Datos personales */}
-                  <div className="grid gap-3">
-                    <Label>Nombre</Label>
-                    <Input
-                      name="nombre"
-                      value={newUser.nombre || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>Apellido</Label>
-                    <Input
-                      name="apellido"
-                      value={newUser.apellido || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>Fecha de nacimiento</Label>
-                    <Input
-                      type="date"
-                      name="fecha_nacimiento"
-                      value={newUser.fecha_nacimiento || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>Tipo de documento</Label>
-                    <select
-                      className="border rounded px-2 py-1"
-                      name="tipo_documento"
-                      value={newUser.tipo_documento || ""}
-                      onChange={handleChange}
-                    >
-                      {tiposDocumentos.map((doc, i) => (
-                        <option key={i} value={doc}>
-                          {doc}
-                        </option>
-                      ))}
-                    </select>
-                    <Label>Nro. documento</Label>
-                    <Input
-                      name="nro_documento"
-                      value={newUser.nro_documento || ""}
-                      onChange={handleChange}
-                    />
-                    {/* 
-                    <Label>ID Usuario</Label>
-                    <Input
-                      name="usuario_id"
-                      value={newUser.usuario_id || ""}
-                      onChange={handleChange}
-                    />
-                     */}
+                  <div className="space-y-4">
+                    <h4 className="text-md font-medium">Datos Personales</h4>
+                    <ResponsiveColumnForm>
+                      <InputValidate
+                        id="nombre"
+                        name="nombre"
+                        type="text"
+                        labelText="Nombre"
+                        value={newUser.nombre || ""}
+                        required
+                      />
+                      
+                      <InputValidate
+                        id="apellido"
+                        name="apellido"
+                        type="text"
+                        labelText="Apellido"
+                        value={newUser.apellido || ""}
+                        required
+                      />
+                    </ResponsiveColumnForm>
+
+                    <ResponsiveColumnForm>
+                      <SimpleSelect
+                        name="tipo_documento"
+                        label="Tipo de documento"
+                        value={newUser.tipo_documento || "DNI"}
+                        placeholder="Selecciona un tipo de documento"
+                        onValueChange={(value) => handleChange({ target: { name: 'tipo_documento', value } })}
+                        required
+                      >
+                        {tiposDocumentos.map((doc, i) => (
+                          <SelectItem key={i} value={doc} >
+                            {doc}
+                          </SelectItem>
+                        ))}
+                      </SimpleSelect>
+
+                      <InputValidate
+                        id="nro_documento"
+                        name="nro_documento"
+                        type="text"
+                        labelText="Nro. documento"
+                        value={newUser.nro_documento || ""}
+                        required
+                      />
+                    </ResponsiveColumnForm>
+
+                    <ResponsiveColumnForm>
+                      <InputValidate
+                        id="fecha_nacimiento"
+                        name="fecha_nacimiento"
+                        type="date"
+                        labelText="Fecha de nacimiento"
+                        value={newUser.fecha_nacimiento || ""}
+                        required
+                      />
+                      
+                      <InputValidate
+                        id="usuario_id"
+                        name="usuario_id"
+                        type="text"
+                        labelText="ID Usuario"
+                        value={newUser.usuario_id || ""}
+                      />
+                    </ResponsiveColumnForm>
                   </div>
 
                   {/* Domicilio */}
-                  <hr />
-                  <div className="grid gap-3">
-                    <Label>Calle</Label>
-                    <Input
-                      name="domicilio_calle"
-                      value={newUser.domicilio_calle || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>Número</Label>
-                    <Input
-                      name="domicilio_numero"
-                      value={newUser.domicilio_numero || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>Piso</Label>
-                    <Input
-                      name="domicilio_piso"
-                      value={newUser.domicilio_piso || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>Dpto</Label>
-                    <Input
-                      name="domicilio_dpto"
-                      value={newUser.domicilio_dpto || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>Referencia</Label>
-                    <Input
-                      name="domicilio_referencia"
-                      value={newUser.domicilio_referencia || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>Código Postal</Label>
-                    <Input
-                      name="codigo_postal"
-                      value={newUser.codigo_postal || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>Localidad</Label>
-                    <select
-                      name="localidad"
-                      value={newUser.localidad || ""}
-                      onChange={handleChange}
-                      className="border rounded px-2 py-1"
-                    >
-                      <option value="">Selecciona una localidad</option>
-                      {localidades.map((loc, index) => (
-                        <option key={`${loc}-${index}`} value={loc}>
-                          {loc}
-                        </option>
-                      ))}
-                    </select>
+                  <hr className="my-6" />
+                  <div className="space-y-4">
+                    <h4 className="text-md font-medium">Domicilio</h4>
+                    <ResponsiveColumnForm>
+                      <InputValidate
+                        id="domicilio_calle"
+                        name="domicilio_calle"
+                        type="text"
+                        labelText="Calle"
+                        value={newUser.domicilio_calle || ""}
+                      />
+
+                      <InputValidate
+                        id="domicilio_numero"
+                        name="domicilio_numero"
+                        type="text"
+                        labelText="Número"
+                        value={newUser.domicilio_numero || ""}
+                      />
+                    </ResponsiveColumnForm>
+
+                    <ResponsiveColumnForm>
+                      <InputValidate
+                        id="domicilio_piso"
+                        name="domicilio_piso"
+                        type="text"
+                        labelText="Piso"
+                        value={newUser.domicilio_piso || ""}
+                      />
+                    </ResponsiveColumnForm>
+                    <ResponsiveColumnForm>
+                      <InputValidate
+                        id="domicilio_dpto"
+                        name="domicilio_dpto"
+                        type="text"
+                        labelText="Departamento"
+                        value={newUser.domicilio_dpto || ""}
+                      />
+
+                      <InputValidate
+                        id="codigo_postal"
+                        name="codigo_postal"
+                        type="text"
+                        labelText="Código Postal"
+                        value={newUser.codigo_postal || ""}
+                        onChange={handleChangePostal}
+                        required
+                      />
+                    </ResponsiveColumnForm>
+
+                    <ResponsiveColumnForm>
+                      <SimpleSelect
+                        name="localidad"
+                        label="Localidad"
+                        value={newUser.localidad || ""}
+                        placeholder="Selecciona una localidad"
+                        onValueChange={(value) => handleChange({ target: { name: 'localidad', value } })}
+                        required
+                      >
+                        {localidades.map((loc, index) => (
+                          <SelectItem key={`${loc}-${index}`} value={loc}>
+                            {loc}
+                          </SelectItem>
+                        ))}
+                      </SimpleSelect>
+                      <div /> {/* Espacio vacío para mantener el diseño de dos columnas */}
+                    </ResponsiveColumnForm>
                   </div>
 
                   {/* Contacto */}
-                  <hr />
-                  <div className="grid gap-3">
-                    <Label>Teléfono fijo</Label>
-                    <Input
-                      name="telefono_fijo"
-                      value={newUser.telefono_fijo || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>Teléfono móvil</Label>
-                    <Input
-                      name="telefono_movil"
-                      value={newUser.telefono_movil || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>Red social</Label>
-                    <select
-                      name="red_social_nombre"
-                      value={newUser.red_social_nombre || ""}
-                      onChange={handleChange}
-                      className="border rounded px-2 py-1"
-                    >
-                      <option value="">Selecciona una red social</option>
-                      {redesSociales.map((rs) => (
-                        <option key={rs} value={rs}>
-                          {rs}
-                        </option>
-                      ))}
-                    </select>
-                    <Label>Su usuario de {newUser.red_social_nombre}</Label>
-                    <Input
-                      name="red_social_contacto"
-                      value={newUser.red_social_contacto || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>Email contacto</Label>
-                    <Input
-                      name="email_contacto"
-                      value={newUser.email_contacto || ""}
-                      onChange={handleChange}
-                    />
-                    <Label>Observación</Label>
-                    <Input
-                      name="observacion_contacto"
-                      value={newUser.observacion_contacto || ""}
-                      onChange={handleChange}
-                    />
+                  <hr className="my-6" />
+                  <div className="space-y-4">
+                    <h4 className="text-md font-medium">Contacto</h4>
+                    <ResponsiveColumnForm>
+                      <InputValidate
+                        id="telefono_fijo"
+                        name="telefono_fijo"
+                        type="tel"
+                        labelText="Teléfono fijo"
+                        value={newUser.telefono_fijo || ""}
+                      />
+
+                      <InputValidate
+                        id="telefono_movil"
+                        name="telefono_movil"
+                        type="tel"
+                        labelText="Teléfono móvil"
+                        value={newUser.telefono_movil || ""}
+                      />
+                    </ResponsiveColumnForm>
+
+                    <ResponsiveColumnForm>
+                      <SimpleSelect
+                        name="red_social_nombre"
+                        label="Red social"
+                        value={newUser.red_social_nombre || ""}
+                        placeholder="Selecciona una red social"
+                        onValueChange={(value) => handleChange({ target: { name: 'red_social_nombre', value } })}
+                      >
+                        {redesSociales.map((rs) => (
+                          <SelectItem key={rs} value={rs}>
+                            {rs}
+                          </SelectItem>
+                        ))}
+                      </SimpleSelect>
+
+                      <InputValidate
+                        id="red_social_contacto"
+                        name="red_social_contacto"
+                        type="text"
+                        labelText={`Usuario de ${newUser.red_social_nombre || 'red social'}`}
+                        value={newUser.red_social_contacto || ""}
+                        disabled={!newUser.red_social_nombre}
+                      />
+                    </ResponsiveColumnForm>
+
+                    <ResponsiveColumnForm>
+                      <InputValidate
+                        id="email_contacto"
+                        name="email_contacto"
+                        type="email"
+                        labelText="Email de contacto"
+                        value={newUser.email_contacto || ""}
+                        required
+                      />
+                      <div /> {/* Espacio vacío para mantener el diseño de dos columnas */}
+                    </ResponsiveColumnForm>
+
+                    <div className="w-full">
+                      <InputValidate
+                        id="observacion_contacto"
+                        name="observacion_contacto"
+                        type="text"
+                        labelText="Observaciones de contacto"
+                        value={newUser.observacion_contacto || ""}
+                        className="w-full"
+                      />
+                    </div>
                   </div>
 
                   <DialogFooter className="pt-4">
@@ -416,25 +466,32 @@ function AdminUsers() {
                         Cancelar
                       </Button>
                     </DialogClose>
-                    <DialogClose asChild>
-                      <Button type="submit">Guardar</Button>
-                    </DialogClose>
+                    <Button type="submit">
+                      Guardar
+                    </Button>
                   </DialogFooter>
                 </form>
               </DialogContent>
             </Dialog>
 
             {alert && (
-              <Alert variant="destructive" className="mb-4 mt-3">
-                <AlertTitle>{alert.title}</AlertTitle>
-                <AlertDescription>{alert.description}</AlertDescription>
-                <Button variant="outline"
-                  onClick={() => setAlert(null)}
-                  className="ml-auto bg-transparent text-red-600 hover:text-red-800 font-semibold"
+              <div className="fixed bottom-4 right-4 z-50 w-96">
+                <Alert 
+                  variant={alert.variant || "default"}
+                  className="animate-in slide-in-from-right-8 duration-300"
                 >
-                  Cerrar
-                </Button>
-              </Alert>
+                  <AlertTitle>{alert.title}</AlertTitle>
+                  {alert.description && (
+                    <AlertDescription>{alert.description}</AlertDescription>
+                  )}
+                  <button 
+                    onClick={() => setAlert(null)}
+                    className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </Alert>
+              </div>
             )}
           </CardContent>
         </Card>
@@ -444,13 +501,16 @@ function AdminUsers() {
       </Fade>
 
       {/* Diálogo modal para editar usuario */}
-      <PersonEditDialog
-        editingUser={editingUser}
-        setEditingUser={setEditingUser}
-        onSubmit={handleEditSubmit}
-      />
+      {editingUser && (
+        <PersonEditDialog
+          editingUser={editingUser}
+          setEditingUser={setEditingUser}
+          onSubmit={handleEditSubmit}
+          tiposDocumentos={tiposDocumentos}
+        />
+      )}
     </div>
   );
 }
 
-export default AdminUsers;
+export default AdminPersons;

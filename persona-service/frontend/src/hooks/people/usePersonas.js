@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { PersonaService } from "@/services/personaService";
+import { formSubmitJson } from "@/utils/formUtils";
 
 /**
  * Hook personalizado que encapsula la lógica de obtención de personas,
@@ -29,6 +30,9 @@ export function usePersonas() {
 
     // Estado: Localidades asociadas al código postal ingresado
     const [localidades, setLocalidades] = useState([]);
+    
+    // Estado para notificaciones
+    const [alert, setAlert] = useState(null);
 
     // Efecto: Carga inicial de datos (usuarios, redes sociales, tipos de documento)
     useEffect(() => {
@@ -87,6 +91,77 @@ export function usePersonas() {
             .catch(() => setLocalidades([]));
     };
 
+    /**
+     * Elimina una persona por su ID.
+     * Actualiza la lista local tras eliminar exitosamente.
+     * @param {number} id - ID de la persona a eliminar
+     */
+    const handleDelete = (id) => {
+        PersonaService.borrar(id)
+            .then(() => {
+                setUsers(users.filter((user) => user.id !== id));
+                setAlert({
+                    title: "Éxito",
+                    description: "La persona se eliminó correctamente",
+                    variant: "success"
+                });
+            })
+            .catch((err) => {
+                console.error("Error eliminando persona:", err);
+                setAlert({
+                    title: "Error",
+                    description: "No se pudo eliminar la persona",
+                    variant: "destructive"
+                });
+            });
+    };
+
+    /**
+     * Maneja el envío del formulario de edición.
+     * Actualiza la persona en la lista local y hace petición para actualizar en backend.
+     * @param {Event} e - Evento submit del formulario
+     * @param {Object} editingUser - Datos del usuario que se está editando
+     * @returns {Promise<Object>} Objeto con el resultado de la operación
+     */
+    const handleEditSubmit = async (e, editingUser) => {
+        e.preventDefault();
+
+        // Construye el body con todos los campos para enviar al backend
+        const body = {
+            nombre_persona: editingUser.nombre || "",
+            apellido_persona: editingUser.apellido || "",
+            tipo_documento: editingUser.tipo_documento || "DNI",
+            num_doc_persona: editingUser.nro_documento || "",
+            fecha_nacimiento_persona: editingUser.fecha_nacimiento || "",
+            usuario_id: editingUser.usuario_id || null,
+        };
+
+        try {
+            await PersonaService.editar(editingUser.id, body);
+
+            // Actualiza el estado local solo si la petición fue exitosa
+            setUsers(users.map((u) => (u.id === editingUser.id ? editingUser : u)));
+            
+            setAlert({
+                title: "Éxito",
+                description: "La persona se actualizó correctamente",
+                variant: "success"
+            });
+            
+            return { success: true };
+        } catch (err) {
+            console.error("Error actualizando persona:", err);
+            
+            setAlert({
+                title: "Error al actualizar persona",
+                description: err?.response?.data?.message || "Error desconocido",
+                variant: "destructive"
+            });
+            
+            return { success: false, error: err };
+        }
+    };
+
     // Exporta el estado y funciones que serán usados en el componente  
     return {
         users,
@@ -94,6 +169,11 @@ export function usePersonas() {
         tiposDocumentos,
         redesSociales,
         localidades,
+        alert,
+        setAlert,
         fetchLocalidadesPorCodigoPostal,
+        setLocalidades,
+        handleDelete,
+        handleEditSubmit,
     };
 }
