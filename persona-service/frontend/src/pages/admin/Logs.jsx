@@ -66,7 +66,7 @@ export default function Logs() {
   }, []);
 
   return (
-    <div className="p-6 space-y-6 py-30 px-3 md:pl-70 md:pr-70 md:pt-10">
+    <div className="p-6 space-y-6 py-15 px-6 md:pl-70 md:pr-70 md:pt-10">
       <Fade duration={300} triggerOnce>
         <h2 className="text-2xl font-bold">Estadísticas Mensuales</h2>
         <p className="text-muted-foreground mb-4">

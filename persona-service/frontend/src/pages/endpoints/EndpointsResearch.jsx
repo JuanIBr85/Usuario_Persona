@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { Home, ShieldUser, Wrench } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -16,7 +18,17 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-  
+
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+
+
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 
 import {
@@ -142,7 +154,7 @@ function EndpointsResearch() {
   }, []);
 
   return (
-    <div className="p-6 space-y-6 py-30 px-3 md:py-10 md:px-15">
+    <div className="p-6 space-y-6 py-15 px-3 md:py-10 md:px-15">
       {/* Botones inicio/detener investigación */}
       <div className="flex gap-4">
         <Button onClick={startResearch} disabled={loading}>
@@ -283,6 +295,34 @@ function EndpointsResearch() {
           </div>
         </DialogContent>
       </Dialog>
+      <Breadcrumb className="mt-auto self-start ">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/adminpanel" className="flex items-center gap-1">
+                <Home className="w-4 h-4" />
+                Panel De Administrador
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/adminservices" className="flex items-center gap-1">
+                <ShieldUser className="w-4 h-4" />
+                Gestión de Servicios
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage className="flex items-center gap-1">
+              <Eye className="w-4 h-4" />
+              Monitoreo de Endpoints
+            </BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
     </div>
   );
 }

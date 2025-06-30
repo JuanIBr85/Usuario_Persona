@@ -39,7 +39,7 @@ function AdminServices() {
   ];
 
   return (
-    <div className="p-6 space-y-6 py-30 px-3 md:px-20 md:pt-10">
+    <div className="p-6 space-y-6 py-15  px-3 md:py-10 md:px-20 md:pt-10">
       <Fade duration={300} triggerOnce>
         <h2 className="text-3xl font-bold mb-6 text-center ">
           Gestión de Servicios
