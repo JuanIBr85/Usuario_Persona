@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { SimpleDialog } from '@/components/SimpleDialog';
 import { useNavigate } from 'react-router-dom';
 import { AuthService } from '@/services/authService';
@@ -25,57 +25,158 @@ const tempAuthData = { ...saveAuthData };
 function AuthContextProvider({ children }) {
     const [authData, setAuthData] = useState(saveAuthData);
     const [dialog, setDialog] = useState(null);
+    const [checkTokenInterval, setCheckTokenInterval] = useState(null);
+    const [logoutTimeout, setLogoutTimeout] = useState(null);
     const navigate = useNavigate();
 
-    const timeLeftToExpire = ()=> (new Date(authData.user.expires_in) - new Date()) / 1000;
+    const timeLeftToExpire = () => (new Date(authData.user.expires_in) - new Date()) / 1000;
 
+    // Función centralizada para limpiar todos los timers
+    const cleanupTimers = useCallback(() => {
+        if (checkTokenInterval) {
+            clearInterval(checkTokenInterval);
+            setCheckTokenInterval(null);
+        }
+        if (logoutTimeout) {
+            clearTimeout(logoutTimeout);
+            setLogoutTimeout(null);
+        }
+    }, [checkTokenInterval, logoutTimeout]);
+
+    // Función mejorada de logout
     const toLogout = () => {
+        cleanupTimers();
+
+        // Token expirado, limpiar datos de autenticación
+        removeAuthData();
+
         if (!window.location.pathname.includes("/auth/")) {
-            window.location.href = '/auth/logout';
+            window.location.href = '/auth/login';
         }
     }
 
-    const checkToken = () => {
-        if (!authData.user?.expires_in) return;
+    // Función para verificar si el usuario está en una ruta de autenticación
+    const isAuthRoute = useCallback(() => {
+        return window.location.pathname.includes("/auth/");
+    }, []);
+
+    // Función para verificar si el token es válido
+    const isTokenValid = useCallback(() => {
+        if (!authData.user?.expires_in) {
+            return false;
+        }
+
         const now = new Date();
         const expirationDate = new Date(authData.user.expires_in);
 
-        if (now > expirationDate) {
-            // Token expirado, limpiar datos de autenticación
-            removeAuthData();
+        return now <= expirationDate;
+    }, [authData.user?.expires_in]);
 
-            setDialog({
-                title: "Sesión expirada",
-                description: "Su sesión ha expirado. Por favor, inicie sesión de nuevo.",
-            });
+    // Función para mostrar dialog de sesión expirada
+    const showSessionExpiredDialog = useCallback(() => {
+        // Limpiar cualquier dialog anterior
+        setDialog(null);
 
-            setTimeout(toLogout, 1000 * 60);
+        // Limpiar timers existentes
+        cleanupTimers();
+
+        const timeout = setTimeout(() => {
+            toLogout();
+        }, 10000); // 10 segundos para que el usuario vea el mensaje
+
+        setLogoutTimeout(timeout);
+
+        setDialog({
+            title: "Sesión expirada",
+            description: "Su sesión ha expirado. Por favor, inicie sesión de nuevo.",
+            timeout: timeout,
+            action: () => navigate('/auth/login')
+        });
+    }, [cleanupTimers, toLogout, navigate]);
+
+    // Función para mostrar dialog de usuario no autorizado
+    const showUnauthorizedDialog = useCallback((message = "No tienes permiso para acceder a esta página") => {
+        // Limpiar cualquier dialog anterior
+        setDialog(null);
+
+        // Limpiar timers existentes
+        cleanupTimers();
+
+        const timeout = setTimeout(() => {
+            toLogout();
+        }, 10000); // 10 segundos para que el usuario vea el mensaje
+
+        setLogoutTimeout(timeout);
+
+        setDialog({
+            title: "No autorizado",
+            description: message,
+            timeout: timeout,
+            action: () => navigate('/auth/login')
+        });
+    }, [cleanupTimers, toLogout, navigate]);
+
+    // Función principal de verificación de token
+    const checkToken = useCallback(() => {
+        // Si está en ruta de autenticación, limpiar flags y no verificar
+        if (isAuthRoute()) {
+            sessionStorage.removeItem("unauthorized_401");
+            return;
         }
 
-    };
+        // Verificar flag de 401 no autorizado
+        if (sessionStorage.getItem("unauthorized_401")) {
+            sessionStorage.removeItem("unauthorized_401");
+            showUnauthorizedDialog("No tienes permiso para acceder a esta página");
+            return;
+        }
+
+        // Verificar validez del token
+        if (!isTokenValid()) {
+            showSessionExpiredDialog();
+            return;
+        }
+
+        // Si llegamos aquí, el token es válido - limpiar cualquier dialog existente
+        if (dialog) {
+            setDialog(null);
+            cleanupTimers();
+        }
+    }, [isAuthRoute, isTokenValid, showSessionExpiredDialog, showUnauthorizedDialog, dialog, cleanupTimers]);
+
+    // Función para verificación inicial al cargar la aplicación
+    const performInitialCheck = useCallback(() => {
+        if (isAuthRoute()) {
+            // Eliminar email para reset si sale de la sección de autenticación
+            sessionStorage.removeItem("email_para_reset");
+            return;
+        }
+
+        // Si no está en ruta de auth y no tiene token válido, mostrar dialog
+        if (!isTokenValid()) {
+            showUnauthorizedDialog("Inicia sesión para ingresar");
+            return;
+        }
+
+        // Limpiar email para reset
+        sessionStorage.removeItem("email_para_reset");
+    }, [isAuthRoute, isTokenValid, showUnauthorizedDialog]);
 
     useEffect(() => {
-        checkToken();
-        //const timeLeft = (new Date(authData.user.expires_in) - new Date()) / 1000;
-        //const minutes = Math.floor(timeLeft / 60);
-        //const seconds = Math.floor(timeLeft % 60);
-        //alert(`Tu sesión expirará en ${minutes} minutos y ${seconds} segundos.`);
-        // Verificar expiración del token cada minuto
-        const interval = setInterval(checkToken, 1000 * 2); // Verificar cada 2 segundos
-        if (!window.location.pathname.includes("/auth/")) {
-            if (!authData.user?.expires_in) {
-                setDialog({
-                    title: "No deberias de estar aqui",
-                    description: "Inicia sesion para ingresar",
-                });
-                navigate('/auth/login');
+        // Realizar verificación inicial
+        performInitialCheck();
+
+        // Configurar verificación periódica (cada 30 segundos en lugar de 2)
+        const interval = setInterval(checkToken, 30000);
+        setCheckTokenInterval(interval);
+
+        // Cleanup al desmontar
+        return () => {
+            clearInterval(interval);
+            if (logoutTimeout) {
+                clearTimeout(logoutTimeout);
             }
-
-            //Elimino el email para reset en caso de que el usuario salga de la seccion de autenticacion
-            sessionStorage.removeItem("email_para_reset");
-        }
-
-        return () => clearInterval(interval);
+        };
     }, [authData.user?.expires_in]);
 
     const removeAuthData = () => {
@@ -84,6 +185,7 @@ function AuthContextProvider({ children }) {
                 setAuthData(defaultData);
                 localStorage.removeItem('authData');
                 localStorage.removeItem('token');
+                Object.assign(tempAuthData, defaultData);
             });
     }
 
@@ -153,16 +255,42 @@ function AuthContextProvider({ children }) {
         }
     }
 
+    // Función pública para marcar usuario como no autorizado
+    const unauthorizedUser = (message) => {
+        const errorMessage = typeof message === 'object' ? message.message : message;
+        showUnauthorizedDialog(errorMessage);
+    }
+
+    // Función para cerrar dialog y ejecutar acción
+    const handleDialogAction = useCallback(() => {
+        const currentDialog = dialog;
+        setDialog(null);
+
+        if (currentDialog?.timeout) {
+            clearTimeout(currentDialog.timeout);
+            setLogoutTimeout(null);
+        }
+
+        if (currentDialog?.action) {
+            currentDialog.action();
+        }
+    }, [dialog]);
+
     return (
-        <AuthContext.Provider value={{ authData, updateData, removeAuthData, encode, decode, timeLeftToExpire }}>
+        <AuthContext.Provider value={{
+            authData,
+            updateData,
+            removeAuthData,
+            encode,
+            decode,
+            timeLeftToExpire,
+            unauthorizedUser
+        }}>
             {dialog && <SimpleDialog
                 title={dialog.title}
                 description={dialog.description}
                 isOpen={dialog}
-                actionHandle={() => {
-                    setDialog(null);
-                    setTimeout(toLogout, 2000);
-                }}
+                actionHandle={handleDialogAction}
             />}
             {children}
         </AuthContext.Provider>

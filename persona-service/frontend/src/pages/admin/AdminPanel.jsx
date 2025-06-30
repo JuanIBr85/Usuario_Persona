@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Users, ShieldCheck, FileText, HandPlatter } from "lucide-react";
 import { Fade } from "react-awesome-reveal";
 import { isAdmin } from "@/context/AuthContext";
+import { useAuthContext } from "@/context/AuthContext";
 /**
  * Lista de opciones disponibles en el panel de administración.
  * Cada opción incluye un título, una descripción, un ícono y la ruta correspondiente.
@@ -59,13 +60,12 @@ const adminOptions = [
 
 const AdminPanel = () => {
   const navigate = useNavigate();
-
+  const {unauthorizedUser} = useAuthContext();
   useEffect(() => {
     if (!isAdmin()) {
-      navigate("/profile");
-      console.log('usuario no es admin')
+      unauthorizedUser("No tienes permiso para acceder a esta página");
     }
-  }, [navigate]);
+  }, []);
 
   return (
     <div className="py-30 px-5 md:py-20 md:px-10 2xl:pl-[5%] 2xl:pr-[5%]">
