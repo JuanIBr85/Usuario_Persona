@@ -137,7 +137,7 @@ function UserDetails() {
     }
   }, [editingUser?.codigo_postal]);
 
-  const handleEditSubmit = (e) => {
+  const handleEditSubmit = async (e) => {
     const body = {
       nombre_persona: editingUser.nombre,
       apellido_persona: editingUser.apellido,
@@ -397,6 +397,7 @@ function UserDetails() {
                     onChange={(e) =>
                       setEditingUser({ ...editingUser, email: e.target.value })
                     }
+                  
                   />
                 </div>
                 <div className="grid gap-2">

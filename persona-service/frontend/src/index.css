@@ -76,8 +76,15 @@
   --sidebar-ring: oklch(0.708 0 0);
 
   --color-primario: #1c1364;
-  --color-fondo: #e0f0f0;/*d0dddd*/
+  --color-fondo: #E8E8EA;
+  /*d0dddd*/
 
+  --color-azul-oscuro: #1c1364;
+  --color-gris: #3C3744;
+  --color-celeste-purpura: #3D52D5;
+  --color-celeste-muy-claro: #B4C5E4;
+  --color-fondo-claro: #ECECEC;
+  --color-fondo-blanco: #ffff;
 }
 
 .dark {
@@ -131,6 +138,7 @@ body {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -154,10 +162,10 @@ body {
   }
 }
 
-.font-dyslexia{
-  font-family: 'Lexend', Verdana, Arial, sans-serif ;
+.font-dyslexia {
+  font-family: 'Lexend', Verdana, Arial, sans-serif;
 }
 
-.font-low-vision{
+.font-low-vision {
   font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
 }

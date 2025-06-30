@@ -22,6 +22,8 @@ import PersonFilter from "@/components/people/PersonFilter";
 import Loading from "@/components/loading/Loading";
 
 import { PersonaService } from "@/services/personaService";
+import { usePersonas } from "@/hooks/people/usePersonas";
+
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import PersonTable from "@/components/people/PersonTable";
 import PersonEditDialog from "@/components/people/PersonEditDialog";
@@ -29,98 +31,51 @@ import PersonBreadcrumb from "@/components/people/PersonBreadcrumb";
 
 /**
  * Componente AdminUsers
- * ---------------------
- * Este componente muestra una lista de usuarios registrados,
- * con funcionalidades para filtrarlos, editar sus datos,
- * ver detalles y eliminarlos.
+ * =====================
+ * Página administrativa para la gestión de personas.
+ * Permite visualizar, filtrar, crear, editar y eliminar usuarios.
  *
- * Estado:
- * - editingUser: usuario que se está editando (null si no hay ninguno).
- * - users: lista completa de usuarios obtenida desde el servicio.
- * - mostrarFiltroAvanzado: controla si se muestra o no el filtro avanzado.
- * - filtro: texto para filtrar usuarios por nombre o email.
+ * Usa el hook `usePersonas` para centralizar la carga de datos desde el backend.
  *
- * Efectos:
- * - Al montar, carga la lista completa de usuarios desde PersonaService.
- *
- * Funcionalidades principales:
- * - Filtrado dinámico de usuarios según texto ingresado.
- * - Eliminación de usuarios con actualización inmediata de la lista.
- * - Navegación a pantalla de detalles de un usuario.
- * - Edición rápida de usuario mediante diálogo modal.
- *
- * Componentes hijos usados:
- * - PersonFilter: formulario para filtrar usuarios.
- * - PersonTable: tabla que muestra la lista filtrada con botones de acción.
- * - PersonEditDialog: diálogo modal para editar datos de usuario.
- * - PersonBreadcrumb: barra de navegación breadcrumb.
+ * Estados locales:
+ * - `newUser`: objeto que representa los datos del formulario de nueva persona.
+ * - `editingUser`: persona seleccionada para edición.
+ * - `mostrarFiltroAvanzado`: alterna el filtro avanzado en la UI.
+ * - `filtro`: cadena de texto para buscar personas.
+ * - `alert`: objeto de error para mostrar en caso de fallas.
  */
 function AdminUsers() {
   const navigate = useNavigate();
+  // Hook que centraliza toda la carga de datos relacionada con personas
+  const {
+    users,
+    setUsers,
+    tiposDocumentos,
+    redesSociales,
+    localidades,
+    fetchLocalidadesPorCodigoPostal,
+  } = usePersonas();
 
   const [newUser, setNewUser] = useState({});
-
-  // Estado para usuario en edición
   const [editingUser, setEditingUser] = useState(null);
-  // Lista completa de usuarios
-  const [users, setUsers] = useState([]);
-  // Control de filtro avanzado
   const [mostrarFiltroAvanzado, setMostrarFiltroAvanzado] = useState(false);
-  // Texto del filtro
   const [filtro, setFiltro] = useState("");
   const [alert, setAlert] = useState(null);
 
-  const [redesSociales, setRedesSociales] = useState([]);
-  const [localidades, setLocalidades] = useState([]);
-  const [tiposDocumentos, setTiposDocumentos] = useState([]);
-
-  // Carga inicial de usuarios al montar el componente
-  useEffect(() => {
-    PersonaService.get_all()
-      .then((res) => {
-        if (res && res.data && Array.isArray(res.data)) {
-          const mappedUsers = res.data.map((persona) => ({
-            id: persona.id_persona,
-            usuario_id: persona.usuario_id,
-
-            nombre: persona.nombre_persona,
-            apellido: persona.apellido_persona,
-            tipo_documento: persona.tipo_documento,
-            nro_documento: persona.num_doc_persona,
-            fecha_nacimiento: persona.fecha_nacimiento_persona,
-          }));
-          console.log("mappedUsers:", mappedUsers);
-          setUsers(mappedUsers);
-        }
-      })
-      .catch((err) => {
-        console.error("Error obteniendo usuarios:", err);
-      });
-  }, []);
+  /**
+ * Efecto que se dispara cuando cambia el código postal del formulario nuevo.
+ * Si es válido, busca localidades asociadas a ese código.
+ */
 
   useEffect(() => {
-    PersonaService.get_redes_sociales().then((res) => {
-      setRedesSociales(res?.data || []);
-    });
-    PersonaService.get_tipos_documentos().then((res) => {
-      setTiposDocumentos(res?.data || []);
-    });
-  }, []);
-  console.log("get_tipos_documentos", tiposDocumentos);
-
-  useEffect(() => {
-    if (newUser.codigo_postal?.length >= 4) {
-      PersonaService.get_localidades_by_codigo_postal(
-        newUser.codigo_postal
-      ).then((res) => {
-        setLocalidades(res?.data || []);
-      });
-    }
-    console.log("localidades", localidades);
+    fetchLocalidadesPorCodigoPostal(newUser.codigo_postal);
   }, [newUser.codigo_postal]);
 
-  // Filtra usuarios según texto en nombre, apellido o email (insensible a mayúsculas)
-  const usuariosFiltrados = users.filter((user) => {
+
+ /**
+   * Filtra la lista de usuarios según el texto ingresado.
+   * Se filtra por nombre, apellido o número de documento.
+   */  const usuariosFiltrados = users.filter((user) => {
     const textoMatch =
       `${user.nombre} ${user.apellido}`
         .toLowerCase()
@@ -129,11 +84,9 @@ function AdminUsers() {
     return textoMatch;
   });
   console.log("usuariosFiltrados", usuariosFiltrados);
-
   /**
-   * Elimina un usuario por id.
-   * Actualiza la lista local tras eliminar exitosamente.
-   * @param {number} id - ID del usuario a eliminar
+   * Elimina una persona del backend y la remueve del estado local.
+   * @param {number} id - ID de la persona a eliminar.
    */
   const handleDelete = (id) => {
     PersonaService.borrar(id)
@@ -146,17 +99,17 @@ function AdminUsers() {
   };
 
   /**
-   * Navega a la pantalla de detalles del usuario.
-   * @param {number} id - ID del usuario
+   * Redirige a la vista de detalles de una persona.
+   * @param {number} id - ID de la persona a ver.
    */
   const handleSeeDetails = (id) => {
     navigate(`/persondetails/${id}`);
   };
 
   /**
-   * Maneja el envío del formulario de edición.
-   * Actualiza el usuario en la lista local y hace petición para actualizar en backend.
-   * @param {Event} e - Evento submit del formulario
+   * Envía el formulario de edición de persona al backend.
+   * Si tiene éxito, actualiza la persona en el estado local.
+   * @param {Event} e - Evento submit del formulario.
    */
   const handleEditSubmit = async (e) => {
     e.preventDefault();
@@ -257,7 +210,7 @@ function AdminUsers() {
   if (!users) return <Loading />;
 
   return (
-    <div className="p-6 space-y-6 py-30 px-3 md:py-25 md:px-15">
+    <div className="p-6 space-y-6 py-25 px-3 md:py-10 md:px-15">
       <Fade duration={300} triggerOnce>
         <Card>
           <CardHeader>
@@ -343,12 +296,14 @@ function AdminUsers() {
                       value={newUser.nro_documento || ""}
                       onChange={handleChange}
                     />
+                    {/* 
                     <Label>ID Usuario</Label>
                     <Input
                       name="usuario_id"
                       value={newUser.usuario_id || ""}
                       onChange={handleChange}
                     />
+                     */}
                   </div>
 
                   {/* Domicilio */}
