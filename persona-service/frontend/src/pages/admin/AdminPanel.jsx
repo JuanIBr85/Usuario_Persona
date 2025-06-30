@@ -68,7 +68,7 @@ const AdminPanel = () => {
   }, [navigate]);
 
   return (
-    <div className=" py-30 px-5 md:py-20 md:px-10 2xl:pl-[5%] 2xl:pr-[5%]">
+    <div className="py-30 px-5 md:py-20 md:px-10 2xl:pl-[5%] 2xl:pr-[5%]">
       <Fade duration={300} triggerOnce>
         <h2 className="text-3xl font-bold mb-10 text-center">
           Panel de Administración
@@ -77,7 +77,7 @@ const AdminPanel = () => {
           {adminOptions.map((option) => (
             <Card
               key={option.title}
-              className="flex flex-col justify-between text-center transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-2xl cursor-pointer"
+              className="flex flex-col justify-between text-center transition-transform duration-300 ease-in-out hover:scale-103 hover:shadow-xl cursor-pointer"
               onClick={() => navigate(option.path)}
             >
               <CardHeader className="flex flex-col items-center justify-center gap-2 flex-grow">
@@ -88,7 +88,7 @@ const AdminPanel = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex items-center justify-center">
-                <Button variant="default" className="mt-2 cursor-pointer">
+                <Button variant="default" className="mt-2 cursor-pointer ">
                   Ir a {option.title}
                 </Button>
               </CardContent>

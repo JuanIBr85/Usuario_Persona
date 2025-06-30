@@ -1,5 +1,6 @@
 import React from 'react';
 import './Loading.css';
+import { Ellipsis } from 'lucide-react';
 
 /**
  * Loading
@@ -12,7 +13,7 @@ import './Loading.css';
  * @returns {JSX.Element} Un overlay con una animación de carga moderna y un texto accesible "Cargando...".
  */
 
-function Loading({ isFixed = false, text="Cargando..." }) {
+function Loading({ isFixed = false,  text = null }) { //Lo de null es temporal
     const pos = isFixed 
         ? "fixed z-50 top-0 left-0 right-0 bottom-0 backdrop-blur-sm" 
         : "relative";

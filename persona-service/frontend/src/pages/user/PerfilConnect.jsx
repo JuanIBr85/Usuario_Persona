@@ -42,6 +42,7 @@ function PerfilConnect() {
         setLoading(true);
         PersonaService.verificar_documento(formData)
             .then(response => {
+                console.log(response.data)
                 setEmail(response.data.email);
                 setTempData(formData);
                 api?.scrollNext()
