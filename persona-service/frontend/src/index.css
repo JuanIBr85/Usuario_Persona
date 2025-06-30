@@ -76,7 +76,7 @@
   --sidebar-ring: oklch(0.708 0 0);
 
   --color-primario: #1c1364;
-  --color-fondo: #fff;
+  --color-fondo: #e0f0f0;
 
 }
 
@@ -119,6 +119,12 @@
   --color-gray-900: var(--color-gray-100);
   --color-gray-500: var(--color-gray-400);
   --color-gray-200: var(--color-gray-700);
+
+  --color-fondo: oklch(0.145 0 0);
+}
+
+body {
+  background-color: var(--color-fondo);
 }
 
 @layer base {
