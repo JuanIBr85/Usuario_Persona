@@ -1,9 +1,10 @@
 import React from 'react';
+import ResponsiveColumnForm from '@/components/ResponsiveColumnForm';
 
 const Resumen = () => (
   <div className="space-y-4">
     <h3 className="text-lg font-medium">Resumen de tu perfil</h3>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <ResponsiveColumnForm>
       <div>
         <h4 className="font-medium">Datos Personales</h4>
         <p>Nombre: [Nombre]</p>
@@ -17,13 +18,16 @@ const Resumen = () => (
         <p>Teléfono: [teléfono]</p>
         <p>Celular: [celular]</p>
       </div>
+    </ResponsiveColumnForm>
+    <ResponsiveColumnForm>
       <div>
         <h4 className="font-medium">Domicilio</h4>
         <p>[Calle] [Número]</p>
         <p>[Localidad], [Provincia]</p>
         <p>Código Postal: [Código Postal]</p>
       </div>
-    </div>
+      <div />
+    </ResponsiveColumnForm>
   </div>
 );
 

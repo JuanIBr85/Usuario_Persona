@@ -7,7 +7,7 @@ import { useState } from "react";
 import { formSubmitJson } from "@/utils/formUtils";
 import Loading from "@/components/loading/Loading";
 import { Ban } from "lucide-react";
-
+import ResponsiveColumnForm from "@/components/ResponsiveColumnForm";
 import { SimpleDialog } from "@/components/SimpleDialog";
 
 export default function FormDatos({
@@ -42,7 +42,7 @@ export default function FormDatos({
       {loading && <Loading isFixed={true} />}
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Datos fijos */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <ResponsiveColumnForm>
           <InputValidate
             id="nombre_persona"
             type="text"
@@ -55,8 +55,9 @@ export default function FormDatos({
             labelText="Apellido"
             value={personaData.apellido_persona || ""}
           />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
+        </ResponsiveColumnForm>
+        
+        <ResponsiveColumnForm>
           <SimpleSelect
             name="tipo_documento"
             label="Tipo de documento"
@@ -76,8 +77,9 @@ export default function FormDatos({
             labelText="Nº de documento"
             value={personaData.num_doc_persona || ""}
           />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        </ResponsiveColumnForm>
+        
+        <ResponsiveColumnForm>
           <InputValidate
             id="fecha_nacimiento_persona"
             type="date"
@@ -90,7 +92,6 @@ export default function FormDatos({
             validateMessage="La fecha de nacimiento es requerida"
             required
           />
-
           <InputValidate
             id="email"
             type="email"
@@ -99,7 +100,7 @@ export default function FormDatos({
             className="bg-gray-100 cursor-not-allowed w-full"
             readOnly
           />
-        </div>
+        </ResponsiveColumnForm>
         <div className="flex flex-col gap-3 pt-4">
           <Button type="submit" className="w-full">
             Guardar Cambios

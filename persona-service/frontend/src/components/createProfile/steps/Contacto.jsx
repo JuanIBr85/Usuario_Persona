@@ -3,11 +3,12 @@ import InputValidate from '@/components/inputValidate/InputValidate';
 import SimpleSelect from '@/components/SimpleSelect';
 import { SelectItem } from '@/components/ui/select';
 import { REDES_SOCIALES } from '../constants';
+import ResponsiveColumnForm from '@/components/ResponsiveColumnForm';
 
 const Contacto = () => (
   <div className="space-y-4">
     <h3 className="text-lg font-medium">Datos de Contacto</h3>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <ResponsiveColumnForm>
       <InputValidate
         id="telefono_fijo"
         name="telefono_fijo"
@@ -27,8 +28,8 @@ const Contacto = () => (
         validateMessage="Ingresa un número de teléfono válido"
         required
       />
-    </div>
-    <div className="grid grid-cols-2 gap-4 items-end">
+    </ResponsiveColumnForm>
+    <ResponsiveColumnForm className="items-end">
       <InputValidate
         id="red_social_contacto"
         name="red_social_contacto"
@@ -50,7 +51,7 @@ const Contacto = () => (
           </SelectItem>
         ))}
       </SimpleSelect>
-    </div>
+    </ResponsiveColumnForm>
 
     <InputValidate
       id="email_contacto"
