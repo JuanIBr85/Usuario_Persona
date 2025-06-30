@@ -68,12 +68,12 @@ const AdminPanel = () => {
   }, []);
 
   return (
-    <div className="py-30 px-5 md:py-20 md:px-10 2xl:pl-[5%] 2xl:pr-[5%]">
+    <div className="py-15 px-5 md:py-10 md:px-10 2xl:pl-[5%] 2xl:pr-[5%]">
       <Fade duration={300} triggerOnce>
         <h2 className="text-3xl font-bold mb-10 text-center">
           Panel de Administración
         </h2>{" "}
-        <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 justify-center place-items-stretch auto-rows-[18rem]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {adminOptions.map((option) => (
             <Card
               key={option.title}

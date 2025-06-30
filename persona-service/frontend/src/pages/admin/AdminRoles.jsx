@@ -252,7 +252,7 @@ const openNewRoleForm = () => {
 
   /* ------------------------------- UI ---------------------------------- */
   return (
-    <div className="p-6 space-y-6 py-30 px-3 md:py-10 md:px-15">
+    <div className="p-6 space-y-6 py-15 px-3 md:py-10 md:px-15">
       {/* Animación Fade para suavizar la aparición */}
       <Fade duration={300} triggerOnce>
 

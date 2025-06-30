@@ -16,12 +16,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
+  
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 
 import {
@@ -43,14 +38,25 @@ function EndpointsResearch() {
   const [dialogMessage, setDialogMessage] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
 
+  function traducirRateLimitMessage(msg) {
+    // Ejemplo de msg: "Ha intentado ingresar demasiadas veces a esta ruta: 5 per 1 minute"
+
+    // Busca el patrón "n per m" y lo reemplaza
+    // Acá usamos una regex para detectar algo tipo "5 per 1 minute", "10 per 1 hour", etc.
+    return msg.replace(/\d+\sper\s\d+\s\w+/, "varias veces en poco tiempo");
+  }
   // Fetch status
   const fetchStatus = async () => {
     try {
       const res = await gatewayService.getResearchStatus();
       setStatus(res);
     } catch (error) {
-      const msg = error?.data?.message || error?.message || "Error desconocido.";
+      const rawMsg = error?.data?.message || error?.message || "Error desconocido.";
+
+      console.log("Raw error message:", rawMsg);
+      const msg = traducirRateLimitMessage(rawMsg);
       setDialogMessage(msg);
+
       setOpenDialog(true);
       console.error("Error al obtener estado investigación:", msg);
     }
@@ -153,7 +159,7 @@ function EndpointsResearch() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Eye  />
+            <Eye />
             Estado de investigación:
           </CardTitle>
         </CardHeader>
