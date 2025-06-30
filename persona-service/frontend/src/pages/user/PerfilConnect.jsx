@@ -49,6 +49,11 @@ function PerfilConnect() {
             })
             .catch(error => {
                 console.log(error)
+
+                if(error.statusCode === 404){
+                    alert("No se encontro el documento, vamos a crear un nuevo perfil");
+                    navigate("/createperfil")
+                }
             })
             .finally(() => {
                 setLoading(false)
