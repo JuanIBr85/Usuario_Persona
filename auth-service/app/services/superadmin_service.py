@@ -196,12 +196,27 @@ class SuperAdminService:
             return {"permisos": resultado}
         except Exception as e:
             raise Exception(f"Error al obtener permisos: {str(e)}")
-    # =========================
-    # =========================
+
+    # =============================
+    # Devuelve todos los usuarios
+    # =============================
     def obtener_usuarios(self, session):
         usuarios = session.query(Usuario).all()
         resultado = []
         for u in usuarios:
+            # Obtener roles asociados (nombres)
+            roles = [ru.rol.nombre_rol for ru in u.roles if ru.rol and not ru.rol.deleted_at]
+
+            # Obtener permisos únicos de todos los roles del usuario
+            permisos = list({
+                permiso_rel.permiso.nombre_permiso
+                for ru in u.roles if ru.rol and not ru.rol.deleted_at
+                for permiso_rel in ru.rol.permisos if permiso_rel.permiso and not permiso_rel.permiso.deleted_at
+            })
+
+            # Obtener ids de roles
+            roles_ids = [ru.rol.id_rol for ru in u.roles if ru.rol and not ru.rol.deleted_at]
+
             usuario_dict = {
                 "id": u.id_usuario,
                 "nombre_usuario": u.nombre_usuario,
@@ -212,7 +227,12 @@ class SuperAdminService:
                 "deleted_at": u.deleted_at.isoformat() if u.deleted_at else None,
                 "password_changed_at": u.password_changed_at.isoformat() if u.password_changed_at else None,
                 "password_expira_en": u.password_expira_en.isoformat() if u.password_expira_en else None,
+                "roles": roles,
+                "roles_ids": roles_ids,     
+                "permisos": permisos,
             }
             resultado.append(usuario_dict)
         return resultado
 
+  # =========================
+  # =========================

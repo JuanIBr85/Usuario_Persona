@@ -36,7 +36,7 @@ export default function AdminRoles() {
   const [availablePermissions, setAvailablePermissions] = useState([]); // Permisos disponibles
   const [selectedUserId, setSelectedUserId] = useState("");
   const [usuarios, setUsuarios] = useState([]);
-  const [selectedRoleId, setSelectedRoleId] = useState("");
+  const [selectedRoleIds, setSelectedRoleIds] = useState([]);
 
   /* --------------------------- Utilidades UI --------------------------- */
   const showError = (message) => {
@@ -62,6 +62,15 @@ export default function AdminRoles() {
         : [...prev, permission];
     });
   };
+
+  const handleRoleToggle = (roleId) => {
+    setSelectedRoleIds((prev) =>
+      prev.includes(roleId)
+        ? prev.filter((id) => id !== roleId)
+        : [...prev, roleId]
+    );
+  };
+
 
   // Crea un nuevo rol
   const handleAddRole = async () => {
@@ -206,21 +215,22 @@ export default function AdminRoles() {
   }
 
   const handleAsignar = async () => {
-    if (!selectedUserId || !selectedRoleId) {
-      alert("Seleccioná un usuario y un rol.");
+    if (!selectedUserId || selectedRoleIds.length === 0) {
+      alert("Seleccioná un usuario y al menos un rol.");
       return;
     }
 
     try {
       await userService.updateUser(selectedUserId, {
-        roles: [selectedRoleId],
+        roles: selectedRoleIds,
       });
-      alert("Rol asignado correctamente.");
+      alert("Roles asignados correctamente.");
     } catch (error) {
-      alert("Error al asignar el rol.");
+      alert("Error al asignar los roles.");
       console.log(error);
     }
   };
+
 
 
   /* ------------------------------ Efectos ------------------------------ */
@@ -242,6 +252,8 @@ export default function AdminRoles() {
         console.error(error);
       }
     };
+
+   
 
     const fetchUsuarios = async () => {
       try {
@@ -275,6 +287,19 @@ export default function AdminRoles() {
     fetchUsuarios();
   }, []);
 
+   useEffect(() => {
+      if (selectedUserId) {
+        const usuarioSeleccionado = usuarios.find(
+          (u) => u.id === Number(selectedUserId)
+        );
+        if (usuarioSeleccionado) {
+          setSelectedRoleIds(usuarioSeleccionado.roles_ids || []);
+        }
+      } else {
+        setSelectedRoleIds([]); 
+      }
+    }, [selectedUserId, usuarios]);
+    
   const [isTimeout, setIsTimeout] = useState(true);
   const [countdown, setCountdown] = useState(3);
 
@@ -462,16 +487,18 @@ export default function AdminRoles() {
                 ))}
               </select>
 
-              <select onChange={(e) => setSelectedRoleId(Number(e.target.value))} value={selectedRoleId}>
-                <option value="">Seleccionar rol</option>
-                {console.log(roles)}
-                {
-                  roles.map((r) => (
-                    <option key={r.id} value={r.id}>
-                      {r.name.charAt(0).toUpperCase() + r.name.slice(1)}
-                    </option>
-                  ))}
-              </select>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {roles.map((role) => (
+                  <label key={role.id} className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={selectedRoleIds.includes(role.id)}
+                      onChange={() => handleRoleToggle(role.id)}
+                    />
+                    <span>{role.name.charAt(0).toUpperCase() + role.name.slice(1)}</span>
+                  </label>
+                ))}
+              </div>
               <Button className={"w-[10rem]"} onClick={handleAsignar}>Asignar Rol</Button>
             </div>
           </CardContent>
