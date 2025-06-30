@@ -23,6 +23,8 @@ PERMISOS = [
     "persona.admin.eliminar_persona",
     "persona.admin.restaurar_persona",
     "example.admin.admin_dice",
+    "auth.admin.obtener_usuarios",
+    "auth.admin.modificar_usuario_con_rol"
 ]
 
 # Permisos por rol
