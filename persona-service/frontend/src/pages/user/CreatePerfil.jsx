@@ -52,9 +52,55 @@ function CreatePerfil() {
     const refForm = useRef(null);
     const [newUser, setNewUser] = useState({});
 
-    const handleCheckResumen = async () => {
+    const getFormValues = async (elements={}) => {
         refForm.current.checkValidity();
-        const formData = await formJson(refForm.current);
+        const formData = {
+            ...(await formJson(refForm.current)),
+            ...elements
+        };
+
+        Object.keys(formData).forEach(key => {
+            if (formData[key] === "") {
+                formData[key] = undefined;
+            }
+        });
+       
+        return {
+            nombre_persona: formData.nombre_persona,
+            apellido_persona: formData.apellido_persona,
+            fecha_nacimiento_persona: formData.fecha_nacimiento_persona,
+            tipo_documento: formData.tipo_documento,
+            num_doc_persona: formData.num_doc_persona,
+            domicilio: {
+                domicilio_calle: formData.domicilio_calle,
+                domicilio_numero: formData.domicilio_numero,
+                domicilio_piso: formData.domicilio_piso,
+                domicilio_dpto: formData.domicilio_dpto,
+                domicilio_referencia: formData.domicilio_referencia,
+                codigo_postal: {
+                    codigo_postal: formData.codigo_postal,
+                    localidad: formData.localidad
+                }
+            },
+            contacto: {
+                telefono_fijo: formData.telefono_fijo,
+                telefono_movil: formData.telefono_movil,
+                red_social_contacto: formData.red_social_contacto,
+                red_social_nombre: formData.red_social_nombre,
+                email_contacto: formData.email_contacto,
+                observacion_contacto: formData.observacion_contacto
+            },
+            persona_extendida: {
+                estado_civil: formData.estado_civil,
+                ocupacion: formData.ocupacion,
+                estudios_alcanzados: formData.estudios_alcanzados,
+                vencimiento_dni: formData.vencimiento_dni,
+                foto_perfil: formData.foto_perfil
+            }
+        }
+    }
+
+    const handleCheckResumen = async () => {
 
         //Filtro los elementos que no son validos
         const elements = Array
@@ -70,59 +116,21 @@ function CreatePerfil() {
                 return acc;
             }, {});
 
-
-        const data = {
-            ...formData,
-            ...elements
-        };
-
-        Object.keys(data).forEach(key => {
-            if (data[key] === "") {
-                data[key] = undefined;
-            }
-        });
-
-        // Estructurar los datos según el formato de PERSONA_DEFAULT
-        const structuredData = {
-            nombre_persona: data.nombre_persona,
-            apellido_persona: data.apellido_persona,
-            fecha_nacimiento_persona: data.fecha_nacimiento_persona,
-            tipo_documento: data.tipo_documento,
-            num_doc_persona: data.num_doc_persona,
-            domicilio: {
-                domicilio_calle: data.domicilio_calle,
-                domicilio_numero: data.domicilio_numero,
-                domicilio_piso: data.domicilio_piso,
-                domicilio_dpto: data.domicilio_dpto,
-                domicilio_referencia: data.domicilio_referencia,
-                codigo_postal: {
-                    codigo_postal: data.codigo_postal,
-                    localidad: data.localidad
-                }
-            },
-            contacto: {
-                telefono_fijo: data.telefono_fijo,
-                telefono_movil: data.telefono_movil,
-                red_social_contacto: data.red_social_contacto,
-                red_social_nombre: data.red_social_nombre,
-                email_contacto: data.email_contacto,
-                observacion_contacto: data.observacion_contacto
-            },
-            persona_extendida: {
-                estado_civil: data.estado_civil,
-                ocupacion: data.ocupacion,
-                estudios_alcanzados: data.estudios_alcanzados,
-                vencimiento_dni: data.vencimiento_dni,
-                foto_perfil: data.foto_perfil
-            }
-        };
+        const structuredData = await getFormValues(elements);
 
         // Establecer los datos del nuevo usuario
         setNewUser(structuredData);
     }
 
     const handleSubmit = async () => {
-        
+        if(!refForm.current.checkValidity()){
+            alert("Por favor, completa todos los campos correctamente.")
+            return;
+        }
+
+        const data = await getFormValues();
+
+        console.log(data);
     };
 
     useEffect(() => {
@@ -153,8 +161,8 @@ function CreatePerfil() {
     return (
         <>
             {isLoading && <Loading isFixed={true} />}
-            <div className="container mx-auto px-4 py-8">
-                <Card className="max-w-4xl mx-auto">
+            <div className="container sm:mx-auto py-8">
+                <Card className="sm:max-w-4xl mx-auto">
                     <CardHeader className="text-center">
                         <CardTitle>Completa tu perfil</CardTitle>
                         <CardDescription>

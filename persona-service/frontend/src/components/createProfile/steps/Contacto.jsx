@@ -36,12 +36,12 @@ const Contacto = ({hidden}) => (
         type="text"
         placeholder="Nombre del Usuario"
         labelText="Red social de contacto"
+        value=""
       />
       <SimpleSelect
         name="red_social_nombre"
         label="Red social"
         placeholder="Selecciona una red social"
-        required
         id="red_social_nombre"
         onChange={(e) => console.log(e.target.value)}
       >

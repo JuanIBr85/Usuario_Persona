@@ -4,7 +4,11 @@ import ResponsiveColumnForm from '@/components/ResponsiveColumnForm';
 const formatDate = (dateString) => {
   if (!dateString) return 'No especificada';
   const options = { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' };
-
+  const date = new Date(dateString);
+  
+  if (isNaN(date.getTime())) {
+    return dateString;
+  }
   try {
     return new Date(dateString).toLocaleDateString('es-AR', options);
   } catch (error) {
@@ -60,7 +64,7 @@ const Resumen = ({ hidden, newUser = {} }) => {
           </div>
           <div>
             <p className="text-gray-600">Red Social: <span className="text-gray-900">{formatField(contacto.red_social_contacto)}</span></p>
-            <p className="text-gray-600">Usuario: <span className="text-gray-900">{formatField(contacto.red_social_nombre)}</span></p>
+            <p className="text-gray-600">Usuario de Red Social: <span className="text-gray-900">{formatField(contacto.red_social_nombre)}</span></p>
             <p className="text-gray-600">Observaciones: <span className="text-gray-900">{formatField(contacto.observacion_contacto)}</span></p>
           </div>
         </div>
