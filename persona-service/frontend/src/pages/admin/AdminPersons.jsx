@@ -324,7 +324,7 @@ function AdminPersons() {
                   {/* Datos personales */}
                   <div className="space-y-4">
                     <h4 className="text-md font-medium">Datos Personales</h4>
-                    <ResponsiveColumnForm className="gap-4">
+                    <ResponsiveColumnForm>
                       <InputValidate
                         id="nombre"
                         name="nombre"
@@ -344,7 +344,7 @@ function AdminPersons() {
                       />
                     </ResponsiveColumnForm>
 
-                    <ResponsiveColumnForm className="gap-4">
+                    <ResponsiveColumnForm>
                       <SimpleSelect
                         name="tipo_documento"
                         label="Tipo de documento"
@@ -370,7 +370,7 @@ function AdminPersons() {
                       />
                     </ResponsiveColumnForm>
 
-                    <ResponsiveColumnForm className="gap-4">
+                    <ResponsiveColumnForm>
                       <InputValidate
                         id="fecha_nacimiento"
                         name="fecha_nacimiento"
@@ -394,7 +394,7 @@ function AdminPersons() {
                   <hr className="my-6" />
                   <div className="space-y-4">
                     <h4 className="text-md font-medium">Domicilio</h4>
-                    <ResponsiveColumnForm className="gap-4">
+                    <ResponsiveColumnForm>
                       <InputValidate
                         id="domicilio_calle"
                         name="domicilio_calle"
@@ -412,7 +412,7 @@ function AdminPersons() {
                       />
                     </ResponsiveColumnForm>
 
-                    <ResponsiveColumnForm className="gap-4">
+                    <ResponsiveColumnForm>
                       <InputValidate
                         id="domicilio_piso"
                         name="domicilio_piso"
@@ -421,7 +421,7 @@ function AdminPersons() {
                         value={newUser.domicilio_piso || ""}
                       />
                     </ResponsiveColumnForm>
-                    <ResponsiveColumnForm className="gap-4">
+                    <ResponsiveColumnForm>
                       <InputValidate
                         id="domicilio_dpto"
                         name="domicilio_dpto"
@@ -441,7 +441,7 @@ function AdminPersons() {
                       />
                     </ResponsiveColumnForm>
 
-                    <ResponsiveColumnForm className="gap-4">
+                    <ResponsiveColumnForm>
                       <SimpleSelect
                         name="localidad"
                         label="Localidad"
@@ -464,7 +464,7 @@ function AdminPersons() {
                   <hr className="my-6" />
                   <div className="space-y-4">
                     <h4 className="text-md font-medium">Contacto</h4>
-                    <ResponsiveColumnForm className="gap-4">
+                    <ResponsiveColumnForm>
                       <InputValidate
                         id="telefono_fijo"
                         name="telefono_fijo"
@@ -482,7 +482,7 @@ function AdminPersons() {
                       />
                     </ResponsiveColumnForm>
 
-                    <ResponsiveColumnForm className="gap-4">
+                    <ResponsiveColumnForm>
                       <SimpleSelect
                         name="red_social_nombre"
                         label="Red social"
@@ -507,7 +507,7 @@ function AdminPersons() {
                       />
                     </ResponsiveColumnForm>
 
-                    <ResponsiveColumnForm className="gap-4">
+                    <ResponsiveColumnForm>
                       <InputValidate
                         id="email_contacto"
                         name="email_contacto"
