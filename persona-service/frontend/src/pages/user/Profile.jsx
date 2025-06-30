@@ -5,7 +5,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 
 // Componentes
 import FormDatos from "@/components/profile/FormDatos"
-import FormServicios from "@/components/profile/FormServicios"
+import FormUsuario from "@/components/profile/FormUsuario"
 import FormContacto from "@/components/profile/FormContacto"
 import FormDomicillio from "@/components/profile/FormDomicillio"
 import FormPersonaExtendida from "@/components/profile/FormPersonaExtendida"
@@ -72,7 +72,7 @@ const ProfileForm = () => {
 
 
         <div className="w-full flex items-center justify-center sm:p-4">
-          <Card className="w-full max-w-7xl shadow-lg rounded-xl overflow-hidden">
+          <Card className="w-full max-w-5xl shadow-lg rounded-xl overflow-hidden">
               <CardHeader className="text-center">
                 <CardTitle className="text-2xl">
                   Información Personal
@@ -91,7 +91,7 @@ const ProfileForm = () => {
                     <TabsTrigger value="contacto">Contacto</TabsTrigger>
                     <TabsTrigger value="domicilio">Domicilio</TabsTrigger>
                     <TabsTrigger value="personaExtendida">Datos Extendidos</TabsTrigger>
-                    <TabsTrigger value="servicios">Mis Servicios</TabsTrigger>
+                    <TabsTrigger value="usuario">Mi Usuario</TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="datos">
@@ -131,8 +131,8 @@ const ProfileForm = () => {
                     />
                   </TabsContent>
 
-                  <TabsContent value="servicios">
-                    <FormServicios
+                  <TabsContent value="usuario">
+                    <FormUsuario
                       servicios={subscribedServices}
                     />
                   </TabsContent>
