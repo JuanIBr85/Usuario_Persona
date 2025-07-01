@@ -73,76 +73,76 @@ const ProfileForm = () => {
 
         <div className="w-full flex items-center justify-center sm:p-4">
           <Card className="w-full max-w-5xl shadow-lg rounded-xl overflow-hidden">
-              <CardHeader className="text-center">
-                <CardTitle className="text-2xl">
-                  Información Personal
-                </CardTitle>
-                <CardDescription>
-                  Gestiona tus datos y servicios suscritos
-                </CardDescription>
-              </CardHeader>
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl">
+                Información Personal
+              </CardTitle>
+              <CardDescription>
+                Gestiona tus datos y servicios suscritos
+              </CardDescription>
+            </CardHeader>
 
-              <CardContent className="h-full overflow-y-auto">
-                <ProfileNick firstName={personaData.nombre_persona} lastName={personaData.apellido_persona} />
+            <CardContent className="h-full overflow-y-auto">
+              <ProfileNick firstName={personaData.nombre_persona} lastName={personaData.apellido_persona} />
 
-                <Tabs defaultValue="datos" className="w-full">
-                  <TabsList className="flex flex-wrap gap-2 w-full mb-3 h-auto">
-                    <TabsTrigger value="datos">Datos Personales</TabsTrigger>
-                    <TabsTrigger value="contacto">Contacto</TabsTrigger>
-                    <TabsTrigger value="domicilio">Domicilio</TabsTrigger>
-                    <TabsTrigger value="personaExtendida">Datos Extendidos</TabsTrigger>
-                    <TabsTrigger value="usuario">Mi Usuario</TabsTrigger>
-                  </TabsList>
+              <Tabs defaultValue="datos" className="w-full">
+                <TabsList className="flex flex-wrap gap-2 w-full mb-3 h-auto">
+                  <TabsTrigger value="datos">Datos Personales</TabsTrigger>
+                  <TabsTrigger value="contacto">Contacto</TabsTrigger>
+                  <TabsTrigger value="domicilio">Domicilio</TabsTrigger>
+                  <TabsTrigger value="personaExtendida">Datos Extendidos</TabsTrigger>
+                  <TabsTrigger value="usuario">Mi Usuario</TabsTrigger>
+                </TabsList>
 
-                  <TabsContent value="datos">
-                    <FormDatos
-                      tipoDocumento={staticData.tipos_documento}
-                      personaData={{ ...personaData, email }}
-                      persona_id={personaData.id_persona}
-                      setPersonaData={setPersonaData}
-                    />
-                  </TabsContent>
+                <TabsContent value="datos">
+                  <FormDatos
+                    tipoDocumento={staticData.tipos_documento}
+                    personaData={{ ...personaData, email }}
+                    persona_id={personaData.id_persona}
+                    setPersonaData={setPersonaData}
+                  />
+                </TabsContent>
 
-                  <TabsContent value="contacto">
-                    <FormContacto
-                      persona_id={personaData.id_persona}
-                      contacto={personaData.contacto || {}}
-                      redes_sociales={staticData.redes_sociales}
-                      setPersonaData={setPersonaData}
-                    />
-                  </TabsContent>
+                <TabsContent value="contacto">
+                  <FormContacto
+                    persona_id={personaData.id_persona}
+                    contacto={personaData.contacto || {}}
+                    redes_sociales={staticData.redes_sociales}
+                    setPersonaData={setPersonaData}
+                  />
+                </TabsContent>
 
-                  <TabsContent value="domicilio">
-                    <FormDomicillio
-                      domicilio={personaData.domicilio || {}}
-                      persona_id={personaData.id_persona}
-                      setPersonaData={setPersonaData}
-                    />
-                  </TabsContent>
+                <TabsContent value="domicilio">
+                  <FormDomicillio
+                    domicilio={personaData.domicilio || {}}
+                    persona_id={personaData.id_persona}
+                    setPersonaData={setPersonaData}
+                  />
+                </TabsContent>
 
-                  <TabsContent value="personaExtendida">
-                    <FormPersonaExtendida
-                      persona_id={personaData.id_persona}
-                      personaExtendida={personaData?.persona_extendida || {}}
-                      estadosCiviles={staticData.estados_civiles}
-                      ocupaciones={staticData.ocupaciones}
-                      estudiosAlcanzados={staticData.estudios_alcanzados}
-                      setPersonaData={setPersonaData}
-                    />
-                  </TabsContent>
+                <TabsContent value="personaExtendida">
+                  <FormPersonaExtendida
+                    persona_id={personaData.id_persona}
+                    personaExtendida={personaData?.persona_extendida || {}}
+                    estadosCiviles={staticData.estados_civiles}
+                    ocupaciones={staticData.ocupaciones}
+                    estudiosAlcanzados={staticData.estudios_alcanzados}
+                    setPersonaData={setPersonaData}
+                  />
+                </TabsContent>
 
-                  <TabsContent value="usuario">
-                    <FormUsuario
-                      servicios={subscribedServices}
-                    />
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
+                <TabsContent value="usuario">
+                  <FormUsuario
 
-              <CardFooter className="flex justify-between text-sm text-gray-500 border-t">
-                <span>Última actualización: hace {lastUpdate}</span>
-              </CardFooter>
-            </Card>
+                  />
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+
+            <CardFooter className="flex justify-between text-sm text-gray-500 border-t">
+              <span>Última actualización: hace {lastUpdate}</span>
+            </CardFooter>
+          </Card>
         </div>
       </Fade>
     </>
