@@ -11,6 +11,7 @@ from app.services.services_search_service import ServicesSearchService
 import threading
 from app.utils.redis_message import redis_stream_start, register_redis_receiver
 from app.services.event_service import EventService
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 endpoints_search_service = EndpointsSearchService()
 # Defino los modelos
@@ -27,6 +28,8 @@ def create_app() -> Flask:
     app = Flask(__name__)
 
     app.config.from_object("config")
+    # Le dice a Flask que confíe en 1 proxy
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 
     CORS(
         app,
