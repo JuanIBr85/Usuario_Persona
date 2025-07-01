@@ -19,6 +19,7 @@ from app.schemas.usuarios_schema import (
     UsuarioOutputSchema,
     ResetPasswordSchema,
     RecuperarPasswordSchema,
+    UsuarioModificarSchema
 )
 from marshmallow import ValidationError
 from app.services.servicio_base import ServicioBase
@@ -52,7 +53,7 @@ class UsuarioService(ServicioBase):
         self.schema_recuperar = RecuperarPasswordSchema()
         self.schema_reset = ResetPasswordSchema()
         self.schema_login = LoginSchema()
-
+        self.schema_modificar = UsuarioModificarSchema()
     # -----------------------------------------------------------------------------------------------------------------------------
     # REGISTRO Y VERIFICACIÓN
     # -----------------------------------------------------------------------------------------------------------------------------
@@ -327,6 +328,39 @@ class UsuarioService(ServicioBase):
         return (ResponseStatus.SUCCESS, "Perfil obtenido correctamente.", perfil, 200)
 
     # -----------------------------------------------------------------------------------------------------------------------------
+
+    def modificar_usuario(self, session:Session, usuario_id: int, nuevo_nombre_usuario: str = None, nuevo_email: str = None) -> dict:
+        try:
+            usuario = session.query(Usuario).filter_by(id_usuario=usuario_id).first()
+            if not usuario:
+                return ResponseStatus.FAIL, "Usuario no encontrado", None, 404
+
+            if nuevo_nombre_usuario and nuevo_nombre_usuario != usuario.nombre_usuario:
+                existente = session.query(Usuario).filter_by(nombre_usuario=nuevo_nombre_usuario).first()
+                if existente:
+                    return ResponseStatus.FAIL, "El nombre de usuario ya está en uso", None, 409
+                usuario.nombre_usuario = nuevo_nombre_usuario
+
+            if nuevo_email and nuevo_email != usuario.email_usuario:
+                existente = session.query(Usuario).filter_by(email_usuario=nuevo_email).first()
+                if existente:
+                    return ResponseStatus.FAIL, "El email ya está en uso", None, 409
+                usuario.email_usuario = nuevo_email
+
+            session.commit()
+            session.refresh(usuario)
+
+            # Retornamos los nuevos datos actualizados
+            return ResponseStatus.SUCCESS, "Usuario modificado con éxito", {
+                "id_usuario": usuario.id_usuario,
+                "nombre_usuario": usuario.nombre_usuario,
+                "email_usuario": usuario.email_usuario
+            }, 200
+
+        except Exception as e:
+            session.rollback()
+            raise e
+    # -----------------------------------------------------------------------------------------------------------------------------
     def logout_usuario(self, session: Session, usuario_id: int, jwt_jti: str) -> dict:
 
         usuario = session.query(Usuario).filter_by(id_usuario=usuario_id).first()
@@ -352,6 +386,7 @@ class UsuarioService(ServicioBase):
     # -----------------------------------------------------------------------------------------------------------------------------
 
     def solicitar_codigo_reset(self, session: Session, email: str) -> dict:
+
         try:
             usuario = session.query(Usuario).filter_by(email_usuario=email).first()
             if not usuario:
