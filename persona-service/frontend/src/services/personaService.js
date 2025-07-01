@@ -20,7 +20,16 @@ export const PersonaService = {
       showError: PersonaService.showError
     });
   },
-
+  crear_perfil: async (body) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.persona}/crear_persona_restringido`,
+      method: HttpMethod.POST,
+      body: body,
+      useToken: true,
+      showError: PersonaService.showError
+    });
+  },
+  
   //Obtiene todas las personas.
   get_all: async () => {
     return fetchService.fetch({

@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import Loading from '@/components/loading/Loading';
 import { formJson } from '@/utils/formUtils';
-
+import { useNavigate } from 'react-router-dom';
 // Importar componentes
 import { ProgressBar } from '@/components/createProfile/ProgressBar';
 import DatosPersonales from '@/components/createProfile/steps/DatosPersonales';
@@ -11,6 +11,8 @@ import Contacto from '@/components/createProfile/steps/Contacto';
 import Domicilio from '@/components/createProfile/steps/Domicilio';
 import InfoAdicional from '@/components/createProfile/steps/InfoAdicional';
 import Resumen from '@/components/createProfile/steps/Resumen';
+
+import { PersonaService } from '@/services/personaService';
 
 const PERSONA_DEFAULT = {
     "nombre_persona": undefined,
@@ -51,8 +53,9 @@ function CreatePerfil() {
     const [isLoading, setIsLoading] = useState(false);
     const refForm = useRef(null);
     const [newUser, setNewUser] = useState({});
+    const navigate = useNavigate();
 
-    const getFormValues = async (elements={}) => {
+    const getFormValues = async (elements = {}) => {
         refForm.current.checkValidity();
         const formData = {
             ...(await formJson(refForm.current)),
@@ -64,7 +67,7 @@ function CreatePerfil() {
                 formData[key] = undefined;
             }
         });
-       
+
         return {
             nombre_persona: formData.nombre_persona,
             apellido_persona: formData.apellido_persona,
@@ -123,14 +126,23 @@ function CreatePerfil() {
     }
 
     const handleSubmit = async () => {
-        if(!refForm.current.checkValidity()){
+        if (!refForm.current.checkValidity()) {
             alert("Por favor, completa todos los campos correctamente.")
             return;
         }
 
         const data = await getFormValues();
 
-        console.log(data);
+        PersonaService
+            .crear_perfil(data)
+            .then(response => {
+                alert("Perfil creado exitosamente");
+                navigate("/profile");
+            })
+            .catch(error => {
+                console.log(error)
+                alert("Error al crear el perfil");
+            });
     };
 
     useEffect(() => {
