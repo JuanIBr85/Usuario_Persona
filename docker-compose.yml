@@ -16,9 +16,8 @@
         - ./auth-service:/app
         - ./auth-service/auth_data:/app/auth_data
       depends_on:
-        redis:
-        auth-db:
-          condition: service_healthy
+        - redis
+        - auth-db
 
     auth-db:
       image: postgres:13
@@ -147,6 +146,16 @@
       ports:
         - "1025:1025"  # SMTP
         - "8025:8025"  # Web UI
+
+    api-creus:
+      build: ./api_creus
+      ports:
+        - "5004:5004"
+      volumes:
+        - ./api_creus:/app
+      environment:
+        - FLASK_ENV=development
+        - COMPONENT_SERVICE_HOST=component-service
 
   volumes:
     mysql_data:
