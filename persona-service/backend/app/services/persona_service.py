@@ -309,8 +309,12 @@ class PersonaService(IPersonaInterface):
             )
 
             if not persona:
-                return None           
+                return None
 
+            if persona.usuario_id:
+                raise Exception(
+                    "No se puede borrar la persona porque está vinculada a un usuario"
+                    )           
             if persona.contacto_id:
                 self.contacto_service.borrar_contacto(persona.contacto_id, session)
             if persona.domicilio_id:
