@@ -4,9 +4,9 @@ from dotenv import load_dotenv
 import json
 from app.extensions import get_redis
 
-
-OTP_EXPIRATION_SECONDS = 300  # 5 minutos
-TOKEN_EXPIRATION_SECONDS = 600  # 10 minutos
+DATOS_REGISTRO_EXPIRATION_SECONDS=43200 # 12 horitas
+OTP_EXPIRATION_SECONDS = 1500  # 15 minutos
+TOKEN_EXPIRATION_SECONDS = 1800  # 30 minutos
 MAX_INTENTOS_FALLIDOS = 3  # máximo de intentos permitidos
 
 

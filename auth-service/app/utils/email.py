@@ -91,8 +91,10 @@ def enviar_codigo_por_email_registro(email: str, codigo_otp: str):
             {codigo}
         </p>
     """.format(codigo=codigo_otp)
-
-    html = render_email_template(saludo, cuerpo)
+    extra = """<p style="font-size: 13px; margin-top: 20px; color: #cccccc;">
+            Pasadas las 12 horas debera registrarse de nuevo.
+        </p>"""
+    html = render_email_template(saludo, cuerpo, extra)
 
     msg = Message(
         subject="Código para validar e-mail",

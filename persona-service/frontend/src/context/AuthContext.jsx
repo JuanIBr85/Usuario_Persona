@@ -28,6 +28,7 @@ function AuthContextProvider({ children }) {
     const [checkTokenInterval, setCheckTokenInterval] = useState(null);
     const [logoutTimeout, setLogoutTimeout] = useState(null);
     const navigate = useNavigate();
+    const [isUnauthorizedRoute, setIsUnauthorizedRoute] = useState(false);
 
     const timeLeftToExpire = () => (new Date(authData.user.expires_in) - new Date()) / 1000;
 
@@ -49,7 +50,7 @@ function AuthContextProvider({ children }) {
 
         // Token expirado, limpiar datos de autenticación
         removeAuthData();
-
+        setIsUnauthorizedRoute(false);
         if (!window.location.pathname.includes("/auth/")) {
             window.location.href = '/auth/login';
         }
@@ -107,7 +108,7 @@ function AuthContextProvider({ children }) {
         }, 10000); // 10 segundos para que el usuario vea el mensaje
 
         setLogoutTimeout(timeout);
-
+        setIsUnauthorizedRoute(true);
         setDialog({
             title: "No autorizado",
             description: message,
@@ -121,6 +122,7 @@ function AuthContextProvider({ children }) {
         // Si está en ruta de autenticación, limpiar flags y no verificar
         if (isAuthRoute()) {
             sessionStorage.removeItem("unauthorized_401");
+            setIsUnauthorizedRoute(false);
             return;
         }
 
@@ -133,6 +135,7 @@ function AuthContextProvider({ children }) {
 
         // Verificar validez del token
         if (!isTokenValid()) {
+            setIsUnauthorizedRoute(true);
             showSessionExpiredDialog();
             return;
         }
@@ -262,7 +265,7 @@ function AuthContextProvider({ children }) {
     const handleDialogAction = useCallback(() => {
         const currentDialog = dialog;
         setDialog(null);
-
+        setIsUnauthorizedRoute(false);
         if (currentDialog?.timeout) {
             clearTimeout(currentDialog.timeout);
             setLogoutTimeout(null);
@@ -289,7 +292,7 @@ function AuthContextProvider({ children }) {
                 isOpen={dialog}
                 actionHandle={handleDialogAction}
             />}
-            {children}
+            { !isUnauthorizedRoute && children}
         </AuthContext.Provider>
     );
 }

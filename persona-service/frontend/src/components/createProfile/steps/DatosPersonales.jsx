@@ -2,10 +2,9 @@ import React from 'react';
 import InputValidate from '@/components/inputValidate/InputValidate';
 import SimpleSelect from '@/components/SimpleSelect';
 import { SelectItem } from '@/components/ui/select';
-import { TIPOS_DOCUMENTO } from '../constants';
 import ResponsiveColumnForm from '@/components/ResponsiveColumnForm';
 
-const DatosPersonales = ({hidden}) => (
+const DatosPersonales = ({hidden, staticData}) => (
   <div className="space-y-4" hidden={hidden}>
     <h3 className="text-lg font-medium">Datos Personales</h3>
     <ResponsiveColumnForm>
@@ -29,7 +28,7 @@ const DatosPersonales = ({hidden}) => (
           placeholder="Selecciona un tipo de documento"
           required
         >
-          {TIPOS_DOCUMENTO.map((tipo) => (
+          {staticData.tipos_documento.map((tipo) => (
             <SelectItem key={tipo} value={tipo}>
               {tipo}
             </SelectItem>

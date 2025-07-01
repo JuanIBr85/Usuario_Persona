@@ -1,7 +1,8 @@
 import json
 import traceback
 from flask import render_template_string
-
+from app.schemas.usuarios_schema import UsuarioModificarSchema
+from marshmallow import ValidationError
 from common.utils.component_request import ComponentRequest
 import jwt
 from os import getenv
@@ -135,9 +136,44 @@ def logout_usuario():
     finally:
         session.close()
 
+@usuario_bp.route("/modificar", methods=["POST"])
+@api_access(is_public=False, limiter=["10 per minute"])
+def modificar_perfil():
+    session = SessionLocal()
+    try:
+        usuario_id = ComponentRequest.get_user_id()
+        datos = request.get_json()
 
+        schema = UsuarioModificarSchema()
+        campos = schema.load(datos)
+
+        nuevo_username = campos.get("nombre_usuario")
+        nuevo_email = campos.get("email_usuario")
+
+        status, mensaje, data, code = usuario_service.modificar_usuario(
+            session, usuario_id, nuevo_username, nuevo_email
+        )
+        return make_response(status, mensaje, data, code), code
+    
+    except ValidationError as err:
+        return make_response(ResponseStatus.FAIL, "Datos inválidos", err.messages), 400
+    
+    except Exception as e:
+        return (
+            make_response(
+                ResponseStatus.ERROR,
+                "Error al modificar usuario",
+                str(e),
+                error_code="MODIFICAR_USUARIO_ERROR",
+            ),
+            500,
+        )
+    finally:
+        session.close()
+
+        
 @usuario_bp.route("/perfil", methods=["GET"])
-@api_access(is_public=True, limiter=["4 per minute"])
+@api_access(is_public=False, limiter=["4 per minute"])
 def perfil_usuario():
     session = SessionLocal()
     try:
@@ -303,11 +339,8 @@ def reset_con_otp():
         session.close()
 
 
-@usuario_bp.route("/modificar", methods=["GET", "POST"])
-@api_access(is_public=True, limiter=["2 per minute"])
-def modificar_perfil():
-    return make_response(ResponseStatus.PENDING, "Funcionalidad en construcción"), 501
 
+    
 
 @usuario_bp.route("/verificar-dispositivo", methods=["GET"])
 @api_access(
