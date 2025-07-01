@@ -60,7 +60,7 @@ const adminOptions = [
 
 const AdminPanel = () => {
   const navigate = useNavigate();
-  const {unauthorizedUser} = useAuthContext();
+  const { unauthorizedUser } = useAuthContext();
   useEffect(() => {
     if (!isAdmin()) {
       unauthorizedUser("No tienes permiso para acceder a esta página");
@@ -68,7 +68,7 @@ const AdminPanel = () => {
   }, []);
 
   return (
-    <div className="py-15 px-5 md:py-10 md:px-10 2xl:pl-[5%] 2xl:pr-[5%]">
+    <div className="py-6 px-4 md:py-10 md:px-10 2xl:pl-[5%] 2xl:pr-[5%]">
       <Fade duration={300} triggerOnce>
         <h2 className="text-3xl font-bold mb-10 text-center">
           Panel de Administración

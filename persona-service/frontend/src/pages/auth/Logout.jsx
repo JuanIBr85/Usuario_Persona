@@ -18,6 +18,6 @@ const Logout = () => {
       <Loading></Loading>
     </div>
   );
-};
+}; 
 
 export default Logout;
