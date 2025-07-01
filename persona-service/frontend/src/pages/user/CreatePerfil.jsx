@@ -14,40 +14,6 @@ import Resumen from '@/components/createProfile/steps/Resumen';
 
 import { PersonaService } from '@/services/personaService';
 
-const PERSONA_DEFAULT = {
-    "nombre_persona": undefined,
-    "apellido_persona": undefined,
-    "fecha_nacimiento_persona": undefined,
-    "tipo_documento": undefined,
-    "num_doc_persona": undefined,
-    "domicilio": {
-        "domicilio_calle": undefined,
-        "domicilio_numero": undefined,
-        "domicilio_piso": undefined,
-        "domicilio_dpto": undefined,
-        "domicilio_referencia": undefined,
-        "codigo_postal": {
-            "codigo_postal": undefined,
-            "localidad": undefined
-        }
-    },
-    "contacto": {
-        "telefono_fijo": undefined,
-        "telefono_movil": undefined,
-        "red_social_contacto": undefined,
-        "red_social_nombre": null,
-        "email_contacto": undefined,
-        "observacion_contacto": undefined
-    },
-    "persona_extendida": {
-        "estado_civil": undefined,
-        "ocupacion": undefined,
-        "estudios_alcanzados": undefined,
-        "vencimiento_dni": undefined,
-        "foto_perfil": undefined
-    }
-};
-
 function CreatePerfil() {
     const [currentStep, setCurrentStep] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
