@@ -345,7 +345,7 @@ def verificar_dispositivo():
         session.add(nuevo_dispositivo)
         session.commit()
 
-        return render_template_string("""
+        return  ("""
         <!DOCTYPE html>
         <html>
         <head>

@@ -216,7 +216,7 @@ def crear_permiso():
 @superadmin_bp.route("/roles", methods=["GET"])
 @api_access(
     is_public=False,
-    limiter=["6 per minute"],
+    limiter=["10 per minute"],
     access_permissions=["auth.admin.obtener_roles"],
     cache=CacheSettings(expiration=5),
 )
@@ -272,7 +272,7 @@ def borrar_rol(rol_id):
 @superadmin_bp.route("/permisos", methods=["GET"])
 @api_access(
     is_public=False,
-    limiter=["6 per minute"],
+    limiter=["10 per minute"],
     access_permissions=["auth.admin.obtener_permisos"],
     cache=CacheSettings(expiration=20),
 )
@@ -315,7 +315,5 @@ def obtener_usuarios():
         )
     finally:
         session.close()
-
-
 # =============================
 # =============================
