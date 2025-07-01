@@ -43,7 +43,6 @@ from flask_jwt_extended import decode_token
 from app.extensions import get_redis
 from common.services.send_message_service import send_message
 from common.utils.response import ResponseStatus
-import logging
 
 
 class UsuarioService(ServicioBase):
@@ -187,7 +186,7 @@ class UsuarioService(ServicioBase):
 
         usuario = (
             session.query(Usuario)
-            .filter_by(email_usuario=data_validada["email_usuario"])
+            .filter_by(email_usuario=data_validada["email_usuario"],eliminado=False)
             .first()
         )
         if not usuario:
@@ -289,7 +288,7 @@ class UsuarioService(ServicioBase):
     # -----------------------------------------------------------------------------------------------------------------------------
     # terminar de modificar con persona-service
     def ver_perfil(self, session: Session, usuario_id: int) -> dict:
-        usuario = session.query(Usuario).filter_by(id_usuario=usuario_id).first()
+        usuario = session.query(Usuario).filter_by(id_usuario=usuario_id,eliminado=False).first()
 
         if not usuario:
             return (ResponseStatus.NOT_FOUND, "Usuario no encontrado.", None, 404)
@@ -331,7 +330,7 @@ class UsuarioService(ServicioBase):
 
     def modificar_usuario(self, session:Session, usuario_id: int, nuevo_nombre_usuario: str = None, nuevo_email: str = None) -> dict:
         try:
-            usuario = session.query(Usuario).filter_by(id_usuario=usuario_id).first()
+            usuario = session.query(Usuario).filter_by(id_usuario=usuario_id,eliminado=False).first()
             if not usuario:
                 return ResponseStatus.FAIL, "Usuario no encontrado", None, 404
 
@@ -361,9 +360,37 @@ class UsuarioService(ServicioBase):
             session.rollback()
             raise e
     # -----------------------------------------------------------------------------------------------------------------------------
+    
+    def eliminar_usuario(self, session:Session, usuario_id: int):
+        usuario = session.query(Usuario).filter_by(id_usuario=usuario_id).first()
+
+        if not usuario:
+            return ResponseStatus.FAIL, "Usuario no encontrado", None, 404
+
+        if usuario.eliminado:
+            return ResponseStatus.FAIL, "El usuario ya fue eliminado", None, 400
+
+        self.delete(usuario_id, soft=True, session=session)
+
+        try:
+            send_message(
+                to_service="persona-service",
+                message={
+                    "id_usuario": usuario.id_usuario,
+                    "email": usuario.email_usuario,
+                },
+                event_type="auth_user_unlink",
+            )
+        except Exception as e:
+            session.rollback()
+            raise e
+        
+        return ResponseStatus.SUCCESS, "Usuario eliminado correctamente", None, 200
+    # -----------------------------------------------------------------------------------------------------------------------------
+    
     def logout_usuario(self, session: Session, usuario_id: int, jwt_jti: str) -> dict:
 
-        usuario = session.query(Usuario).filter_by(id_usuario=usuario_id).first()
+        usuario = session.query(Usuario).filter_by(id_usuario=usuario_id,eliminado=False).first()
         if not usuario:
             return ResponseStatus.NOT_FOUND, "Usuario no encontrado", None, 404
 
@@ -388,7 +415,7 @@ class UsuarioService(ServicioBase):
     def solicitar_codigo_reset(self, session: Session, email: str) -> dict:
 
         try:
-            usuario = session.query(Usuario).filter_by(email_usuario=email).first()
+            usuario = session.query(Usuario).filter_by(email_usuario=email,eliminado=False).first()
             if not usuario:
                 return ResponseStatus.FAIL, "Email no registrado", None, 404
 
@@ -477,7 +504,7 @@ class UsuarioService(ServicioBase):
         if not nueva_pass:
             return ResponseStatus.FAIL, "Contraseña nueva requerida", None, 400
 
-        usuario = session.query(Usuario).filter_by(email_usuario=email).first()
+        usuario = session.query(Usuario).filter_by(email_usuario=email,eliminado=False).first()
         if not usuario:
             return ResponseStatus.FAIL, "Usuario no encontrado", None, 404
 
@@ -496,7 +523,7 @@ class UsuarioService(ServicioBase):
         return ResponseStatus.SUCCESS, "Contraseña actualizada correctamente", None, 200
 
     def refresh_token(self, session: Session, usuario_id: int) -> dict:
-        usuario = session.query(Usuario).filter_by(id_usuario=usuario_id).first()
+        usuario = session.query(Usuario).filter_by(id_usuario=usuario_id,eliminado=False).first()
         if not usuario:
             return {
                 "status": ResponseStatus.UNAUTHORIZED,

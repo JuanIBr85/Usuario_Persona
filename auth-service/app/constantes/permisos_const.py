@@ -30,5 +30,5 @@ PERMISOS = [
 # Permisos por rol
 PERMISOS_POR_ROL = {
     "superadmin": PERMISOS,
-    "usuario": ["auth.admin.ver_usuario", "auth.admin.logout"],
+    "usuario": ["auth.admin.ver_usuario", "auth.admin.logout","auth.admin.eliminar_usuario","auth.admin.modificar_usuario"],
 }
