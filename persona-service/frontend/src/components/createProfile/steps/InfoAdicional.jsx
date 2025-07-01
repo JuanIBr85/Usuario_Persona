@@ -2,10 +2,9 @@ import React from 'react';
 import InputValidate from '@/components/inputValidate/InputValidate';
 import SimpleSelect from '@/components/SimpleSelect';
 import { SelectItem } from '@/components/ui/select';
-import { ESTADOS_CIVILES, OCUPACIONES, ESTUDIOS_ALCANZADOS } from '../constants';
 import ResponsiveColumnForm from '@/components/ResponsiveColumnForm';
 
-const InfoAdicional = ({hidden}) => (
+const InfoAdicional = ({hidden, staticData}) => (
   <div className="space-y-4" hidden={hidden}>
     <h3 className="text-lg font-medium">Información Adicional</h3>
     <ResponsiveColumnForm>
@@ -15,7 +14,7 @@ const InfoAdicional = ({hidden}) => (
         label="Estado Civil"
         placeholder="Selecciona tu estado civil"
       >
-        {ESTADOS_CIVILES.map((estado) => (
+        {staticData.estados_civiles.map((estado) => (
           <SelectItem key={estado} value={estado}>
             {estado}
           </SelectItem>
@@ -28,7 +27,7 @@ const InfoAdicional = ({hidden}) => (
         label="Ocupación"
         placeholder="Selecciona tu ocupación"
       >
-        {OCUPACIONES.map((ocupacion) => (
+        {staticData.ocupaciones.map((ocupacion) => (
           <SelectItem key={ocupacion} value={ocupacion}>
             {ocupacion}
           </SelectItem>
@@ -43,7 +42,7 @@ const InfoAdicional = ({hidden}) => (
         label="Nivel de Estudios"
         placeholder="Selecciona tu nivel de estudios"
       >
-        {ESTUDIOS_ALCANZADOS.map((nivel) => (
+        {staticData.estudios_alcanzados.map((nivel) => (
           <SelectItem key={nivel} value={nivel}>
             {nivel}
           </SelectItem>

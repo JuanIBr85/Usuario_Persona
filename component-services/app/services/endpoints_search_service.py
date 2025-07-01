@@ -145,6 +145,7 @@ class EndpointsSearchService:
                 logger.error(f"Error cargando {service.service_name}: {str(e)}")
                 self._search_log[service.service_name]["error"] = str(e)
                 self._search_log[service.service_name]["success"] = "error"
+            finally:
                 self._search_log[service.service_name]["in_progress"] = False
         # Finalización de la carga
         self._search_in_progress = False

@@ -2,10 +2,9 @@ import React from 'react';
 import InputValidate from '@/components/inputValidate/InputValidate';
 import SimpleSelect from '@/components/SimpleSelect';
 import { SelectItem } from '@/components/ui/select';
-import { REDES_SOCIALES } from '../constants';
 import ResponsiveColumnForm from '@/components/ResponsiveColumnForm';
 
-const Contacto = ({hidden}) => (
+const Contacto = ({hidden, staticData}) => (
   <div className="space-y-4" hidden={hidden}>
     <h3 className="text-lg font-medium">Datos de Contacto</h3>
     <ResponsiveColumnForm>
@@ -45,7 +44,7 @@ const Contacto = ({hidden}) => (
         id="red_social_nombre"
         onChange={(e) => console.log(e.target.value)}
       >
-        {REDES_SOCIALES.map((red) => (
+        {staticData.redes_sociales.map((red) => (
           <SelectItem key={red} value={red}>
             {red}
           </SelectItem>
