@@ -171,7 +171,28 @@ def modificar_perfil():
     finally:
         session.close()
 
-        
+
+@usuario_bp.route("/eliminar_usuario", methods=["DELETE"])
+@api_access(is_public=False)
+def eliminar_usuario():
+    session = SessionLocal()
+    try:
+        usuario_id = ComponentRequest.get_user_id()
+        status, mensaje, data, code = usuario_service.eliminar_usuario(session, usuario_id)
+        return make_response(status, mensaje, data), code
+
+    except Exception as e:
+        return make_response(
+            ResponseStatus.ERROR,
+            "Error al eliminar usuario",
+            str(e),
+            error_code="ELIMINAR_USUARIO_ERROR"
+        ), 500
+
+    finally:
+        session.close()
+
+
 @usuario_bp.route("/perfil", methods=["GET"])
 @api_access(is_public=False, limiter=["4 per minute"])
 def perfil_usuario():
@@ -363,7 +384,7 @@ def verificar_dispositivo():
 
         # Buscar usuario
         session = SessionLocal()
-        usuario = session.query(Usuario).filter_by(email_usuario=email).first()
+        usuario = session.query(Usuario).filter_by(email_usuario=email,eliminado=False).first()
         if not usuario:
             return "Usuario no encontrado.", 404
 

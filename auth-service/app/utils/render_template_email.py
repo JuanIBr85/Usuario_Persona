@@ -2,7 +2,7 @@
 def render_email_template(saludo_html: str,
                            cuerpo_html: str,
                            extra_html: str = "",
-                           aviso_expiracion: str = "Este código expirará en 15 minutos. Despues de pasadas las 12 horas debera registrarse nuevamente"):
+                           aviso_expiracion: str = "Este código expirará en 15 minutos."):
     # """Devuelve el bloque HTML con la misma estética en todos los mails."""
     return f"""
     <div style="
