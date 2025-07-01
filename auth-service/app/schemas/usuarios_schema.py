@@ -93,3 +93,16 @@ class ResetPasswordSchema(Schema):
     def validate_passwords_match(self, data, **kwargs):
         if data.get("password") != data.get("confirm_password"):
             raise ValidationError("Las contraseñas no coinciden.", field_name="confirm_password")
+        
+
+class UsuarioModificarSchema(Schema):
+    nombre_usuario = fields.Str(
+        required=False,
+        validate=validate.Length(min=4, error="El nombre de usuario debe tener al menos 4 caracteres.")
+    )
+    email_usuario = fields.Email(
+        required=False,
+        error_messages={
+            "invalido": "Debe ser un email válido."
+        }
+    )
