@@ -11,7 +11,7 @@ const DEFAULT = {
   }
 }
 
-const Domicilio = ({hidden}) => {
+const Domicilio = ({hidden, staticData}) => {
   const {localidades,  codigoPostal, setCodigoPostal, inputCPRef, localidad} = useFormDomicilio(DEFAULT, ()=>{}, 0, ()=>{}, ()=>{});
 
   return (

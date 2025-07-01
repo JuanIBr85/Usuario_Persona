@@ -21,6 +21,8 @@ function CreatePerfil() {
     const [newUser, setNewUser] = useState({});
     const navigate = useNavigate();
 
+    const [staticData, setStaticData] = useState({});
+
     const getFormValues = async (elements = {}) => {
         refForm.current.checkValidity();
         const formData = {
@@ -103,7 +105,7 @@ function CreatePerfil() {
             .crear_perfil(data)
             .then(response => {
                 alert("Perfil creado exitosamente");
-                navigate("/profile");
+                setTimeout(() => navigate("/profile"), 2000);
             })
             .catch(error => {
                 console.log(error)
@@ -126,19 +128,52 @@ function CreatePerfil() {
         setCurrentStep(prev => prev - 1);
     };
 
+
+    const fetchData = async () => {
+        setIsLoading(true);
+        try {
+            const [tiposDocumentoResponse, redes_socialesResponse, estados_civilesResponse, ocupacionesResponse, estudios_alcanzadosResponse] = await Promise.all([
+                PersonaService.get_tipos_documentos(),
+                PersonaService.get_redes_sociales(),
+                PersonaService.get_estados_civiles(),
+                PersonaService.get_ocupaciones(),
+                PersonaService.get_estudios_alcanzados()
+            ]);
+
+            setStaticData({
+                estados_civiles: estados_civilesResponse?.data || [],
+                ocupaciones: ocupacionesResponse?.data || [],
+                estudios_alcanzados: estudios_alcanzadosResponse?.data || [],
+                tipos_documento: tiposDocumentoResponse?.data || [],
+                redes_sociales: redes_socialesResponse?.data || []
+            });
+        } catch (error) {
+            console.log(error);
+            alert("Error al cargar datos");
+            navigate("/*");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => fetchData(), []);
+
     const renderStep = () => {
         return <>
-            <DatosPersonales hidden={currentStep !== 0} />
-            <Contacto hidden={currentStep !== 1} />
-            <Domicilio hidden={currentStep !== 2} />
-            <InfoAdicional hidden={currentStep !== 3} />
+            <DatosPersonales hidden={currentStep !== 0} staticData={staticData}/>
+            <Contacto hidden={currentStep !== 1} staticData={staticData}/>
+            <Domicilio hidden={currentStep !== 2} staticData={staticData}/>
+            <InfoAdicional hidden={currentStep !== 3} staticData={staticData}/>
             <Resumen hidden={currentStep !== 4} newUser={newUser} />
         </>
     };
 
+    if (isLoading) {
+        return <Loading text="Cargando datos..." />;
+    }
+
     return (
         <>
-            {isLoading && <Loading isFixed={true} />}
             <div className="container sm:mx-auto py-8">
                 <Card className="sm:max-w-4xl mx-auto">
                     <CardHeader className="text-center">
