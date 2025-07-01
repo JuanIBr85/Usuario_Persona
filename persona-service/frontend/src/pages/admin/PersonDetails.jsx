@@ -1,9 +1,12 @@
+// React & Hooks
 import React, { useState, useEffect } from "react";
-import { Fade } from "react-awesome-reveal";
 import { useParams, Link } from "react-router-dom";
 
-import Loading from "@/components/loading/Loading";
+// Animations
+import { Fade } from "react-awesome-reveal";
 
+// UI Components
+import Loading from "@/components/loading/Loading";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -22,6 +25,18 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+// Icons
+import {
   User,
   Pencil,
   Mail,
@@ -35,73 +50,61 @@ import {
   ChevronRight,
   BookUser,
 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
-// Servicio
+// Services
 import { PersonaService } from "@/services/personaService";
 
+/**
+ * UserDetails
+ * Página de detalles de una persona/usuario.
+ * Permite visualizar y editar los datos de una persona, incluyendo información personal,
+ * de contacto y domicilio. Utiliza un diálogo para la edición.
+ */
 function UserDetails() {
+  // Obtiene el parámetro de la URL (id de la persona)
   const { id } = useParams();
+
+  // Estado para los datos del usuario y edición
   const [user, setUser] = useState(null);
   const [editingUser, setEditingUser] = useState(null);
 
+  // Estado para listas de selección
   const [redesSociales, setRedesSociales] = useState([]);
   const [tiposDocumentos, setTiposDocumentos] = useState([]);
   const [localidades, setLocalidades] = useState([]);
 
+  // Carga los datos de la persona al montar el componente o cambiar el id
   useEffect(() => {
     PersonaService.get_by_id(id)
       .then((res) => {
-        console.log("Respuesta completa:", res);
         if (res?.data) {
           const persona = res.data;
-
+          // Mapea la respuesta a un objeto de usuario para el formulario
           const userMapped = {
             id: persona.id_persona,
             usuario_id: persona.usuario_id || null,
-
             nombre: persona.nombre_persona || "",
             apellido: persona.apellido_persona || "",
-
-            tipo_documento:
-              persona.tipo_documento || "Tipo de documento indefinido",
+            tipo_documento: persona.tipo_documento || "Tipo de documento indefinido",
             documento: persona.num_doc_persona || "",
-
             fecha_nacimiento: persona.fecha_nacimiento_persona || "",
             fechaRegistro: new Date(persona.created_at).toLocaleDateString(),
-            fechaActualizacion: new Date(
-              persona.updated_at
-            ).toLocaleDateString(),
+            fechaActualizacion: new Date(persona.updated_at).toLocaleDateString(),
             eliminado: persona.deleted_at !== null,
-
             // Contacto
             email: persona.contacto?.email_contacto || "Sin email",
             telefono_movil: persona.contacto?.telefono_movil || "Sin móvil",
             telefono_fijo: persona.contacto?.telefono_fijo || "Sin fijo",
-            red_social_nombre:
-              persona.contacto?.red_social_nombre || "Sin red social",
-            red_social_contacto:
-              persona.contacto?.red_social_contacto ||
-              "Sin nombre de usuario en red",
+            red_social_nombre: persona.contacto?.red_social_nombre || "Sin red social",
+            red_social_contacto: persona.contacto?.red_social_contacto || "Sin nombre de usuario en red",
             observacion_contacto: persona.contacto?.observacion_contacto || "",
-
             // Domicilio
             calle: persona.domicilio?.domicilio_calle || "Sin dirección",
             numero: persona.domicilio?.domicilio_numero || "",
             piso: persona.domicilio?.domicilio_piso || "",
             dpto: persona.domicilio?.domicilio_dpto || "",
             referencia: persona.domicilio?.domicilio_referencia || "",
-            codigo_postal:
-              persona.domicilio?.domicilio_postal?.codigo_postal || "",
+            codigo_postal: persona.domicilio?.domicilio_postal?.codigo_postal || "",
             localidad: persona.domicilio?.domicilio_postal?.localidad || "",
             partido: persona.domicilio?.domicilio_postal?.partido || "",
             provincia: persona.domicilio?.domicilio_postal?.provincia || "",
@@ -116,6 +119,7 @@ function UserDetails() {
       });
   }, [id]);
 
+  // Carga listas de selección (redes sociales y tipos de documentos)
   useEffect(() => {
     PersonaService.get_redes_sociales().then((res) => {
       setRedesSociales(res?.data || []);
@@ -124,27 +128,29 @@ function UserDetails() {
       setTiposDocumentos(res?.data || []);
     });
   }, []);
-  console.log("get_tipos_documentos", tiposDocumentos);
 
+  // Carga localidades según el código postal ingresado en edición
   useEffect(() => {
     if (editingUser?.codigo_postal?.length >= 4) {
-      PersonaService.get_localidades_by_codigo_postal(
-        editingUser.codigo_postal
-      ).then((res) => {
-        setLocalidades(res?.data || []);
-        console.log("localidades", res?.data || []);
-      });
+      PersonaService.get_localidades_by_codigo_postal(editingUser.codigo_postal)
+        .then((res) => {
+          setLocalidades(res?.data || []);
+        });
     }
   }, [editingUser?.codigo_postal]);
 
+  /**
+   * handleEditSubmit
+   * Envía los datos editados del usuario al backend y actualiza el estado.
+   */
   const handleEditSubmit = async (e) => {
+    e.preventDefault();
     const body = {
       nombre_persona: editingUser.nombre,
       apellido_persona: editingUser.apellido,
       tipo_documento: editingUser.tipo_documento || "",
       num_doc_persona: editingUser.documento || "",
       fecha_nacimiento_persona: editingUser.fecha_nacimiento || "",
-
       domicilio: {
         domicilio_calle: editingUser.calle,
         domicilio_numero: editingUser.numero,
@@ -158,7 +164,6 @@ function UserDetails() {
           provincia: editingUser.provincia,
         },
       },
-
       contacto: {
         telefono_movil: editingUser.telefono_movil || "",
         telefono_fijo: editingUser.telefono_fijo || "",
@@ -167,20 +172,19 @@ function UserDetails() {
         email_contacto: editingUser.email || "",
       },
     };
-
-    e.preventDefault();
-    console.log(editingUser);
     setUser(editingUser);
     setEditingUser(null);
     PersonaService.editar(id, body);
   };
 
+  // Muestra loading mientras se cargan los datos
   if (!user) {
-    return <Loading></Loading>;
+    return <Loading />;
   }
 
   return (
     <div className="p-6 space-y-6">
+      {/* Card principal con los datos de la persona */}
       <Fade duration={300} triggerOnce>
         <Card>
           <CardHeader>
@@ -191,8 +195,8 @@ function UserDetails() {
               Información detallada de la persona.
             </CardDescription>
           </CardHeader>
-
           <CardContent className="space-y-4">
+            {/* Muestra los campos principales del usuario */}
             {[
               {
                 label: "Nombre completo",
@@ -218,9 +222,7 @@ function UserDetails() {
                 label: "Red social",
                 icon: BadgeCheck,
                 value: user.red_social_nombre
-                  ? `${user.red_social_nombre} (${
-                      user.red_social_contacto || "sin usuario"
-                    })`
+                  ? `${user.red_social_nombre} (${user.red_social_contacto || "sin usuario"})`
                   : "Sin red social",
               },
               {
@@ -228,7 +230,6 @@ function UserDetails() {
                 icon: BadgeCheck,
                 value: user.observacion_contacto || "Sin observaciones",
               },
-
               {
                 label: "Dirección y Ubicación",
                 icon: MapPin,
@@ -236,11 +237,7 @@ function UserDetails() {
                   <div className="flex flex-wrap gap-x-4 gap-y-1">
                     <span>
                       <strong>Dirección:</strong>{" "}
-                      {`${user.localidad || "-"} (${
-                        user.codigo_postal || "-"
-                      }) - ${user.calle || "-"} ${user.numero || "-"} - Piso: ${
-                        user.piso || "-"
-                      } Dpto: ${user.dpto || "-"}`}
+                      {`${user.localidad || "-"} (${user.codigo_postal || "-"}) - ${user.calle || "-"} ${user.numero || "-"} - Piso: ${user.piso || "-"} Dpto: ${user.dpto || "-"}`}
                     </span>
                     <span>
                       <strong>Referencia:</strong>{" "}
@@ -255,9 +252,7 @@ function UserDetails() {
                   </div>
                 ),
               },
-
               {
-                // Grupo: Tipo de documento y Número de documento en la misma línea
                 label: "Documento",
                 icon: IdCard,
                 value: (
@@ -271,15 +266,12 @@ function UserDetails() {
                   </div>
                 ),
               },
-
               {
                 label: "Fecha de nacimiento",
                 icon: Calendar,
                 value: user.fecha_nacimiento || "-",
               },
-
               {
-                // Grupo: Fecha de registro y Última actualización en la misma línea
                 label: "Fechas",
                 icon: Calendar,
                 value: (
@@ -308,7 +300,6 @@ function UserDetails() {
               </div>
             ))}
           </CardContent>
-
           <CardFooter className="justify-start">
             <Button
               variant="outline"
@@ -319,6 +310,7 @@ function UserDetails() {
           </CardFooter>
         </Card>
 
+        {/* Breadcrumb de navegación */}
         <Breadcrumb className="mt-auto self-start">
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -351,7 +343,7 @@ function UserDetails() {
         </Breadcrumb>
       </Fade>
 
-      {/* Dialog de edición */}
+      {/* Diálogo de edición de usuario */}
       <Dialog
         open={!!editingUser}
         onOpenChange={(open) => !open && setEditingUser(null)}
@@ -366,6 +358,7 @@ function UserDetails() {
           {editingUser && (
             <form onSubmit={handleEditSubmit}>
               <div className="grid gap-4 py-4">
+                {/* Campos del formulario de edición */}
                 <div className="grid gap-2">
                   <Label htmlFor="nombre">Nombre</Label>
                   <Input
@@ -397,7 +390,6 @@ function UserDetails() {
                     onChange={(e) =>
                       setEditingUser({ ...editingUser, email: e.target.value })
                     }
-                  
                   />
                 </div>
                 <div className="grid gap-2">
@@ -513,7 +505,6 @@ function UserDetails() {
                     />
                   )}
                 </div>
-
                 <div className="grid gap-2">
                   <Label htmlFor="partido">Partido</Label>
                   <Input
@@ -540,7 +531,6 @@ function UserDetails() {
                     }
                   />
                 </div>
-
                 <div className="grid gap-2">
                   <Label htmlFor="fecha_nacimiento">Fecha de nacimiento</Label>
                   <Input
@@ -555,7 +545,6 @@ function UserDetails() {
                     }
                   />
                 </div>
-
                 <div className="grid gap-2">
                   <Label htmlFor="tipo_documento">Tipo de documento</Label>
                   <select
@@ -577,7 +566,6 @@ function UserDetails() {
                     ))}
                   </select>
                 </div>
-
                 <div className="grid gap-2">
                   <Label htmlFor="documento">Número de Documento</Label>
                   <Input
@@ -591,7 +579,6 @@ function UserDetails() {
                     }
                   />
                 </div>
-
                 <div className="grid gap-2">
                   <Label htmlFor="red_social_nombre">Red Social</Label>
                   <select
@@ -613,7 +600,6 @@ function UserDetails() {
                     ))}
                   </select>
                 </div>
-
                 <div className="grid gap-2">
                   <Label htmlFor="red_social_contacto">
                     Usuario de Red Social
