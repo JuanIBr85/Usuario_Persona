@@ -77,7 +77,7 @@ def generar_token_restauracion(email: str) -> str:
         "sub": email,
         "email": email,
         "type": "restauracion_admin",
-        "exp": datetime.now(timezone.utc) + timedelta(minutes=30),
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=720),
     }
     return encode(payload, getenv("JWT_SECRET", "clave_jwt_123"), algorithm="HS256")
 

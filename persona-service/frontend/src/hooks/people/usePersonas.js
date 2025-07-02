@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { PersonaService } from "@/services/personaService";
 import { formSubmitJson } from "@/utils/formUtils";
-
+import { traducirRateLimitMessage } from "@/utils/traductores";
 /**
  * Hook personalizado que encapsula la lógica de obtención de personas,
  * tipos de documentos, redes sociales y localidades según código postal.
@@ -30,7 +30,7 @@ export function usePersonas() {
 
     // Estado: Localidades asociadas al código postal ingresado
     const [localidades, setLocalidades] = useState([]);
-    
+
     // Estado para notificaciones
     const [alert, setAlert] = useState(null);
 
@@ -72,6 +72,31 @@ export function usePersonas() {
             .catch(() => setTiposDocumentos([]));
     }, []);
 
+    // Función para extraer el mensaje de error del servidor.  
+    // El metodo tipico de "const rawMsg = e?.data?.message || e?.message || "Error desconocido."
+    // no funcionaba por lo que se optó por una función más robusta
+    const extractServerError = (err) => {
+        if (err && typeof err.message === "string") {
+            // Busca texto tipo Datos: { ... }
+            const match = err.message.match(/Datos:\s*(\{[\s\S]*\})/);
+            if (match && match[1]) {
+                try {
+                    const parsed = JSON.parse(match[1]);
+                    return parsed?.error?.server
+                        || parsed?.message
+                        || "Error desconocido";
+                } catch (e) {
+                    // Si el JSON está mal, muestra el string bruto
+                    return "Error desconocido";
+                }
+            }
+            // No encontró JSON, muestra mensaje base
+            return err.message;
+        }
+        // Si no hay message, retorna string por defecto
+        return "Error desconocido";
+    };
+
     /**
      * Obtiene localidades según un código postal dado.
      * Solo realiza la petición si el código postal tiene al menos 4 caracteres.
@@ -107,10 +132,13 @@ export function usePersonas() {
                 });
             })
             .catch((err) => {
-                console.error("Error eliminando persona:", err);
+                const msg = extractServerError(err);
+
+                console.log("Error al eliminar persona:", msg);
+
                 setAlert({
                     title: "Error",
-                    description: "No se pudo eliminar la persona",
+                    description: msg,
                     variant: "destructive"
                 });
             });
@@ -141,23 +169,23 @@ export function usePersonas() {
 
             // Actualiza el estado local solo si la petición fue exitosa
             setUsers(users.map((u) => (u.id === editingUser.id ? editingUser : u)));
-            
+
             setAlert({
                 title: "Éxito",
                 description: "La persona se actualizó correctamente",
                 variant: "success"
             });
-            
+
             return { success: true };
         } catch (err) {
             console.error("Error actualizando persona:", err);
-            
+
             setAlert({
                 title: "Error al actualizar persona",
-                description: err?.response?.data?.message || "Error desconocido",
+                description: "Error actualizando persona",
                 variant: "destructive"
             });
-            
+
             return { success: false, error: err };
         }
     };

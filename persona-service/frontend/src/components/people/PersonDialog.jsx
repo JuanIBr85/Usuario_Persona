@@ -19,6 +19,28 @@ import SimpleSelect from "@/components/SimpleSelect";
 import { SelectItem } from "@/components/ui/select";
 import ResponsiveColumnForm from "@/components/ResponsiveColumnForm";
 
+/**
+ * PersonDialog
+ *
+ * Componente de diálogo para crear una nueva persona en el sistema.
+ * Permite ingresar datos personales, domicilio y contacto, incluyendo la asociación opcional a un usuario del sistema.
+ * Utiliza varios componentes personalizados para formularios y selectores.
+ *
+ * Este componente reemplaza a PersonCreateDialog.jsx.
+ *
+ * Props:
+ * @param {boolean} isDialogOpen - Indica si el diálogo está abierto.
+ * @param {function} setIsDialogOpen - Función para cambiar el estado de apertura del diálogo.
+ * @param {object} newUser - Objeto que contiene los datos del nuevo usuario/persona.
+ * @param {function} handleChange - Función para manejar cambios en los campos del formulario.
+ * @param {function} handleSubmit - Función que se ejecuta al enviar el formulario.
+ * @param {Array<string>} tiposDocumentos - Lista de tipos de documentos disponibles.
+ * @param {Array<string>} localidades - Lista de localidades disponibles.
+ * @param {function} handleChangePostal - Función para manejar cambios en el campo de código postal.
+ * @param {Array<string>} redesSociales - Lista de redes sociales disponibles.
+ *
+ * @returns {JSX.Element} El diálogo de creación de persona.
+ */
 function PersonDialog({
     isDialogOpen,
     setIsDialogOpen,
@@ -30,9 +52,9 @@ function PersonDialog({
     handleChangePostal,
     redesSociales,
 }) {
-    // Nuevo: hook de usuarios básicos
+    // hook de usuarios básicos
     const { usuarios, loading, error } = useUsuariosBasic();
-
+    
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
@@ -127,7 +149,7 @@ function PersonDialog({
                                         <option disabled>Cargando usuarios...</option>
                                     )}
                                     {error && (
-                                        <option disabled>Error al cargar usuarios</option>
+                                        <option disabled>{error}</option>
                                     )}
                                     {usuarios.map(u => (
                                         <option key={u.id} value={u.id}>

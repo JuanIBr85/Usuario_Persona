@@ -77,7 +77,7 @@ class UsuarioService(ServicioBase):
                 enviar_solicitud_restauracion_admin(usuario_existente)
                 return (
                     ResponseStatus.FAIL,
-                    "Ya existe una cuenta con este email desactivada. Hemos notificado al administrador.",
+                    "Ya existe una cuenta con este email desactivada. Hemos notificado al administrador. Verifique su email en las proximas 48 horas",
                     None,
                     403,
                 )

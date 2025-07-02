@@ -29,7 +29,10 @@ usuario_service = UsuarioService()
 
 
 @usuario_bp.route("/registro", methods=["POST"])
-@api_access(is_public=True, limiter=["2 per minute"])
+@api_access(
+    is_public=True, 
+    limiter=["1 per minute", "5 per hour"]
+)
 def iniciar_registro_usuario():
     data = request.get_json()
     if not data:
@@ -48,7 +51,11 @@ def iniciar_registro_usuario():
 
 
 @usuario_bp.route("/verificar-email", methods=["POST"])
-@api_access(is_public=True)
+@api_access(
+    is_public=True, 
+    limiter=["3 per minute , 10 per hour"], 
+    cache=CacheSettings(expiration=1800, params=["email_usuario", "otp"]),
+)
 def confirmar_registro_usuario():
     data = request.get_json()
     email = data.get("email_usuario")
@@ -79,7 +86,10 @@ def confirmar_registro_usuario():
 
 
 @usuario_bp.route("/login", methods=["POST"])
-@api_access(is_public=True, limiter=["3 per minute"])
+@api_access(
+    is_public=True, 
+    limiter=["5 per minute", "20 per hour"]
+)
 def login1():
     session = SessionLocal()
     try:
@@ -111,7 +121,10 @@ def login1():
 
 
 @usuario_bp.route("/logout", methods=["POST"])
-@api_access(is_public=False)
+@api_access(
+    is_public=False,
+    access_permissions=["auth.admin.logout"],
+)
 def logout_usuario():
     session = SessionLocal()
     try:
@@ -137,7 +150,11 @@ def logout_usuario():
         session.close()
 
 @usuario_bp.route("/modificar", methods=["POST"])
-@api_access(is_public=False, limiter=["10 per minute"])
+@api_access(
+    is_public=False, 
+    access_permissions=["auth.admin.modificar_usuario"],
+    limiter=["6 per minute"],
+)
 def modificar_perfil():
     session = SessionLocal()
     try:
@@ -173,7 +190,11 @@ def modificar_perfil():
 
 
 @usuario_bp.route("/eliminar", methods=["DELETE"])
-@api_access(is_public=False)
+@api_access(
+    is_public=False, 
+    access_permissions=["auth.admin.eliminar_usuario"],
+    limiter="2 per day",
+)
 def eliminar_usuario():
     session = SessionLocal()
     try:
@@ -194,7 +215,12 @@ def eliminar_usuario():
 
 
 @usuario_bp.route("/perfil", methods=["GET"])
-@api_access(is_public=False, limiter=["4 per minute"])
+@api_access(
+    is_public=False, 
+    limiter=["10 per minute"],
+    cache=CacheSettings(expiration=60, params=["id_usuario"]),
+    access_permissions=["auth.admin.ver_usuario"],
+)
 def perfil_usuario():
     session = SessionLocal()
     try:
@@ -224,7 +250,10 @@ def perfil_usuario():
 
 
 @usuario_bp.route("/solicitar-otp", methods=["POST"])
-@api_access(is_public=True, limiter=["10 per minute", "10 per day"])
+@api_access(
+    is_public=True, 
+    limiter=["2 per minute", "5 per hour"]
+)
 def solicitar_otp():
     session = SessionLocal()
     try:
@@ -260,9 +289,9 @@ def solicitar_otp():
 @usuario_bp.route("/verificar-otp", methods=["POST"])
 @api_access(
     is_public=True,
-    limiter=["5 per minute", "10 per day"],
+    limiter=["3 per minute", "10 per hour"],
     # 1hs previene que reenvien el token correcto para evitar abusos
-    # cache=CacheSettings(expiration=60 * 60, params=["email", "otp"]),
+    cache=CacheSettings(expiration=3600, params=["email", "otp"]),
 )
 def verificar_otp():
     session = SessionLocal()
@@ -301,7 +330,10 @@ def verificar_otp():
 
 
 @usuario_bp.route("/reset-password-con-codigo", methods=["POST"])
-@api_access(is_public=True, limiter=["3 per day"])
+@api_access(
+    is_public=True, 
+    limiter=["3 per day"],
+)
 def reset_con_otp():
     session = SessionLocal()
     try:
@@ -366,9 +398,9 @@ def reset_con_otp():
 @usuario_bp.route("/verificar-dispositivo", methods=["GET"])
 @api_access(
     is_public=True,
-    limiter=["2 per minute"],
+    limiter=["2 per minute", "5 per hour"],
     # Cache para evitar abusos
-    cache=CacheSettings(expiration=60 * 30, params=["token"]),
+    cache=CacheSettings(expiration=1800, params=["token"]),
 )
 def verificar_dispositivo():
     token = request.args.get("token")
@@ -451,8 +483,8 @@ def verificar_dispositivo():
 @usuario_bp.route("/refresh", methods=["POST"])
 @api_access(
     is_public=True,
-    limiter=["5 per minute", "5 per hour"],
-)  # solo controla si es pública, pero no te ayuda con el refresh_token
+    limiter=["5 per minute", "20 per hour"],
+)
 def refresh_token():
     session = SessionLocal()
     try:
@@ -505,9 +537,10 @@ def refresh_token():
 
 
 @usuario_bp.route("/confirmar-restauracion", methods=["GET"])
-@api_access(is_public=True,
-            limiter=["5 per minute", "5 per hour"]
-            )
+@api_access(
+    is_public=True,
+    limiter=["1 per minute", "5 per day"]
+)
 def confirmar_restauracion():
     token = request.args.get("token")
     try:
