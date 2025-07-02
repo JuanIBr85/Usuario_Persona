@@ -12,22 +12,33 @@ STREAMS = {}
 
 _redis_receiver = {}
 
-
+# Decorador para registrar un receiver de eventos de redis
+# Sirve como una forma de sincronizar workers, a futuro talvez se podria reutilizar
+# stream_name sirve como un canal para los mensajes
 def register_redis_receiver(stream_name: str):
     def decorador(f):
+        # Define el nombre del "canal"
         _group_stream = f"{GROUP_NAME}_{stream_name}"
+
+        # Si el canal ya esta registrado, lanza un error
+        # No pueden haber dos metodos escuchando el mismo canal
         if _group_stream in _redis_receiver:
             raise ValueError(f"El stream {stream_name} ya esta registrado")
 
+        # Si el metodo no es callable, lanza un error
         if not callable(f):
             raise ValueError("El decorador receiver solo puede ser usado con funciones")
-
+        
+        # Guarda el metodo en el diccionario
         _redis_receiver[_group_stream] = f
 
+        # Guarda el stream en el diccionario
+        # El $ indica que solo espera nuevos mensajes
         STREAMS[_group_stream] = "$"
 
         # Crea el grupo
         try:
+            # Crea el stream(canal) si no existe
             r.xgroup_create(_group_stream, GROUP_NAME, id="$", mkstream=True)
         except Exception as e:
             # Ignora el error si el grupo ya existe
@@ -69,6 +80,7 @@ def redis_receiver(app: Flask):
                 r.xack(stream, GROUP_NAME, msg_id)
 
 
+#Este endpoint esta escuchando el stream "test"
 @register_redis_receiver("test")
 def test(app: Flask, message_data: dict):
     logger.warning(f"Worker {WORKER_ID} recibio mensaje: {message_data}")
@@ -85,10 +97,12 @@ def send_event(stream_name: str, message_data: dict):
     r.xadd(_group_stream, {"data": json.dumps(message_data)})
 
 
+# Inicia el redis receiver
 def redis_stream_start(app: Flask):
     import time
 
     def run():
+        # Espero unos segundos para asegurarme de que se ejecute flask
         time.sleep(5)
         # Ejecuta el redis receiver con el contexto de flask
         with app.app_context():

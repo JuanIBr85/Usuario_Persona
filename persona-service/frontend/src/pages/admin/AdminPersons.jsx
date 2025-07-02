@@ -142,7 +142,7 @@ function AdminPersons() {
 
       await PersonaService.crear(body);
 
-      const newUserForTable = {
+      const newUserForTable = { 
         id: null,
         nombre: formData.nombre || "",
         apellido: formData.apellido || "",
@@ -157,10 +157,10 @@ function AdminPersons() {
       setIsDialogOpen(false);
     } catch (error) {
       console.error("Error al crear persona:", error);
-      //const message = error?.response?.data?.message || error.message || "Error desconocido";
-
+      const rawMsg = error?.response?.data?.message || error.message || "Error desconocido";
+      console.log("Error al crear persona:", rawMsg);
       setAlert({
-        title: "Error al crear persona",
+        title: rawMsg,
         description: "",
       });
       setIsDialogOpen(false);
