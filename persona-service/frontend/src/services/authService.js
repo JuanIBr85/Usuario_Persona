@@ -121,5 +121,25 @@ logout: async () => {
     useToken: true,
     showError: AuthService.showError
   });
-},
+  },
+   
+  updateUser: async (body) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/modificar`,
+      method: HttpMethod.POST,
+      body: body,
+      useToken: true,
+      showError: AuthService.showError,
+    });
+  },
+
+  deleteUser: async () => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/eliminar`,
+      method: HttpMethod.DELETE,
+      useToken: true,
+      showError: AuthService.showError,
+    });
+  },
+
 };
