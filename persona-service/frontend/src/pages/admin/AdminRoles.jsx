@@ -16,7 +16,7 @@ import RolesErrorDialog from "@/components/roles/RolesErrorDialog";
 import RoleAssignment from "@/components/roles/RoleAssignment";
 import RoleForm from "@/components/roles/RoleForm";
 import RoleList from "@/components/roles/RoleList";
-
+import { BadgePlus } from "lucide-react";
 // Services
 import { roleService } from "@/services/roleService";
 import { permisoService } from "@/services/permisoService";
@@ -278,18 +278,17 @@ export default function AdminRoles() {
           onEdit={handleEditClick}
           onDelete={openDeleteConfirmDialog}
           formatPermissionName={formatPermissionName}
-        />
+        >
+          {!showNewRoleForm && (
+            <div>
+              <Button onClick={openNewRoleForm} className="mb-4">
+                <BadgePlus/> Agregar Rol
+              </Button>
+            </div>
+          )}
+        </RoleList>
 
-        {/* Botón para agregar nuevo rol */}
-        {!showNewRoleForm && (
-          <div>
-            <Button onClick={openNewRoleForm} className="mb-4">
-              Agregar Rol
-            </Button>
-          </div>
-        )}
-
-        {/* Formulario de rol (nuevo o edición) */}
+        {/* Formulario de rol  */}
         {showNewRoleForm && (
           <RoleForm
             isEditing={!!editRoleId}
