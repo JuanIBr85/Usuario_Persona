@@ -118,8 +118,6 @@
         - ./nginx/conf.d:/etc/nginx/conf.d
         - ./nginx/cert:/etc/nginx/cert
         - ./nginx/logs:/var/log/nginx
-      depends_on:
-        - component-service
 
     #phpmyadmin:
     #  image: phpmyadmin/phpmyadmin

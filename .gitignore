@@ -3,3 +3,5 @@ venv2/
 venv/
 *.txt
 
+nginx/logs/error.log
+nginx/logs/access.log
