@@ -80,6 +80,19 @@ class PersonaService(IPersonaInterface):
 
             data_validada = self.schema.load(data)
 
+            existe_persona = (
+                    session.query(Persona)
+                    .filter(
+                        Persona.tipo_documento == data_validada["tipo_documento"],
+                        Persona.num_doc_persona == data_validada["num_doc_persona"],
+                        Persona.deleted_at.is_(None)
+                    )
+                    .first()        
+            )
+
+            if existe_persona:
+                raise Exception("La persona ya se encuentra registrada con ese tipo y numero de documento")
+
             # Se crea el contacto, domicilio
             domicilio = self.domicilio_service.crear_domicilio(
                 data_validada.pop("domicilio"), session=session
