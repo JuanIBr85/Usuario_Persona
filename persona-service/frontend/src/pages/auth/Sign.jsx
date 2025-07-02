@@ -32,6 +32,7 @@ function Sign() {
 
     AuthService.register(formData) // Llama al servicio para registrar al usuario
       .then(() => {
+
         // Si fue exitoso, muestra mensaje de éxito y activa bandera isOK
         sessionStorage.setItem("email_verificar", formData.email_usuario);
         setMessage(
