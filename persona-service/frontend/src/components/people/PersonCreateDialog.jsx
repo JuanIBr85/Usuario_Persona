@@ -169,7 +169,6 @@ export default function PersonCreateDialog({
                         <Label>Email contacto</Label>
                         <Input
                             name="email_contacto"
-                            type={"email"}
                             value={newUser.email_contacto || ""}
                             onChange={handleChange}
                         />

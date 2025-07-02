@@ -1,21 +1,21 @@
-import React, {  } from "react";
+import React from "react";
+import { useUsuariosBasic } from "@/hooks/users/useUsuariosBasic";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from "@/components/ui/dialog";
 
 import InputValidate from "@/components/inputValidate/InputValidate";
 import SimpleSelect from "@/components/SimpleSelect";
-
 import { SelectItem } from "@/components/ui/select";
 import ResponsiveColumnForm from "@/components/ResponsiveColumnForm";
 
@@ -30,11 +30,13 @@ function PersonDialog({
     handleChangePostal,
     redesSociales,
 }) {
+    // Nuevo: hook de usuarios básicos
+    const { usuarios, loading, error } = useUsuariosBasic();
+
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
                 <Button variant="outline" className={"mt-5"}>
-                    {" "}
                     <Plus /> Crear Persona
                 </Button>
             </DialogTrigger>
@@ -107,13 +109,33 @@ function PersonDialog({
                                 required
                             />
 
-                            <InputValidate
-                                id="usuario_id"
-                                name="usuario_id"
-                                type="text"
-                                labelText="ID Usuario"
-                                value={newUser.usuario_id || ""}
-                            />
+                            {/* Select de usuario */}
+                            <div>
+
+                                <label className="block text-sm font-medium mb-1" htmlFor="usuario_id">
+                                    Usuario del sistema
+                                </label>
+                                <select
+                                    id="usuario_id"
+                                    name="usuario_id"
+                                    className="border rounded px-2 py-1 w-full"
+                                    value={newUser.usuario_id || ""}
+                                    onChange={handleChange}
+                                >
+                                    <option value="">Ningún usuario</option>
+                                    {loading && (
+                                        <option disabled>Cargando usuarios...</option>
+                                    )}
+                                    {error && (
+                                        <option disabled>Error al cargar usuarios</option>
+                                    )}
+                                    {usuarios.map(u => (
+                                        <option key={u.id} value={u.id}>
+                                            {u.nombre_usuario} ({u.email_usuario})
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
                         </ResponsiveColumnForm>
                     </div>
 
