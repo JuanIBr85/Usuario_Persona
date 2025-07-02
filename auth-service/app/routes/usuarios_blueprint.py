@@ -10,7 +10,7 @@ from flask import request, Blueprint, Response
 from app.database.session import SessionLocal
 from app.services.usuario_service import UsuarioService
 from app.extensions import limiter
-from app.utils.jwt import verificar_token_reset
+from app.utils.jwt import verificar_token_reset,verificar_token_restauracion_usuario
 from jwt import ExpiredSignatureError, InvalidTokenError
 from app.utils.email import decodificar_token_verificacion, generar_token_dispositivo
 from app.models.usuarios import Usuario
@@ -172,7 +172,7 @@ def modificar_perfil():
         session.close()
 
 
-@usuario_bp.route("/eliminar_usuario", methods=["DELETE"])
+@usuario_bp.route("/eliminar", methods=["DELETE"])
 @api_access(is_public=False)
 def eliminar_usuario():
     session = SessionLocal()
@@ -502,3 +502,40 @@ def refresh_token():
 
     finally:
         session.close()
+
+
+@usuario_bp.route("/confirmar-restauracion", methods=["GET"])
+@api_access(is_public=True,
+            limiter=["5 per minute", "5 per hour"]
+            )
+def confirmar_restauracion():
+    token = request.args.get("token")
+    try:
+        email = verificar_token_restauracion_usuario(token)
+        if not email:
+            return make_response(ResponseStatus.FAIL, "Token inválido o expirado", None, 400)
+        
+        session = SessionLocal()
+        usuario = session.query(Usuario).filter_by(email_usuario=email, eliminado=True).first()
+
+        if not usuario:
+            return "Usuario no encontrado o ya restaurado.", 404
+
+        usuario.eliminado = False
+        usuario.deleted_at = None
+        session.commit()
+
+        return """
+        <!DOCTYPE html>
+        <html>
+        <body style="font-family:sans-serif;text-align:center;padding:2rem;">
+        <h1>✅ Cuenta restaurada</h1>
+        <p>Ahora podés iniciar sesión con tus credenciales anteriores.</p>
+        </body>
+        </html>
+        """, 200
+
+    except ExpiredSignatureError:
+        return "El enlace ha expirado.", 400
+    except InvalidTokenError:
+        return "Token inválido.", 400

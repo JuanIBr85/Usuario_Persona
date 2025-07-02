@@ -28,7 +28,7 @@ from app.utils.email import (
     generar_codigo_otp,
     enviar_codigo_por_email,
     enviar_codigo_por_email_registro,
-    decodificar_token_verificacion,
+    enviar_solicitud_restauracion_admin,
     enviar_email_validacion_dispositivo,
 )
 from app.utils.otp_manager import (
@@ -63,21 +63,31 @@ class UsuarioService(ServicioBase):
         except ValidationError as e:
             return ResponseStatus.FAIL, "Error en los datos de entrada", e.messages, 400
 
-        # Verificar si el usuario ya existe
-        if (
+        usuario_existente = (
             session.query(Usuario)
             .filter(
-                (Usuario.nombre_usuario == data_validada["nombre_usuario"])
-                | (Usuario.email_usuario == data_validada["email_usuario"])
+                (Usuario.email_usuario == data_validada["email_usuario"])
+                | (Usuario.nombre_usuario == data_validada["nombre_usuario"])
             )
             .first()
-        ):
-            return (
-                ResponseStatus.FAIL,
-                "El nombre de usuario o email ya están registrados",
-                None,
-                400,
-            )
+        )
+
+        if usuario_existente:
+            if usuario_existente.eliminado:
+                enviar_solicitud_restauracion_admin(usuario_existente)
+                return (
+                    ResponseStatus.FAIL,
+                    "Ya existe una cuenta con este email desactivada. Hemos notificado al administrador.",
+                    None,
+                    403,
+                )
+            else:
+                return (
+                    ResponseStatus.FAIL,
+                    "El nombre de usuario o email ya están registrados.",
+                    None,
+                    400,
+                )
 
         # Generar y guardar OTP
         email = data_validada["email_usuario"]
