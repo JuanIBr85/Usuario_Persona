@@ -21,7 +21,7 @@ superadmin_service = SuperAdminService()
 @superadmin_bp.route("/admins", methods=["POST"])
 @api_access(
     is_public=False,
-    limiter=["6 per minute"],
+    limiter=["5 per minute"],
     access_permissions=["auth.admin.crear_usuario_con_rol"],
 )
 def crear_usuario_con_rol():
@@ -69,7 +69,7 @@ def crear_usuario_con_rol():
 @superadmin_bp.route("/roles", methods=["POST"])
 @api_access(
     is_public=False,
-    limiter=["6 per minute"],
+    limiter=["5 per minute"],
     access_permissions=["auth.admin.crear_rol"],
 )
 def crear_rol():
@@ -105,7 +105,7 @@ def crear_rol():
 @superadmin_bp.route("/admins/permisos/<int:id>", methods=["POST"])
 @api_access(
     is_public=False,
-    limiter=["6 per minute"],
+    limiter=["5 per minute"],
     access_permissions=["auth.admin.asignar_permisos_rol"],
 )
 def asignar_permisos_rol(id):
@@ -146,7 +146,7 @@ def asignar_permisos_rol(id):
 @superadmin_bp.route("/usuarios/<int:id>", methods=["PUT"])
 @api_access(
     is_public=False,
-    limiter=["6 per minute"],
+    limiter=["5 per minute"],
     access_permissions=["auth.admin.modificar_usuario_con_rol"],
 )
 def modificar_usuario_con_rol(id):
@@ -186,7 +186,7 @@ def modificar_usuario_con_rol(id):
 @superadmin_bp.route("/roles/<int:rol_id>", methods=["PUT"])
 @api_access(
     is_public=False,
-    limiter=["6 per minute"],
+    limiter=["5 per minute"],
     access_permissions=["auth.admin.modificar_rol"],
 )
 def modificar_rol(rol_id):
@@ -203,7 +203,7 @@ def modificar_rol(rol_id):
 @superadmin_bp.route("/permisos", methods=["POST"])
 @api_access(
     is_public=False,
-    limiter=["6 per minute"],
+    limiter=["5 per minute"],
     access_permissions=["auth.admin.crear_permiso"],
 )
 def crear_permiso():
@@ -246,7 +246,7 @@ def obtener_roles():
 @superadmin_bp.route("/roles/<int:rol_id>", methods=["DELETE"])
 @api_access(
     is_public=False,
-    limiter=["6 per minute"],
+    limiter=["5 per minute"],
     access_permissions=["auth.admin.borrar_rol"],
 )
 def borrar_rol(rol_id):
@@ -278,7 +278,7 @@ def borrar_rol(rol_id):
     is_public=False,
     limiter=["10 per minute"],
     access_permissions=["auth.admin.obtener_permisos"],
-    cache=CacheSettings(expiration=20),
+    cache=CacheSettings(expiration=10),
 )
 def obtener_permisos():
     session = SessionLocal()
@@ -301,7 +301,7 @@ def obtener_permisos():
 @superadmin_bp.route("/usuarios", methods=["GET"])
 @api_access(
     is_public=False,
-    limiter=["10 per minute"],
+    limiter=["5 per minute"],
     access_permissions=["auth.admin.obtener_usuarios"],
     cache=CacheSettings(expiration=10),
 )
@@ -324,7 +324,12 @@ def obtener_usuarios():
 # obtener todos los usuarios eliminados
 # ========================================
 @superadmin_bp.route("/usuarios-eliminados", methods=["GET"])
-@api_access(access_permissions=["auth.admin.obtener_usuarios_eliminados"])
+@api_access(
+    is_public=False, 
+    limiter=["3 per minute"],
+    access_permissions=["auth.admin.obtener_usuarios_eliminados"],
+    cache=CacheSettings(expiration=10),
+)
 def ver_usuarios_eliminados():
     session = SessionLocal()
     try:
@@ -341,9 +346,9 @@ def ver_usuarios_eliminados():
 @superadmin_bp.route("/restaurar-usuario", methods=["GET"])
 @api_access(
     is_public=True,
-    limiter=["10 per minute"],
+    limiter=["3 per minute"],
     access_permissions=["auth.admin.restaurar_usuario"],
-    cache=CacheSettings(expiration=10),
+    cache=CacheSettings(expiration=600, params=["token"]),
     )
 def restaurar_usuario_desde_token():
     session = SessionLocal()
@@ -356,7 +361,15 @@ def restaurar_usuario_desde_token():
         usuario = session.query(Usuario).filter_by(email_usuario=email, eliminado=True).first()
 
         if not usuario:
-            return "Usuario no encontrado o ya restaurado.", 404
+            return """
+            <!DOCTYPE html>
+            <html>
+            <body style="font-family:sans-serif;text-align:center;padding:2rem;">
+            <h1>⚠️ Usuario no encontrado</h1>
+            <p>Es posible que el usuario ya haya sido restaurado o no exista.</p>
+            </body>
+            </html>
+            """, 404
 
         # 1) Generar nuevo token para que el usuario confirme
         token_usuario = generar_token_confirmacion_usuario(email)
@@ -365,7 +378,15 @@ def restaurar_usuario_desde_token():
         # 2) Enviar mail de confirmación al usuario
         enviar_mail_confirmacion_usuario(usuario, enlace_usuario)
 
-        return "Se envió un correo al usuario para confirmar la restauración.", 200
+        return f"""
+        <!DOCTYPE html>
+        <html>
+        <body style="font-family:sans-serif;text-align:center;padding:2rem;">
+        <h1>📧 Correo enviado</h1>
+        <p>Se envió un correo a <strong>{email}</strong> con un enlace para que confirme la restauración de su cuenta.</p>
+        </body>
+        </html>
+        """, 200
 
     except ExpiredSignatureError:
         return "El enlace ha expirado.", 400
