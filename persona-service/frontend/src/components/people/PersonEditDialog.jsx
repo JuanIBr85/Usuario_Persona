@@ -94,7 +94,7 @@ function PersonEditDialog({ editingUser, setEditingUser, onSubmit, tiposDocument
                 >
                   <option value="">Ningún usuario</option>
                   {loading && <option disabled>Cargando usuarios...</option>}
-                  {error && <option disabled>Error al obtener usuarios</option>}
+                  {error && <option disabled>{error}</option>}
                   {usuarios.map(u => (
                     <option key={u.id} value={u.id}>
                       {u.nombre_usuario} ({u.email_usuario})
