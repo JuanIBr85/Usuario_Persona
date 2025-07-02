@@ -20,9 +20,9 @@ function SimpleSelect({
     ...props
 }) {
 
-    const [internalValue, setInternalValue] = useState(value);
+    const [internalValue, setInternalValue] = useState(value || '');
     useEffect(() => {
-        setInternalValue(value)
+        setInternalValue(value || '')
     }, [value]);
     
     return (
@@ -30,7 +30,7 @@ function SimpleSelect({
             <Label htmlFor={name}>{label}</Label>
             <div className="relative">
                 <Select id={id} name={name} value={internalValue} onValueChange={(e) => {
-                    setInternalValue(e);
+                    setInternalValue(e || '');
                     onValueChange && onValueChange(e);
                 }} required={required} {...props}>
                     <SelectTrigger className="w-full">

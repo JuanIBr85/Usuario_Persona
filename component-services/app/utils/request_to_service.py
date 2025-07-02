@@ -30,8 +30,8 @@ ALLOWED_RESPONSE_HEADERS = (
     "SUNSET",  # RFC 8594 - fecha cuando el endpoint será removido
 )
 
-
-def request_to_service(url):
+# Este metodo envia una request al microservicio y retorna la respuesta
+def request_to_service(url:str):
     # se remueven los parametros de los headers, para evitar errores
     headers = {
         key: value for key, value in request.headers if key.upper() in SAFE_HEADERS
