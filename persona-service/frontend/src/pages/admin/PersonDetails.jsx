@@ -8,6 +8,34 @@ import PersonDetailsCard from "@/components/person-details/PersonDetailsCard";
 import PersonEditDialog from "@/components/person-details/PersonEditDialog";
 import PersonDetailsBreadcrumb from "@/components/person-details/PersonDetailsBreadcrumb";
 
+/**
+ * PersonDetails component
+ *
+ * Muestra los detalles de una persona específica obtenida por su ID desde la URL.
+ * Permite visualizar y editar la información personal, de contacto y domicilio de la persona.
+ * Gestiona la carga de datos auxiliares como tipos de documentos, redes sociales y localidades según el código postal.
+ *
+ * Estado:
+ * - person: Objeto con los datos mapeados de la persona.
+ * - editingPerson: Objeto con los datos de la persona en modo edición.
+ * - redesSociales: Lista de redes sociales disponibles.
+ * - tiposDocumentos: Lista de tipos de documentos disponibles.
+ * - localidades: Lista de localidades filtradas por código postal.
+ *
+ * Efectos:
+ * - Carga los datos de la persona al montar el componente o cambiar el ID.
+ * - Carga las listas de redes sociales y tipos de documentos al montar.
+ * - Carga las localidades cuando cambia el código postal en edición.
+ *
+ * Props: Ninguna.
+ *
+ * Dependencias:
+ * - PersonaService: Servicio para obtener y editar datos de personas.
+ * - useParams: Hook de React Router para obtener parámetros de la URL.
+ * - PersonDetailsCard, PersonDetailsBreadcrumb, PersonEditDialog, Loading: Componentes auxiliares.
+ *
+ * @component
+ */
 function PersonDetails() {
   const { id } = useParams();
 

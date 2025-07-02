@@ -1,4 +1,5 @@
 import React from "react";
+import { useUsuariosBasic } from "@/hooks/users/useUsuariosBasic";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
   DialogDescription, DialogFooter, DialogClose
@@ -9,6 +10,8 @@ import SimpleSelect from "@/components/SimpleSelect";
 import { SelectItem } from "@/components/ui/select";
 
 function PersonEditDialog({ editingUser, setEditingUser, onSubmit, tiposDocumentos = [] }) {
+  const { usuarios, loading, error } = useUsuariosBasic();
+
   if (!editingUser) return null;
   
   return (
@@ -76,6 +79,31 @@ function PersonEditDialog({ editingUser, setEditingUser, onSubmit, tiposDocument
                 value={editingUser.fecha_nacimiento || ""}
                 onChange={(e) => setEditingUser({ ...editingUser, fecha_nacimiento: e.target.value })}
               />
+
+              {/* Nuevo: Select de usuario */}
+              <div>
+                <label className="block text-sm font-medium mb-1" htmlFor="usuario_id">
+                  Usuario del sistema
+                </label>
+                <select
+                  id="usuario_id"
+                  name="usuario_id"
+                  className="border rounded px-2 py-1 w-full"
+                  value={editingUser.usuario_id || ""}
+                  onChange={(e) => setEditingUser({ ...editingUser, usuario_id: e.target.value })}
+                >
+                  <option value="">Ningún usuario</option>
+                  {loading && <option disabled>Cargando usuarios...</option>}
+                  {error && <option disabled>Error al obtener usuarios</option>}
+                  {usuarios.map(u => (
+                    <option key={u.id} value={u.id}>
+                      {u.nombre_usuario} ({u.email_usuario})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {/* Fin select usuario */}
+
             </div>
 
           </div>

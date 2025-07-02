@@ -18,7 +18,7 @@ export default function RoleForm({
     <Fade duration={300} triggerOnce>
       <Card>
         <CardHeader>
-          <CardTitle>{isEditing ? "Editar Rol" : "Nuevo Rol"}</CardTitle>
+          <CardTitle>{isEditing ? "Editar este rol" : "Agrega un nuevo rol"}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <Input

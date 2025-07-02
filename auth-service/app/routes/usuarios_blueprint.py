@@ -42,7 +42,7 @@ def iniciar_registro_usuario():
         status, mensaje, contenido, codigo = usuario_service.iniciar_registro(
             session, data
         )
-        return make_response(status, mensaje, contenido, codigo)
+        return make_response(status, mensaje, contenido), codigo
     finally:
         session.close()
 
