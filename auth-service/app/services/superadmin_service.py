@@ -200,8 +200,14 @@ class SuperAdminService:
     # =============================
     # Devuelve todos los usuarios
     # =============================
-    def obtener_usuarios(self, session):
-        usuarios = session.query(Usuario).all()
+    def obtener_usuarios(self, session, solo_eliminados=False):
+        query = session.query(Usuario)
+        if solo_eliminados:
+            query = query.filter_by(eliminado=True).order_by(Usuario.deleted_at.desc())
+        else:
+            query = query.filter_by(eliminado=False)
+            
+        usuarios = query.all()
         resultado = []
         for u in usuarios:
             # Obtener roles asociados (nombres)

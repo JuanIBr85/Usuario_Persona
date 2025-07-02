@@ -5,6 +5,7 @@ import jwt
 from datetime import datetime, timedelta,timezone
 from jwt import decode, ExpiredSignatureError, InvalidTokenError
 from app.utils.render_template_email import render_email_template
+from app.utils.jwt import generar_token_restauracion
 import random
 
 
@@ -184,3 +185,53 @@ def enviar_email_validacion_dispositivo(usuario, user_agent, ip):
     )
     mail.send(msg)
     
+
+def enviar_solicitud_restauracion_admin(usuario):
+    token = generar_token_restauracion(usuario.email_usuario)
+    enlace = f"{current_app.config['USER_RESTORE_URL']}?token={token}"
+
+    saludo = f"""
+        <p style="font-size:16px;">Solicitud de restauración de cuenta</p>
+    """
+    cuerpo = f"""
+        <p>El usuario <strong>{usuario.email_usuario}</strong> intentó registrarse nuevamente.</p>
+        <p>Para restaurar la cuenta, hacé clic en el siguiente botón:</p>
+    """
+    extra = f"""
+        <p style="margin-top:20px;text-align:center;">
+            <a href="{enlace}" style="background-color:white; color:black; padding:12px 24px;
+            text-decoration:none; border-radius:5px; font-weight:bold;">Restaurar cuenta</a>
+        </p>
+    """
+
+    html = render_email_template(saludo, cuerpo, extra, "Este enlace expirará en 30 minutos.")
+    
+    msg = Message(
+        subject="Solicitud de restauración de usuario",
+        recipients=["superadmin@admin.com"], #[current_app.config['superadmin@admin.com']],
+        html=html,
+    )
+    mail.send(msg)
+
+
+def enviar_mail_confirmacion_usuario(usuario, enlace):
+    saludo = f"<p>Hola <strong>{usuario.nombre_usuario}</strong>,</p>"
+    cuerpo = """
+        <p>Recibimos una solicitud para restaurar tu cuenta.</p>
+        <p>Si fuiste vos, confirmá haciendo clic en el botón:</p>
+    """
+    extra = f"""
+        <p style="margin-top:20px;text-align:center;">
+            <a href="{enlace}" style="background-color:white;color:black;padding:12px 24px;
+            text-decoration:none; border-radius:5px;font-weight:bold;">Confirmar restauración</a>
+        </p>
+    """
+
+    html = render_email_template(saludo, cuerpo, extra)
+
+    msg = Message(
+        subject="Confirmar restauración de cuenta",
+        recipients=[usuario.email_usuario],
+        html=html,
+    )
+    mail.send(msg)

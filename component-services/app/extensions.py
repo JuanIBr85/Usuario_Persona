@@ -27,6 +27,7 @@ services_config = []  # json.load(open(SERVICES_CONFIG_FILE))
 
 limiter = Limiter(key_func=get_remote_address, default_limits=["100/minute"])
 
+# Este es el cache de los endpoints
 cache = FanoutCache(
     "cache-db",
     shards=4,  # Número de shards para mejor concurrencia
@@ -37,8 +38,8 @@ cache = FanoutCache(
 logger = logging.getLogger(__name__)
 
 # Configuracion de redis
-redis_client_auth = None
-redis_client_core = None
+redis_client_auth = None # Aca se almacenan los tokens
+redis_client_core = None # Es para intercambiar mensajes para sincronizar los workers
 try:
     redis_client_auth = redis.StrictRedis(
         host=os.getenv("REDIS_HOST", "localhost"),
