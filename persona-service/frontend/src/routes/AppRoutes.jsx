@@ -25,6 +25,7 @@ import ComponentServicesDetails from "@/pages/component/ComponentServicesDetails
 import Redirect from "@/pages/auth/Redirect";
 import EndpointsResearch from "@/pages/endpoints/EndpointsResearch";
 import CreatePerfil from "@/pages/user/CreatePerfil";
+import OTPRegisterRecovery from "@/pages/auth/OTPRegisterRecovery";
 /**
  * Componente que define todas las rutas de la aplicación utilizando react-router-dom.
  * Cada ruta se asocia con un componente de página específico para renderizar.
@@ -63,6 +64,7 @@ function AppRoutes() {
       <Route path="auth/otpvalidation" element={<OTPValidation />} />
       <Route path="auth/redirect" element={<Redirect />} />
       <Route path="auth/otpregister" element={<OTPRegister />} />
+      <Route path="auth/otpregisterrecovery" element={<OTPRegisterRecovery />} />
     </Routes>
   );
 }
