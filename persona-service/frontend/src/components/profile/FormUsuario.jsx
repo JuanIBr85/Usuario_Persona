@@ -34,7 +34,7 @@ export default function FormUsuario() {
     setLoading(true);
     AuthService.deleteUser()
       .then(() => {
-        removeAuthData();
+        removeAuthData("Usuario eliminado");
         window.location.href = "/auth/login";
       })
       .catch((error) => {

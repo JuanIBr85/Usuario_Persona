@@ -81,9 +81,6 @@
       environment:
         - SERVICES_CONFIG_FILE=services-docker.json
         - REDIS_HOST=redis
-      depends_on:
-        - auth-service
-        - persona-backend
 
     redis:
       image: redis:latest
