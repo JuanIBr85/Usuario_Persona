@@ -143,6 +143,11 @@ function OTPRegisterRecovery() {
             ¿No te llegó el código? Reenviar
           </Button>
 
+          {/* Enlace para registrarse si no tiene cuenta */}
+          <Button variant="link" asChild className="p-0">
+            <Link to="/auth/sign">¿No tienes una cuenta? Regístrate</Link>
+          </Button>
+
           <Button type="submit" className="mt-4">Validar</Button>
         </form>
       </AuthLayout>
