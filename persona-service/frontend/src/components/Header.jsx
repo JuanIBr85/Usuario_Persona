@@ -38,7 +38,7 @@ const Header = () => {
       {/* FAKE_HEADER Ayuda a mantener el contenido de las paginas fuera del header (al ser este 'fixed') */}
       <header className="fixed top-0 z-50 bg-[var(--color-primario)] text-white p-4 md:px-20 w-full shadow-[0_4px_10px_rgba(0,0,0,0.2)]">
         <div className="flex flex-row justify-between items-center">
-          <NavLink to="/" className="flex items-center">
+          <NavLink to={_isAdmin?"/":"/profile"} className="flex items-center">
           <svg fill="#ffff" className="w-1/12" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M1.485,16.857l10,6c.027.016.057.023.084.036s.057.026.087.038a.892.892,0,0,0,.688,0c.03-.012.058-.024.087-.038s.057-.02.084-.036l10-6a1,1,0,0,0,.3-1.438l-10-14c-.013-.018-.035-.024-.049-.04a.962.962,0,0,0-1.53,0c-.014.016-.036.022-.049.04l-10,14a1,1,0,0,0,.3,1.438ZM13,20.234V5.121L20.557,15.7ZM11,5.121V20.234L3.443,15.7Z"/></svg>
             <h1 className="text-xl font-bold ml-2">PRISMA</h1>
           </NavLink>

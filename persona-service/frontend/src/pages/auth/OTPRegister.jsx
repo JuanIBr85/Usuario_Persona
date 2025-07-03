@@ -68,6 +68,7 @@ function OTPRegister() {
       .then(() => {
 
         setMessage("Se ha verificado correctamente el código de verificación.");
+        sessionStorage.removeItem("email_verificar")
         setIsOK(true);
         setShouldRedirect(true);
 

@@ -94,7 +94,6 @@ function AuthContextProvider({ children }) {
         AuthService.logout()
             .finally(() => {
                 localStorage.removeItem('token');
-                setTimeout(() => location.reload(), 1000);
             });
 
         setAuthData(defaultData);
@@ -106,9 +105,10 @@ function AuthContextProvider({ children }) {
     const navigate = useCallback(
         async (path, rason) => {
             removeAuthData(rason);
-            await _navigate(path);
-
             sessionStorage.removeItem("unauthorized_401");
+            //await _navigate(path);
+            //Me aseguro de que se recargue la pagina
+            window.location.href="/auth/login";
         },
         [_navigate]
     );
@@ -265,8 +265,10 @@ function AuthContextProvider({ children }) {
             title: "No autorizado",
             description: errorMessage,
             action: async () => {
-                await _navigate('/profile');
-                location.reload();
+                //await _navigate('/profile');
+                //Me aseguro de que se recargue la pagina
+                window.location.href = "/profile";
+                //location.reload();
                 setIsUnauthorizedRoute(false);
             },
         });

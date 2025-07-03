@@ -1,14 +1,19 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Separator } from "@/components/ui/separator";
 import { Link } from "react-router-dom";
+import { isAdmin } from "@/context/AuthContext";
 
 const Footer = () => {
+  const [_isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    setIsAdmin(isAdmin());
+  }, []);
   return (
     <footer className="bg-white shadow-[-4px_-4px_10px_rgba(0,0,0,0.01)] dark:bg-card px-4 pt-16 w-full mx-auto max-w-full px-lg:px-24  lg:px-8">
       <div className="grid gap-10 row-gap-6 mb-8 sm:grid-cols-2 lg:grid-cols-4">
         <div className="sm:col-span-2">
           <Link
-            to="/"
+            to={_isAdmin?"/":"/profile"}
             aria-label="Ir a inicio"
             title="PRISMA"
             className="inline-flex items-center"
@@ -108,7 +113,7 @@ const Footer = () => {
           </div>
           <Separator className="my-4" />
           <p className="mt-4 text-sm text-gray-500">
-            Los contenidos de coronelsuarez.gob.ar están licenciados bajo  Creative Commons Reconocimiento 2.5 Argentina License      
+            Los contenidos de coronelsuarez.gob.ar están licenciados bajo  Creative Commons Reconocimiento 2.5 Argentina License
           </p>
         </div>
       </div>

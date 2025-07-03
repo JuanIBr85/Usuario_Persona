@@ -111,6 +111,10 @@ function Sign() {
             <Link to="/auth/login">¿Ya tienes una cuenta? Inicia sesión</Link>
           </Button>
 
+          <Button variant="link" asChild className="p-0">
+            <Link to="/auth/login">¿Tiene un OTP de registro?</Link>
+          </Button>
+
           {/* Botón de envío del formulario */}
           <Button type="submit" className="mt-4">
             Registrarse
