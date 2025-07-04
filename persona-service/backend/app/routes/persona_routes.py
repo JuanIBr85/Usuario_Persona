@@ -508,6 +508,14 @@ def verificar_persona():
         usuario_id = ComponentRequest.get_user_id()
         data = request.get_json() or {}
 
+        persona = persona_service.listar_persona_usuario_id(usuario_id)
+
+        if persona is not None:
+            return (
+                make_response(ResponseStatus.ERROR, "El usuario ya posee una persona"),
+                400,
+            )
+
         error = validar_documento_email_schema.validate(data)
         if error:
             return (
