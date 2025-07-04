@@ -193,7 +193,7 @@ function CreatePerfil() {
           <CardContent className="flex flex-col flex-1 min-h-107">
             <form className="flex flex-col h-full" ref={refForm}>
               <div className="space-y-8 flex-1">
-                <ProgressBar currentStep={currentStep} />
+                <ProgressBar currentStep={currentStep} setCurrentStep={setCurrentStep} />
                 <div className="mb-6">
                   {renderStep()}
                 </div>
