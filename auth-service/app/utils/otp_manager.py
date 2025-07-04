@@ -86,8 +86,8 @@ def obtener_datos_registro_temporal(email: str) -> dict | None:
     if valor:
         try:
             return json.loads(valor)
-        finally:
-            redis_client.delete(key)
+        except Exception as e:
+            print(f"Error decodificando datos temporales: {e}")
     return None
 
 # =========================

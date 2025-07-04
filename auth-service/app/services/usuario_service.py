@@ -162,6 +162,9 @@ class UsuarioService(ServicioBase):
 
             session.commit()
 
+            key = f"registro_temp:{email}"
+            get_redis().delete(key)
+
             return (
                 ResponseStatus.SUCCESS,
                 "Usuario registrado exitosamente",
@@ -177,6 +180,42 @@ class UsuarioService(ServicioBase):
                 500,
             )
 
+#----------------------renvio de otp registro------------------------------------
+
+    def reenviar_otp_registro(self, session: Session, email: str) -> tuple:
+    # Verificar si ya está registrado (por si acaso)
+       if session.query(Usuario).filter(Usuario.email_usuario == email).first():
+        return (
+            ResponseStatus.FAIL,
+            "El usuario ya está registrado",
+            None,
+            400,
+        )
+
+       # Buscar datos temporales del registro desde redis
+       datos_temporales = obtener_datos_registro_temporal(email)  
+
+       if not datos_temporales:
+        return (
+            ResponseStatus.FAIL,
+            "No hay registro pendiente para este email",
+            None,
+            404,
+        )
+
+       # Generar nuevo OTP y guarda
+       nuevo_otp = generar_codigo_otp()
+       guardar_otp(email, nuevo_otp)
+
+       # Actualizar los datos temporales (por si querés regenerar todo, pero si no, simplemente reenviá)
+       enviar_codigo_por_email_registro(email, nuevo_otp)
+
+       return (
+          ResponseStatus.SUCCESS,
+          "Se ha reenviado el código OTP al correo electrónico",
+          None,
+          200,
+        )  
     # -----------------------------------------------------------------------------------------------------------------------------
     # LOGIN Y LOGOUT
     # -----------------------------------------------------------------------------------------------------------------------------

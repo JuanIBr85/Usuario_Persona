@@ -80,6 +80,23 @@ def confirmar_registro_usuario():
     finally:
         session.close()
 
+@usuario_bp.route("/resend-otp", methods=["POST"])
+@api_access(is_public=True, limiter=["3 per minute"])
+def reenviar_otp_registro():
+    data = request.get_json()
+    email = data.get("email_usuario") or data.get("email")
+    
+    if not email:
+        return make_response(ResponseStatus.FAIL, "Email requerido", None, 400)
+    session = SessionLocal()
+    try:
+        status, mensaje, contenido, codigo = usuario_service.reenviar_otp_registro(
+            session, email
+        )
+        return make_response(status, mensaje, contenido, codigo)
+    finally:
+        session.close()
+
 # -----------------------------------------------------------------------------------------------------------------------------
 # LOGIN Y LOGOUT
 # -----------------------------------------------------------------------------------------------------------------------------
