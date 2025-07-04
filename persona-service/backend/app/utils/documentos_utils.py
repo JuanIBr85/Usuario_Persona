@@ -40,9 +40,7 @@ def validar_documento_por_regex(documento: str, regex: str) -> bool:
     """Valida un número de documento según una expresión regular."""
     try:
         # Valido el documento contra el patron(regex)
-        logging.error(f"Validando documento '{documento}' type({type(documento)}) con regex '{regex}'")
         resultado = bool(re.match(regex, documento))
-        logging.error(f"Resultado: {resultado}")
         return resultado
     except re.error:
         logging.error(f"Error al validar documento {documento} con regex {regex}")
