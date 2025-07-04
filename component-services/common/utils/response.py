@@ -18,7 +18,7 @@ class ResponseStatus(Enum):
 # Función para construir una respuesta JSON estandarizada
 def make_response(
     status: ResponseStatus,
-    message: str | Dict,
+    message: str,
     data: Any = None,
     error_code: Optional[str] = None,
 ) -> Dict:
@@ -42,7 +42,16 @@ def make_response(
     """
 
     if not isinstance(status, ResponseStatus):
-        raise TypeError("status debe de ser de tipo ResponseStatus")
+        raise TypeError(f"status debe de ser de tipo ResponseStatus. type: {type(status).__name__}")
+
+    if not isinstance(message, str):
+        raise TypeError(f"message debe de ser de tipo str. type: {type(message).__name__}")
+    
+    if data is not None and not isinstance(data, (dict, list, tuple, set)):
+        raise TypeError(f"data debe de ser de tipo dict, list, tuple o set. type: {type(data).__name__}")
+    
+    if error_code is not None and not isinstance(error_code, str):
+        raise TypeError(f"error_code debe de ser de tipo str. type: {type(error_code).__name__}")
 
     response = {"status": status.value, "message": message or ""}
 
