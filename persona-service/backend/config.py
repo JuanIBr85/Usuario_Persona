@@ -1,7 +1,11 @@
 import os
 import urllib.parse
 from dotenv import find_dotenv, load_dotenv
+import yaml
 
+# Cargo el yml con los datos estaticos
+with open(os.path.join(os.getcwd(), "datos-estaticos.yml"), "r") as file:
+    DATOS_ESTATICOS = yaml.safe_load(file)
 
 # Cargar primero el archivo con datos sensibles (si existe)
 dotenv_path = ".env"
@@ -32,7 +36,7 @@ SQLALCHEMY_DATABASE_URI = (
 )
 
 # cambiar las dos lineas de arriba por la de abajo para levantar mysql con docker. no olvidar configurar .env antes.
-#SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{user}:{password_enc}@{host}/{database}"
+# SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{user}:{password_enc}@{host}/{database}"
 
 
 SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -41,15 +45,16 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 # CONFIGURACIONES JWT
 JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
 
-#Dias de restriccion
+# Dias de restriccion
 DIAS_RESTRICCION_MODIFICACION = int(os.getenv("RESTRICCION_MODIFICACION_DIAS", 30))
 
+
 # LISTAS REDES Y TIPOS DOCUMENTOS
-TIPOS_DOCUMENTO_VALIDOS = os.environ.get("TIPOS_DOCUMENTO_VALIDOS", "").split(",")
-REDES_SOCIALES_VALIDAS = os.environ.get("REDES_SOCIALES_VALIDAS", "").split(",")
-ESTADO_CIVIL = os.environ.get("ESTADO_CIVIL", "").split(",")
-OCUPACION = os.environ.get("OCUPACION", "").split(",")
-ESTUDIOS_ALCANZADOS = os.environ.get("ESTUDIOS_ALCANZADOS", "").split(",")
+TIPOS_DOCUMENTO_VALIDOS = DATOS_ESTATICOS.get("documentos") or []
+REDES_SOCIALES_VALIDAS = DATOS_ESTATICOS.get("redes_sociales") or []
+ESTADO_CIVIL = DATOS_ESTATICOS.get("estado_civil") or []
+OCUPACION = DATOS_ESTATICOS.get("ocupacion") or []
+ESTUDIOS_ALCANZADOS = DATOS_ESTATICOS.get("estudios_alcanzados") or []
 
 print("TIPOS_DOCUMENTO_VALIDOS:", TIPOS_DOCUMENTO_VALIDOS)
 print("REDES_SOCIALES_VALIDAS:", REDES_SOCIALES_VALIDAS)
