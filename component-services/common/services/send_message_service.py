@@ -1,6 +1,6 @@
 from common.utils.get_component_info import get_component_info
 import uuid
-import requests
+from common.services.service_request import ServiceRequest
 import traceback
 from common.schemas.message_schema import MessageSchema
 import os
@@ -43,10 +43,9 @@ def send_message(
         )
 
         # Enviamos el mensaje
-        response = requests.post(
+        response = ServiceRequest.post(
             f"http://{COMPONENT_SERVICE_HOST}:5002/internal/message/send",
-            json=message,
-            timeout=2,
+            json=message
         )
         if response.status_code != 200:
             return (

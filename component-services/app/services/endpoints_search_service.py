@@ -1,6 +1,5 @@
 import traceback
 from flask import request
-import requests
 from werkzeug.routing import Map, Rule
 from app.services.services_search_service import ServicesSearchService
 from common.models.endpoint_route_model import EndpointRouteModel
@@ -9,6 +8,7 @@ import time
 from app.extensions import logger
 from app.services.event_service import EventService
 from app.utils.service_endpoint_log import ServiceEndpointLog
+from common.services.service_request import ServiceRequest
 
 event_service: EventService = EventService()
 
@@ -56,7 +56,7 @@ class EndpointsSearchService:
                 # Construye y realiza la petición al servicio
                 service_url = service.service_url
                 service_prefix = service.service_prefix
-                response = requests.get(
+                response = ServiceRequest.get(
                     f"{service_url}/component_service/endpoints"
                 ).json()
 
