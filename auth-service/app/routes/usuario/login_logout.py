@@ -1,5 +1,6 @@
 import json
 import traceback
+from typing import Any, Literal
 from flask import render_template_string
 from app.schemas.usuarios_schema import UsuarioModificarSchema
 from marshmallow import ValidationError
@@ -69,10 +70,9 @@ def login1():
 
 @bp.route("/logout", methods=["POST"])
 @api_access(
-    is_public=False,
-    access_permissions=["auth.admin.logout"],
+    is_public=False
 )
-def logout_usuario():
+def logout_usuario() -> tuple[Dict[Any, Any], Any] | tuple[Dict[Any, Any], Literal[500]]:
     session = SessionLocal()
     try:
         jwt_jti = ComponentRequest.get_jti()
@@ -99,7 +99,7 @@ def logout_usuario():
 @bp.route("/modificar", methods=["POST"])
 @api_access(
     is_public=False, 
-    access_permissions=["auth.admin.modificar_usuario"],
+    #access_permissions=["auth.admin.modificar_usuario"],
     limiter=["6 per minute"],
 )
 def modificar_perfil():
@@ -139,7 +139,7 @@ def modificar_perfil():
 @bp.route("/eliminar", methods=["DELETE"])
 @api_access(
     is_public=False, 
-    access_permissions=["auth.admin.eliminar_usuario"],
+    #access_permissions=["auth.admin.eliminar_usuario"],
     limiter="2 per day",
 )
 def eliminar_usuario():
@@ -166,7 +166,7 @@ def eliminar_usuario():
     is_public=False, 
     limiter=["10 per minute"],
     cache=CacheSettings(expiration=60, params=["id_usuario"]),
-    access_permissions=["auth.admin.ver_usuario"],
+    #access_permissions=["auth.admin.ver_usuario"],
 )
 def perfil_usuario():
     session = SessionLocal()
