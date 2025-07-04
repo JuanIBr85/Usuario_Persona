@@ -18,7 +18,7 @@ class Domicilio(Base):
     
     codigo_postal=relationship("DomicilioPostal", backref="domicilios", lazy="joined")
 
-    created_at=Column(DateTime, default=datetime.now(timezone.utc))
+    created_at=Column(DateTime,default=lambda: datetime.now(timezone.utc))
     updated_at=Column(DateTime, nullable=True)
     deleted_at = Column(DateTime, nullable=True)
     

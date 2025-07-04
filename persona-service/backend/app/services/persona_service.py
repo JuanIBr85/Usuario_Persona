@@ -20,6 +20,7 @@ from app.services.otp_service import OtpService
 from app.schema.persona_schema import PersonaSchema, PersonaResumidaSchema
 from app.interfaces.persona_interface import IPersonaInterface
 from app.extensions import SessionLocal
+from app.utils.documentos_utils import validar_documento_por_tipo
 from app.schema.persona_extendida_schema import PersonaExtendidaSchema
 
 
@@ -80,6 +81,12 @@ class PersonaService(IPersonaInterface):
                 return jsonify({"error": "No hay datos"}), 400
 
             data_validada = self.schema.load(data)
+
+            tipo_doc = data_validada["tipo_documento"]
+            num_doc = data_validada["num_doc_persona"]
+
+            if not validar_documento_por_tipo(tipo_doc, num_doc):
+                raise Exception ("Numero de documento invalido par el tipo selecionado. Verifique y vuelva a intentar.")    
 
             existe_persona = (
                 session.query(Persona)
@@ -151,6 +158,11 @@ class PersonaService(IPersonaInterface):
             data_validada = self.schema.load(
                 data, partial=True
             )  # permite que la modificacion sea parcial o total
+
+            tipo_doc = data_validada.get("num_doc_persona", persona.tipo_documento)
+            num_doc =  data_validada.get("tipo_documento", persona.num_doc_persona)
+            if not validar_documento_por_tipo(tipo_doc,num_doc):
+                raise Exception("Numero de documento invalido par el tipo selecionado")
 
             hubo_cambios = False
 

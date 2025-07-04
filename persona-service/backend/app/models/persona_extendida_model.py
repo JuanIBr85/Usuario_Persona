@@ -15,6 +15,6 @@ class PersonaExtendida(Base):
     vencimiento_dni = Column(Date,nullable=True)
     foto_perfil = Column(String(255), nullable=True)
 
-    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    created_at = Column(DateTime,default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime, nullable=True)
     deleted_at= Column(DateTime, nullable=True)
