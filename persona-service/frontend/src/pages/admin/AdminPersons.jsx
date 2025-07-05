@@ -157,11 +157,12 @@ function AdminPersons() {
       setIsDialogOpen(false);
     } catch (error) {
       console.error("Error al crear persona:", error);
-      const rawMsg = error?.response?.data?.message || error.message || "Error desconocido";
+      const rawMsg = error?.data?.error?.server || error?.data?.message || error.message || "Error desconocido";
       console.log("Error al crear persona:", rawMsg);
       setAlert({
-        title: rawMsg,
-        description: "",
+        title: "Error al crear persona",
+        description: rawMsg,
+        variant: "destructive"
       });
       setIsDialogOpen(false);
     }

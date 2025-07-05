@@ -182,7 +182,7 @@ export function usePersonas() {
 
             setAlert({
                 title: "Error al actualizar persona",
-                description: "Error actualizando persona",
+                description: err?.data?.error?.server || "Error actualizando persona",
                 variant: "destructive"
             });
 
