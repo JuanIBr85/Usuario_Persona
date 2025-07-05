@@ -140,7 +140,7 @@ function AdminPersons() {
         fecha_nacimiento_persona: formData.fecha_nacimiento || "",
         tipo_documento: formData.tipo_documento || "DNI",
         num_doc_persona: formData.nro_documento || "",
-        usuario_id: formData.usuario_id || null,
+        usuario_id: (formData.usuario_id==="-1")?null:formData?.usuario_id,
         domicilio: {
           domicilio_calle: formData.domicilio_calle || "",
           domicilio_numero: formData.domicilio_numero || "",

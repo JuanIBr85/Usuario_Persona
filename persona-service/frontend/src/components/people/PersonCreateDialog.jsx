@@ -132,34 +132,28 @@ function PersonCreateDialog({
                             />
 
                             {/* Select de usuario */}
-                            {/*  
-                            <div>
-
-                                <label className="block text-sm font-medium mb-1" htmlFor="usuario_id">
-                                    Usuario del sistema
-                                </label>
-                                <select
-                                    id="usuario_id"
-                                    name="usuario_id"
-                                    className="border rounded px-2 py-1 w-full"
-                                    value={newUser.usuario_id || ""}
-                                    onChange={handleChange}
-                                >
-                                    <option value="">Ningún usuario</option>
-                                    {loading && (
-                                        <option disabled>Cargando usuarios...</option>
-                                    )}
-                                    {error && (
-                                        <option disabled>{error}</option>
-                                    )}
-                                    {usuarios.map(u => (
-                                        <option key={u.id} value={u.id}>
-                                            {u.nombre_usuario} ({u.email_usuario})
-                                        </option>
-                                    ))}
-                                </select>
+                            <div className="w-full">
+                              <SimpleSelect
+                                name="usuario_id"
+                                label="Usuario del sistema"
+                                value={newUser.usuario_id || ""}
+                                placeholder="Selecciona un usuario"
+                                onValueChange={(value) => handleChange({ target: { name: 'usuario_id', value } })}
+                              >
+                                <SelectItem value="-1">Ningún usuario</SelectItem>
+                                {loading && (
+                                  <SelectItem disabled>Cargando usuarios...</SelectItem>
+                                )}
+                                {error && (
+                                  <SelectItem disabled>{error}</SelectItem>
+                                )}
+                                {usuarios.map(u => (
+                                  <SelectItem key={u.id} value={u.id}>
+                                    {u.nombre_usuario} ({u.email_usuario})
+                                  </SelectItem>
+                                ))}
+                              </SimpleSelect>
                             </div>
-                            */}
                         </ResponsiveColumnForm>
                     </div>
 
