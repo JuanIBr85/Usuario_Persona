@@ -1,6 +1,6 @@
 import json
 import traceback
-from typing import Any, Literal
+from typing import Any, Literal, Dict
 from flask import render_template_string
 from app.schemas.usuarios_schema import UsuarioModificarSchema
 from marshmallow import ValidationError
