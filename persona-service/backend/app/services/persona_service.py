@@ -159,9 +159,9 @@ class PersonaService(IPersonaInterface):
                 data, partial=True
             )  # permite que la modificacion sea parcial o total
 
-            tipo_doc = data_validada.get("num_doc_persona", persona.tipo_documento)
-            num_doc =  data_validada.get("tipo_documento", persona.num_doc_persona)
-            if not validar_documento_por_tipo(tipo_doc,num_doc):
+            tipo_doc = data_validada.get("tipo_documento", persona.tipo_documento)
+            num_doc = data_validada.get("num_doc_persona", persona.num_doc_persona)
+            if not validar_documento_por_tipo(tipo_doc, num_doc):
                 raise Exception("Numero de documento invalido par el tipo selecionado")
 
             hubo_cambios = False
@@ -336,6 +336,7 @@ class PersonaService(IPersonaInterface):
 
         except Exception as e:
             import traceback
+
             print("Error al modificar persona:")
             print(traceback.format_exc())
             session.rollback()

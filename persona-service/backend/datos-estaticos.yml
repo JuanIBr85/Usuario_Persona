@@ -1,0 +1,50 @@
+documentos:
+  # DNI:  8 dígitos
+  DNI: "^[0-9]{8}$"
+
+  # Libreta de Enrolamiento: 7 u 8 dígitos 
+  LE: "^[0-9]{7,8}$"
+
+  # Libreta Cívica: 7 u 8 dígitos
+  LC: "^[0-9]{7,8}$"
+
+  # Cédula de Identidad: 7 u 8 dígitos 
+  CI: "^[0-9]{7,8}$"
+
+  # Pasaporte: formato AAA999999 (3 letras + 6 dígitos)
+  Pasaporte: "^[A-Z]{3}[0-9]{6}$"
+
+  # CUIT: (20|23|24|27|30|33|34)-12345678-9
+  CUIT: "^(20|23|24|27|30|33|34)-?\\d{8}-?\\d$"
+
+  # CUIL: mismo formato que CUIT
+  CUIL: "^(20|23|24|27|30|33|34)-?\\d{8}-?\\d$"
+
+redes_sociales:
+  - Facebook
+  - Instagram
+  - X
+  - Threds
+  - LinkedIn
+  - TikTok
+  - YouTube
+
+estado_civil:
+  - Casado/a
+  - Soltero/a
+  - Viudo/a
+  - Divorciado/a
+  - Unión convivencial
+  - Otros estados civiles
+
+ocupacion:
+  - Trabajo informal
+  - Trabajo en relacion de dependencia
+  - Trabajo independiente
+  - Desocupado
+  - Empleado público
+
+estudios_alcanzados:
+  - Educación primaria
+  - Educación secundaria
+  - Educación superior
