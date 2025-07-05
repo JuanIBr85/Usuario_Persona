@@ -203,7 +203,6 @@ class PersonaService(IPersonaInterface):
                         setattr(persona, field, nuevo_valor)
                         hubo_cambios = True
 
-            # --- AGREGADO: Permitir modificar usuario_id ---
             if "usuario_id" in data_validada:
                 nuevo_usuario_id = data_validada["usuario_id"]
                 if nuevo_usuario_id == "" or nuevo_usuario_id is None:
@@ -223,7 +222,6 @@ class PersonaService(IPersonaInterface):
                             "Ese usuario ya está asociado a otra persona")
                     persona.usuario_id = nuevo_usuario_id
                     hubo_cambios = True
-            # --- FIN AGREGADO ---
 
             if hubo_cambios:
                 persona.updated_at = datetime.now(timezone.utc)
@@ -425,6 +423,7 @@ class PersonaService(IPersonaInterface):
     def contar_personas(self):
         session = SessionLocal()
         try:
+            # Personas por mes
             resultados = (
                 session.query(
                     extract("year", Persona.created_at).label("year"),
@@ -436,11 +435,63 @@ class PersonaService(IPersonaInterface):
                 .order_by("year", "month")
                 .all()
             )
-
-            return [
+            personas_por_mes = [
                 {"year": r.year, "month": int(r.month), "total": r.total}
                 for r in resultados
             ]
+
+            # Totales generales
+            total_activas = session.query(Persona).filter(Persona.deleted_at.is_(None)).count()
+            total_inactivas = session.query(Persona).filter(Persona.deleted_at.isnot(None)).count()
+            total_vinculadas = session.query(Persona).filter(Persona.usuario_id.isnot(None), Persona.deleted_at.is_(None)).count()
+            total_no_vinculadas = session.query(Persona).filter(Persona.usuario_id.is_(None), Persona.deleted_at.is_(None)).count()
+            total_personas = total_activas + total_inactivas
+
+            # Altas por día y por semana (últimos 30 días)
+            hoy = datetime.now().date()
+            altas_dia = session.query(
+                func.date(Persona.created_at),
+                func.count(Persona.id_persona)
+            ).filter(
+                Persona.deleted_at.is_(None),
+                Persona.created_at >= hoy - timedelta(days=30)
+            ).group_by(
+                func.date(Persona.created_at)
+            ).order_by(
+                func.date(Persona.created_at)
+            ).all()
+            personas_por_dia = [
+                {"fecha": str(fecha), "total": total} for fecha, total in altas_dia
+            ]
+
+            # Personas creadas hoy, este mes, este año
+            total_hoy = session.query(Persona).filter(
+                Persona.deleted_at.is_(None),
+                func.date(Persona.created_at) == hoy
+            ).count()
+            ahora = datetime.now()
+            total_este_mes = session.query(Persona).filter(
+                Persona.deleted_at.is_(None),
+                extract("year", Persona.created_at) == ahora.year,
+                extract("month", Persona.created_at) == ahora.month
+            ).count()
+            total_este_anio = session.query(Persona).filter(
+                Persona.deleted_at.is_(None),
+                extract("year", Persona.created_at) == ahora.year
+            ).count()
+
+            return {
+                "total_personas": total_personas,
+                "total_activas": total_activas,
+                "total_inactivas": total_inactivas,
+                "total_vinculadas": total_vinculadas,
+                "total_no_vinculadas": total_no_vinculadas,
+                "personas_creadas_hoy": total_hoy,
+                "personas_creadas_este_mes": total_este_mes,
+                "personas_creadas_este_anio": total_este_anio,
+                "personas_por_dia_ultimos_30": personas_por_dia,
+                "personas_por_mes": personas_por_mes,
+            }
         finally:
             session.close()
 
