@@ -36,7 +36,7 @@ function OTPRegister() {
     setIsLoading(true);
 
     AuthService
-      .requestOtp({ email })
+      .resendOtp({ email })
       .then(() => {
         setMessage("Se ha reenviado el código al correo electrónico.");
         setIsOK(true);
