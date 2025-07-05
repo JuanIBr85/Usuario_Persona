@@ -11,8 +11,8 @@ import { traducirRateLimitMessage } from "@/utils/traductores";
  * necesarios para formularios o tablas.
  *
  * @returns {Object} Un objeto con:
- *  - users: Lista de usuarios/personas
- *  - setUsers: Función para actualizar usuarios
+ *  - personas: Lista de usuarios/personas
+ *  - setPersonas: Función para actualizar personas
  *  - tiposDocumentos: Lista de tipos de documentos válidos
  *  - redesSociales: Lista de redes sociales disponibles
  *  - localidades: Lista de localidades relacionadas a un código postal
@@ -20,7 +20,7 @@ import { traducirRateLimitMessage } from "@/utils/traductores";
  */
 export function usePersonas() {
     // Estado: Lista de personas obtenidas
-    const [users, setUsers] = useState([]);
+    const [personas, setPersonas] = useState([]);
 
     // Estado: Tipos de documentos disponibles
     const [tiposDocumentos, setTiposDocumentos] = useState([]);
@@ -34,14 +34,14 @@ export function usePersonas() {
     // Estado para notificaciones
     const [alert, setAlert] = useState(null);
 
-    // Efecto: Carga inicial de datos (usuarios, redes sociales, tipos de documento)
+    // Efecto: Carga inicial de datos (personas, redes sociales, tipos de documento)
     useEffect(() => {
         // Cargar todas las personas desde el servicio
         PersonaService.get_all()
             .then((res) => {
                 if (res && res.data && Array.isArray(res.data)) {
                     // Mapeo de datos crudos a estructura usada por el frontend
-                    const mappedUsers = res.data.map((persona) => ({
+                    const mappedPersonas = res.data.map((persona) => ({
                         id: persona.id_persona,
                         usuario_id: persona.usuario_id,
                         nombre: persona.nombre_persona,
@@ -50,11 +50,11 @@ export function usePersonas() {
                         nro_documento: persona.num_doc_persona,
                         fecha_nacimiento: persona.fecha_nacimiento_persona,
                     }));
-                    setUsers(mappedUsers);
+                    setPersonas(mappedPersonas);
                 }
             })
             .catch((err) => {
-                console.error("Error obteniendo usuarios:", err);
+                console.error("Error obteniendo personas:", err);
             });
 
         // Cargar redes sociales
@@ -124,7 +124,7 @@ export function usePersonas() {
     const handleDelete = (id) => {
         PersonaService.borrar(id)
             .then(() => {
-                setUsers(users.filter((user) => user.id !== id));
+                setPersonas(personas.filter((persona) => persona.id !== id));
                 setAlert({
                     title: "Éxito",
                     description: "La persona se eliminó correctamente",
@@ -168,7 +168,7 @@ export function usePersonas() {
             await PersonaService.editar(editingUser.id, body);
 
             // Actualiza el estado local solo si la petición fue exitosa
-            setUsers(users.map((u) => (u.id === editingUser.id ? editingUser : u)));
+            setPersonas(personas.map((p) => (p.id === editingUser.id ? editingUser : p)));
 
             setAlert({
                 title: "Éxito",
@@ -192,8 +192,8 @@ export function usePersonas() {
 
     // Exporta el estado y funciones que serán usados en el componente  
     return {
-        users,
-        setUsers,
+        personas,
+        setPersonas,
         tiposDocumentos,
         redesSociales,
         localidades,
