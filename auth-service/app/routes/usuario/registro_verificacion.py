@@ -1,6 +1,6 @@
 import json
 import traceback
-from flask import render_template_string
+from flask import render_template
 from app.schemas.usuarios_schema import UsuarioModificarSchema
 from marshmallow import ValidationError
 from common.utils.component_request import ComponentRequest
@@ -34,7 +34,7 @@ usuario_service = UsuarioService()
 @bp.route("/registro", methods=["POST"])
 @api_access(
     is_public=True, 
-    limiter=["1 per minute", "5 per hour"]
+    limiter=["15 per minute", "100 per hour"]
 )
 def iniciar_registro_usuario():
     data = request.get_json()
@@ -56,8 +56,8 @@ def iniciar_registro_usuario():
 @bp.route("/verificar-email", methods=["POST"])
 @api_access(
     is_public=True, 
-    limiter=["3 per minute , 10 per hour"], 
-    cache=CacheSettings(expiration=1800, params=["email_usuario", "otp"]),
+    limiter=["10 per minute , 50 per hour"], 
+    cache=CacheSettings(expiration=1, params=["email_usuario", "otp"]),
 )
 def confirmar_registro_usuario():
     data = request.get_json()
@@ -84,7 +84,7 @@ def confirmar_registro_usuario():
         session.close()
 
 @bp.route("/resend-otp", methods=["POST"])
-@api_access(is_public=True, limiter=["3 per minute"])
+@api_access(is_public=True, limiter=["10 per minute"])
 def reenviar_otp_registro():
     data = request.get_json()
     email = data.get("email_usuario") or data.get("email")
@@ -96,6 +96,6 @@ def reenviar_otp_registro():
         status, mensaje, contenido, codigo = usuario_service.reenviar_otp_registro(
             session, email
         )
-        return make_response(status, mensaje, contenido, codigo)
+        return make_response(status, mensaje, contenido), codigo
     finally:
         session.close()

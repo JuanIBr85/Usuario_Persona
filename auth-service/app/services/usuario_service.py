@@ -57,7 +57,7 @@ class UsuarioService(ServicioBase):
     # REGISTRO Y VERIFICACIÓN
     # -----------------------------------------------------------------------------------------------------------------------------
 
-    def iniciar_registro(self, session: Session, data: dict) -> tuple:
+    def iniciar_registro(self, session: Session, data: dict) -> dict:
         try:
             data_validada = self.schema.load(data)
         except ValidationError as e:
@@ -105,14 +105,13 @@ class UsuarioService(ServicioBase):
 
     def confirmar_registro(
         self, session: Session, email: str, otp: str, user_agent: str
-    ) -> tuple:
+    ) -> dict:
         if not verificar_otp_redis(email, otp):
             return ResponseStatus.FAIL, "OTP incorrecto o expirado", None, 400
-
+        
         datos_registro = obtener_datos_registro_temporal(email)
         if not datos_registro:
             return ResponseStatus.FAIL, "Registro expirado o no iniciado", None, 400
-
         try:
             password_hash = generate_password_hash(datos_registro["password"])
             datos_registro["password"] = password_hash
@@ -151,6 +150,29 @@ class UsuarioService(ServicioBase):
                 )
             )
 
+            session.commit()
+
+            key = f"registro_temp:{email}"
+            get_redis().delete(key)
+
+            '''return (
+                ResponseStatus.SUCCESS,
+                "Usuario registrado exitosamente",
+                self.schema_out.dump(nuevo_usuario),
+                200,
+            )'''
+        except Exception as e:
+            session.rollback()
+            traceback_str = traceback.format_exc()
+            print("[ERROR] Error al registrar usuario:\n", traceback_str)
+            return (
+                ResponseStatus.ERROR,
+                "Error interno al registrar usuario",
+                str(e),
+                500,
+            )
+        
+        try:
             send_message(
                 to_service="persona-service",
                 message={
@@ -159,58 +181,48 @@ class UsuarioService(ServicioBase):
                 },
                 event_type="auth_user_register",
             )
-
-            session.commit()
-
-            key = f"registro_temp:{email}"
-            get_redis().delete(key)
-
-            return (
-                ResponseStatus.SUCCESS,
-                "Usuario registrado exitosamente",
-                self.schema_out.dump(nuevo_usuario),
-                200,
-            )
         except Exception as e:
-            session.rollback()
-            return (
-                ResponseStatus.ERROR,
-                "Error interno al registrar usuario",
-                str(e),
-                500,
-            )
+            print("[WARNING] Error al enviar mensaje a persona-service:", e, flush=True)
+
+        # Respuesta final
+        return (
+            ResponseStatus.SUCCESS,
+            "Usuario registrado exitosamente",
+            self.schema_out.dump(nuevo_usuario),
+            200,
+        )
+    
 
 #----------------------renvio de otp registro------------------------------------
 
     def reenviar_otp_registro(self, session: Session, email: str) -> tuple:
     # Verificar si ya está registrado (por si acaso)
-       if session.query(Usuario).filter(Usuario.email_usuario == email).first():
-        return (
+        if session.query(Usuario).filter(Usuario.email_usuario == email).first():
+            return (
             ResponseStatus.FAIL,
             "El usuario ya está registrado",
             None,
             400,
         )
 
-       # Buscar datos temporales del registro desde redis
-       datos_temporales = obtener_datos_registro_temporal(email)  
+        # Buscar datos temporales del registro desde redis
+        datos_temporales = obtener_datos_registro_temporal(email)
+        if not datos_temporales:
+            return (
+                ResponseStatus.FAIL,
+                f"No hay registro pendiente para {email}. Probablemente ya expiró.",
+                None,
+                404,
+            )   
 
-       if not datos_temporales:
+        # Generar nuevo OTP y guarda
+        nuevo_otp = generar_codigo_otp()
+        guardar_otp(email, nuevo_otp)
+
+        # Actualizar los datos temporales (por si querés regenerar todo, pero si no, simplemente reenviá)
+        enviar_codigo_por_email_registro(email, nuevo_otp)
+
         return (
-            ResponseStatus.FAIL,
-            "No hay registro pendiente para este email",
-            None,
-            404,
-        )
-
-       # Generar nuevo OTP y guarda
-       nuevo_otp = generar_codigo_otp()
-       guardar_otp(email, nuevo_otp)
-
-       # Actualizar los datos temporales (por si querés regenerar todo, pero si no, simplemente reenviá)
-       enviar_codigo_por_email_registro(email, nuevo_otp)
-
-       return (
           ResponseStatus.SUCCESS,
           "Se ha reenviado el código OTP al correo electrónico",
           None,

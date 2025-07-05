@@ -9,4 +9,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Comando para desarrollo con hot reload usando gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:5001", "--reload", "run:app"]
+CMD ["gunicorn","--timeout","120", "--bind", "0.0.0.0:5001", "--reload", "run:app"]
