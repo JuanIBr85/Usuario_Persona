@@ -1,18 +1,12 @@
 from common.utils.get_component_info import get_component_info
 import uuid
-from common.services.service_request import ServiceRequest
+from common.services.component_service_api import ComponentServiceApi
 import traceback
 from common.schemas.message_schema import MessageSchema
-import os
 import logging
 
 message_schema = MessageSchema()
 logger = logging.getLogger(__name__)
-COMPONENT_SERVICE_HOST = os.environ.get(
-    "COMPONENT_SERVICE_HOST", "localhost"
-)  # Default to auth-service if not set
-logger.error(COMPONENT_SERVICE_HOST)
-
 
 def send_message(
     to_service: str,
@@ -43,10 +37,8 @@ def send_message(
         )
 
         # Enviamos el mensaje
-        response = ServiceRequest.post(
-            f"http://{COMPONENT_SERVICE_HOST}:5002/internal/message/send",
-            json=message
-        )
+        response = ComponentServiceApi.internal_message_send(message)
+
         if response.status_code != 200:
             return (
                 None,

@@ -15,21 +15,33 @@ bp = Blueprint("service", __name__, cli_group="component")
 
 @bp.route("/endpoints", methods=["GET"])
 def service():
+    """
+    Retorna la lista de endpoints del servicio que poseean el decorador @api_access
+    """
     return make_endpoints_list(current_app)
 
 
 @bp.route("/health", methods=["GET"])
 def health():
+    """
+    Retorna el estado de salud del servicio
+    """
     return "OK", 200
 
 
 @bp.route("/info", methods=["GET"])
 def info():
+    """
+    Retorna la informacion del servicio que esta en el component-info
+    """
     return get_component_info(), 200
 
 
 @bp.route("/receiver", methods=["POST"])
 def receiver():
+    """
+    Recibe un mensaje y lo envia al receiver correspondiente
+    """
     try:
         data = request.get_json()
 
