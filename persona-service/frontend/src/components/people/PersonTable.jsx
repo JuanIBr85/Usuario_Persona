@@ -64,12 +64,9 @@ function PersonTable({ persons, users, onEdit, onSeeDetails, onDelete }) {
               <TableCell>{user.nro_documento}</TableCell>
               <TableCell>{user.fecha_nacimiento}</TableCell>
               <TableCell>
-                {
-                  (() => {
-                    const linkedUser = users.find(u => u.id === user.usuario_id);
-                    return linkedUser ? linkedUser.email_usuario : user.email_usuario || "No vinculado"; 
-                  })()
-                }
+                {users.find((u) => u.id === user.usuario_id)
+                  ? users.find((u) => u.id === user.usuario_id).email_usuario
+                  : "No vinculado"}
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end items-center gap-2">

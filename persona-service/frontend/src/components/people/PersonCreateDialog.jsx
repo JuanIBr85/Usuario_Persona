@@ -19,7 +19,7 @@ import { SelectItem } from "@/components/ui/select";
 import ResponsiveColumnForm from "@/components/ResponsiveColumnForm";
 
 /**
- * PersonDialog
+ * PersonCreateDialog
  *
  * Componente de diálogo para crear una nueva persona en el sistema.
  * Permite ingresar datos personales, domicilio y contacto, incluyendo la asociación opcional a un usuario del sistema.
@@ -40,7 +40,7 @@ import ResponsiveColumnForm from "@/components/ResponsiveColumnForm";
  *
  * @returns {JSX.Element} El diálogo de creación de persona.
  */
-function PersonDialog({
+function PersonCreateDialog({
     isDialogOpen,
     setIsDialogOpen,
     newUser,
@@ -52,9 +52,9 @@ function PersonDialog({
     redesSociales,
     usuarios = [],
     loading = false,
-    error = null, 
+    error = null,
 }) {
-    
+
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
@@ -132,6 +132,7 @@ function PersonDialog({
                             />
 
                             {/* Select de usuario */}
+                            {/*  
                             <div>
 
                                 <label className="block text-sm font-medium mb-1" htmlFor="usuario_id">
@@ -158,6 +159,7 @@ function PersonDialog({
                                     ))}
                                 </select>
                             </div>
+                            */}
                         </ResponsiveColumnForm>
                     </div>
 
@@ -318,4 +320,4 @@ function PersonDialog({
     );
 }
 
-export default PersonDialog;
+export default PersonCreateDialog;

@@ -16,7 +16,7 @@ import { formSubmitJson } from "@/utils/formUtils";
 import { usePersonas } from "@/hooks/people/usePersonas";
 import { useUsuariosBasic } from "@/hooks/users/useUsuariosBasic";
 
-import PersonDialog from "@/components/people/PersonDialog";
+import PersonCreateDialog from "@/components/people/PersonCreateDialog";
 
 /**
  * Componente AdminUsers
@@ -112,7 +112,18 @@ function AdminPersons() {
    * @param {Event} e - Evento submit del formulario
    */
   const handleEditSubmit = async (e) => {
-    const result = await handleEditSubmitHook(e, editingUser);
+    e.preventDefault();
+
+    // Crea una copia del usuario y transforma usuario_id a number si corresponde
+    const userForSubmit = {
+      ...editingUser,
+      usuario_id:
+        editingUser.usuario_id && editingUser.usuario_id !== "none"
+          ? Number(editingUser.usuario_id)
+          : null,
+    };
+
+    const result = await handleEditSubmitHook(e, userForSubmit);
     if (result?.success) {
       setEditingUser(null);
     }
@@ -153,7 +164,7 @@ function AdminPersons() {
 
       await PersonaService.crear(body);
 
-      const newUserForTable = { 
+      const newUserForTable = {
         id: null,
         nombre: formData.nombre || "",
         apellido: formData.apellido || "",
@@ -232,8 +243,8 @@ function AdminPersons() {
                 onSeeDetails={handleSeeDetails}
               />
             </div>
-            
-            <PersonDialog
+
+            <PersonCreateDialog
               isDialogOpen={isDialogOpen}
               setIsDialogOpen={setIsDialogOpen}
               newUser={newUser}
@@ -250,7 +261,7 @@ function AdminPersons() {
 
             {alert && (
               <div className="fixed bottom-16 right-4 z-50 w-96">
-                <Alert 
+                <Alert
                   variant={alert.variant || "default"}
                   className="animate-in slide-in-from-right-8 duration-300 bg-white border-black"
                 >
@@ -258,7 +269,7 @@ function AdminPersons() {
                   {alert.description && (
                     <AlertDescription>{alert.description}</AlertDescription>
                   )}
-                  <button 
+                  <button
                     onClick={() => setAlert(null)}
                     className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
                   >
