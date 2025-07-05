@@ -71,6 +71,17 @@ export const AuthService = {
     });
   },
 
+
+  resendOtp: async (body) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/resend-otp`,
+      method: HttpMethod.POST,
+      body: body,
+      
+      showError: AuthService.showError
+    });
+  },
+
   /**
    * Valida un código OTP proporcionado por el usuario.
    * @async

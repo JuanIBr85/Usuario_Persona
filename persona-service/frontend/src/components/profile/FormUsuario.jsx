@@ -6,6 +6,7 @@ import { AuthService } from "@/services/authService";
 import { formSubmitJson } from "@/utils/formUtils";
 import { useAuthContext } from "@/context/AuthContext";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function FormUsuario() {
   const { authData, updateData, removeAuthData } = useAuthContext();
@@ -13,6 +14,10 @@ export default function FormUsuario() {
   const [error, setError] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [otpDialogOpen, setOtpDialogOpen] = useState(false);
+  const [otpMessage, setOtpMessage] = useState("");
+  const [otpRedirect, setOtpRedirect] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     const formData = await formSubmitJson(event);
@@ -48,6 +53,29 @@ export default function FormUsuario() {
       });
   };
 
+  const requestOtp = () => {
+    setLoading(true);
+    AuthService.requestOtp({ email: authData.user.email_usuario })
+      .then(() => {
+        sessionStorage.setItem("email_para_reset", authData.user.email_usuario);
+        setOtpMessage(
+          "Se ha enviado un código de verificación a tu mail para cambiar la contraseña."
+        );
+        setOtpRedirect(true);
+      })
+      .catch((error) => {
+        setOtpMessage(
+          error?.data?.message || error?.message || "Error al solicitar código"
+        );
+        setOtpRedirect(false);
+      })
+      .finally(() => {
+        setLoading(false);
+        setOtpDialogOpen(true);
+      });
+  };
+
+
   return (
     <>
       {loading && <Loading isFixed={true} />}
@@ -74,6 +102,13 @@ export default function FormUsuario() {
           <div className="flex flex-col gap-3 pt-4">
             <Button type="submit" className="w-full sm:w-auto">
               Guardar Cambios
+            </Button>
+            <Button
+              type="button"
+              className="w-full sm:w-auto"
+              onClick={requestOtp}
+            >
+              Cambiar Contraseña
             </Button>
             <Button
               type="button"
@@ -105,6 +140,17 @@ export default function FormUsuario() {
         action="Eliminar"
         cancelHandle={() => setOpenDeleteDialog(false)}
         actionHandle={confirmDelete}
+      />
+      <SimpleDialog
+        title="Recuperar contraseña"
+        description={otpMessage}
+        isOpen={otpDialogOpen}
+        setIsOpen={(value) => {
+          setOtpDialogOpen(value);
+          if (!value && otpRedirect) {
+            navigate("/auth/otpvalidation");
+          }
+        }}
       />
     </>
   );
