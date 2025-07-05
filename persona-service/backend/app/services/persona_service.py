@@ -21,6 +21,7 @@ from app.schema.persona_schema import PersonaSchema, PersonaResumidaSchema
 from app.interfaces.persona_interface import IPersonaInterface
 from app.extensions import SessionLocal
 from app.utils.documentos_utils import validar_documento_por_tipo
+from app.utils.email_util import enviar_notificacion_verificacion_admin
 from app.schema.persona_extendida_schema import PersonaExtendidaSchema
 
 
@@ -541,3 +542,71 @@ class PersonaService(IPersonaInterface):
             session.commit()  # guarda los cambios en la base de datos
         finally:
             session.close()
+
+
+#VERIFICACION DE DATOS PERSONALES PARA VINCULACION DE USUARIO Y PERSONA
+def verificar_datos_personales(
+    self,
+    persona_id: int,
+    datos_usuario: dict
+) -> dict:
+    #recibe id_persona que ya estaba localizada, para no volver a verificar el documento
+    session = SessionLocal()
+    try:
+        persona = (
+            session.query(Persona)
+            .filter(
+                Persona.id_persona == persona_id,
+                Persona.deleted_at.is_(None),
+                Persona.usuario_id.is_(None),
+            )
+            .first()
+        )
+
+        if not persona:
+            return {
+                "encontrada": False,
+                "coinciden": False,
+                "mensaje": "No existe una persona con este identificador."
+            }
+        try:
+            fecha_nac_dt = datetime.strptime(
+            datos_usuario["fecha_nacimiento"], "%Y-%m-%d"
+            ).date()
+        except ValueError:
+            return {
+                "encontrada": True,
+                "coinciden": False,
+                "mensaje": "Formato de fecha inválido. Debe ser YYYY-MM-DD."
+            }
+
+
+        if fecha_nac_dt > date.today():
+            return {
+                "encontrada": True,
+                "coinciden": False,
+                "mensaje": "La fecha de nacimiento no puede ser futura."
+            }
+
+        coinciden = (
+            persona.nombre_persona.strip().lower() == datos_usuario["nombre"].strip().lower()
+            and persona.apellido_persona.strip().lower() == datos_usuario["apellido"].strip().lower()
+            and persona.fecha_nacimiento_persona == fecha_nac_dt
+            and persona.contacto.telefono_movil.strip() == datos_usuario["telefono_movil"].strip()
+        )
+
+        # Enviar notificación al administrador
+        enviar_notificacion_verificacion_admin(persona, datos_usuario, coinciden)
+
+        return {
+            "encontrada": True,
+            "coinciden": coinciden,
+            "mensaje": (
+                "Tus datos concuerdan, contacta al administrador para continuar la verificación."
+                if coinciden
+                else "Los datos proporcionados no coinciden. Contacta al administrador para continuar la verificación."
+            )
+        }
+
+    finally:
+        session.close()
