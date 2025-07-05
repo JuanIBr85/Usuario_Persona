@@ -39,7 +39,7 @@ export const gatewayService = {
    */
   stopResearch: async () => {
     return fetchService.fetch({
-      url: `${ServiceURL.control}/gateway/reserch_stop`,
+      url: `${ServiceURL.control}/gateway/research_stop`,
       method: HttpMethod.GET,
       showError: gatewayService.showError,
       useToken: true,
@@ -141,7 +141,7 @@ export const gatewayService = {
    */
   setServiceAvailable: async (id, state) => {
     return fetchService.fetch({
-      url: `${ServiceURL.control}/services/set_available/${id}/${state}`,
+      url: `${ServiceURL.control}/services/set_service_available/${id}/${state}`,
       method: HttpMethod.PUT,
       showError: gatewayService.showError,
       useToken: true,

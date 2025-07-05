@@ -1,6 +1,6 @@
 from flask import Blueprint
 from common.utils.response import make_response, ResponseStatus
-from app.services.services_serch_service import ServicesSearchService
+from app.services.services_search_service import ServicesSearchService
 from app.decorators.cp_api_access import cp_api_access
 
 bp = Blueprint("component", __name__, cli_group="control", url_prefix="/redirect")

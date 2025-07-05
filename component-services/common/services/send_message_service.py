@@ -5,12 +5,20 @@ import traceback
 from common.schemas.message_schema import MessageSchema
 import os
 import logging
+
 message_schema = MessageSchema()
 logger = logging.getLogger(__name__)
-COMPONENT_SERVICE_HOST = os.environ.get("COMPONENT_SERVICE_HOST", "localhost")  # Default to auth-service if not set
+COMPONENT_SERVICE_HOST = os.environ.get(
+    "COMPONENT_SERVICE_HOST", "localhost"
+)  # Default to auth-service if not set
 logger.error(COMPONENT_SERVICE_HOST)
+
+
 def send_message(
-    to_service: str, channel: str = "default", event_type: str = "default", message: dict = {}
+    to_service: str,
+    channel: str = "default",
+    event_type: str = "default",
+    message: dict = {},
 ):
     try:
         # Obtenemos el nombre del servicio desde el header
@@ -30,15 +38,13 @@ def send_message(
         if error:
             return None, 400, error
 
-
-        
         logger.error(
             f"Enviando mensaje a {to_service} en el canal {channel}: {message}"
         )
 
         # Enviamos el mensaje
         response = requests.post(
-            f"http://{COMPONENT_SERVICE_HOST}:5002/internal/send",
+            f"http://{COMPONENT_SERVICE_HOST}:5002/internal/message/send",
             json=message,
             timeout=2,
         )

@@ -66,8 +66,44 @@ def crear_token_refresh(usuario_id):
     )
     payload = {"sub": str(usuario_id), "scope": "refresh_token", "exp": expires_in}
     return (
-        jwt.encode(
+        encode(
             payload, getenv("JWT_SECRET_KEY", "clave_jwt_123"), algorithm="HS256"
         ),
         expires_in,
     )
+
+def generar_token_restauracion(email: str) -> str:
+    payload = {
+        "sub": email,
+        "email": email,
+        "type": "restauracion_admin",
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=720),
+    }
+    return encode(payload, getenv("JWT_SECRET", "clave_jwt_123"), algorithm="HS256")
+
+def generar_token_confirmacion_usuario(email: str) -> str:
+    payload = {
+        "sub": email,
+        "email": email,
+        "type": "restauracion_usuario",
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=30),
+    }
+    return encode(payload, getenv("JWT_SECRET", "clave_jwt_123"), algorithm="HS256")
+
+def verificar_token_restauracion(token: str, tipo: str = "restauracion_admin") -> str | None:
+    try:
+        payload = decode(token, getenv("JWT_SECRET", "clave_jwt_123"), algorithms=["HS256"])
+        if payload.get("type") != tipo:
+            return None
+        return payload.get("email")
+    except (ExpiredSignatureError, InvalidTokenError):
+        return None
+    
+def verificar_token_restauracion_usuario(token: str, tipo: str = "restauracion_usuario") -> str | None:
+    try:
+        payload = decode(token, getenv("JWT_SECRET", "clave_jwt_123"), algorithms=["HS256"])
+        if payload.get("type") != tipo:
+            return None
+        return payload.get("email")
+    except (ExpiredSignatureError, InvalidTokenError):
+        return None

@@ -8,13 +8,13 @@ from sqlalchemy.orm import relationship
 class PersonaExtendida(Base):
     __tablename__ = 'personas_extendidas'
 
-    id_extendida = Column(Integer, primary_key=True) # va conectado con Persona
+    id_extendida = Column(Integer, primary_key=True)
     estado_civil = Column(String(30), nullable=True)
     ocupacion = Column(String(100), nullable=True)
     estudios_alcanzados = Column(String(100), nullable=True) 
     vencimiento_dni = Column(Date,nullable=True)
     foto_perfil = Column(String(255), nullable=True)
 
-    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    created_at = Column(DateTime,default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime, nullable=True)
     deleted_at= Column(DateTime, nullable=True)

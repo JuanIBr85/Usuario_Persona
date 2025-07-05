@@ -28,3 +28,5 @@ class Config:
     EMAIL_VERIFICATION_URL = os.getenv("EMAIL_VERIFICATION_URL")
     PASSWORD_RESET_URL = os.getenv("PASSWORD_RESET_URL")
     DEVICE_VERIFICATION_URL = os.getenv("DEVICE_VERIFICATION_URL")
+    USER_RESTORE_URL = os.getenv("USER_RESTORE_URL", "http://localhost:5000/super-admin/restaurar-usuario")
+    USER_RESTORE_CONFIRM_URL = os.getenv("USER_RESTORE_CONFIRM_URL", "http://localhost:5000/confirmar-restauracion")

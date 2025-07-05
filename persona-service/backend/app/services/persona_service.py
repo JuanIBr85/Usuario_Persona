@@ -20,6 +20,7 @@ from app.services.otp_service import OtpService
 from app.schema.persona_schema import PersonaSchema, PersonaResumidaSchema
 from app.interfaces.persona_interface import IPersonaInterface
 from app.extensions import SessionLocal
+from app.utils.documentos_utils import validar_documento_por_tipo
 from app.schema.persona_extendida_schema import PersonaExtendidaSchema
 
 
@@ -36,7 +37,8 @@ class PersonaService(IPersonaInterface):
     def listar_personas(self):
         session = SessionLocal()
         try:
-            personas = session.query(Persona).filter(Persona.deleted_at.is_(None)).all()
+            personas = session.query(Persona).filter(
+                Persona.deleted_at.is_(None)).all()
             return self.varios_schemas.dump(personas)
         finally:
             session.close()
@@ -80,6 +82,26 @@ class PersonaService(IPersonaInterface):
 
             data_validada = self.schema.load(data)
 
+            tipo_doc = data_validada["tipo_documento"]
+            num_doc = data_validada["num_doc_persona"]
+
+            if not validar_documento_por_tipo(tipo_doc, num_doc):
+                raise Exception ("Numero de documento invalido para el tipo selecionado. Verifique y vuelva a intentar.")    
+
+            existe_persona = (
+                session.query(Persona)
+                .filter(
+                    Persona.tipo_documento == data_validada["tipo_documento"],
+                    Persona.num_doc_persona == data_validada["num_doc_persona"],
+                    Persona.deleted_at.is_(None)
+                )
+                .first()
+            )
+
+            if existe_persona:
+                raise Exception(
+                    "La persona ya se encuentra registrada con ese tipo y numero de documento")
+
             # Se crea el contacto, domicilio
             domicilio = self.domicilio_service.crear_domicilio(
                 data_validada.pop("domicilio"), session=session
@@ -96,7 +118,8 @@ class PersonaService(IPersonaInterface):
             data_validada["domicilio_id"] = domicilio.id_domicilio
             data_validada["contacto_id"] = contacto.id_contacto
             data_validada["extendida_id"] = persona_extendida.id_extendida
-            data_validada["tipo_documento"] = data_validada.pop("tipo_documento")
+            data_validada["tipo_documento"] = data_validada.pop(
+                "tipo_documento")
 
             # Crear Persona
             persona_nueva = Persona(**data_validada)
@@ -123,8 +146,6 @@ class PersonaService(IPersonaInterface):
         session = SessionLocal()
 
         try:
-            # persona = session.query(Persona).get(id)
-
             persona = (
                 session.query(Persona)
                 .filter(Persona.id_persona == id, Persona.deleted_at.is_(None))
@@ -138,33 +159,34 @@ class PersonaService(IPersonaInterface):
                 data, partial=True
             )  # permite que la modificacion sea parcial o total
 
-            """ ejemplo de funcionamiento: si en el json recibe 'domicilio' llama a domiciolio_service
-             para modificar ese domicilio, pasa el id existente y los nuevos datos.
-              lo mismo con contacto y persona extendida """
+            tipo_doc = data_validada.get("tipo_documento", persona.tipo_documento)
+            num_doc = data_validada.get("num_doc_persona", persona.num_doc_persona)
+            if not validar_documento_por_tipo(tipo_doc, num_doc):
+                raise Exception("Numero de documento invalido par el tipo selecionado")
 
-            hubo_cambios = False  
+            hubo_cambios = False
 
             if "domicilio" in data:
                 actualizado = self.domicilio_service.modificar_domicilio(
                     persona.domicilio_id, data["domicilio"], session
                 )
                 if actualizado:
-                    hubo_cambios=True
+                    hubo_cambios = True
 
             if "contacto" in data:
                 actualizado = self.contacto_service.modificar_contacto(
                     persona.contacto_id, data["contacto"], session
                 )
                 if actualizado:
-                    hubo_cambios=True
+                    hubo_cambios = True
 
             if "persona_extendida" in data:
                 if persona.persona_extendida:
-                   actualizado = self.persona_ext_service.modificar_persona_extendida(
+                    actualizado = self.persona_ext_service.modificar_persona_extendida(
                         persona.extendida_id, data["persona_extendida"], session
                     )
-                if actualizado:
-                    hubo_cambios=True
+                    if actualizado:
+                        hubo_cambios = True
 
             for field in [
                 "nombre_persona",
@@ -181,13 +203,32 @@ class PersonaService(IPersonaInterface):
                         setattr(persona, field, nuevo_valor)
                         hubo_cambios = True
 
+            if "usuario_id" in data_validada:
+                nuevo_usuario_id = data_validada["usuario_id"]
+                if nuevo_usuario_id == "" or nuevo_usuario_id is None:
+                    # Para desvincular usuario
+                    if persona.usuario_id is not None:
+                        persona.usuario_id = None
+                        hubo_cambios = True
+                elif nuevo_usuario_id != persona.usuario_id:
+                    # Verificar que ese usuario no tiene ya otra persona vinculada
+                    existe = session.query(Persona).filter(
+                        Persona.usuario_id == nuevo_usuario_id,
+                        Persona.deleted_at.is_(None),
+                        Persona.id_persona != id
+                    ).first()
+                    if existe:
+                        raise Exception(
+                            "Ese usuario ya está asociado a otra persona")
+                    persona.usuario_id = nuevo_usuario_id
+                    hubo_cambios = True
+
             if hubo_cambios:
                 persona.updated_at = datetime.now(timezone.utc)
 
             session.commit()
             return self.schema.dump(persona)
 
-        # si ocurre un error deshace los cambios
         except Exception as e:
             import traceback
 
@@ -211,38 +252,44 @@ class PersonaService(IPersonaInterface):
 
             if not Persona:
                 return None
-            
+
             data_validada = self.schema.load(data, partial=True)
 
             if 'domicilio' in data:
-                self.domicilio_service.modificar_domicilio(persona.domicilio_id, data['domicilio'], session)
+                self.domicilio_service.modificar_domicilio(
+                    persona.domicilio_id, data['domicilio'], session)
 
             if 'contacto' in data:
-                self.contacto_service.modificar_contacto(persona.contacto_id, data['contacto'], session)
+                self.contacto_service.modificar_contacto(
+                    persona.contacto_id, data['contacto'], session)
 
             if 'persona_extendida' in data:
                 if persona.persona_extendida:
-                    self.persona_ext_service.modificar_persona_extendida(persona.extendida_id,data['persona_extendida'], session)
+                    self.persona_ext_service.modificar_persona_extendida(
+                        persona.extendida_id, data['persona_extendida'], session)
 
             # Permiten cambios cada 30 días
-            campos_modificables_cada_30_dias = ['nombre_persona', 'apellido_persona']
+            campos_modificables_cada_30_dias = [
+                'nombre_persona', 'apellido_persona']
 
             # No deberían cambiarse automáticamente
-            campos_no_modificables = ['fecha_nacimiento_persona', 'num_doc_persona', 'tipo_documento']   
+            campos_no_modificables = [
+                'fecha_nacimiento_persona', 'num_doc_persona', 'tipo_documento']
 
             ahora = datetime.now(timezone.utc)
-            dias_restriccion=DIAS_RESTRICCION_MODIFICACION 
+            dias_restriccion = DIAS_RESTRICCION_MODIFICACION
 
-            #Campos no modificables por el usuario
+            # Campos no modificables por el usuario
             for campo in campos_no_modificables:
                 if campo in data_validada:
                     valor_actual = getattr(persona, campo)
-                    nuevo_valor = data_validada[campo]   
+                    nuevo_valor = data_validada[campo]
 
                     if str(nuevo_valor).strip() != str(valor_actual).strip():
-                        raise Exception(f"El campo '{campo}' no puede modificarse directamente. Contacte al administrador.")
-                     
-            #Campos editables con restriccion temporal
+                        raise Exception(
+                            f"El campo '{campo}' no puede modificarse directamente. Contacte al administrador.")
+
+            # Campos editables con restriccion temporal
             evaluar_restriccion = False
             cambios_realizados = []
 
@@ -254,25 +301,25 @@ class PersonaService(IPersonaInterface):
                         evaluar_restriccion = True
                         cambios_realizados.append(campo)
 
-
             if evaluar_restriccion:
                 ultima_modificacion = persona.updated_at
 
                 if not ultima_modificacion:
                     ultima_modificacion = ahora - timedelta(days=31)
                 elif ultima_modificacion.tzinfo is None:
-                    ultima_modificacion = ultima_modificacion.replace(tzinfo=timezone.utc)
+                    ultima_modificacion = ultima_modificacion.replace(
+                        tzinfo=timezone.utc)
 
-                dias=(ahora - ultima_modificacion).days
-                evaluar_restriccion = False 
+                dias = (ahora - ultima_modificacion).days
+                evaluar_restriccion = False
 
                 if dias < dias_restriccion:
                     raise Exception(
-                            f"Los campos Nombre y Apellido solo pueden modificarse cada {dias_restriccion} días. Si es necesario contacte a un administrador. "
-                            f"Última modificación: {ultima_modificacion.date()}"
-                        )
-                 #Aplica las modificaciones 
-            hubo_cambios = False  
+                        f"Los campos Nombre y Apellido solo pueden modificarse cada {dias_restriccion} días. Si es necesario contacte a un administrador. "
+                        f"Última modificación: {ultima_modificacion.date()}"
+                    )
+                 # Aplica las modificaciones
+            hubo_cambios = False
             for campo in cambios_realizados:
                 setattr(persona, campo, data_validada[campo])
                 hubo_cambios = True
@@ -284,9 +331,10 @@ class PersonaService(IPersonaInterface):
                 session.flush()
 
             return self.schema.dump(persona)
-        
+
         except Exception as e:
             import traceback
+
             print("Error al modificar persona:")
             print(traceback.format_exc())
             session.rollback()
@@ -295,7 +343,6 @@ class PersonaService(IPersonaInterface):
         finally:
             session.close()
 
-
     def borrar_persona(self, id_persona):
         session = SessionLocal()
 
@@ -303,18 +350,25 @@ class PersonaService(IPersonaInterface):
             persona = (
                 session.query(Persona)
                 .filter(
-                    and_(Persona.id_persona == id_persona, Persona.deleted_at.is_(None))
+                    and_(Persona.id_persona == id_persona,
+                         Persona.deleted_at.is_(None))
                 )
                 .first()
             )
 
             if not persona:
-                return None           
+                return None
 
+            if persona.usuario_id:
+                raise Exception(
+                    "No se puede borrar la persona porque está vinculada a un usuario"
+                )
             if persona.contacto_id:
-                self.contacto_service.borrar_contacto(persona.contacto_id, session)
+                self.contacto_service.borrar_contacto(
+                    persona.contacto_id, session)
             if persona.domicilio_id:
-                self.domicilio_service.borrar_domicilio(persona.domicilio_id, session)
+                self.domicilio_service.borrar_domicilio(
+                    persona.domicilio_id, session)
 
             if persona.extendida_id:
                 self.persona_ext_service.borrar_persona_extendida(
@@ -347,11 +401,14 @@ class PersonaService(IPersonaInterface):
             persona.deleted_at = None
 
             if persona.contacto_id:
-                self.contacto_service.restaurar_contacto(persona.contacto_id, session)
+                self.contacto_service.restaurar_contacto(
+                    persona.contacto_id, session)
             if persona.domicilio_id:
-                self.domicilio_service.restaurar_domicilio(persona.domicilio_id, session)
+                self.domicilio_service.restaurar_domicilio(
+                    persona.domicilio_id, session)
             if persona.extendida_id:
-                self.persona_ext_service.restaurar_persona_extendida(persona.extendida_id, session)     
+                self.persona_ext_service.restaurar_persona_extendida(
+                    persona.extendida_id, session)
 
             session.commit()
             return True
@@ -366,6 +423,7 @@ class PersonaService(IPersonaInterface):
     def contar_personas(self):
         session = SessionLocal()
         try:
+            # Personas por mes
             resultados = (
                 session.query(
                     extract("year", Persona.created_at).label("year"),
@@ -377,11 +435,63 @@ class PersonaService(IPersonaInterface):
                 .order_by("year", "month")
                 .all()
             )
-
-            return [
+            personas_por_mes = [
                 {"year": r.year, "month": int(r.month), "total": r.total}
                 for r in resultados
             ]
+
+            # Totales generales
+            total_activas = session.query(Persona).filter(Persona.deleted_at.is_(None)).count()
+            total_inactivas = session.query(Persona).filter(Persona.deleted_at.isnot(None)).count()
+            total_vinculadas = session.query(Persona).filter(Persona.usuario_id.isnot(None), Persona.deleted_at.is_(None)).count()
+            total_no_vinculadas = session.query(Persona).filter(Persona.usuario_id.is_(None), Persona.deleted_at.is_(None)).count()
+            total_personas = total_activas + total_inactivas
+
+            # Altas por día y por semana (últimos 30 días)
+            hoy = datetime.now().date()
+            altas_dia = session.query(
+                func.date(Persona.created_at),
+                func.count(Persona.id_persona)
+            ).filter(
+                Persona.deleted_at.is_(None),
+                Persona.created_at >= hoy - timedelta(days=30)
+            ).group_by(
+                func.date(Persona.created_at)
+            ).order_by(
+                func.date(Persona.created_at)
+            ).all()
+            personas_por_dia = [
+                {"fecha": str(fecha), "total": total} for fecha, total in altas_dia
+            ]
+
+            # Personas creadas hoy, este mes, este año
+            total_hoy = session.query(Persona).filter(
+                Persona.deleted_at.is_(None),
+                func.date(Persona.created_at) == hoy
+            ).count()
+            ahora = datetime.now()
+            total_este_mes = session.query(Persona).filter(
+                Persona.deleted_at.is_(None),
+                extract("year", Persona.created_at) == ahora.year,
+                extract("month", Persona.created_at) == ahora.month
+            ).count()
+            total_este_anio = session.query(Persona).filter(
+                Persona.deleted_at.is_(None),
+                extract("year", Persona.created_at) == ahora.year
+            ).count()
+
+            return {
+                "total_personas": total_personas,
+                "total_activas": total_activas,
+                "total_inactivas": total_inactivas,
+                "total_vinculadas": total_vinculadas,
+                "total_no_vinculadas": total_no_vinculadas,
+                "personas_creadas_hoy": total_hoy,
+                "personas_creadas_este_mes": total_este_mes,
+                "personas_creadas_este_anio": total_este_anio,
+                "personas_por_dia_ultimos_30": personas_por_dia,
+                "personas_por_mes": personas_por_mes,
+            }
         finally:
             session.close()
 
@@ -427,7 +537,7 @@ class PersonaService(IPersonaInterface):
         try:
             session.query(Persona).filter_by(id_persona=persona_id).update(
                 {"usuario_id": usuario_id}
-            ) # asocia la persona al usuario
-            session.commit() # guarda los cambios en la base de datos
+            )  # asocia la persona al usuario
+            session.commit()  # guarda los cambios en la base de datos
         finally:
             session.close()

@@ -1,59 +1,57 @@
-import { fetchService, HttpMethod } from './fetchUtils';
+import { fetchService, HttpMethod, ServiceURL } from "@/utils/fetchUtils";
 
-export async function getAllUsers() {
-  return await fetchService.useDefaultUrl({
-    url: "api/usuarios",
-    method: HttpMethod.GET,
-  }).then(response => {
-    console.log("Usuarios obtenidos:", response);
-    return response;
-  }).catch(error => {
-    console.error("Error al obtener los usuarios:", error);
-    throw new Error('Error al obtener los usuarios');
-  });
-}
+/**
+ * Servicio para la gestión de usuarios
+ * Contiene métodos para obtener, actualizar, crear y eliminar usuarios mediante solicitudes HTTP.
+ */
+export const userService = {
+  showError: true, // Permite que se muestren errores si ocurre un fallo en las peticiones
 
-export async function getUserById(id) {
-  return await fetchService.useDefaultUrl({
-    url: `api/usuarios/${id}`,
-    method: HttpMethod.GET,
-  }).catch(error => {
-    console.error("Error al obtener usuario por ID:", error);
-    throw new Error('Usuario no encontrado');
-  });
-}
+  // Método para obtener todos los usuarios
+  getAllUsers: async () => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/super-admin/usuarios`,
+      method: HttpMethod.GET,
+      showError: userService.showError,
+      useToken: true,
+    });
+  },
 
-export async function createUser(userData) {
-  return await fetchService.useDefaultUrl({
-    url: "api/crear_usuario",
-    method: HttpMethod.POST,
-    body: userData,
-    useToken: true,
-  }).catch(error => {
-    console.error("Error al crear el usuario:", error);
-    throw new Error('Error al crear el usuario');
-  });
-}
+  // Método para actualizar un usuario existente por ID
+  updateUser: async (id, body) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/super-admin/usuarios/${id}`,
+      method: HttpMethod.PUT,
+      showError: userService.showError,
+      body,
+      useToken: true,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  },
 
-export async function updateUser(id, updatedData) {
-  return await fetchService.useDefaultUrl({
-    url: `api/actualizar_usuario/${id}`,
-    method: HttpMethod.PUT,
-    body: updatedData,
-    useToken: true,
-  }).catch(error => {
-    console.error("Error al actualizar el usuario:", error);
-    throw new Error('Error al actualizar el usuario');
-  });
-}
+  // Método para crear un nuevo usuario
+  createUser: async (body) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/super-admin/admins`,
+      method: HttpMethod.POST,
+      showError: userService.showError,
+      body,
+      useToken: true,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  },
 
-export async function deleteUser(id) {
-  return await fetchService.useDefaultUrl({
-    url: `api/eliminar_usuario/${id}`,
-    method: HttpMethod.DELETE,
-    useToken: true,
-  }).catch(error => {
-    console.error("Error al eliminar el usuario:", error);
-    throw new Error('Error al eliminar el usuario');
-  });
-}
+  // Método para eliminar un usuario por ID
+  deleteUser: async (id) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/super-admin/usuarios/${id}`,
+      method: HttpMethod.DELETE,
+      showError: userService.showError,
+      useToken: true,
+    });
+  },
+};

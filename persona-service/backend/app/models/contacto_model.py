@@ -15,6 +15,6 @@ class Contacto(Base):
     email_contacto=Column(String(50), nullable=False)
     observacion_contacto=Column(String(300), nullable=True)
 
-    created_at=Column(DateTime, default=datetime.now(timezone.utc))
+    created_at=Column(DateTime,default=lambda: datetime.now(timezone.utc))
     updated_at=Column(DateTime, nullable=True)
     deleted_at=Column(DateTime, nullable=True)

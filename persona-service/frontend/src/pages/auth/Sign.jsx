@@ -32,6 +32,7 @@ function Sign() {
 
     AuthService.register(formData) // Llama al servicio para registrar al usuario
       .then(() => {
+
         // Si fue exitoso, muestra mensaje de éxito y activa bandera isOK
         sessionStorage.setItem("email_verificar", formData.email_usuario);
         setMessage(
@@ -79,7 +80,7 @@ function Sign() {
             type="email"
             placeholder="Email"
             labelText="Email"
-            validateMessage="Email inválido"
+            validationMessage="Email inválido"
             required
           />
 
@@ -90,7 +91,7 @@ function Sign() {
             placeholder="Nombre de usuario"
             labelText="Nombre"
             validatePattern=".{4,}"
-            validateMessage="El nombre debe tener al menos 4 caracteres"
+            validationMessage="El nombre debe tener al menos 4 caracteres"
             required
           />
 
@@ -101,13 +102,17 @@ function Sign() {
             placeholder="Contraseña"
             labelText="Contraseña"
             validatePattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$"
-            validateMessage="La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula, un número y un carácter especial."
+            validationMessage="La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula, un número y un carácter especial."
             required
           />
 
           {/* Link para ir al login si ya tiene cuenta */}
           <Button variant="link" asChild className="p-0">
             <Link to="/auth/login">¿Ya tienes una cuenta? Inicia sesión</Link>
+          </Button>
+
+          <Button variant="link" asChild className="p-0">
+            <Link to="/auth/otpregisterrecovery">¿Tiene un OTP de registro?</Link>
           </Button>
 
           {/* Botón de envío del formulario */}

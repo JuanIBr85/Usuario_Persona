@@ -7,7 +7,7 @@ load_dotenv()
 # CONFIGURACIONES GENERALES
 
 # CONFIGURACIONES BASE DE DATOS
-
+ 
 DB_USER = os.environ.get("DB_USER", "componentes_user")
 DB_PASSWORD = os.environ.get("DB_PASSWORD", "componentes_pass")
 DB_HOST = os.environ.get("DB_HOST", "localhost")
@@ -28,3 +28,4 @@ JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
 SERVICES_CONFIG_FILE: str = (
     os.environ.get("SERVICES_CONFIG_FILE") or "services-dev.json"
 )
+ 

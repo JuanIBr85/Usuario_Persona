@@ -164,6 +164,84 @@ def crear_persona():
         )
 
 
+@api_access()  # limiter=["2 per hour"]
+@persona_bp.route("/crear_persona_restringido", methods=["POST"])
+def crear_persona_restringido():
+    try:
+        data = request.get_json()
+
+        if not data:
+            return (
+                make_response(
+                    status=ResponseStatus.ERROR,
+                    message="No se enviaron los datos",
+                    data=None,
+                ),
+                400,
+            )
+
+        data["usuario_id"] = ComponentRequest.get_user_id()
+
+        usuario_persona = persona_service.listar_persona_usuario_id(data["usuario_id"])
+
+        if usuario_persona:
+            return (
+                make_response(
+                    status=ResponseStatus.ERROR,
+                    message="Usuario ya tiene una persona asociada",
+                    data=None,
+                ),
+                400,
+            )
+
+        errors = persona_schema.validate(data)
+
+        if errors:
+            return (
+                make_response(
+                    status=ResponseStatus.ERROR,
+                    message="Error de validacion",
+                    data=errors,
+                ),
+                400,
+            )
+
+        existe, _, _ = persona_service.verificar_documento_mas_get_id(
+            data["tipo_documento"], data["num_doc_persona"]
+        )
+
+        if existe:
+            return (
+                make_response(
+                    status=ResponseStatus.ERROR,
+                    message="Persona ya existe",
+                    data=None,
+                ),
+                400,
+            )
+
+        persona = persona_service.crear_persona(data)
+
+        return (
+            make_response(
+                status=ResponseStatus.SUCCESS,
+                message="Recurso creado correctamente",
+                data={"id": persona.id_persona},
+            ),
+            201,
+        )
+
+    except Exception as e:
+        return (
+            make_response(
+                status=ResponseStatus.ERROR,
+                message="Error interno del servidor",
+                data={"server": str(e)},
+            ),
+            500,
+        )
+
+
 # modificar persona, siguiendo el formato json sugerido
 @api_access(access_permissions=["persona.admin.modificar_persona"])
 @persona_bp.route("/modificar_persona/<int:id>", methods=["PUT"])
@@ -429,6 +507,14 @@ def verificar_persona():
     try:
         usuario_id = ComponentRequest.get_user_id()
         data = request.get_json() or {}
+
+        persona = persona_service.listar_persona_usuario_id(usuario_id)
+
+        if persona is not None:
+            return (
+                make_response(ResponseStatus.ERROR, "El usuario ya posee una persona"),
+                400,
+            )
 
         error = validar_documento_email_schema.validate(data)
         if error:

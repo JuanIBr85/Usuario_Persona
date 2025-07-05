@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Users, ShieldCheck, FileText, HandPlatter } from "lucide-react";
 import { Fade } from "react-awesome-reveal";
 import { isAdmin } from "@/context/AuthContext";
+import { useAuthContext } from "@/context/AuthContext";
 /**
  * Lista de opciones disponibles en el panel de administración.
  * Cada opción incluye un título, una descripción, un ícono y la ruta correspondiente.
@@ -59,25 +60,24 @@ const adminOptions = [
 
 const AdminPanel = () => {
   const navigate = useNavigate();
-
+  const { unauthorizedUser } = useAuthContext();
   useEffect(() => {
     if (!isAdmin()) {
-      navigate("/profile");
-      console.log('usuario no es admin')
+      unauthorizedUser("No tienes permiso para acceder a esta página");
     }
-  }, [navigate]);
+  }, []);
 
   return (
-    <div className=" py-30 px-5 md:py-20 md:px-10 2xl:pl-[5%] 2xl:pr-[5%]">
+    <div className="py-6 px-4 md:py-10 md:px-10 2xl:pl-[5%] 2xl:pr-[5%]">
       <Fade duration={300} triggerOnce>
         <h2 className="text-3xl font-bold mb-10 text-center">
           Panel de Administración
         </h2>{" "}
-        <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 justify-center place-items-stretch auto-rows-[18rem]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {adminOptions.map((option) => (
             <Card
               key={option.title}
-              className="flex flex-col justify-between text-center transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-2xl cursor-pointer"
+              className="flex flex-col justify-between text-center transition-transform duration-300 ease-in-out hover:scale-103 hover:shadow-xl cursor-pointer"
               onClick={() => navigate(option.path)}
             >
               <CardHeader className="flex flex-col items-center justify-center gap-2 flex-grow">
@@ -88,7 +88,7 @@ const AdminPanel = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex items-center justify-center">
-                <Button variant="default" className="mt-2 cursor-pointer">
+                <Button variant="default" className="mt-2 cursor-pointer ">
                   Ir a {option.title}
                 </Button>
               </CardContent>

@@ -24,7 +24,8 @@ function Login() {
   const [isLogin, setIsLogin] = React.useState(false); // Indica si el login fue exitoso
   const [isLoading, setIsLoading] = React.useState(false); // Estado de carga (spinner)
   const { updateData } = useAuthContext(); // Función del contexto global para guardar datos del usuario
-
+  //Compruebo si tiene un otp
+  const [hasResetEmail, setHasResetEmail] = React.useState(sessionStorage.getItem("email_verificar") !== null);
   /**
    * Maneja el envío del formulario de login.
    * Realiza la autenticación contra el backend usando AuthService.
@@ -86,7 +87,7 @@ function Login() {
             type="email"
             placeholder="Email"
             labelText="Email"
-            validateMessage="Email inválido"
+            validationMessage="Email inválido"
             required
           />
 
@@ -97,7 +98,7 @@ function Login() {
             placeholder="Contraseña"
             labelText="Contraseña"
             validatePattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$"
-            validateMessage="La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula, un número y un carácter especial."
+            validationMessage="La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula, un número y un carácter especial."
             required
           />
 
@@ -105,6 +106,13 @@ function Login() {
           <Button variant="link" asChild className="p-0">
             <Link to="/auth/forgotPassword">¿Olvidaste la contraseña?</Link>
           </Button>
+
+          {/* Enlace para registrarse si no tiene cuenta */}
+
+          {hasResetEmail &&
+            <Button variant="link" asChild className="p-0">
+              <Link to="/auth/otpregister">¿Posee un codigo OTP?</Link>
+            </Button>}
 
           {/* Enlace para registrarse si no tiene cuenta */}
           <Button variant="link" asChild className="p-0">

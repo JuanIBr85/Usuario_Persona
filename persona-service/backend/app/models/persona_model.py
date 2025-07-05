@@ -12,7 +12,7 @@ class Persona(Base):
     apellido_persona=Column(String(50),nullable=False)
     fecha_nacimiento_persona = Column(Date,nullable=False)
     tipo_documento = Column(String(20), nullable=False) 
-    num_doc_persona=Column(String(11), nullable=False)
+    num_doc_persona=Column(String(13), nullable=False)
     
     usuario_id = Column(Integer, nullable=True, unique=True)
     domicilio_id=Column(Integer, ForeignKey('domicilios.id_domicilio'))
@@ -23,7 +23,7 @@ class Persona(Base):
     contacto = relationship("Contacto")
     persona_extendida = relationship("PersonaExtendida")
 
-    created_at=Column(DateTime, default=datetime.now(timezone.utc))
+    created_at=Column(DateTime,default=lambda: datetime.now(timezone.utc))
     updated_at=Column(DateTime, nullable=True)
     deleted_at=Column(DateTime, nullable=True)
 

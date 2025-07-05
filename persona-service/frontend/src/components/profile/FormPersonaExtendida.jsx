@@ -8,6 +8,7 @@ import { formSubmitJson } from "@/utils/formUtils";
 import Loading from "@/components/loading/Loading";
 import { Ban } from "lucide-react";
 import { SimpleDialog } from "@/components/SimpleDialog";
+import ResponsiveColumnForm from "@/components/ResponsiveColumnForm";
 export default function FormPersonaExtendida({
   persona_id,
   personaExtendida,
@@ -43,61 +44,61 @@ export default function FormPersonaExtendida({
     <>
       {loading && <Loading isFixed={true} />}
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Estado Civil */}
-          <SimpleSelect
-            name="estado_civil"
-            label="Estado Civil"
-            placeholder="Selecciona tu estado civil"
-            value={personaExtendida?.estado_civil || ""}
-          >
-            {estadosCiviles.map((estado) => (
-              <SelectItem key={estado} value={estado}>
-                {estado}
-              </SelectItem>
-            ))}
-          </SimpleSelect>
+        <ResponsiveColumnForm>
+        {/* Estado Civil */}
+        <SimpleSelect
+          name="estado_civil"
+          label="Estado Civil"
+          placeholder="Selecciona tu estado civil"
+          value={personaExtendida?.estado_civil || ""}
+        >
+          {estadosCiviles.map((estado) => (
+            <SelectItem key={estado} value={estado}>
+              {estado}
+            </SelectItem>
+          ))}
+        </SimpleSelect>
 
-          {/* Ocupación */}
-          <SimpleSelect
-            name="ocupacion"
-            label="Ocupación"
-            placeholder="Selecciona tu ocupación"
-            value={personaExtendida?.ocupacion || ""}
-          >
-            {ocupaciones.map((ocupacion) => (
-              <SelectItem key={ocupacion} value={ocupacion}>
-                {ocupacion}
-              </SelectItem>
-            ))}
-          </SimpleSelect>
-        </div>
+        {/* Ocupación */}
+        <SimpleSelect
+          name="ocupacion"
+          label="Ocupación"
+          placeholder="Selecciona tu ocupación"
+          value={personaExtendida?.ocupacion || ""}
+        >
+          {ocupaciones.map((ocupacion) => (
+            <SelectItem key={ocupacion} value={ocupacion}>
+              {ocupacion}
+            </SelectItem>
+          ))}
+        </SimpleSelect>
+      </ResponsiveColumnForm>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Nivel de Estudios */}
-          <SimpleSelect
-            name="estudios_alcanzados"
-            label="Nivel de Estudios"
-            placeholder="Selecciona tu nivel de estudios"
-            value={personaExtendida?.estudios_alcanzados || ""}
-          >
-            {estudiosAlcanzados.map((nivel) => (
-              <SelectItem key={nivel} value={nivel}>
-                {nivel}
-              </SelectItem>
-            ))}
-          </SimpleSelect>
+      <ResponsiveColumnForm>
+        {/* Nivel de Estudios */}
+        <SimpleSelect
+          name="estudios_alcanzados"
+          label="Nivel de Estudios"
+          placeholder="Selecciona tu nivel de estudios"
+          value={personaExtendida?.estudios_alcanzados || ""}
+        >
+          {estudiosAlcanzados.map((nivel) => (
+            <SelectItem key={nivel} value={nivel}>
+              {nivel}
+            </SelectItem>
+          ))}
+        </SimpleSelect>
 
-          {/* Vencimiento DNI */}
-          <InputValidate
-            id="vencimiento_dni"
-            type="date"
-            placeholder="Ingresa tu fecha de vencimiento del DNI"
-            labelText="Fecha de vencimiento del DNI"
-            value={personaExtendida?.vencimiento_dni || ""}
-            onChange={(e) => handleChange("vencimiento_dni", e.target.value)}
-          />
-        </div>
+        {/* Vencimiento DNI */}
+        <InputValidate
+          id="vencimiento_dni"
+          type="date"
+          placeholder="Ingresa tu fecha de vencimiento del DNI"
+          labelText="Fecha de vencimiento del DNI"
+          value={personaExtendida?.vencimiento_dni || ""}
+          onChange={(e) => handleChange("vencimiento_dni", e.target.value)}
+        />
+      </ResponsiveColumnForm>
 
         {/* Foto de perfil (solo visualización, la carga se manejaría aparte) */}
         {personaExtendida?.foto_perfil && (

@@ -134,7 +134,7 @@ export const fetchService = {
             }
 
             if(error.statusCode===401){
-                setTimeout(()=>{window.location.href="/auth/login";},1000*20);              
+                sessionStorage.setItem("unauthorized_401", true);             
             }
 
             if(error instanceof FetchError) {

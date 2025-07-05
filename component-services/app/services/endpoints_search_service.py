@@ -2,11 +2,14 @@ import traceback
 from flask import request
 import requests
 from werkzeug.routing import Map, Rule
-from app.services.services_serch_service import ServicesSearchService
+from app.services.services_search_service import ServicesSearchService
 from common.models.endpoint_route_model import EndpointRouteModel
 from app.models.service_model import ServiceModel
 import time
 from app.extensions import logger
+from app.services.event_service import EventService
+
+event_service: EventService = EventService()
 
 
 class EndpointsSearchService:
@@ -61,17 +64,6 @@ class EndpointsSearchService:
 
                 self._search_log[service.service_name]["endpoints_count"] = len(
                     response
-                )
-
-                print(
-                    {
-                        k: {
-                            **v,
-                            "api_url": f"{service_url}{v['api_url']}",
-                            "access_url": f"{service_prefix}/{v['access_url']}",
-                        }
-                        for k, v in response.items()
-                    }
                 )
 
                 # Retorna diccionario de endpoints con URLs completas
@@ -153,6 +145,7 @@ class EndpointsSearchService:
                 logger.error(f"Error cargando {service.service_name}: {str(e)}")
                 self._search_log[service.service_name]["error"] = str(e)
                 self._search_log[service.service_name]["success"] = "error"
+            finally:
                 self._search_log[service.service_name]["in_progress"] = False
         # Finalización de la carga
         self._search_in_progress = False
@@ -210,6 +203,10 @@ class EndpointsSearchService:
         Actualiza los endpoints de los servicios
         """
         self._load_endpoints()
+
+        # Envio un evento para indicar que la gateway se recarga
+        # Desactivado cada worker terminaria reenviando un evento
+        # event_service.gateway_research(isEnd=True)
         return True
 
     def stop_search(self):

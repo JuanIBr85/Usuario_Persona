@@ -20,15 +20,16 @@ service = PersonaService()
 validar_documento_schema = ValidarDocumentoSchema()
 
 
-@api_access(cache=CacheSettings(expiration=60 * 60))
+@api_access(cache=CacheSettings(expiration=1))
 @opciones_bp.route("/tipos_documento", methods=["GET"])
 def obtener_tipos_documento():
-
     return (
         make_response(
             status=ResponseStatus.SUCCESS,
             message="Tipos de documento obtenidos correctamente",
-            data=TIPOS_DOCUMENTO_VALIDOS,
+            # Devuelve solo los tipos de documento
+            # Lo ideal seria enviar los regex para permitir al front una validacion fiable
+            data=list(TIPOS_DOCUMENTO_VALIDOS.keys()),
         ),
         200,
     )

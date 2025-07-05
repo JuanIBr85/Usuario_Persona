@@ -2,18 +2,21 @@ import threading
 from flask import Blueprint
 from app.decorators.cp_api_access import cp_api_access
 from app.services.endpoints_search_service import EndpointsSearchService
-from app.services.services_serch_service import ServicesSearchService
+from app.services.services_search_service import ServicesSearchService
 from common.utils.response import make_response, ResponseStatus
 from app.services.message_service import MessageService
 import uuid
 from app.utils.redis_message import send_event
+from app.services.event_service import EventService
+
+event_service: EventService = EventService()
 
 bp = Blueprint("gateway", __name__, cli_group="control", url_prefix="/gateway")
 endpoints_search_service = EndpointsSearchService()
 
 
 @bp.route("/research", methods=["GET"])
-@cp_api_access(is_public=True, limiter=["5 per minute"])
+@cp_api_access(is_public=True, limiter=["2 per minute"])
 def research():
 
     if endpoints_search_service.is_search_in_progress():
@@ -24,27 +27,10 @@ def research():
             ),
             202,
         )
-
+    # Envio un evento de que la gateway se recarga
+    event_service.gateway_research()
+    # Sincronizo a los workers para que recargen sus endpoints
     send_event("research", {})
-
-    message_service = MessageService()
-    for service in ServicesSearchService().get_services():
-
-        data = {
-            "from_service": "component-service",
-            "to_service": service.service_name,
-            "channel": "default",
-            "event_type": "gateway-research",
-            "message": {
-                "message": "Actualización de endpoints iniciada en segundo plano"
-            },
-            "message_id": uuid.uuid4().hex,
-        }
-
-        status = message_service.send_message(
-            data["to_service"],
-            message=data,
-        )
 
     return (
         make_response(
@@ -56,7 +42,7 @@ def research():
 
 
 @bp.route("/research_status", methods=["GET"])
-@cp_api_access(is_public=True, limiter=["2 per minute"])
+@cp_api_access(is_public=True, limiter=["5 per minute"])
 def get_research_status():
     return (
         make_response(
@@ -71,7 +57,7 @@ def get_research_status():
     )
 
 
-@bp.route("/reserch_stop", methods=["GET"])
+@bp.route("/research_stop", methods=["GET"])
 @cp_api_access(is_public=True, limiter=["2 per minute"])
 def stop_research():
     endpoints_search_service.stop_search()

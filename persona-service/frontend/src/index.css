@@ -76,8 +76,15 @@
   --sidebar-ring: oklch(0.708 0 0);
 
   --color-primario: #1c1364;
-  --color-fondo: #fff;
+  --color-fondo: #E8E8EA;
+  /*d0dddd*/
 
+  --color-azul-oscuro: #1c1364;
+  --color-gris: #3C3744;
+  --color-celeste-purpura: #3D52D5;
+  --color-celeste-muy-claro: #B4C5E4;
+  --color-fondo-claro: #ECECEC;
+  --color-fondo-blanco: #ffff;
 }
 
 .dark {
@@ -119,12 +126,19 @@
   --color-gray-900: var(--color-gray-100);
   --color-gray-500: var(--color-gray-400);
   --color-gray-200: var(--color-gray-700);
+
+  --color-fondo: oklch(0.145 0 0);
+}
+
+body {
+  background-color: var(--color-fondo);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -148,10 +162,10 @@
   }
 }
 
-.font-dyslexia{
-  font-family: 'Lexend', Verdana, Arial, sans-serif ;
+.font-dyslexia {
+  font-family: 'Lexend', Verdana, Arial, sans-serif;
 }
 
-.font-low-vision{
+.font-low-vision {
   font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
 }

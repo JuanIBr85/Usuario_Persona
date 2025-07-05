@@ -1,30 +1,29 @@
 
 import { Fade } from "react-awesome-reveal";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import InputValidate from "@/components/inputValidate/InputValidate";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Loading from "@/components/loading/Loading";
 import { SimpleDialog } from "@/components/SimpleDialog";
-import SimpleCarousel from "@/components/SimpleCarousel";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import React from "react";
-import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/components/ui/input-otp";
-import { Label } from "@/components/ui/label";
 import { PersonaService } from "@/services/personaService";
 import { formSubmitJson } from "@/utils/formUtils";
-import SimpleSelect from "@/components/SimpleSelect";
-import { SelectItem } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
+import { ProgressBar } from "@/components/connectProfile/ProgressBar";
+import { Documento } from "@/components/connectProfile/steps/Documento";
+import { VerificarEmail } from "@/components/connectProfile/steps/VerificarEmail";
+import { VerificarOTP } from "@/components/connectProfile/steps/VerificarOTP";
+import { VerificarIdentidad } from "@/components/connectProfile/steps/VerificarIdentidad";
 
 
 function PerfilConnect() {
+    const [currentStep, setCurrentStep] = useState(0);
     const [loading, setLoading] = useState(false);
     const [dialog, setDialog] = useState(null);
-    const [api, setApi] = useState();
-    const [email, setEmail] = useState(null)
-    const [tipoDocumento, setTipoDocumento] = useState([])
-    const [tempData, setTempData] = useState({})
-
+    const [email, setEmail] = useState(null);
+    const [tipoDocumento, setTipoDocumento] = useState([]);
+    const [tempData, setTempData] = useState({});
+    const formRef = useRef(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -38,58 +37,113 @@ function PerfilConnect() {
     }, [])
 
     const handleDNIVerificacion = async (event) => {
+        event.preventDefault();
         const formData = await formSubmitJson(event);
         setLoading(true);
-        PersonaService.verificar_documento(formData)
-            .then(response => {
-                setEmail(response.data.email);
-                setTempData(formData);
-                api?.scrollNext()
-            })
-            .catch(error => {
-                console.log(error)
-            })
-            .finally(() => {
-                setLoading(false)
-            })
+        
+        try {
+            const response = await PersonaService.verificar_documento(formData);
+            setEmail(response.data.email);
+            setTempData(formData);
+            nextStep();
+        } catch (error) {
+            console.error(error);
+            if (error.statusCode === 404) {
+                alert("No se encontró el documento, vamos a crear un nuevo perfil");
+                navigate("/createperfil");
+            }
+        } finally {
+            setLoading(false);
+        }
     }
 
     const handleEmailVerification = async (event) => {
+        event.preventDefault();
         const formData = await formSubmitJson(event);
         setLoading(true);
-        PersonaService.verificar_email({
-            ...tempData,
-            ...formData
-        })
-        .then(response => {
-            setTempData({...response.data});
-            api?.scrollNext()
-        })
-        .catch(error => {
-            console.error(error)
-        })
-        .finally(() => {
-            setLoading(false)
-        })
+        
+        try {
+            const response = await PersonaService.verificar_email({
+                ...tempData,
+                ...formData
+            });
+            setTempData({ ...response.data });
+            nextStep();
+        } catch (error) {
+            console.error(error);
+            alert(error.data.message)
+        } finally {
+            setLoading(false);
+        }
     }
 
     const handleOTPVerification = async (event) => {
+        event.preventDefault();
         const formData = await formSubmitJson(event);
         setLoading(true);
-        PersonaService.verificar_otp({
-            ...tempData,
-            ...formData
-        })
-        .then(response => {
-            navigate('/profile')
-        })
-        .catch(error => {
-            console.error(error)
-        })
-        .finally(() => {
-            setLoading(false)
-        })
+        
+        try {
+            await PersonaService.verificar_otp({
+                ...tempData,
+                ...formData
+            });
+            navigate('/profile');
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
     }
+
+    const nextStep = () => {
+        setCurrentStep(prev => Math.min(prev + 1, 3));
+    };
+
+
+    const handleEmailIncorrecto = () => {
+        setCurrentStep(3); // Ir directamente al paso de verificación de identidad
+    };
+
+    const renderStep = () => {
+        switch (currentStep) {
+            case 0:
+                return (
+                    <Documento 
+                        formRef={formRef}
+                        tipoDocumento={tipoDocumento}
+                        onSubmit={handleDNIVerificacion}
+                        loading={loading}
+                    />
+                );
+            case 1:
+                return (
+                    <VerificarEmail 
+                        formRef={formRef}
+                        email={email}
+                        onSubmit={handleEmailVerification}
+                        onEmailIncorrecto={handleEmailIncorrecto}
+                        loading={loading}
+                    />
+                );
+            case 2:
+                return (
+                    <VerificarOTP 
+                        formRef={formRef}
+                        onSubmit={handleOTPVerification}
+                        loading={loading}
+                    />
+                );
+            case 3:
+                return (
+                    <VerificarIdentidad 
+                        formRef={formRef}
+                        setDialog={setDialog}
+                    />
+                );
+            default:
+                return null;
+        }
+    };
 
     return (
         <>
@@ -98,154 +152,31 @@ function PerfilConnect() {
                 description={dialog?.description}
                 isOpen={dialog}
                 setIsOpen={() => setDialog(null)}
-                className="sm:max-w-3xl" />
+                className="sm:max-w-3xl" 
+            />
             {loading && <Loading isFixed={true} />}
             <Fade duration={300} triggerOnce>
-                <div className="w-full flex items-center justify-center sm:p-4" >
-                    <div className="w-full h-full sm:h-auto md:max-w-2xl shadow-md rounded-xl overflow-hidden w-full flex items-center justify-center sm:p-4">
-                        <Card className="w-full h-full rounded-xl">
-                            <CardHeader className="text-center">
-                                <CardTitle className="text-2xl">
-                                    Vinculacion de perfil
-                                </CardTitle>
-                                <CardDescription>
-                                    <p>Conecta tu perfil con tu cuenta de usuario</p>
-                                    <p>Verificaremos si estas en el sistema</p>
-                                </CardDescription>
-                            </CardHeader>
+                <div className="w-full flex items-center justify-center sm:p-4">
+                    <Card className="w-full max-w-2xl shadow-lg rounded-xl overflow-hidden">
+                        <CardHeader className="text-center">
+                            <CardTitle className="text-2xl">
+                                Vinculación de perfil
+                            </CardTitle>
+                            <CardDescription>
+                                <p>Conecta tu perfil con tu cuenta de usuario</p>
+                                <p>Verificaremos si estás en el sistema</p>
+                            </CardDescription>
+                        </CardHeader>
 
-
-                            <SimpleCarousel setApi={setApi}>
-                                <CardContent className="h-full overflow-y-auto ">
-                                    <form onSubmit={handleDNIVerificacion} className="flex flex-col gap-8">
-                                        <SimpleSelect
-                                            name="tipo_documento"
-                                            label="Tipo de documento"
-                                            placeholder="Selecciona un tipo de documento"
-                                            required
-                                        >
-                                            {tipoDocumento.map((tipo) => (
-                                            <SelectItem key={tipo} value={tipo}>
-                                                {tipo}
-                                            </SelectItem>
-                                            ))}
-                                        </SimpleSelect>
-                                        <InputValidate
-                                            id="num_doc_persona"
-                                            type="number"
-                                            labelText="Ingresa el número de documento"
-                                            placeholder="Nº de documento"
-                                            containerClassName="sm:col-span-3"
-                                            required
-                                        />
-                                        <Button type="submit" className="w-full">
-                                            Siguiente
-                                        </Button>
-                                    </form>
-                                </CardContent>
-
-                                <CardContent className="h-full overflow-y-auto">
-                                <form onSubmit={handleEmailVerification} className="flex flex-col gap-4">
-                                    <InputValidate
-                                        type="text"
-                                        labelText="¿Es este tu email?"
-                                        value={email}
-                                        containerClassName="sm:col-span-3"
-                                        readOnly
-                                    />
-                                    <InputValidate
-                                        id="email_confirmado"
-                                        type="text"
-                                        labelText="Escribe tu email"
-                                        placeholder={email}
-                                        containerClassName="sm:col-span-3"
-                                    />
-                                    <Button type="submit" className="w-full">
-                                        Siguiente
-                                    </Button>
-                                    <Button className="w-full" onClick={() => api?.scrollTo(3)}>
-                                        No es mi correo / Ya no uso ese correo
-                                    </Button>
-                                    </form>
-                                </CardContent>
-
-                                <CardContent className="h-full overflow-y-auto flex flex-col gap-8">
-                                    <form onSubmit={handleOTPVerification} className="grid w-full items-center justify-center gap-4">
-                                        <Label htmlFor="codigo" className="inline-block w-full text-center">Código de verificación</Label>
-                                        <div className="relative">
-                                            <InputOTP name="codigo" maxLength={6} containerClassName="justify-center">
-                                                <InputOTPGroup>
-                                                    <InputOTPSlot className="bg-gray-100" index={0} />
-                                                    <InputOTPSlot className="bg-gray-100" index={1} />
-                                                    <InputOTPSlot className="bg-gray-100" index={2} />
-                                                </InputOTPGroup>
-                                                <InputOTPSeparator />
-                                                <InputOTPGroup>
-                                                    <InputOTPSlot className="bg-gray-100" index={3} />
-                                                    <InputOTPSlot className="bg-gray-100" index={4} />
-                                                    <InputOTPSlot className="bg-gray-100" index={5} />
-                                                </InputOTPGroup>
-                                            </InputOTP>
-                                        </div>
-                                        <Button type="submit" className="w-full">
-                                            Siguiente
-                                        </Button>
-                                    </form>
-                                </CardContent>
-
-                                <CardContent className="h-full overflow-y-auto flex flex-col gap-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
-                                        <InputValidate
-                                            id="nombre_persona"
-                                            type="text"
-                                            labelText="Nombre"
-                                        />
-                                        <InputValidate
-                                            id="apellido_persona"
-                                            type="text"
-                                            labelText="Apellido"
-                                        />
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
-                                        <InputValidate
-                                            id="fecha_nacimiento_persona"
-                                            type="date"
-                                            placeholder="Ingresa tu fecha de nacimiento"
-                                            labelText="Fecha de nacimiento"
-                                            validateMessage="La fecha de nacimiento es requerida"
-                                            required
-                                        />
-                                        <InputValidate
-                                            id="telefono_movil"
-                                            name="telefono_movil"
-                                            type="tel"
-                                            placeholder="Ingresa tu teléfono móvil"
-                                            labelText="Teléfono móvil"
-                                            validatePattern="^[\+]?[0-9\-\s\(\)]{10,}$"
-                                            validateMessage="Ingresa un número de teléfono válido"
-                                            required
-                                        />
-                                    </div>
-                                    <Button type="submit" className="w-full" onClick={() => setDialog({
-                                        title: "Verificar identidad",
-                                        description: <>
-                                            Tus datos concuerdan, enviaremos una peticion de verificacion al administrador, te contactaremos pronto
-                                            <br />
-                                            En caso de no ser contactado, puedes contactarnos al correo <a className="text-blue-500" href="mailto:soporte@persona.com">soporte@persona.com</a>
-                                            <br />
-                                            o llamar al numero <a className="text-blue-500" href="tel:+56912345678">+56912345678</a>
-                                        </>
-                                    })}>
-                                        Verificar identidad
-                                    </Button>
-                                </CardContent>
-                            </SimpleCarousel>
-
-                            <CardFooter className="flex justify-between text-sm text-gray-500 border-t">
-                            </CardFooter>
-
-                        </Card>
-                    </div>
+                        <CardContent className="flex flex-col flex-1 min-h-70">
+                            <div className="space-y-8 flex-1">
+                                <ProgressBar currentStep={currentStep} />
+                                <div className="mb-6">
+                                    {renderStep()}
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
             </Fade>
         </>

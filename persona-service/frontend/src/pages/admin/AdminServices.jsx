@@ -22,6 +22,29 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
+/**
+ * @file AdminServices.jsx
+ * @description Página de administración para la gestión de servicios en el panel de administrador.
+ * Permite navegar a la gestión de servicios disponibles y al monitoreo de endpoints.
+ * Incluye navegación mediante tarjetas interactivas y breadcrumbs para mejorar la experiencia de usuario.
+ *
+ * @component
+ * @returns {JSX.Element} Renderiza la interfaz de gestión de servicios para administradores.
+ *
+ * @dependencies
+ * - React
+ * - useNavigate (react-router-dom)
+ * - Link (react-router-dom)
+ * - Fade (animación)
+ * - Card, CardHeader, CardTitle, CardDescription, CardFooter (componentes UI)
+ * - Button (componente UI)
+ * - Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage (componentes UI)
+ * - Home, ShieldUser (iconos)
+ *
+ * @example
+ * // Uso dentro de una ruta protegida para administradores:
+ * <Route path="/adminservices" element={<AdminServices />} />
+ */
 function AdminServices() {
   const navigate = useNavigate();
 
@@ -39,7 +62,7 @@ function AdminServices() {
   ];
 
   return (
-    <div className="p-6 space-y-6 py-30 px-3 md:px-20 md:pt-10">
+    <div className="p-6 space-y-6 py-15  px-3 md:py-10 md:px-20 md:pt-10">
       <Fade duration={300} triggerOnce>
         <h2 className="text-3xl font-bold mb-6 text-center ">
           Gestión de Servicios

@@ -7,9 +7,10 @@ from app.decorators.cp_api_access import cp_api_access
 from flask_jwt_extended import JWTManager
 from app.extensions import limiter, jwt
 from app.services.endpoints_search_service import EndpointsSearchService
-from app.services.services_serch_service import ServicesSearchService
+from app.services.services_search_service import ServicesSearchService
 import threading
 from app.utils.redis_message import redis_stream_start, register_redis_receiver
+from app.services.event_service import EventService
 
 endpoints_search_service = EndpointsSearchService()
 # Defino los modelos
@@ -65,6 +66,9 @@ def create_app() -> Flask:
 
     # Inicializa el servicio de mensajeria
     redis_stream_start(app)
+
+    # Aviso a los servicios que inicio el servicio de componentes
+    EventService().component_start_service()
 
     return app
 

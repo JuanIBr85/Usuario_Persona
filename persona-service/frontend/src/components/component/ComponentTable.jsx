@@ -327,7 +327,7 @@ function ComponentTable({ data, setData }) {
                     placeholder="https://example:port"
                     labelText="URL del servicio"
                     validatePattern="^https?:\/\/(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(?:\/[^\s]*)?$"
-                    validateMessage="Por favor, ingresa una URL válida."
+                    validationMessage="Por favor, ingresa una URL válida."
                     required
                   />
                 </div>

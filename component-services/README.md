@@ -6,7 +6,7 @@ Documentación de los endpoints disponibles en el servicio de componentes.
 
 - `/api/control/gateway/research` (GET): Inicia una búsqueda en segundo plano para actualizar los endpoints disponibles.
 - `/api/control/gateway/research_status` (GET): Obtiene el estado actual de la búsqueda de endpoints, incluyendo si está en progreso y el registro de búsqueda.
-- `/api/control/gateway/reserch_stop` (GET): Detiene la búsqueda de endpoints en curso.
+- `/api/control/gateway/research_stop` (GET): Detiene la búsqueda de endpoints en curso.
 
 ## Endpoints de Servicios
 

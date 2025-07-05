@@ -23,10 +23,14 @@ PERMISOS = [
     "persona.admin.eliminar_persona",
     "persona.admin.restaurar_persona",
     "example.admin.admin_dice",
+    "auth.admin.obtener_usuarios",
+    "auth.admin.modificar_usuario_con_rol",
+    "auth.admin.obtener_usuarios_eliminados",
+    "auth.admin.restaurar_usuario"
 ]
 
 # Permisos por rol
 PERMISOS_POR_ROL = {
     "superadmin": PERMISOS,
-    "usuario": ["auth.admin.ver_usuario", "auth.admin.logout"],
+    "usuario": ["auth.admin.ver_usuario", "auth.admin.logout","auth.admin.eliminar_usuario","auth.admin.modificar_usuario"],
 }

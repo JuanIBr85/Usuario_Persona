@@ -3,9 +3,10 @@ from cachetools import TTLCache
 from app.models.service_model import ServiceModel
 from app.schemas.service_schema import ServiceSchema
 from app.services.servicio_base import ServicioBase
+import uuid
+
 
 services_service: ServicioBase = ServicioBase(ServiceModel, ServiceSchema())
-
 # Cache para los servicios 10s
 cache_ttl = TTLCache(maxsize=300, ttl=10)
 
@@ -51,3 +52,19 @@ class MessageService:
             return None, 500, str(e)
 
         return response.text, response.status_code, None
+
+    def make_message(
+        self,
+        to_service: str,
+        event_type: str,
+        message: dict = {},
+        channel: str = "default",
+    ):
+        return {
+            "from_service": "component-service",
+            "to_service": to_service,
+            "channel": channel,
+            "event_type": event_type,
+            "message": message,
+            "message_id": uuid.uuid4().hex,
+        }

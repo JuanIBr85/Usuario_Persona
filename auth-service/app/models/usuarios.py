@@ -3,25 +3,26 @@ from sqlalchemy.orm import relationship
 from datetime import datetime, timezone,timedelta
 from app.models.base_model import Base
 
+
 class Usuario(Base):
     __tablename__ = 'usuario'
-    __table_args__ = {'sqlite_autoincrement': True}  #---> buscar forma de hacerlo sobre id_usuario/ 
-                                                     # esto solo hace que los integer y primary key se autoincrementen.
-                                                     
+    __table_args__ = {'sqlite_autoincrement': True}
+
     id_usuario = Column(Integer, primary_key=True)
     nombre_usuario = Column(String, nullable=False)
     email_usuario = Column(String, unique=True, nullable=False)
     email_verificado = Column(Boolean, default=0)
     password = Column(String, nullable=False)
-    
+
+    eliminado = Column(Boolean, default=False)  # <-- campo para borrado lógico
+    deleted_at = Column(DateTime, nullable=True)
+
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
-    deleted_at = Column(DateTime, nullable=True)
-    password_changed_at = Column(DateTime, default=datetime.now(timezone.utc))    #este campo se actualiza cada vez q se cambia algo en las filas, cambiar a manual mas tarde
-    password_expira_en = Column(DateTime, default=lambda: datetime.now(timezone.utc) + timedelta(days=365)) #agregar fecha de expiracion predeterminada - datetime.now(timezone.utc) + timedelta(days=365)
-    
-    # Definir las relaciones y acomodar los nombres segun la tabla Entidad-relacion
-    #persona = relationship("Persona") ---> solo comentado para poder hacer desarrollo hasta que podamos usar la tabla persona.
+    password_changed_at = Column(DateTime, default=datetime.now(timezone.utc))
+    password_expira_en = Column(DateTime, default=lambda: datetime.now(timezone.utc) + timedelta(days=365))
+
+    # Relaciones
     roles = relationship("RolUsuario", back_populates="usuario")
     logs = relationship("UsuarioLog", back_populates="usuario")
     password_logs = relationship("PasswordLog", back_populates="usuario")
@@ -29,6 +30,11 @@ class Usuario(Base):
 
     def marcar_email_verificado(self):
         self.email_verificado = True
+
+    def set_delete(self):
+        """Marca al usuario como eliminado lógicamente."""
+        self.eliminado = True
+        self.deleted_at = datetime.now(timezone.utc)
 
 class UsuarioLog(Base):
     __tablename__ = 'usuario_logs'

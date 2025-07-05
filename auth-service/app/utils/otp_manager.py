@@ -4,9 +4,9 @@ from dotenv import load_dotenv
 import json
 from app.extensions import get_redis
 
-
-OTP_EXPIRATION_SECONDS = 300  # 5 minutos
-TOKEN_EXPIRATION_SECONDS = 600  # 10 minutos
+DATOS_REGISTRO_EXPIRATION_SECONDS=21600 # 6 horitas
+OTP_EXPIRATION_SECONDS = 1500  # 15 minutos
+TOKEN_EXPIRATION_SECONDS = 1800  # 30 minutos
 MAX_INTENTOS_FALLIDOS = 3  # máximo de intentos permitidos
 
 
@@ -77,7 +77,7 @@ def verificar_otp_redis(email: str, codigo: str) -> bool:
 def guardar_datos_registro_temporal(email: str, datos: dict):
     key = f"registro_temp:{email}"
     redis_client = get_redis()
-    redis_client.setex(key, OTP_EXPIRATION_SECONDS, json.dumps(datos))
+    redis_client.setex(key, DATOS_REGISTRO_EXPIRATION_SECONDS, json.dumps(datos))
 
 def obtener_datos_registro_temporal(email: str) -> dict | None:
     key = f"registro_temp:{email}"
@@ -86,8 +86,8 @@ def obtener_datos_registro_temporal(email: str) -> dict | None:
     if valor:
         try:
             return json.loads(valor)
-        finally:
-            redis_client.delete(key)
+        except Exception as e:
+            print(f"Error decodificando datos temporales: {e}")
     return None
 
 # =========================

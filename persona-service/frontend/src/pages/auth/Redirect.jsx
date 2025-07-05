@@ -41,7 +41,7 @@ const Redirect = () => {
             //Si no se pudo convertir la informacion de auth en base64
             if (!b64Data) {
                 setLoadingText("Hubo un problema al empaquetar la informacion");
-                removeAuthData();
+                removeAuthData("Redirect");
                 setTimeout(() => navigate('/auth/login'), 1000);
                 return;
             }
