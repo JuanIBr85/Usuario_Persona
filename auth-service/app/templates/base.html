@@ -1,24 +1,19 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="UTF-8">
-    <title>{% block title %}Mi App{% endblock %}</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            padding: 2rem;
-            text-align: center;
-        }
-        .ok {
-            color: #065f46;
-        }
-        .error {
-            background-color: #fef2f2;
-            color: #991b1b;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>{% block title %}Mi App{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block head %}{% endblock %}
 </head>
+
 <body class="{% block body_class %}{% endblock %}">
+  <div class="container">
     {% block content %}{% endblock %}
+  </div>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block scripts %}{% endblock %}
 </body>
+
 </html>
