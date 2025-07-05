@@ -12,13 +12,13 @@ import { Button } from "@/components/ui/button";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import PersonaDeleteDialog from "./PersonDeleteDialog";
 
-function PersonTable({ users, onEdit, onSeeDetails, onDelete }) {
+function PersonTable({ persons, users, onEdit, onSeeDetails, onDelete }) {
   const [isTimeout, setIsTimeout] = useState(true);
   const [countdown, setCountdown] = useState(3);
 
   useEffect(() => {
     let intervalId;
-    if (users.length > 0) {
+    if (persons.length > 0) {
       // Si hay usuarios, cancelamos el timeout
       setIsTimeout(false);
     } else {
@@ -38,7 +38,7 @@ function PersonTable({ users, onEdit, onSeeDetails, onDelete }) {
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
-  }, [users, countdown]);
+  }, [persons, countdown]);
 
   return (
     <Table>
@@ -49,13 +49,13 @@ function PersonTable({ users, onEdit, onSeeDetails, onDelete }) {
           <TableHead>Tipo Doc.</TableHead>
           <TableHead>Nro. Documento</TableHead>
           <TableHead>Fecha Nac.</TableHead>
-          <TableHead>ID Usuario</TableHead>
+          <TableHead>Usuario Vinculado</TableHead>
           <TableHead className="text-right">Acciones</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {users.length > 0 ? (
-          users.map((user) => (
+        {persons.length > 0 ? (
+          persons.map((user) => (
             <TableRow key={user.id}>
               <TableCell className="font-medium">
                 {user.nombre} {user.apellido}
@@ -63,8 +63,14 @@ function PersonTable({ users, onEdit, onSeeDetails, onDelete }) {
               <TableCell>{user.tipo_documento}</TableCell>
               <TableCell>{user.nro_documento}</TableCell>
               <TableCell>{user.fecha_nacimiento}</TableCell>
-              <TableCell>{user.usuario_id}</TableCell>
-
+              <TableCell>
+                {
+                  (() => {
+                    const linkedUser = users.find(u => u.id === user.usuario_id);
+                    return linkedUser ? linkedUser.email_usuario : user.email_usuario || "No vinculado"; 
+                  })()
+                }
+              </TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end items-center gap-2">
                   <Button

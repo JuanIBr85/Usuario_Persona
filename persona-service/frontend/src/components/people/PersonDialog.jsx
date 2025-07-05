@@ -1,5 +1,4 @@
 import React from "react";
-import { useUsuariosBasic } from "@/hooks/users/useUsuariosBasic";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
@@ -51,9 +50,10 @@ function PersonDialog({
     localidades,
     handleChangePostal,
     redesSociales,
+    usuarios = [],
+    loading = false,
+    error = null, 
 }) {
-    // hook de usuarios básicos
-    const { usuarios, loading, error } = useUsuariosBasic();
     
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

@@ -9,11 +9,9 @@ import InputValidate from "@/components/inputValidate/InputValidate";
 import SimpleSelect from "@/components/SimpleSelect";
 import { SelectItem } from "@/components/ui/select";
 
-function PersonEditDialog({ editingUser, setEditingUser, onSubmit, tiposDocumentos = [] }) {
-  const { usuarios, loading, error } = useUsuariosBasic();
+function PersonEditDialog({ editingUser, setEditingUser, onSubmit, tiposDocumentos = [], usuarios = [], loading = false, error = null }) {
 
   if (!editingUser) return null;
-  
   return (
     <Dialog open={!!editingUser} onOpenChange={(open) => !open && setEditingUser(null)}>
       <DialogContent className="sm:max-w-[425px]">
