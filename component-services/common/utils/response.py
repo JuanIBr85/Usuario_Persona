@@ -1,4 +1,3 @@
-from typing import Any, Dict
 from enum import Enum
 from typing import Any, Dict, Tuple, Union, Optional
 from flask import jsonify, Flask
@@ -19,7 +18,7 @@ class ResponseStatus(Enum):
 def make_response(
     status: ResponseStatus,
     message: str,
-    data: Any = None,
+    data: Optional[dict|list|tuple|str] = None,
     error_code: Optional[str] = None,
 ) -> Dict:
     """
@@ -47,10 +46,10 @@ def make_response(
     if not isinstance(message, str):
         raise TypeError(f"message debe de ser de tipo str. type: {type(message).__name__}")
     
-    if data is not None and not isinstance(data, (dict, list, tuple, set)):
-        raise TypeError(f"data debe de ser de tipo dict, list, tuple o set. type: {type(data).__name__}")
+    if data is not None and not isinstance(data, (dict, list, tuple, str)):
+        raise TypeError(f"data debe de ser de tipo dict, list, tuple o str. type: {type(data).__name__}")
     
-    if error_code is not None and not isinstance(error_code, str):
+    if error_code is not None and not isinstance(error_code, (str, int)):
         raise TypeError(f"error_code debe de ser de tipo str. type: {type(error_code).__name__}")
 
     response = {"status": status.value, "message": message or ""}
@@ -61,7 +60,7 @@ def make_response(
             if status == ResponseStatus.SUCCESS or status == ResponseStatus.PENDING
             else "error"
         )
-        response[key] = data
+        response[key] = data    
         if isinstance(data, (list, set, tuple)):
             response["total"] = len(data)
 

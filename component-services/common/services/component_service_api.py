@@ -7,7 +7,7 @@ COMPONENT_SERVICE_HOST = os.environ.get(
 )
 COMPONENT_SERVICE_URL = f"http://{COMPONENT_SERVICE_HOST}:5002"
 
-class ComponentService:
+class ComponentServiceApi:
     """
     Servicio que permite la comunicación con el servicio de componentes.
     Contiene todas las rutas del servicio.
@@ -33,7 +33,7 @@ class ComponentService:
         Códigos de estado: 200, 202
         """
         
-        return ComponentService._request_to("control/gateway/research", "GET")
+        return ComponentServiceApi._request_to("api/control/gateway/research", "GET")
 
     @staticmethod
     def control_gateway_research_status():
@@ -51,7 +51,7 @@ class ComponentService:
             
         Códigos de estado: 200
         """
-        return ComponentService._request_to("control/gateway/research_status", "GET")
+        return ComponentServiceApi._request_to("api/control/gateway/research_status", "GET")
         
     @staticmethod
     def control_gateway_research_stop():
@@ -63,7 +63,7 @@ class ComponentService:
             
         Códigos de estado: 200
         """
-        return ComponentService._request_to("control/gateway/research_stop", "GET")
+        return ComponentServiceApi._request_to("api/control/gateway/research_stop", "GET")
 
     # Control Redirect
     @staticmethod
@@ -77,7 +77,7 @@ class ComponentService:
             
         Códigos de estado: 200, 500
         """
-        return ComponentService._request_to("control/redirect/all", "GET")
+        return ComponentServiceApi._request_to("api/control/redirect/all", "GET")
         
     @staticmethod
     def control_redirect_update():
@@ -90,7 +90,7 @@ class ComponentService:
             
         Códigos de estado: 200, 500
         """
-        return ComponentService._request_to("control/redirect/update", "GET")
+        return ComponentServiceApi._request_to("api/control/redirect/update", "GET")
         
     @staticmethod
     def control_redirect_get(code: str):
@@ -107,7 +107,7 @@ class ComponentService:
             
         Códigos de estado: 200, 404, 500
         """
-        return ComponentService._request_to(f"control/redirect/get/{code}", "GET")
+        return ComponentServiceApi._request_to(f"api/control/redirect/get/{code}", "GET")
     
     # Control Services
     @staticmethod
@@ -120,7 +120,7 @@ class ComponentService:
             
         Códigos de estado: 200
         """
-        return ComponentService._request_to("control/services/echo", "GET")
+        return ComponentServiceApi._request_to("api/control/services/echo", "GET")
         
     @staticmethod
     def control_services_all():
@@ -133,7 +133,7 @@ class ComponentService:
             
         Códigos de estado: 200, 500
         """
-        return ComponentService._request_to("control/services/all", "GET")
+        return ComponentServiceApi._request_to("api/control/services/all", "GET")
         
     @staticmethod
     def control_services_get(id: int):
@@ -150,7 +150,7 @@ class ComponentService:
             
         Códigos de estado: 200, 404, 500
         """
-        return ComponentService._request_to(f"control/services/get_service/{id}", "GET")
+        return ComponentServiceApi._request_to(f"api/control/services/get_service/{id}", "GET")
         
     @staticmethod
     def control_services_refresh(id: int):
@@ -168,7 +168,7 @@ class ComponentService:
             
         Códigos de estado: 200, 400, 404, 500
         """
-        return ComponentService._request_to(f"control/services/refresh_service/{id}", "PUT")
+        return ComponentServiceApi._request_to(f"api/control/services/refresh_service/{id}", "PUT")
         
     @staticmethod
     def control_services_install(data: dict):
@@ -190,7 +190,7 @@ class ComponentService:
             
         Códigos de estado: 200, 400, 500
         """
-        return ComponentService._request_to("control/services/install_service", "POST", json=data)
+        return ComponentServiceApi._request_to("api/control/services/install_service", "POST", json=data)
         
     @staticmethod
     def control_services_remove(id: int):
@@ -208,7 +208,7 @@ class ComponentService:
             
         Códigos de estado: 200, 400, 404, 500
         """
-        return ComponentService._request_to(f"control/services/remove_service/{id}", "DELETE")
+        return ComponentServiceApi._request_to(f"api/control/services/remove_service/{id}", "DELETE")
         
     @staticmethod
     def control_services_set_available(id: int, state: int):
@@ -227,7 +227,7 @@ class ComponentService:
             
         Códigos de estado: 200, 400, 404, 500
         """
-        return ComponentService._request_to(f"control/services/set_service_available/{id}/{state}", "PUT")
+        return ComponentServiceApi._request_to(f"api/control/services/set_service_available/{id}/{state}", "PUT")
         
     @staticmethod
     def control_services_stop_system():
@@ -240,7 +240,7 @@ class ComponentService:
             
         Códigos de estado: 200, 500
         """
-        return ComponentService._request_to("control/services/stop_system", "GET")
+        return ComponentServiceApi._request_to("api/control/services/stop_system", "GET")
     
     # Internal Message
     @staticmethod
@@ -265,7 +265,7 @@ class ComponentService:
             
         Códigos de estado: 200, 400, 500
         """
-        return ComponentService._request_to("internal/message/send", "POST", json=data)
+        return ComponentServiceApi._request_to("internal/message/send", "POST", json=data)
     
     # Internal Services
     @staticmethod
@@ -281,4 +281,4 @@ class ComponentService:
             
         Códigos de estado: 200, 500
         """
-        return ComponentService._request_to("internal/services/recolect_perms", "GET")
+        return ComponentServiceApi._request_to("internal/services/recolect_perms", "GET")

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Script de build y distribucin multiplataforma - Versin corregida
+Script de build y distribucin multiplataforma - version corregida
 Funciona en Windows y Linux con manejo mejorado de permisos
 """
 
@@ -208,8 +208,8 @@ def check_admin_privileges():
 
 
 def update_version():
-    """Incrementa la versin en setup.py"""
-    print(" Actualizando nmero de versin...")
+    """Incrementa la version en setup.py"""
+    print(" Actualizando numero de version...")
 
     if not os.path.exists("setup.py"):
         print(" Error: No se encontr setup.py")
@@ -223,7 +223,7 @@ def update_version():
         match = re.search(version_pattern, content)
 
         if not match:
-            print(" Error: No se pudo encontrar la versin en setup.py")
+            print(" Error: No se pudo encontrar la version en setup.py")
             return False, None, None
 
         current_version = match.group(1)
@@ -237,11 +237,11 @@ def update_version():
         with open("setup.py", "w", encoding="utf-8") as f:
             f.write(new_content)
 
-        print(f" Versin actualizada de {current_version} a {new_version}")
+        print(f" version actualizada de {current_version} a {new_version}")
         return True, current_version, new_version
 
     except Exception as e:
-        print(f" Error al actualizar versin: {e}")
+        print(f" Error al actualizar version: {e}")
         return False, None, None
 
 
