@@ -1,5 +1,5 @@
 import time
-import requests
+from common.services.service_request import ServiceRequest
 import logging
 
 
@@ -8,7 +8,7 @@ def get_component_info(service_url, wait=False) -> list[str] | None:
     while True:
         try:
             # logging.warning(msg=f"Conectando con {service_url}...")
-            req = requests.get(f"{service_url}/component_service/info", timeout=2)
+            req = ServiceRequest.get(f"{service_url}/component_service/info")
             return req.json()
         except Exception as e:
             # logging.error(msg=f"Error al conectarse con {service_url}: {str(e)}")

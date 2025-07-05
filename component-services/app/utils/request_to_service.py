@@ -1,5 +1,5 @@
 from flask import request, g
-import requests
+from common.services.service_request import ServiceRequest
 
 # Headers que se envian al microservicio
 SAFE_HEADERS = (
@@ -47,7 +47,7 @@ def request_to_service(url:str):
     headers["X-CLIENT-USER-AGENT"] = request.user_agent.string
     # Armo la request para enviar al microservicio con todos los datos recibidos
     # Envio la request al microservicio
-    response = requests.request(
+    response = ServiceRequest.request(
         method=request.method,
         **{
             "url": url,

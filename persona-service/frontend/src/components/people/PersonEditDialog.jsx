@@ -1,19 +1,57 @@
-import React from "react";
-import { useUsuariosBasic } from "@/hooks/users/useUsuariosBasic";
+import React, { useState, useMemo } from "react";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle,
-  DialogDescription, DialogFooter, DialogClose
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import InputValidate from "@/components/inputValidate/InputValidate";
 import SimpleSelect from "@/components/SimpleSelect";
-import { SelectItem } from "@/components/ui/select";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 
-function PersonEditDialog({ editingUser, setEditingUser, onSubmit, tiposDocumentos = [] }) {
-  const { usuarios, loading, error } = useUsuariosBasic();
+function PersonEditDialog({
+  editingUser,
+  setEditingUser,
+  onSubmit,
+  tiposDocumentos = [],
+  usuarios = [],
+  loading = false,
+  error = null,
+}) {
+  const [userSearch, setUserSearch] = useState("");
+
+  const filteredUsuarios = useMemo(() => {
+    if (!userSearch) return usuarios;
+    return usuarios.filter(
+      (u) =>
+        (u.nombre_usuario &&
+          u.nombre_usuario.toLowerCase().includes(userSearch.toLowerCase())) ||
+        (u.email_usuario &&
+          u.email_usuario.toLowerCase().includes(userSearch.toLowerCase()))
+    );
+  }, [userSearch, usuarios]);
 
   if (!editingUser) return null;
-  
+
+  // Adaptar para que null, undefined o "none" sean equivalentes a "ningún usuario"
+  const usuarioValue =
+    editingUser.usuario_id === null ||
+    editingUser.usuario_id === undefined ||
+    editingUser.usuario_id === "" // por compatibilidad con valor previo
+      ? "none"
+      : String(editingUser.usuario_id);
+
   return (
     <Dialog open={!!editingUser} onOpenChange={(open) => !open && setEditingUser(null)}>
       <DialogContent className="sm:max-w-[425px]">
@@ -25,7 +63,6 @@ function PersonEditDialog({ editingUser, setEditingUser, onSubmit, tiposDocument
         </DialogHeader>
         <form onSubmit={onSubmit}>
           <div className="grid gap-4 py-4">
-
             <div className="grid gap-4">
               <InputValidate
                 id="nombre"
@@ -56,7 +93,7 @@ function PersonEditDialog({ editingUser, setEditingUser, onSubmit, tiposDocument
                 required
               >
                 {tiposDocumentos.map((doc, i) => (
-                  <SelectItem key={i} value={doc} >
+                  <SelectItem key={i} value={doc}>
                     {doc}
                   </SelectItem>
                 ))}
@@ -80,32 +117,61 @@ function PersonEditDialog({ editingUser, setEditingUser, onSubmit, tiposDocument
                 onChange={(e) => setEditingUser({ ...editingUser, fecha_nacimiento: e.target.value })}
               />
 
-              {/* Nuevo: Select de usuario */}
+              {/* Select usuario con búsqueda y sin value vacío */}
               <div>
                 <label className="block text-sm font-medium mb-1" htmlFor="usuario_id">
                   Usuario del sistema
                 </label>
-                <select
-                  id="usuario_id"
+                <Select
+                  value={usuarioValue}
+                  onValueChange={(value) => {
+                    setEditingUser({
+                      ...editingUser,
+                      usuario_id: value === "none" ? null : value,
+                    });
+                  }}
+                  disabled={loading}
                   name="usuario_id"
-                  className="border rounded px-2 py-1 w-full"
-                  value={editingUser.usuario_id || ""}
-                  onChange={(e) => setEditingUser({ ...editingUser, usuario_id: e.target.value })}
                 >
-                  <option value="">Ningún usuario</option>
-                  {loading && <option disabled>Cargando usuarios...</option>}
-                  {error && <option disabled>{error}</option>}
-                  {usuarios.map(u => (
-                    <option key={u.id} value={u.id}>
-                      {u.nombre_usuario} ({u.email_usuario})
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger id="usuario_id">
+                    <SelectValue placeholder="Buscar usuario por nombre o email" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <div className="px-2 py-1">
+                      <Input
+                        autoFocus
+                        value={userSearch}
+                        onChange={(e) => setUserSearch(e.target.value)}
+                        placeholder="Buscar por email o usuario..."
+                        className="w-full"
+                      />
+                    </div>
+                    <SelectItem value="none">Ningún usuario</SelectItem>
+                    {loading && (
+                      <SelectItem value="loading" disabled>
+                        Cargando usuarios...
+                      </SelectItem>
+                    )}
+                    {error && (
+                      <SelectItem value="error" disabled>
+                        {error}
+                      </SelectItem>
+                    )}
+                    {filteredUsuarios.length === 0 && !loading && !error && (
+                      <SelectItem value="noresults" disabled>
+                        No se encontraron usuarios
+                      </SelectItem>
+                    )}
+                    {filteredUsuarios.map((u) => (
+                      <SelectItem key={u.id} value={String(u.id)}>
+                        {u.nombre_usuario} ({u.email_usuario})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               {/* Fin select usuario */}
-
             </div>
-
           </div>
           <DialogFooter>
             <DialogClose asChild>

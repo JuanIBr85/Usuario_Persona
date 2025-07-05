@@ -1,4 +1,4 @@
-import requests
+from common.services.service_request import ServiceRequest
 from cachetools import TTLCache
 from app.models.service_model import ServiceModel
 from app.schemas.service_schema import ServiceSchema
@@ -41,10 +41,9 @@ class MessageService:
             return None, 400, "Servicio no disponible"
         try:
             # Enviamos el mensaje
-            response = requests.post(
+            response = ServiceRequest.post(
                 f"{service.service_url}/component_service/receiver",
                 json=message,
-                timeout=2,
             )
             if response.status_code != 200:
                 return None, response.status_code, "Error al enviar mensaje"

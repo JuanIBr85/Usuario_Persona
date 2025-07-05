@@ -72,7 +72,7 @@ def login1():
 @api_access(
     is_public=False
 )
-def logout_usuario() -> tuple[Dict[Any, Any], Any] | tuple[Dict[Any, Any], Literal[500]]:
+def logout_usuario() -> tuple[dict[Any, Any], Any] | tuple[dict[Any, Any], Literal[500]]:
     session = SessionLocal()
     try:
         jwt_jti = ComponentRequest.get_jti()

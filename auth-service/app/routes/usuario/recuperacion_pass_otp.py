@@ -1,6 +1,6 @@
 import json
 import traceback
-from flask import render_template_string
+from flask import render_template
 from app.schemas.usuarios_schema import UsuarioModificarSchema
 from marshmallow import ValidationError
 from common.utils.component_request import ComponentRequest
@@ -214,21 +214,7 @@ def verificar_dispositivo():
         session.add(nuevo_dispositivo)
         session.commit()
 
-        return  ("""
-        <!DOCTYPE html>
-        <html>
-        <head>
-        <title>Dispositivo confirmado</title>
-        <style>
-            body { font-family: sans-serif; padding: 2rem; text-align: center; }
-        </style>
-        </head>
-        <body>
-        <h1>✅ Dispositivo confirmado</h1>
-        <p>Ahora podés volver a iniciar sesión.</p>
-        </body>
-        </html>
-        """), 200
+        return  render_template("dispositivo_confirmado.html")
     
     except ExpiredSignatureError:
         return "El enlace ha expirado.", 400
@@ -237,30 +223,7 @@ def verificar_dispositivo():
     except Exception as e:
         traceback.print_exc()
 
-        return render_template_string(f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-        <title>Error al verificar</title>
-        <style>
-            body {{
-            font-family: sans-serif;
-            padding: 2rem;
-            text-align: center;
-            background-color: #fef2f2;
-            color: #991b1b;
-            }}
-            h1 {{
-            font-size: 1.6rem;
-            }}
-        </style>
-        </head>
-        <body>
-        <h1>❌ Error al verificar el dispositivo</h1>
-        <p>{str(e)}</p>
-        </body>
-        </html>
-        """), 500
+        return render_template("error_generico.html", error=str(e))
 
 
 @bp.route("/refresh", methods=["POST"])
@@ -341,15 +304,7 @@ def confirmar_restauracion():
         usuario.deleted_at = None
         session.commit()
 
-        return """
-        <!DOCTYPE html>
-        <html>
-        <body style="font-family:sans-serif;text-align:center;padding:2rem;">
-        <h1>✅ Cuenta restaurada</h1>
-        <p>Ahora podés iniciar sesión con tus credenciales anteriores.</p>
-        </body>
-        </html>
-        """, 200
+        return render_template("cuenta_restaurada.html")
 
     except ExpiredSignatureError:
         return "El enlace ha expirado.", 400
