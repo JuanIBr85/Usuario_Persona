@@ -59,36 +59,50 @@ class DomicilioService(IDomicilioInterface):
         if not domicilio:
             raise ValueError("Domicilio no encontrado")
 
-        campos_modificables = ['domicilio_calle', 'domicilio_numero', 'domicilio_piso', 'domicilio_dpto',
-                               'domicilio_referencia']
+        campos_modificables = [
+            'domicilio_calle',
+            'domicilio_numero', 
+            'domicilio_piso', 
+            'domicilio_dpto',
+            'domicilio_referencia'
+            ]
+        
+        cambios = False
 
         for campo in campos_modificables:
             if campo in data:
-                setattr(domicilio, campo, data[campo])
+                nuevo_valor = data[campo]
+                if getattr(domicilio, campo) != nuevo_valor:
+                    setattr(domicilio, campo, nuevo_valor)
+                    cambios = True
 
         ''' esta parte permite cambiar el id del codigo postal si se incluye
         codigo_postal es dump_only por lo que no se lo espera en edicion'''
 
-        if 'codigo_postal' in data:
-            cp_data = data['codigo_postal']
-            codigo_postal = cp_data.get('codigo_postal')
-            localidad = cp_data.get('localidad')
+        if "codigo_postal" in data:
+            cp_data = data["codigo_postal"]
+            codigo_postal = cp_data.get("codigo_postal")
+            localidad = cp_data.get("localidad")
 
         if codigo_postal and localidad:
             
             dom_postal = session.query(DomicilioPostal).filter_by(
                 codigo_postal=codigo_postal.strip(),
-                localidad=localidad.strip()
+                localidad=localidad.strip(),
             ).first()
 
             if not dom_postal:
                 raise ValueError("No se encontró el domicilio postal")
-            domicilio.codigo_postal_id = dom_postal.id_domicilio_postal
+            
+            if domicilio.codigo_postal_id != dom_postal.id_domicilio_postal:
+                domicilio.codigo_postal_id = dom_postal.id_domicilio_postal
+                cambios = True
 
-        domicilio.updated_at = datetime.now(timezone.utc)
-
-        session.flush() 
-        return domicilio
+        if cambios:
+            domicilio.updated_at = datetime.now(timezone.utc)
+            session.flush()
+ 
+        return cambios
         
     
     def borrar_domicilio(self, id_domicilio, session=None):
