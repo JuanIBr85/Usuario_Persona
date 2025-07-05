@@ -12,8 +12,7 @@ class Persona(Base):
     apellido_persona=Column(String(50),nullable=False)
     fecha_nacimiento_persona = Column(Date,nullable=False)
     tipo_documento = Column(String(20), nullable=False) 
-    #Hay que cambiar el tamaño de la columna num_doc_persona a 13 para permitir CUIT/CUIL con guiones
-    num_doc_persona=Column(String(11), nullable=False)
+    num_doc_persona=Column(String(13), nullable=False)
     
     usuario_id = Column(Integer, nullable=True, unique=True)
     domicilio_id=Column(Integer, ForeignKey('domicilios.id_domicilio'))

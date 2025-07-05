@@ -4,7 +4,8 @@ from dotenv import find_dotenv, load_dotenv
 import yaml
 
 # Cargo el yml con los datos estaticos
-with open(os.path.join(os.getcwd(), "datos-estaticos.yml"), "r") as file:
+datos_estaticos_path = os.path.join(os.path.dirname(__file__), "datos-estaticos.yml")
+with open(datos_estaticos_path, "r", encoding="utf-8") as file:    
     DATOS_ESTATICOS = yaml.safe_load(file)
 
 # Cargar primero el archivo con datos sensibles (si existe)

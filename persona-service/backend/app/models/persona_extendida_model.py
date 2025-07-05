@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship
 class PersonaExtendida(Base):
     __tablename__ = 'personas_extendidas'
 
-    id_extendida = Column(Integer, primary_key=True) # va conectado con Persona
+    id_extendida = Column(Integer, primary_key=True)
     estado_civil = Column(String(30), nullable=True)
     ocupacion = Column(String(100), nullable=True)
     estudios_alcanzados = Column(String(100), nullable=True) 
