@@ -86,7 +86,7 @@ class PersonaService(IPersonaInterface):
             num_doc = data_validada["num_doc_persona"]
 
             if not validar_documento_por_tipo(tipo_doc, num_doc):
-                raise Exception ("Numero de documento invalido par el tipo selecionado. Verifique y vuelva a intentar.")    
+                raise Exception ("Numero de documento invalido para el tipo selecionado. Verifique y vuelva a intentar.")    
 
             existe_persona = (
                 session.query(Persona)
