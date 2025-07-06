@@ -140,25 +140,37 @@ El microservicio `persona-service` expone una serie de endpoints organizados pri
 
 Estos endpoints devuelven catálogos de valores utilizados para completar formularios y validar datos:
 
-| Ruta                      | Método | Función asociada             | Descripción breve                               |
-|---------------------------|--------|------------------------------|--------------------------------------------------|
-| `/tipos_documento`        | GET    | `obtener_tipos_documento`    | Lista de tipos válidos de documento              |
-| `/redes_sociales`         | GET    | `obtener_red_social`         | Lista de redes sociales válidas                  |
-| `/estados_civiles`        | GET    | `obtener_estado_civile`      | Estados civiles posibles                         |
-| `/ocupaciones`            | GET    | `obtener_ocupacion`          | Ocupaciones disponibles                          |
-| `/estudios_alcanzados`    | GET    | `obtener_estudios_alcanzados`| Niveles educativos posibles                      |
+| Ruta                               | Método | Función asociada                       | Descripción breve                                |
+|----------------------------------- |--------|----------------------------------------|--------------------------------------------------|
+| `/tipos_documento`                 | GET    | `obtener_tipos_documento`              | Lista de tipos válidos de documento              |
+| `/redes_sociales`                  | GET    | `obtener_red_social`                   | Lista de redes sociales válidas                  |
+| `/estados_civiles`                 | GET    | `obtener_estado_civile`                | Estados civiles posibles                         |
+| `/ocupaciones`                     | GET    | `obtener_ocupacion`                    | Ocupaciones disponibles                          |
+| `/estudios_alcanzados`             | GET    | `obtener_estudios_alcanzados`          | Niveles educativos posibles                      |
+| `/domicilios_postales/localidades` | GET    | `buscar_localidades_por_codigo_postal` | Localidades según el código postal               |
+| `/domicilios_postales/buscar`      | GET    | `buscar_domicilio_postal`              | Busca un domicilio postal por código y localidad |
+| `/opciones/verificar-documento`    | POST   | `verificar_documento`                  | Comprueba si un documento ya está registrado     |
 
 ### 👤 Rutas: `/api` – Gestión de Persona
 
 Este conjunto de endpoints permite gestionar datos personales, consultar por ID, crear y modificar personas en el sistema.
 
-| Ruta                             | Método | Función               | Descripción breve                                |
-|----------------------------------|--------|------------------------|--------------------------------------------------|
-| `/personas`                      | GET    | `listar_personas`     | Retorna un listado completo de personas registradas |
-| `/persona_by_id/<int:id>`        | GET    | `persona_by_id`       | Devuelve una persona buscando directamente por ID |
-| `/personas/<int:id>`             | GET    | `obtener_persona`     | Recupera los datos extendidos de una persona     |
-| `/crear_persona`                 | POST   | `crear_persona`       | Crea una nueva persona con su información básica y relaciones |
-| `/modificar_persona/<int:id>`    | PUT    | `modificar_persona`   | Modifica los datos de una persona existente      |
+| Ruta                             | Método | Función                          | Descripción breve                                             |
+|----------------------------------|--------|----------------------------------|---------------------------------------------------------------|
+| `/personas`                      | GET    | `listar_personas`                | Retorna un listado completo de personas registradas           |
+| `/persona_by_id`                 | GET    | `persona_by_id`                  | Devuelve la persona vinculada al usuario autenticado          |
+| `/personas/<int:id>`             | GET    | `obtener_persona`                | Recupera los datos extendidos de una persona                  |
+| `/crear_persona`                 | POST   | `crear_persona`                  | Crea una nueva persona con su información básica y relaciones |
+| `/modificar_persona/<int:id>`    | PUT    | `modificar_persona`              | Modifica los datos de una persona existente                   |
+| `/crear_persona_restringido`     | POST   | `crear_persona_restringido`      | Crea la persona asociada al usuario autenticado               |
+| `/modificar_persona_restringido` | PUT    | `modificar_persona_restringido`  | Modifica la persona vinculada al usuario                      |
+| `/borrar_persona/<int:id>`       | DELETE | `borrar_persona`                 | Elimina lógicamente una persona                               |
+| `/restaurar_persona/<int:id>`    | PATCH  | `restaurar_persona`              | Restaura una persona previamente eliminada                    |
+| `/personas_by_usuario/<int:id>`  | GET    | `obtener_persona_usuario`        | Obtiene la persona asociada a un usuario específico           |
+| `/personas/count`                | GET    | `contar_personas`                | Devuelve la cantidad total de personas                        |
+| `/personas/verify`               | POST   | `verificar_persona`              | Inicia verificación de persona mediante OTP                   |
+| `/personas/verify-otp`           | POST   | `verificar_otp_persona`          | Confirma el OTP y vincula la persona con el usuario           |
+| `/personas/verificar-identidad`  | POST   | `verificar_identidad`            | Verifica datos personales cuando no coincide el email         |
 
 > ℹ️ Estos endpoints son parte central del flujo de verificación y registro de personas dentro del sistema.
 
