@@ -1,4 +1,4 @@
-from datetime import datetime, timezone, timedelta
+from datetime import date, datetime, timezone, timedelta
 from flask import jsonify
 from flask_jwt_extended import create_access_token
 from marshmallow import ValidationError
