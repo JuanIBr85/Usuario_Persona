@@ -3,12 +3,12 @@ from marshmallow import Schema, fields, validate
 
 class ValidarDocumentoSchema(Schema):
     tipo_documento = fields.Str(required=True)
-    num_doc_persona = fields.Int(required=True)
+    num_doc_persona = fields.Str(required=True)
 
 
 class ValidarDocumentoEmailSchema(Schema):
     tipo_documento = fields.Str(required=True)
-    num_doc_persona = fields.Int(required=True)
+    num_doc_persona = fields.Str(required=True)
     email_confirmado = fields.Email(required=True)
 
 

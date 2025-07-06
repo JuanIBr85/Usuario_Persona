@@ -206,7 +206,11 @@ def verificar_documento():
         error = validar_documento_schema.validate(data)
         if error:
             return (
-                make_response(ResponseStatus.FAIL, error),
+                make_response(
+                    status=ResponseStatus.FAIL,
+                    message="Datos inválidos",
+                    data=error,
+                ),
                 400,
             )
 
