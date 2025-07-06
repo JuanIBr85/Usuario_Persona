@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import InputValidate from "@/components/inputValidate/InputValidate";
 import SimpleSelect from "@/components/SimpleSelect";
@@ -18,14 +18,17 @@ function PersonEditDialog({
   open,
   editingPerson,
   setEditingPerson,
+  changePostal,
   onSubmit,
   redesSociales = [],
   tiposDocumentos = [],
   localidades = [],
   loading = false,
+  usuarios = [],
   error = null,
 }) {
   if (!editingPerson) return null;
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -44,16 +47,16 @@ function PersonEditDialog({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if(!e.currentTarget.checkValidity())return;
+    if (!e.currentTarget.checkValidity()) return;
     const formData = await formSubmitJson(e);
 
     const body = {
-      nombre_persona: formData.nombre || "",
-      apellido_persona: formData.apellido || "",
+      nombre_persona: formData.nombre_persona || "",
+      apellido_persona: formData.apellido_persona || "",
+      fecha_nacimiento_persona: formData.fecha_nacimiento || "",
       tipo_documento: formData.tipo_documento || "DNI",
       num_doc_persona: formData.num_doc_persona || "",
-      fecha_nacimiento_persona: formData.fecha_nacimiento || "",
-      //usuario_id: (formData.usuario_id === "-1") ? null : formData?.usuario_id,
+      usuario_id: formData?.usuario_id,
       domicilio: {
         domicilio_calle: formData.domicilio_calle || "",
         domicilio_numero: formData.domicilio_numero || "",
@@ -74,17 +77,14 @@ function PersonEditDialog({
         observacion_contacto: formData.observacion_contacto || "",
       },
     };
-    console.warn(body)
-    setEditingPerson(body);
     onSubmit(body);
   };
 
   const handleChangePostal = (e) => {
     const { value } = e.target;
-    setEditingPerson(prev => ({
-      ...prev,
-      codigo_postal: value
-    }));
+
+    if(value.length !== 4) return;
+    changePostal(value);
   };
 
   return (
@@ -103,21 +103,19 @@ function PersonEditDialog({
             <h4 className="text-md font-medium">Datos Personales</h4>
             <ResponsiveColumnForm>
               <InputValidate
-                id="nombre"
-                name="nombre"
+                id="nombre_persona"
                 type="text"
                 labelText="Nombre"
-                value={editingPerson.nombre || ""}
+                value={editingPerson.nombre_persona || ""}
                 onChange={handleChange}
                 required
               />
 
               <InputValidate
-                id="apellido"
-                name="apellido"
+                id="apellido_persona"
                 type="text"
                 labelText="Apellido"
-                value={editingPerson.apellido || ""}
+                value={editingPerson.apellido_persona || ""}
                 onChange={handleChange}
                 required
               />
@@ -144,7 +142,7 @@ function PersonEditDialog({
                 name="num_doc_persona"
                 type="text"
                 labelText="Nro. documento"
-                value={editingPerson.documento || ""}
+                value={editingPerson.num_doc_persona || ""}
                 onChange={handleChange}
                 required
               />
@@ -153,12 +151,32 @@ function PersonEditDialog({
             <ResponsiveColumnForm>
               <InputValidate
                 id="fecha_nacimiento"
-                name="fecha_nacimiento"
                 type="date"
                 labelText="Fecha de nacimiento"
-                value={editingPerson.fecha_nacimiento || ""}
+                value={editingPerson.fecha_nacimiento_persona || ""}
                 onChange={handleChange}
               />
+
+              {/* Select de usuario */}
+              <SimpleSelect
+                name="usuario_id"
+                label="Usuario del sistema"
+                value={editingPerson.usuario_id || -1}
+                placeholder="Selecciona un usuario"
+              >
+                <SelectItem value={-1} default>Ningún usuario</SelectItem>
+                {loading && (
+                  <SelectItem disabled>Cargando usuarios...</SelectItem>
+                )}
+                {error && (
+                  <SelectItem disabled>{error}</SelectItem>
+                )}
+                {usuarios.map(u => (
+                  <SelectItem key={u.id} value={u.id}>
+                    {u.nombre_usuario} {u.email_usuario}
+                  </SelectItem>
+                ))}
+              </SimpleSelect>
             </ResponsiveColumnForm>
           </div>
 
@@ -168,21 +186,19 @@ function PersonEditDialog({
             <h4 className="text-md font-medium">Contacto</h4>
             <ResponsiveColumnForm>
               <InputValidate
-                id="email"
-                name="email"
+                id="email_contacto"
                 type="email"
                 labelText="Email"
-                value={editingPerson.email || ""}
+                value={editingPerson.contacto?.email_contacto || ""}
                 onChange={handleChange}
                 required
               />
 
               <InputValidate
                 id="telefono_movil"
-                name="telefono_movil"
                 type="tel"
                 labelText="Teléfono móvil"
-                value={editingPerson.telefono_movil || ""}
+                value={editingPerson.contacto?.telefono_movil || ""}
                 onChange={handleChange}
               />
             </ResponsiveColumnForm>
@@ -190,10 +206,9 @@ function PersonEditDialog({
             <ResponsiveColumnForm>
               <InputValidate
                 id="telefono_fijo"
-                name="telefono_fijo"
                 type="tel"
                 labelText="Teléfono fijo"
-                value={editingPerson.telefono_fijo || ""}
+                value={editingPerson.contacto?.telefono_fijo || ""}
                 onChange={handleChange}
               />
             </ResponsiveColumnForm>
@@ -205,51 +220,46 @@ function PersonEditDialog({
             <h4 className="text-md font-medium">Domicilio</h4>
             <ResponsiveColumnForm>
               <InputValidate
-                id="calle"
-                name="calle"
+                id="domicilio_calle"
                 type="text"
                 labelText="Calle"
-                value={editingPerson.calle || ""}
+                value={editingPerson.domicilio?.domicilio_calle || ""}
                 onChange={handleChange}
               />
 
               <InputValidate
-                id="numero"
-                name="numero"
+                id="domicilio_numero"
                 type="text"
                 labelText="Número"
-                value={editingPerson.numero || ""}
+                value={editingPerson.domicilio?.domicilio_numero || ""}
                 onChange={handleChange}
               />
             </ResponsiveColumnForm>
 
             <ResponsiveColumnForm>
               <InputValidate
-                id="piso"
-                name="piso"
+                id="domicilio_piso"
                 type="text"
                 labelText="Piso"
-                value={editingPerson.piso || ""}
+                value={editingPerson.domicilio?.domicilio_piso || ""}
                 onChange={handleChange}
               />
 
               <InputValidate
-                id="dpto"
-                name="dpto"
+                id="domicilio_dpto"
                 type="text"
                 labelText="Departamento"
-                value={editingPerson.dpto || ""}
+                value={editingPerson.domicilio?.domicilio_dpto || ""}
                 onChange={handleChange}
               />
             </ResponsiveColumnForm>
 
             <ResponsiveColumnForm>
               <InputValidate
-                id="referencia"
-                name="referencia"
+                id="domicilio_referencia"
                 type="text"
                 labelText="Referencia"
-                value={editingPerson.referencia || ""}
+                value={editingPerson.domicilio?.domicilio_referencia || ""}
                 onChange={handleChange}
               />
             </ResponsiveColumnForm>
@@ -257,10 +267,9 @@ function PersonEditDialog({
             <ResponsiveColumnForm>
               <InputValidate
                 id="codigo_postal"
-                name="codigo_postal"
                 type="text"
                 labelText="Código Postal"
-                value={editingPerson.codigo_postal || ""}
+                value={editingPerson.domicilio?.domicilio_postal?.codigo_postal || ""}
                 onChange={handleChangePostal}
               />
 
@@ -268,11 +277,12 @@ function PersonEditDialog({
                 <SimpleSelect
                   name="localidad"
                   label="Localidad"
-                  value={editingPerson.localidad || ""}
+                  value={editingPerson.domicilio?.domicilio_postal?.localidad || ""}
                   placeholder="Selecciona una localidad"
                   onValueChange={(value) => handleSelectChange('localidad', value)}
+                  required={true}
                 >
-                  <option value="">Seleccionar localidad</option>
+                  <SelectItem>Seleccionar localidad</SelectItem>
                   {localidades.map((loc, index) => (
                     <SelectItem key={index} value={loc}>
                       {loc}
@@ -290,11 +300,11 @@ function PersonEditDialog({
             <ResponsiveColumnForm>
               {redesSociales.length > 0 && (
                 <SimpleSelect
-                  name="red_social_contacto"
+                  name="red_social_nombre"
                   label="Red Social"
-                  value={editingPerson.red_social_contacto || ""}
+                  value={editingPerson.contacto?.red_social_nombre || ""}
                   placeholder="Selecciona una red social"
-                  onValueChange={(value) => handleSelectChange('red_social_contacto', value)}
+                  onValueChange={(value) => handleSelectChange('red_social_nombre', value)}
                 >
                   <option value="">Ninguna</option>
                   {redesSociales.map((red, index) => (
@@ -306,11 +316,11 @@ function PersonEditDialog({
               )}
 
               <InputValidate
-                id="red_social_nombre"
-                name="red_social_nombre"
+                id="red_social_contacto"
+                name="red_social_contacto"
                 type="text"
                 labelText="Usuario de la red social"
-                value={editingPerson.red_social_nombre || ""}
+                value={editingPerson.contacto?.red_social_contacto || ""}
                 onChange={handleChange}
               />
             </ResponsiveColumnForm>

@@ -122,6 +122,11 @@ class PersonaService(IPersonaInterface):
             data_validada["tipo_documento"] = data_validada.pop(
                 "tipo_documento")
 
+            if "usuario_id" in data_validada:
+                nuevo_usuario_id = data_validada["usuario_id"]
+                if nuevo_usuario_id == -1 or nuevo_usuario_id is None:
+                    data_validada["usuario_id"] = None
+
             # Crear Persona
             persona_nueva = Persona(**data_validada)
             session.add(persona_nueva)
@@ -217,13 +222,13 @@ class PersonaService(IPersonaInterface):
 
             if "usuario_id" in data_validada:
                 nuevo_usuario_id = data_validada["usuario_id"]
-                if nuevo_usuario_id == "" or nuevo_usuario_id is None:
+                if nuevo_usuario_id == -1 or nuevo_usuario_id is None:
                     # Para desvincular usuario
                     if persona.usuario_id is not None:
                         persona.usuario_id = None
                         hubo_cambios_persona = True
                 elif nuevo_usuario_id != persona.usuario_id:
-                    # Verificar que ese usuario no tiene ya otra persona vinculada
+                     # Verificar que ese usuario no tiene ya otra persona vinculada
                     existe = session.query(Persona).filter(
                         Persona.usuario_id == nuevo_usuario_id,
                         Persona.deleted_at.is_(None),

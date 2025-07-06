@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import Loading from "@/components/loading/Loading";
 
 import { PersonaService } from "@/services/personaService";
+import { useUsuariosBasic } from "@/hooks/users/useUsuariosBasic";
+
 
 import PersonDetailsCard from "@/components/person-details/PersonDetailsCard";
 import PersonEditDialog from "@/components/person-details/PersonEditDialog";
@@ -45,41 +47,19 @@ function PersonDetails() {
   const [tiposDocumentos, setTiposDocumentos] = useState([]);
   const [localidades, setLocalidades] = useState([]);
 
+  const [postal, setPostal] = useState("");
+  const {
+    usuarios,
+    loading,
+    error,
+  } = useUsuariosBasic();
   useEffect(() => {
     PersonaService.get_by_id(id)
       .then((res) => {
         if (res?.data) {
           const persona = res.data;
-          const personMapped = {
-            id: persona.id_persona,
-            usuario_id: persona.usuario_id || null,
-            nombre: persona.nombre_persona || "",
-            apellido: persona.apellido_persona || "",
-            tipo_documento: persona.tipo_documento || "Tipo de documento indefinido",
-            documento: persona.num_doc_persona || "",
-            fecha_nacimiento: persona.fecha_nacimiento_persona || "",
-            fechaRegistro: new Date(persona.created_at).toLocaleDateString(),
-            fechaActualizacion: new Date(persona.updated_at).toLocaleDateString(),
-            eliminado: persona.deleted_at !== null,
-            email: persona.contacto?.email_contacto || "Sin email",
-            telefono_movil: persona.contacto?.telefono_movil || "Sin móvil",
-            telefono_fijo: persona.contacto?.telefono_fijo || "Sin fijo",
-            red_social_nombre: persona.contacto?.red_social_nombre || "Sin red social",
-            red_social_contacto: persona.contacto?.red_social_contacto || "Sin nombre de usuario en red",
-            observacion_contacto: persona.contacto?.observacion_contacto || "",
-            calle: persona.domicilio?.domicilio_calle || "Sin dirección",
-            numero: persona.domicilio?.domicilio_numero || "",
-            piso: persona.domicilio?.domicilio_piso || "",
-            dpto: persona.domicilio?.domicilio_dpto || "",
-            referencia: persona.domicilio?.domicilio_referencia || "",
-            codigo_postal: persona.domicilio?.domicilio_postal?.codigo_postal || "",
-            localidad: persona.domicilio?.domicilio_postal?.localidad || "",
-            partido: persona.domicilio?.domicilio_postal?.partido || "",
-            provincia: persona.domicilio?.domicilio_postal?.provincia || "",
-            domicilio_id: persona.domicilio?.id_domicilio || null,
-            domicilio_cp_id: persona.domicilio?.codigo_postal_id || null,
-          };
-          setPerson(personMapped);
+          setPerson(persona);
+          setPostal(persona.domicilio.domicilio_postal.codigo_postal);
         }
       })
       .catch((err) => {
@@ -97,18 +77,24 @@ function PersonDetails() {
   }, []);
 
   useEffect(() => {
-    if (editingPerson?.codigo_postal?.length >= 4) {
-      PersonaService.get_localidades_by_codigo_postal(editingPerson.codigo_postal)
+    if (postal) {
+      PersonaService.get_localidades_by_codigo_postal(postal)
         .then((res) => {
           setLocalidades(res?.data || []);
         });
     }
-  }, [editingPerson?.codigo_postal]);
+  }, [postal]);
 
   const handleEditSubmit = async (body) => {
     setPerson(editingPerson);
     setEditingPerson(null);
-    PersonaService.editar(id, body);
+    PersonaService.editar(id, body).then((res) => {
+      if (res?.data) {
+        const persona = res.data;
+        setPerson(persona);
+        setPostal(persona.domicilio.codigo_postal);
+      }
+    })
   };
 
   if (!person) {
@@ -121,12 +107,16 @@ function PersonDetails() {
       <PersonDetailsBreadcrumb />
       <PersonEditDialog
         open={!!editingPerson}
-        editingPerson={editingPerson}
-        setEditingPerson={setEditingPerson}
+        editingPerson={person}
+        setEditingPerson={setPerson}
+        changePostal={setPostal}
         onSubmit={handleEditSubmit}
         redesSociales={redesSociales}
         tiposDocumentos={tiposDocumentos}
         localidades={localidades}
+        usuarios={usuarios}
+        loading={loading}
+        error={error}
       />
     </div>
   );

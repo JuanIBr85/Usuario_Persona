@@ -132,28 +132,20 @@ function PersonCreateDialog({
                             />
 
                             {/* Select de usuario */}
-                            <div className="w-full">
-                              <SimpleSelect
+                            <SimpleSelect
                                 name="usuario_id"
                                 label="Usuario del sistema"
-                                value={newUser.usuario_id || ""}
+                                value={-1}
                                 placeholder="Selecciona un usuario"
-                                onValueChange={(value) => handleChange({ target: { name: 'usuario_id', value } })}
-                              >
-                                <SelectItem value="-1">Ningún usuario</SelectItem>
-                                {loading && (
-                                  <SelectItem disabled>Cargando usuarios...</SelectItem>
-                                )}
-                                {error && (
-                                  <SelectItem disabled>{error}</SelectItem>
-                                )}
+                            >
+                                <SelectItem value={-1} default>Ningún usuario</SelectItem>
+                                
                                 {usuarios.map(u => (
-                                  <SelectItem key={u.id} value={u.id}>
-                                    {u.nombre_usuario} ({u.email_usuario})
-                                  </SelectItem>
+                                    <SelectItem key={u.id} value={u.id}>
+                                        {u.nombre_usuario} {u.email_usuario}
+                                    </SelectItem>
                                 ))}
-                              </SimpleSelect>
-                            </div>
+                            </SimpleSelect>
                         </ResponsiveColumnForm>
                     </div>
 

@@ -98,9 +98,6 @@ def init_app():
 
 
 
-COMPONENT_SERVICE_URL = "http://localhost:5002"
-
-
 def actualizar_permisos():
     # Obtengo el listado de permisos del servicio de componentes
     response = ComponentServiceApi.internal_services_recolect_perms()

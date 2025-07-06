@@ -13,19 +13,23 @@ function PersonDetailsCard({ person, onEdit }) {
     {
       label: "Nombre completo",
       icon: User,
-      value: `${person.nombre} ${person.apellido}`,
+      value: `${person.nombre_persona || ''} ${person.apellido_persona || ''}`.trim() || '-',
     },
-    { label: "Correo electrónico", icon: Mail, value: person.email },
+    { 
+      label: "Correo electrónico", 
+      icon: Mail, 
+      value: person.contacto?.email_contacto || 'Sin correo electrónico' 
+    },
     {
       label: "Teléfonos",
       icon: Phone,
       value: (
         <div className="flex gap-x-6">
           <span>
-            <strong>Móvil:</strong> {person.telefono_movil || "-"}
+            <strong>Móvil:</strong> {person.contacto?.telefono_movil || "-"}
           </span>
           <span>
-            <strong>Fijo:</strong> {person.telefono_fijo || "-"}
+            <strong>Fijo:</strong> {person.contacto?.telefono_fijo || "-"}
           </span>
         </div>
       ),
@@ -33,34 +37,32 @@ function PersonDetailsCard({ person, onEdit }) {
     {
       label: "Red social",
       icon: BadgeCheck,
-      value: person.red_social_nombre
-        ? `${person.red_social_nombre} (${person.red_social_contacto || "sin usuario"})`
+      value: person.contacto?.red_social_nombre
+        ? `${person.contacto.red_social_nombre} (${person.contacto.red_social_contacto || "sin usuario"})`
         : "Sin red social",
     },
     {
       label: "Observaciones",
       icon: BadgeCheck,
-      value: person.observacion_contacto || "Sin observaciones",
+      value: person.contacto?.observacion_contacto || "Sin observaciones",
     },
     {
-      label: "Dirección y Ubicación",
+      label: "Dirección",
       icon: MapPin,
       value: (
-        <div className="flex flex-wrap gap-x-4 gap-y-1">
-          <span>
-            <strong>Dirección:</strong>{" "}
-            {`${person.localidad || "-"} (${person.codigo_postal || "-"}) - ${person.calle || "-"} ${person.numero || "-"} - Piso: ${person.piso || "-"} Dpto: ${person.dpto || "-"}`}
-          </span>
-          <span>
-            <strong>Referencia:</strong>{" "}
-            {person.referencia || "Sin referencia"}
-          </span>
-          <span>
-            <strong>Partido:</strong> {person.partido || "-"}
-          </span>
-          <span>
-            <strong>Provincia:</strong> {person.provincia || "-"}
-          </span>
+        <div className="flex flex-col gap-1">
+          <div>
+            <strong>Calle:</strong> {`${person.domicilio?.domicilio_calle || 'Sin calle'} ${person.domicilio?.domicilio_numero || ''}`.trim() || '-'}
+          </div>
+          <div>
+            <strong>Piso/Depto:</strong> {`Piso: ${person.domicilio?.domicilio_piso || '-'} - Dpto: ${person.domicilio?.domicilio_dpto || '-'}`}
+          </div>
+          <div>
+            <strong>Localidad:</strong> {`${person.domicilio?.domicilio_postal?.localidad || '-'} (CP: ${person.domicilio?.domicilio_postal?.codigo_postal || '-'})`}
+          </div>
+          <div>
+            <strong>Referencia:</strong> {person.domicilio?.domicilio_referencia || "Sin referencia"}
+          </div>
         </div>
       ),
     },
@@ -73,7 +75,7 @@ function PersonDetailsCard({ person, onEdit }) {
             <strong>Tipo:</strong> {person.tipo_documento || "-"}
           </span>
           <span>
-            <strong>Número:</strong> {person.documento || "-"}
+            <strong>Número:</strong> {person.num_doc_persona || "-"}
           </span>
         </div>
       ),
@@ -81,22 +83,7 @@ function PersonDetailsCard({ person, onEdit }) {
     {
       label: "Fecha de nacimiento",
       icon: Calendar,
-      value: person.fecha_nacimiento || "-",
-    },
-    {
-      label: "Fechas",
-      icon: Calendar,
-      value: (
-        <div className="flex gap-x-6">
-          <span>
-            <strong>Registro:</strong> {person.fechaRegistro || "-"}
-          </span>
-          <span>
-            <strong>Última actualización:</strong>{" "}
-            {person.fechaActualizacion || "-"}
-          </span>
-        </div>
-      ),
+      value: person.fecha_nacimiento_persona || "-",
     },
   ];
 
