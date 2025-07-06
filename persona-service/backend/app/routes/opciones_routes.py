@@ -29,7 +29,8 @@ def obtener_tipos_documento():
             message="Tipos de documento obtenidos correctamente",
             # Devuelve solo los tipos de documento
             # Lo ideal seria enviar los regex para permitir al front una validacion fiable
-            data=list(TIPOS_DOCUMENTO_VALIDOS.keys()),
+            # data=list(TIPOS_DOCUMENTO_VALIDOS.keys()),
+            data=TIPOS_DOCUMENTO_VALIDOS,
         ),
         200,
     )

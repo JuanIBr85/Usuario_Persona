@@ -30,6 +30,7 @@ function PersonEditDialog({
   error = null,
 }) {
   const [userSearch, setUserSearch] = useState("");
+  const [tipoDoc, setTipoDoc] = useState(editingUser?.tipo_documento || Object.keys(tiposDocumentos)[0] || "");
 
   const filteredUsuarios = useMemo(() => {
     if (!userSearch) return usuarios;
@@ -87,12 +88,15 @@ function PersonEditDialog({
               <SimpleSelect
                 name="tipo_documento"
                 label="Tipo de documento"
-                value={editingUser.tipo_documento || "DNI"}
+                value={editingUser.tipo_documento || tipoDoc}
                 placeholder="Selecciona un tipo de documento"
-                onValueChange={(value) => setEditingUser({ ...editingUser, tipo_documento: value })}
+                onValueChange={(value) => {
+                  setTipoDoc(value);
+                  setEditingUser({ ...editingUser, tipo_documento: value });
+                }}
                 required
               >
-                {tiposDocumentos.map((doc, i) => (
+                {Object.keys(tiposDocumentos).map((doc, i) => (
                   <SelectItem key={i} value={doc}>
                     {doc}
                   </SelectItem>
@@ -105,6 +109,7 @@ function PersonEditDialog({
                 type="text"
                 labelText="Número de Documento"
                 value={editingUser.nro_documento || ""}
+                validatePattern={tiposDocumentos[tipoDoc]}
                 onChange={(e) => setEditingUser({ ...editingUser, nro_documento: e.target.value })}
               />
 

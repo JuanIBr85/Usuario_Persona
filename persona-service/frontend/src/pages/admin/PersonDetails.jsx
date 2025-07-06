@@ -72,7 +72,7 @@ function PersonDetails() {
       setRedesSociales(res?.data || []);
     });
     PersonaService.get_tipos_documentos().then((res) => {
-      setTiposDocumentos(res?.data || []);
+      setTiposDocumentos(res?.data || {});
     });
   }, []);
 

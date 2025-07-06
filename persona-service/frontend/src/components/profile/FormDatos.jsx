@@ -20,12 +20,13 @@ export default function FormDatos({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
+  const [tipoDoc, setTipoDoc] = useState(personaData.tipo_documento || Object.keys(tipoDocumento)[0] || "");
 
   const handleSubmit = async (event) => {
     const { email, ...formData } = await formSubmitJson(event);
     document.activeElement.blur();
     setLoading(true);
-    PersonaService.editar_restringido( formData)
+    PersonaService.editar_restringido(formData)
       .then((response) => {
         setPersonaData(response.data);
       })
@@ -56,16 +57,20 @@ export default function FormDatos({
             value={personaData.apellido_persona || ""}
           />
         </ResponsiveColumnForm>
-        
+
         <ResponsiveColumnForm>
           <SimpleSelect
             name="tipo_documento"
             label="Tipo de documento"
             placeholder="Selecciona un tipo de documento"
-            value={personaData.tipo_documento}
+            value={personaData.tipo_documento || tipoDoc}
+            onValueChange={(value) => {
+              setTipoDoc(value);
+              handleChange('tipo_documento', value);
+            }}
             required
           >
-            {tipoDocumento.map((tipo) => (
+            {Object.keys(tipoDocumento).map((tipo) => (
               <SelectItem key={tipo} value={tipo}>
                 {tipo}
               </SelectItem>
@@ -76,9 +81,10 @@ export default function FormDatos({
             type="text"
             labelText="Nº de documento"
             value={personaData.num_doc_persona || ""}
+            validatePattern={tipoDocumento[tipoDoc]}
           />
         </ResponsiveColumnForm>
-        
+
         <ResponsiveColumnForm>
           <InputValidate
             id="fecha_nacimiento_persona"
@@ -115,14 +121,14 @@ export default function FormDatos({
           </Button>
         </div>
         {error && <SimpleDialog
-            title={<div className="flex flex-row items-center gap-2"><Ban /> Ocurrió un error</div>}
-            description={"No se pudieron guardar los datos. Intenta nuevamente."}
-            isOpen={openDialog}
-            actionHandle={() => {
-              setOpenDialog(null);
-            }}
-            action="Cerrar"
-          />}
+          title={<div className="flex flex-row items-center gap-2"><Ban /> Ocurrió un error</div>}
+          description={"No se pudieron guardar los datos. Intenta nuevamente."}
+          isOpen={openDialog}
+          actionHandle={() => {
+            setOpenDialog(null);
+          }}
+          action="Cerrar"
+        />}
       </form>
     </>
   );

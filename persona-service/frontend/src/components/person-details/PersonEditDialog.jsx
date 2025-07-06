@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import InputValidate from "@/components/inputValidate/InputValidate";
 import SimpleSelect from "@/components/SimpleSelect";
@@ -28,6 +28,10 @@ function PersonEditDialog({
   error = null,
 }) {
   if (!editingPerson) return null;
+
+  const [tipoDoc, setTipoDoc] = useState(
+    editingPerson?.tipo_documento || Object.keys(tiposDocumentos)[0] || ""
+  );
 
 
   const handleChange = (e) => {
@@ -77,7 +81,7 @@ function PersonEditDialog({
   const handleChangePostal = (e) => {
     const { value } = e.target;
 
-    if(value.length !== 4) return;
+    if (value.length !== 4) return;
     changePostal(value);
   };
 
@@ -117,11 +121,15 @@ function PersonEditDialog({
               <SimpleSelect
                 name="tipo_documento"
                 label="Tipo de documento"
-                value={editingPerson.tipo_documento || "DNI"}
+                value={editingPerson.tipo_documento || tipoDoc}
                 placeholder="Selecciona un tipo de documento"
+                onValueChange={(value) => {
+                  setTipoDoc(value);
+                  handleSelectChange('tipo_documento', value);
+                }}
                 required
               >
-                {tiposDocumentos.map((doc, i) => (
+                {Object.keys(tiposDocumentos).map((doc, i) => (
                   <SelectItem key={i} value={doc}>
                     {doc}
                   </SelectItem>
@@ -134,6 +142,7 @@ function PersonEditDialog({
                 type="text"
                 labelText="Nro. documento"
                 value={editingPerson.num_doc_persona || ""}
+                validatePattern={tiposDocumentos[tipoDoc]}
                 required
               />
             </ResponsiveColumnForm>
