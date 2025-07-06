@@ -42,7 +42,7 @@ function PersonDetails() {
   const { id } = useParams();
 
   const [person, setPerson] = useState(null);
-  const [editingPerson, setEditingPerson] = useState(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [redesSociales, setRedesSociales] = useState([]);
   const [tiposDocumentos, setTiposDocumentos] = useState([]);
   const [localidades, setLocalidades] = useState([]);
@@ -86,8 +86,7 @@ function PersonDetails() {
   }, [postal]);
 
   const handleEditSubmit = async (body) => {
-    setPerson(editingPerson);
-    setEditingPerson(null);
+    setIsDialogOpen(false);
     PersonaService.editar(id, body).then((res) => {
       if (res?.data) {
         const persona = res.data;
@@ -103,12 +102,12 @@ function PersonDetails() {
 
   return (
     <div className="p-6 space-y-6">
-      <PersonDetailsCard person={person} onEdit={() => setEditingPerson({ ...person })} />
+      <PersonDetailsCard person={person} onEdit={() => setIsDialogOpen(true)} />
       <PersonDetailsBreadcrumb />
       <PersonEditDialog
-        open={!!editingPerson}
+        open={isDialogOpen}
+        setIsDialogOpen={setIsDialogOpen}
         editingPerson={person}
-        setEditingPerson={setPerson}
         changePostal={setPostal}
         onSubmit={handleEditSubmit}
         redesSociales={redesSociales}

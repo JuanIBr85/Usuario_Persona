@@ -17,9 +17,9 @@ import {
 function PersonEditDialog({
   open,
   editingPerson,
-  setEditingPerson,
   changePostal,
   onSubmit,
+  setIsDialogOpen,
   redesSociales = [],
   tiposDocumentos = [],
   localidades = [],
@@ -32,17 +32,11 @@ function PersonEditDialog({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setEditingPerson(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    editingPerson[name] = value;
   };
 
   const handleSelectChange = (name, value) => {
-    setEditingPerson(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    editingPerson[name] = value;
   };
 
   const handleSubmit = async (e) => {
@@ -88,7 +82,7 @@ function PersonEditDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && setEditingPerson(null)}>
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && setIsDialogOpen(false)}>
       <DialogContent className="sm:max-w-[600px] overflow-y-auto max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>Editar Persona</DialogTitle>
@@ -107,7 +101,6 @@ function PersonEditDialog({
                 type="text"
                 labelText="Nombre"
                 value={editingPerson.nombre_persona || ""}
-                onChange={handleChange}
                 required
               />
 
@@ -116,7 +109,6 @@ function PersonEditDialog({
                 type="text"
                 labelText="Apellido"
                 value={editingPerson.apellido_persona || ""}
-                onChange={handleChange}
                 required
               />
             </ResponsiveColumnForm>
@@ -127,7 +119,6 @@ function PersonEditDialog({
                 label="Tipo de documento"
                 value={editingPerson.tipo_documento || "DNI"}
                 placeholder="Selecciona un tipo de documento"
-                onValueChange={(value) => handleSelectChange('tipo_documento', value)}
                 required
               >
                 {tiposDocumentos.map((doc, i) => (
@@ -143,7 +134,6 @@ function PersonEditDialog({
                 type="text"
                 labelText="Nro. documento"
                 value={editingPerson.num_doc_persona || ""}
-                onChange={handleChange}
                 required
               />
             </ResponsiveColumnForm>
@@ -154,7 +144,6 @@ function PersonEditDialog({
                 type="date"
                 labelText="Fecha de nacimiento"
                 value={editingPerson.fecha_nacimiento_persona || ""}
-                onChange={handleChange}
               />
 
               {/* Select de usuario */}
@@ -190,7 +179,6 @@ function PersonEditDialog({
                 type="email"
                 labelText="Email"
                 value={editingPerson.contacto?.email_contacto || ""}
-                onChange={handleChange}
                 required
               />
 
@@ -199,7 +187,7 @@ function PersonEditDialog({
                 type="tel"
                 labelText="Teléfono móvil"
                 value={editingPerson.contacto?.telefono_movil || ""}
-                onChange={handleChange}
+                required
               />
             </ResponsiveColumnForm>
 
@@ -209,7 +197,6 @@ function PersonEditDialog({
                 type="tel"
                 labelText="Teléfono fijo"
                 value={editingPerson.contacto?.telefono_fijo || ""}
-                onChange={handleChange}
               />
             </ResponsiveColumnForm>
           </div>
@@ -224,7 +211,6 @@ function PersonEditDialog({
                 type="text"
                 labelText="Calle"
                 value={editingPerson.domicilio?.domicilio_calle || ""}
-                onChange={handleChange}
               />
 
               <InputValidate
@@ -232,7 +218,6 @@ function PersonEditDialog({
                 type="text"
                 labelText="Número"
                 value={editingPerson.domicilio?.domicilio_numero || ""}
-                onChange={handleChange}
               />
             </ResponsiveColumnForm>
 
@@ -242,7 +227,6 @@ function PersonEditDialog({
                 type="text"
                 labelText="Piso"
                 value={editingPerson.domicilio?.domicilio_piso || ""}
-                onChange={handleChange}
               />
 
               <InputValidate
@@ -250,7 +234,6 @@ function PersonEditDialog({
                 type="text"
                 labelText="Departamento"
                 value={editingPerson.domicilio?.domicilio_dpto || ""}
-                onChange={handleChange}
               />
             </ResponsiveColumnForm>
 
@@ -260,7 +243,6 @@ function PersonEditDialog({
                 type="text"
                 labelText="Referencia"
                 value={editingPerson.domicilio?.domicilio_referencia || ""}
-                onChange={handleChange}
               />
             </ResponsiveColumnForm>
 
@@ -279,7 +261,6 @@ function PersonEditDialog({
                   label="Localidad"
                   value={editingPerson.domicilio?.domicilio_postal?.localidad || ""}
                   placeholder="Selecciona una localidad"
-                  onValueChange={(value) => handleSelectChange('localidad', value)}
                   required={true}
                 >
                   <SelectItem>Seleccionar localidad</SelectItem>
@@ -330,7 +311,7 @@ function PersonEditDialog({
             <Button
               type="button"
               variant="outline"
-              onClick={() => setEditingPerson(null)}
+              onClick={() => setIsDialogOpen(false)}
             >
               Cancelar
             </Button>

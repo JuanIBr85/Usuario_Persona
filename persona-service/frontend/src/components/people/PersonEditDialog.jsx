@@ -47,8 +47,8 @@ function PersonEditDialog({
   // Adaptar para que null, undefined o "none" sean equivalentes a "ningún usuario"
   const usuarioValue =
     editingUser.usuario_id === null ||
-    editingUser.usuario_id === undefined ||
-    editingUser.usuario_id === "" // por compatibilidad con valor previo
+      editingUser.usuario_id === undefined ||
+      editingUser.usuario_id === "" // por compatibilidad con valor previo
       ? "none"
       : String(editingUser.usuario_id);
 
@@ -117,60 +117,51 @@ function PersonEditDialog({
                 onChange={(e) => setEditingUser({ ...editingUser, fecha_nacimiento: e.target.value })}
               />
 
-              {/* Select usuario con búsqueda y sin value vacío */}
-              <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="usuario_id">
-                  Usuario del sistema
-                </label>
-                <Select
-                  value={usuarioValue}
-                  onValueChange={(value) => {
-                    setEditingUser({
-                      ...editingUser,
-                      usuario_id: value === "none" ? null : value,
-                    });
-                  }}
-                  disabled={loading}
-                  name="usuario_id"
-                >
-                  <SelectTrigger id="usuario_id">
-                    <SelectValue placeholder="Buscar usuario por nombre o email" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <div className="px-2 py-1">
-                      <Input
-                        autoFocus
-                        value={userSearch}
-                        onChange={(e) => setUserSearch(e.target.value)}
-                        placeholder="Buscar por email o usuario..."
-                        className="w-full"
-                      />
-                    </div>
-                    <SelectItem value="none">Ningún usuario</SelectItem>
-                    {loading && (
-                      <SelectItem value="loading" disabled>
-                        Cargando usuarios...
-                      </SelectItem>
-                    )}
-                    {error && (
-                      <SelectItem value="error" disabled>
-                        {error}
-                      </SelectItem>
-                    )}
-                    {filteredUsuarios.length === 0 && !loading && !error && (
-                      <SelectItem value="noresults" disabled>
-                        No se encontraron usuarios
-                      </SelectItem>
-                    )}
-                    {filteredUsuarios.map((u) => (
-                      <SelectItem key={u.id} value={String(u.id)}>
-                        {u.nombre_usuario} ({u.email_usuario})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              {/* Fin select usuario */}
+              <SimpleSelect
+                label="Usuario del sistema"
+                name="usuario_id"
+                id="usuario_id"
+                value={usuarioValue}
+                onValueChange={(value) => {
+                  setEditingUser({
+                    ...editingUser,
+                    usuario_id: value === "none" ? null : value,
+                  });
+                }}
+                disabled={loading}
+                placeholder="Buscar usuario por nombre o email"
+              >
+                <div className="px-2 py-1">
+                  <Input
+                    autoFocus
+                    value={userSearch}
+                    onChange={(e) => setUserSearch(e.target.value)}
+                    placeholder="Buscar por email o usuario..."
+                    className="w-full"
+                  />
+                </div>
+                <SelectItem value="none">Ningún usuario</SelectItem>
+                {loading && (
+                  <SelectItem value="loading" disabled>
+                    Cargando usuarios...
+                  </SelectItem>
+                )}
+                {error && (
+                  <SelectItem value="error" disabled>
+                    {error}
+                  </SelectItem>
+                )}
+                {filteredUsuarios.length === 0 && !loading && !error && (
+                  <SelectItem value="noresults" disabled>
+                    No se encontraron usuarios
+                  </SelectItem>
+                )}
+                {filteredUsuarios.map((u) => (
+                  <SelectItem key={u.id} value={String(u.id)}>
+                    {u.nombre_usuario} ({u.email_usuario})
+                  </SelectItem>
+                ))}
+              </SimpleSelect>
             </div>
           </div>
           <DialogFooter>
