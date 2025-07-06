@@ -140,7 +140,7 @@ function AdminPersons() {
         fecha_nacimiento_persona: formData.fecha_nacimiento || "",
         tipo_documento: formData.tipo_documento || "DNI",
         num_doc_persona: formData.nro_documento || "",
-        usuario_id: (formData.usuario_id==="-1")?null:formData?.usuario_id,
+        usuario_id: formData?.usuario_id,
         domicilio: {
           domicilio_calle: formData.domicilio_calle || "",
           domicilio_numero: formData.domicilio_numero || "",
@@ -162,21 +162,23 @@ function AdminPersons() {
         },
       };
 
-      await PersonaService.crear(body);
+      await PersonaService.crear(body).then((res) => {
+        const newUserForTable = {
+          id: res?.data?.id_persona,
+          nombre: formData.nombre || "",
+          apellido: formData.apellido || "",
+          tipo_documento: formData.tipo_documento || "DNI",
+          nro_documento: formData.nro_documento || "",
+          fecha_nacimiento: formData.fecha_nacimiento || "",
+          usuario_id: formData.usuario_id || "",
+        };
 
-      const newUserForTable = {
-        id: null,
-        nombre: formData.nombre || "",
-        apellido: formData.apellido || "",
-        tipo_documento: formData.tipo_documento || "DNI",
-        nro_documento: formData.nro_documento || "",
-        fecha_nacimiento: formData.fecha_nacimiento || "",
-        usuario_id: formData.usuario_id || null,
-      };
+        setPersonas((prevPersonas) => [...prevPersonas, newUserForTable]);
+        setNewUser({});
+        setIsDialogOpen(false);
+      });
 
-      setPersonas((prevPersonas) => [...prevPersonas, newUserForTable]);
-      setNewUser({});
-      setIsDialogOpen(false);
+
     } catch (error) {
       console.error("Error al crear persona:", error);
       const rawMsg = error?.data?.error?.server || error?.data?.message || error.message || "Error desconocido";

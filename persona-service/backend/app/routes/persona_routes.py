@@ -1,3 +1,4 @@
+import datetime
 from common.utils.component_request import ComponentRequest
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity, decode_token
@@ -491,8 +492,6 @@ def contar_personas():
 ruta para iniciar lqa verificacion de persona mediante codigo otp
 el usuario debe estar autenticado jwt_required
 """
-
-
 @persona_bp.route("/personas/verify", methods=["POST"])
 @api_access()
 def verificar_persona():
@@ -554,8 +553,6 @@ def verificar_persona():
 """
 ruta paqra verificar el codigo otp recibido y vincular la persona con el usuario
 """
-
-
 # cambios para usar X-USER-ID
 @api_access()
 @persona_bp.route("/personas/verify-otp", methods=["POST"])
@@ -591,3 +588,55 @@ def verificar_otp_persona():
     # aca se vincula la persona con el usuario
     persona_service.vincular_persona(int(usuario_id), claims.get("persona_id"))
     return make_response(ResponseStatus.SUCCESS, "Persona vinculada con usuario"), 200
+
+"""VERIFICACIÓN DE DATOS DEL USUARIO
+caso de uso: cuando un usuario registrado coincide documento, pero no reconoce el email,
+se verifican datos personales, deben coincidir los cuatro: nombre, apellido, fecha_de_nac, telefono
+tanto si coinciden o no, el usuario debe contactar al administrador
+"""
+@api_access()
+@persona_bp.route('/personas/verificar-identidad', methods=['POST'])
+def verificar_identidad():
+    try:
+        data = request.get_json() or {}
+
+        required_fields = ["persona_id", "nombre", "apellido", "fecha_nacimiento", "telefono_movil"]
+        if not all(field in data and data[field] for field in required_fields):
+            return (
+                make_response(
+                    ResponseStatus.ERROR,
+                    "Todos los campos son obligatorios.",
+                ),
+                400,
+            )
+
+        result = persona_service.verificar_datos_personales(
+            persona_id=data["persona_id"],
+            datos_usuario={
+                "nombre": data["nombre"],
+                "apellido": data["apellido"],
+                "fecha_nacimiento": data["fecha_nacimiento"],
+                "telefono_movil": data["telefono_movil"],
+            },
+        )
+
+        if not result["encontrada"]:
+            return (
+                make_response(ResponseStatus.ERROR, result["mensaje"]),
+                404,
+            )
+
+        status = ResponseStatus.SUCCESS if result["coinciden"] else ResponseStatus.ERROR
+
+        return (
+            make_response(status, result["mensaje"]),
+            200 if result["coinciden"] else 400,
+        )
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return (
+            make_response(ResponseStatus.FAIL, "Error interno al verificar identidad."),
+            500,
+        )

@@ -13,10 +13,12 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 
+import {Input} from "@/components/ui/input";
 import InputValidate from "@/components/inputValidate/InputValidate";
 import SimpleSelect from "@/components/SimpleSelect";
 import { SelectItem } from "@/components/ui/select";
 import ResponsiveColumnForm from "@/components/ResponsiveColumnForm";
+import { useState, useMemo } from "react";
 
 /**
  * PersonCreateDialog
@@ -55,6 +57,20 @@ function PersonCreateDialog({
     error = null,
 }) {
 
+    const [userSearch, setUserSearch] = useState("");
+    
+      const filteredUsuarios = useMemo(() => {
+        if (!userSearch) return usuarios;
+        return usuarios.filter(
+          (u) =>
+            (u.nombre_usuario &&
+              u.nombre_usuario.toLowerCase().includes(userSearch.toLowerCase())) ||
+            (u.email_usuario &&
+              u.email_usuario.toLowerCase().includes(userSearch.toLowerCase()))
+        );
+      }, [userSearch, usuarios]);
+    
+    
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
@@ -132,28 +148,44 @@ function PersonCreateDialog({
                             />
 
                             {/* Select de usuario */}
-                            <div className="w-full">
-                              <SimpleSelect
-                                name="usuario_id"
+                            <SimpleSelect
                                 label="Usuario del sistema"
-                                value={newUser.usuario_id || ""}
-                                placeholder="Selecciona un usuario"
-                                onValueChange={(value) => handleChange({ target: { name: 'usuario_id', value } })}
-                              >
+                                name="usuario_id"
+                                id="usuario_id"
+                                value="-1"
+                                disabled={loading}
+                                placeholder="Buscar usuario por nombre o email"
+                            >
+                                <div className="px-2 py-1">
+                                    <Input
+                                        autoFocus
+                                        value={userSearch}
+                                        placeholder="Buscar por email o usuario..."
+                                        className="w-full"
+                                    />
+                                </div>
                                 <SelectItem value="-1">Ningún usuario</SelectItem>
                                 {loading && (
-                                  <SelectItem disabled>Cargando usuarios...</SelectItem>
+                                    <SelectItem disabled>
+                                        Cargando usuarios...
+                                    </SelectItem>
                                 )}
                                 {error && (
-                                  <SelectItem disabled>{error}</SelectItem>
+                                    <SelectItem disabled>
+                                        {error}
+                                    </SelectItem>
                                 )}
-                                {usuarios.map(u => (
-                                  <SelectItem key={u.id} value={u.id}>
-                                    {u.nombre_usuario} ({u.email_usuario})
-                                  </SelectItem>
+                                {filteredUsuarios.length === 0 && !loading && !error && (
+                                    <SelectItem disabled>
+                                        No se encontraron usuarios
+                                    </SelectItem>
+                                )}
+                                {filteredUsuarios.map((u) => (
+                                    <SelectItem key={u.id} value={`${u.id}`}>
+                                        {u.nombre_usuario} ({u.email_usuario})
+                                    </SelectItem>
                                 ))}
-                              </SimpleSelect>
-                            </div>
+                            </SimpleSelect>
                         </ResponsiveColumnForm>
                     </div>
 
@@ -246,6 +278,7 @@ function PersonCreateDialog({
                                 type="tel"
                                 labelText="Teléfono móvil"
                                 value={newUser.telefono_movil || ""}
+                                required
                             />
                         </ResponsiveColumnForm>
 
