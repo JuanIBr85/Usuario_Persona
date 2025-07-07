@@ -29,7 +29,8 @@ def obtener_tipos_documento():
             message="Tipos de documento obtenidos correctamente",
             # Devuelve solo los tipos de documento
             # Lo ideal seria enviar los regex para permitir al front una validacion fiable
-            data=list(TIPOS_DOCUMENTO_VALIDOS.keys()),
+            # data=list(TIPOS_DOCUMENTO_VALIDOS.keys()),
+            data=TIPOS_DOCUMENTO_VALIDOS,
         ),
         200,
     )
@@ -206,7 +207,11 @@ def verificar_documento():
         error = validar_documento_schema.validate(data)
         if error:
             return (
-                make_response(ResponseStatus.FAIL, error),
+                make_response(
+                    status=ResponseStatus.FAIL,
+                    message="Datos inválidos",
+                    data=error,
+                ),
                 400,
             )
 

@@ -54,7 +54,7 @@ export function useProfile() {
         estados_civiles: estados_civilesResponse?.data || [],
         ocupaciones: ocupacionesResponse?.data || [],
         estudios_alcanzados: estudios_alcanzadosResponse?.data || [],
-        tipos_documento: tiposDocumentoResponse?.data || [],
+        tipos_documento: tiposDocumentoResponse?.data || {},
         redes_sociales: redes_socialesResponse?.data || []
       });
       const profileResponse = await PersonaService.persona_by_usuario();

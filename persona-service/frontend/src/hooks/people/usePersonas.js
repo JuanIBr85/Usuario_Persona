@@ -23,7 +23,7 @@ export function usePersonas() {
     const [personas, setPersonas] = useState([]);
 
     // Estado: Tipos de documentos disponibles
-    const [tiposDocumentos, setTiposDocumentos] = useState([]);
+    const [tiposDocumentos, setTiposDocumentos] = useState({});
 
     // Estado: Redes sociales disponibles
     const [redesSociales, setRedesSociales] = useState([]);
@@ -67,9 +67,9 @@ export function usePersonas() {
         // Cargar tipos de documentos
         PersonaService.get_tipos_documentos()
             .then((res) => {
-                setTiposDocumentos(res?.data || []);
+                setTiposDocumentos(res?.data || {});
             })
-            .catch(() => setTiposDocumentos([]));
+            .catch(() => setTiposDocumentos({}));
     }, []);
 
     // Función para extraer el mensaje de error del servidor.  
