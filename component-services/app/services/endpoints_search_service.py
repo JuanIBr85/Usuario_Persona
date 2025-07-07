@@ -100,11 +100,27 @@ class EndpointsSearchService:
 
         self._stop_search = False
         services = ServicesSearchService().get_services()
+
+        # Ordena los servicios, para cargar primero los servicios del core
+        services = tuple(sorted(services, key=lambda x: (not x.service_core, x.service_name)))
+        
+        # Una bandera para saber cuando terminan de cargar los servicios del core
+        is_core_services = True
+
         # Itera sobre cada servicio en la configuración
         for service in services:
+
+            # Si se pasa de los servicios del core, actualiza el mapa
+            # Para tener el acceso minimo
+            if is_core_services and not service.service_core:
+                is_core_services = False
+                self._update_map()
+
+            # Inicializa el log
             service_endpoint_log = ServiceEndpointLog(service.service_name)
             self._search_log[service.service_name] = service_endpoint_log
 
+            #Si el servicio no esta disponible, continua con el siguiene
             if service.service_available is False:
                 service_endpoint_log.set_not_available()
                 continue
@@ -135,12 +151,15 @@ class EndpointsSearchService:
         # Finalización de la carga
         self._search_in_progress = False
         logger.warning(f"Carga completada. Total de endpoints: {len(self._endpoints)}")
+        self._update_map()
+
+    def _update_map(self):
         # Crea modelos de ruta para cada endpoint
         self._services_route = {
             k: EndpointRouteModel(**v) for k, v in self._endpoints.items()
         }
         # Actualiza el mapa de URLs
-        self._update_url_map()
+        self._update_url_map()        
 
     def _update_url_map(self):
         """

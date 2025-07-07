@@ -44,6 +44,7 @@ class ServiceEndpointLog:
     def set_success(self, endpoints_count:int):
         """Setea el estado de la busqueda de endpoints como exitoso"""
         self.set_state(EnumSuccess.SUCCESS)
+        self.error = None
         self.endpoints_count = endpoints_count  
     
     def set_error(self, error:str):

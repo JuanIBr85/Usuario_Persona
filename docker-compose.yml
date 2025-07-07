@@ -81,6 +81,10 @@
       environment:
         - SERVICES_CONFIG_FILE=services-docker.json
         - REDIS_HOST=redis
+        #Estas variables de entorno son requeridas por common 
+        #para encontrar los servicios para poder usar su api
+        - AUTH_SERVICE_HOST=auth-service
+        - PERSONA_SERVICE_HOST=persona-backend
 
     redis:
       image: redis:latest

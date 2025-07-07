@@ -1,5 +1,5 @@
 from common.services.service_request import ServiceRequest
-from cachetools import TTLCache
+from common.utils.ttl_cache_util import TTLCacheUtil
 from app.models.service_model import ServiceModel
 from app.schemas.service_schema import ServiceSchema
 from app.services.servicio_base import ServicioBase
@@ -8,7 +8,7 @@ import uuid
 
 services_service: ServicioBase = ServicioBase(ServiceModel, ServiceSchema())
 # Cache para los servicios 10s
-cache_ttl = TTLCache(maxsize=300, ttl=10)
+cache_ttl = TTLCacheUtil(maxsize=300, ttl=10)
 
 
 class MessageService:
@@ -23,14 +23,10 @@ class MessageService:
         self, to_service: str, channel: str = "default", message: dict = {}
     ):
         # Si el servicio no esta cacheado lo buscamos en la base de datos
-        if to_service in cache_ttl:
-            service = cache_ttl[to_service]
-        else:
-            service = services_service.query(
-                lambda session: session.filter_by(service_name=to_service).first(),
-                not_dump=True,
-            )
-            cache_ttl[to_service] = service
+        service = cache_ttl.get_or_cache(to_service, lambda: services_service.query(
+            lambda session: session.filter_by(service_name=to_service).first(),
+            not_dump=True,
+        ))
 
         # Si el servicio no existe
         if service is None:

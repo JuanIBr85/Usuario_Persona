@@ -5,30 +5,21 @@ from common.models.endpoint_route_model import EndpointRouteModel
 import logging
 from app.extensions import jwt, redis_client_auth
 from app.utils.is_local_connection import is_local_connection
-from cachetools import TTLCache
+from common.utils.ttl_cache_util import TTLCacheUtil
 from common.utils.response import make_response, ResponseStatus
 
 logger = logging.getLogger(__name__)
 endpoints_search_service = EndpointsSearchService()
 
 # Cache para los permisos de los usuarios para evitar sobre cargar redis
-jwt_cache = TTLCache(maxsize=10000, ttl=20)
+jwt_cache = TTLCacheUtil(maxsize=1000, ttl=20)
 
 
 # Obtengo los permisos del usuario
 def get_jwt_permissions(jti):
     # Si esta en el cache devuelvo los permisos
-    if jti in jwt_cache:
-        return jwt_cache[jti]
-
-    # Recupero la lista de permisos del token
-    permissions: list = redis_client_auth.lrange(jti, 0, -1)
-    # Si no esta en el cache compruebo si esta en redis
-    if permissions:
-        # Si esta en redis lo guardo en el cache
-        jwt_cache[jti] = set(permissions)
-        return jwt_cache[jti]
-    return None
+    # sino consulto a redis
+    return jwt_cache.get_or_cache(jti, lambda: set(redis_client_auth.lrange(jti, 0, -1)))
 
 
 # Comprueba que el token no alla sido revocado
