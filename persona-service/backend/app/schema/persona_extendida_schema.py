@@ -1,8 +1,9 @@
-from marshmallow import Schema, ValidationError, fields, pre_load
+from marshmallow import ValidationError, fields, pre_load
 from config import ESTADO_CIVIL,ESTUDIOS_ALCANZADOS,OCUPACION
 from app.utils.vacios import permitir_vacios
+from app.schema.base_schema import BaseSchema
 
-class PersonaExtendidaSchema(Schema):
+class PersonaExtendidaSchema(BaseSchema):
 
     id_extendida=fields.Int(dump_only=True)
     estado_civil = fields.Str(allow_none=True, required=False,validate=permitir_vacios(ESTADO_CIVIL))

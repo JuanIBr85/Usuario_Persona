@@ -1,8 +1,9 @@
-from marshmallow import Schema, fields
+from marshmallow import fields
 from marshmallow.validate import Length
 from app.schema.domicilio_postal_schema import DomicilioPostalSchema
+from app.schema.base_schema import BaseSchema
 
-class DomicilioSchema(Schema):
+class DomicilioSchema(BaseSchema):
 
     id_domicilio=fields.Int(dump_only=True)
     domicilio_calle=fields.Str(required=True)
