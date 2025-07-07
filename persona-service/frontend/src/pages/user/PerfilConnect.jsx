@@ -17,170 +17,170 @@ import { VerificarIdentidad } from "@/components/connectProfile/steps/VerificarI
 
 
 function PerfilConnect() {
-    const [currentStep, setCurrentStep] = useState(0);
-    const [loading, setLoading] = useState(false);
-    const [dialog, setDialog] = useState(null);
-    const [email, setEmail] = useState(null);
-    const [tipoDocumento, setTipoDocumento] = useState([]);
-    const [tempData, setTempData] = useState({});
-    const formRef = useRef(null);
-    const navigate = useNavigate();
+  const [currentStep, setCurrentStep] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [dialog, setDialog] = useState(null);
+  const [email, setEmail] = useState(null);
+  const [tipoDocumento, setTipoDocumento] = useState({});
+  const [tempData, setTempData] = useState({});
+  const formRef = useRef(null);
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        PersonaService.get_tipos_documentos()
-            .then(response => {
-                setTipoDocumento(response.data)
-            })
-            .catch(error => {
-                console.log(error)
-            })
-    }, [])
+  useEffect(() => {
+    PersonaService.get_tipos_documentos()
+      .then(response => {
+        setTipoDocumento(response.data)
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  }, [])
 
-    const handleDNIVerificacion = async (event) => {
-        event.preventDefault();
-        const formData = await formSubmitJson(event);
-        setLoading(true);
-        
-        try {
-            const response = await PersonaService.verificar_documento(formData);
-            setEmail(response.data.email);
-            setTempData(formData);
-            nextStep();
-        } catch (error) {
-            console.error(error);
-            if (error.statusCode === 404) {
-                alert("No se encontró el documento, vamos a crear un nuevo perfil");
-                navigate("/createperfil");
-            }
-        } finally {
-            setLoading(false);
-        }
+  const handleDNIVerificacion = async (event) => {
+    event.preventDefault();
+    const formData = await formSubmitJson(event);
+    setLoading(true);
+
+    try {
+      const response = await PersonaService.verificar_documento(formData);
+      setEmail(response.data.email);
+      setTempData(formData);
+      nextStep();
+    } catch (error) {
+      console.error(error);
+      if (error.statusCode === 404) {
+        alert("No se encontró el documento, vamos a crear un nuevo perfil");
+        navigate("/createperfil");
+      }
+    } finally {
+      setLoading(false);
     }
+  }
 
-    const handleEmailVerification = async (event) => {
-        event.preventDefault();
-        const formData = await formSubmitJson(event);
-        setLoading(true);
-        
-        try {
-            const response = await PersonaService.verificar_email({
-                ...tempData,
-                ...formData
-            });
-            setTempData({ ...response.data });
-            nextStep();
-        } catch (error) {
-            console.error(error);
-            alert(error.data.message)
-        } finally {
-            setLoading(false);
-        }
+  const handleEmailVerification = async (event) => {
+    event.preventDefault();
+    const formData = await formSubmitJson(event);
+    setLoading(true);
+
+    try {
+      const response = await PersonaService.verificar_email({
+        ...tempData,
+        ...formData
+      });
+      setTempData({ ...response.data });
+      nextStep();
+    } catch (error) {
+      console.error(error);
+      alert(error.data.message)
+    } finally {
+      setLoading(false);
     }
+  }
 
-    const handleOTPVerification = async (event) => {
-        event.preventDefault();
-        const formData = await formSubmitJson(event);
-        setLoading(true);
-        
-        try {
-            await PersonaService.verificar_otp({
-                ...tempData,
-                ...formData
-            });
-            navigate('/profile');
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
+  const handleOTPVerification = async (event) => {
+    event.preventDefault();
+    const formData = await formSubmitJson(event);
+    setLoading(true);
+
+    try {
+      await PersonaService.verificar_otp({
+        ...tempData,
+        ...formData
+      });
+      navigate('/profile');
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
+  }
 
-    const nextStep = () => {
-        setCurrentStep(prev => Math.min(prev + 1, 3));
-    };
+  const nextStep = () => {
+    setCurrentStep(prev => Math.min(prev + 1, 3));
+  };
 
 
-    const handleEmailIncorrecto = () => {
-        setCurrentStep(3); // Ir directamente al paso de verificación de identidad
-    };
+  const handleEmailIncorrecto = () => {
+    setCurrentStep(3); // Ir directamente al paso de verificación de identidad
+  };
 
-    const renderStep = () => {
-        switch (currentStep) {
-            case 0:
-                return (
-                    <Documento 
-                        formRef={formRef}
-                        tipoDocumento={tipoDocumento}
-                        onSubmit={handleDNIVerificacion}
-                        loading={loading}
-                    />
-                );
-            case 1:
-                return (
-                    <VerificarEmail 
-                        formRef={formRef}
-                        email={email}
-                        onSubmit={handleEmailVerification}
-                        onEmailIncorrecto={handleEmailIncorrecto}
-                        loading={loading}
-                    />
-                );
-            case 2:
-                return (
-                    <VerificarOTP 
-                        formRef={formRef}
-                        onSubmit={handleOTPVerification}
-                        loading={loading}
-                    />
-                );
-            case 3:
-                return (
-                    <VerificarIdentidad 
-                        formRef={formRef}
-                        setDialog={setDialog}
-                    />
-                );
-            default:
-                return null;
-        }
-    };
+  const renderStep = () => {
+    switch (currentStep) {
+      case 0:
+        return (
+          <Documento
+            formRef={formRef}
+            tipoDocumento={tipoDocumento}
+            onSubmit={handleDNIVerificacion}
+            loading={loading}
+          />
+        );
+      case 1:
+        return (
+          <VerificarEmail
+            formRef={formRef}
+            email={email}
+            onSubmit={handleEmailVerification}
+            onEmailIncorrecto={handleEmailIncorrecto}
+            loading={loading}
+          />
+        );
+      case 2:
+        return (
+          <VerificarOTP
+            formRef={formRef}
+            onSubmit={handleOTPVerification}
+            loading={loading}
+          />
+        );
+      case 3:
+        return (
+          <VerificarIdentidad
+            formRef={formRef}
+            setDialog={setDialog}
+          />
+        );
+      default:
+        return null;
+    }
+  };
 
-    return (
-        <>
-            <SimpleDialog
-                title={dialog?.title}
-                description={dialog?.description}
-                isOpen={dialog}
-                setIsOpen={() => setDialog(null)}
-                className="sm:max-w-3xl" 
-            />
-            {loading && <Loading isFixed={true} />}
-            <Fade duration={300} triggerOnce>
-                <div className="w-full flex items-center justify-center sm:p-4">
-                    <Card className="w-full max-w-2xl shadow-lg rounded-xl overflow-hidden">
-                        <CardHeader className="text-center">
-                            <CardTitle className="text-2xl">
-                                Vinculación de perfil
-                            </CardTitle>
-                            <CardDescription>
-                                <p>Conecta tu perfil con tu cuenta de usuario</p>
-                                <p>Verificaremos si estás en el sistema</p>
-                            </CardDescription>
-                        </CardHeader>
+  return (
+    <>
+      <SimpleDialog
+        title={dialog?.title}
+        description={dialog?.description}
+        isOpen={dialog}
+        setIsOpen={() => setDialog(null)}
+        className="sm:max-w-3xl"
+      />
+      {loading && <Loading isFixed={true} />}
+      <Fade duration={300} triggerOnce>
+        <div className="w-full flex items-center justify-center sm:p-4">
+          <Card className="w-full max-w-2xl shadow-lg rounded-xl overflow-hidden">
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl">
+                Vinculación de perfil
+              </CardTitle>
+              <CardDescription>
+                <p>Conecta tu perfil con tu cuenta de usuario</p>
+                <p>Verificaremos si estás en el sistema</p>
+              </CardDescription>
+            </CardHeader>
 
-                        <CardContent className="flex flex-col flex-1 min-h-70">
-                            <div className="space-y-8 flex-1">
-                                <ProgressBar currentStep={currentStep} />
-                                <div className="mb-6">
-                                    {renderStep()}
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+            <CardContent className="flex flex-col flex-1 min-h-70">
+              <div className="space-y-8 flex-1">
+                <ProgressBar currentStep={currentStep} />
+                <div className="mb-6">
+                  {renderStep()}
                 </div>
-            </Fade>
-        </>
-    );
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </Fade>
+    </>
+  );
 }
 
 export default PerfilConnect;

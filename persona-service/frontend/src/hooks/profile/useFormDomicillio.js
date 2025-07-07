@@ -60,7 +60,7 @@ export function useFormDomicilio(domicilio, setPersonaData, persona_id) {
         };
 
         setLoading(true);
-        PersonaService.editar(persona_id, domicilioData)
+        PersonaService.editar_restringido(domicilioData)
             .then(response => {
                 setLoading(false);
                 setPersonaData(response.data);

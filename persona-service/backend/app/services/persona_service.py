@@ -1,4 +1,4 @@
-from datetime import datetime, timezone, timedelta
+from datetime import date, datetime, timezone, timedelta
 from flask import jsonify
 from flask_jwt_extended import create_access_token
 from marshmallow import ValidationError
@@ -21,6 +21,7 @@ from app.schema.persona_schema import PersonaSchema, PersonaResumidaSchema
 from app.interfaces.persona_interface import IPersonaInterface
 from app.extensions import SessionLocal
 from app.utils.documentos_utils import validar_documento_por_tipo
+from app.utils.email_util import enviar_notificacion_verificacion_admin
 from app.schema.persona_extendida_schema import PersonaExtendidaSchema
 
 
@@ -121,6 +122,11 @@ class PersonaService(IPersonaInterface):
             data_validada["tipo_documento"] = data_validada.pop(
                 "tipo_documento")
 
+            if "usuario_id" in data_validada:
+                nuevo_usuario_id = data_validada["usuario_id"]
+                if nuevo_usuario_id == -1 or nuevo_usuario_id is None:
+                    data_validada["usuario_id"] = None
+
             # Crear Persona
             persona_nueva = Persona(**data_validada)
             session.add(persona_nueva)
@@ -162,29 +168,40 @@ class PersonaService(IPersonaInterface):
             tipo_doc = data_validada.get("tipo_documento", persona.tipo_documento)
             num_doc = data_validada.get("num_doc_persona", persona.num_doc_persona)
             if not validar_documento_por_tipo(tipo_doc, num_doc):
-                raise Exception("Numero de documento invalido par el tipo selecionado")
+                raise Exception("Numero de documento invalido para el tipo selecionado")
 
             hubo_cambios = False
+            hubo_cambios_persona = False
+
 
             if "domicilio" in data:
                 actualizado = self.domicilio_service.modificar_domicilio(
-                    persona.domicilio_id, data["domicilio"], session
+                    persona.domicilio_id, 
+                    data["domicilio"], 
+                    session
                 )
+
                 if actualizado:
                     hubo_cambios = True
 
             if "contacto" in data:
                 actualizado = self.contacto_service.modificar_contacto(
-                    persona.contacto_id, data["contacto"], session
+                    persona.contacto_id, 
+                    data["contacto"], 
+                    session
                 )
+
                 if actualizado:
                     hubo_cambios = True
 
             if "persona_extendida" in data:
                 if persona.persona_extendida:
                     actualizado = self.persona_ext_service.modificar_persona_extendida(
-                        persona.extendida_id, data["persona_extendida"], session
+                        persona.extendida_id, 
+                        data["persona_extendida"], 
+                        session
                     )
+                    
                     if actualizado:
                         hubo_cambios = True
 
@@ -201,18 +218,17 @@ class PersonaService(IPersonaInterface):
 
                     if nuevo_valor != valor_actual:
                         setattr(persona, field, nuevo_valor)
-                        hubo_cambios = True
+                        hubo_cambios_persona = True
 
-            # --- AGREGADO: Permitir modificar usuario_id ---
             if "usuario_id" in data_validada:
                 nuevo_usuario_id = data_validada["usuario_id"]
-                if nuevo_usuario_id == "" or nuevo_usuario_id is None:
+                if nuevo_usuario_id == -1 or nuevo_usuario_id is None:
                     # Para desvincular usuario
                     if persona.usuario_id is not None:
                         persona.usuario_id = None
-                        hubo_cambios = True
+                        hubo_cambios_persona = True
                 elif nuevo_usuario_id != persona.usuario_id:
-                    # Verificar que ese usuario no tiene ya otra persona vinculada
+                     # Verificar que ese usuario no tiene ya otra persona vinculada
                     existe = session.query(Persona).filter(
                         Persona.usuario_id == nuevo_usuario_id,
                         Persona.deleted_at.is_(None),
@@ -222,13 +238,17 @@ class PersonaService(IPersonaInterface):
                         raise Exception(
                             "Ese usuario ya está asociado a otra persona")
                     persona.usuario_id = nuevo_usuario_id
-                    hubo_cambios = True
+                    hubo_cambios_persona = True
             # --- FIN AGREGADO ---
 
-            if hubo_cambios:
+            if hubo_cambios_persona:
                 persona.updated_at = datetime.now(timezone.utc)
 
-            session.commit()
+            if hubo_cambios or hubo_cambios_persona:
+                session.commit()
+            else:
+                session.flush()    
+
             return self.schema.dump(persona)
 
         except Exception as e:
@@ -252,31 +272,56 @@ class PersonaService(IPersonaInterface):
                 .first()
             )
 
-            if not Persona:
+            if not persona:
                 return None
 
             data_validada = self.schema.load(data, partial=True)
 
+            hubo_cambios_relacionados = False
+            hubo_cambios_persona = False
+
+            # Modificar entidades relacionadas
             if 'domicilio' in data:
-                self.domicilio_service.modificar_domicilio(
-                    persona.domicilio_id, data['domicilio'], session)
+                actualizado = self.domicilio_service.modificar_domicilio(
+                    persona.domicilio_id, 
+                    data['domicilio'], 
+                    session
+                )
+               
+                if actualizado:
+                    hubo_cambios_relacionados = True              
 
             if 'contacto' in data:
-                self.contacto_service.modificar_contacto(
-                    persona.contacto_id, data['contacto'], session)
+                actualizado = self.contacto_service.modificar_contacto(
+                    persona.contacto_id, 
+                    data['contacto'], 
+                    session
+                    )
+                if actualizado:
+                    hubo_cambios_relacionados = True
 
             if 'persona_extendida' in data:
                 if persona.persona_extendida:
-                    self.persona_ext_service.modificar_persona_extendida(
-                        persona.extendida_id, data['persona_extendida'], session)
+                    actualizado = self.persona_ext_service.modificar_persona_extendida(
+                        persona.extendida_id, 
+                        data['persona_extendida'], 
+                        session
+                        )
+                    if actualizado:
+                        hubo_cambios_relacionados = True
 
             # Permiten cambios cada 30 días
             campos_modificables_cada_30_dias = [
-                'nombre_persona', 'apellido_persona']
+                'nombre_persona', 
+                'apellido_persona'
+                ]
 
             # No deberían cambiarse automáticamente
             campos_no_modificables = [
-                'fecha_nacimiento_persona', 'num_doc_persona', 'tipo_documento']
+                'fecha_nacimiento_persona', 
+                'num_doc_persona', 
+                'tipo_documento'
+                ]
 
             ahora = datetime.now(timezone.utc)
             dias_restriccion = DIAS_RESTRICCION_MODIFICACION
@@ -313,7 +358,8 @@ class PersonaService(IPersonaInterface):
                         tzinfo=timezone.utc)
 
                 dias = (ahora - ultima_modificacion).days
-                evaluar_restriccion = False
+
+                #evaluar_restriccion = False
 
                 if dias < dias_restriccion:
                     raise Exception(
@@ -321,13 +367,17 @@ class PersonaService(IPersonaInterface):
                         f"Última modificación: {ultima_modificacion.date()}"
                     )
                  # Aplica las modificaciones
-            hubo_cambios = False
+                 
+            #hubo_cambios_persona = False
+            
             for campo in cambios_realizados:
                 setattr(persona, campo, data_validada[campo])
-                hubo_cambios = True
+                hubo_cambios_persona = True
 
-            if hubo_cambios:
+            if hubo_cambios_persona:
                 persona.updated_at = ahora
+
+            if hubo_cambios_relacionados or hubo_cambios_persona:    
                 session.commit()
             else:
                 session.flush()
@@ -425,6 +475,7 @@ class PersonaService(IPersonaInterface):
     def contar_personas(self):
         session = SessionLocal()
         try:
+            # Personas por mes
             resultados = (
                 session.query(
                     extract("year", Persona.created_at).label("year"),
@@ -436,11 +487,63 @@ class PersonaService(IPersonaInterface):
                 .order_by("year", "month")
                 .all()
             )
-
-            return [
+            personas_por_mes = [
                 {"year": r.year, "month": int(r.month), "total": r.total}
                 for r in resultados
             ]
+
+            # Totales generales
+            total_activas = session.query(Persona).filter(Persona.deleted_at.is_(None)).count()
+            total_inactivas = session.query(Persona).filter(Persona.deleted_at.isnot(None)).count()
+            total_vinculadas = session.query(Persona).filter(Persona.usuario_id.isnot(None), Persona.deleted_at.is_(None)).count()
+            total_no_vinculadas = session.query(Persona).filter(Persona.usuario_id.is_(None), Persona.deleted_at.is_(None)).count()
+            total_personas = total_activas + total_inactivas
+
+            # Altas por día y por semana (últimos 30 días)
+            hoy = datetime.now().date()
+            altas_dia = session.query(
+                func.date(Persona.created_at),
+                func.count(Persona.id_persona)
+            ).filter(
+                Persona.deleted_at.is_(None),
+                Persona.created_at >= hoy - timedelta(days=30)
+            ).group_by(
+                func.date(Persona.created_at)
+            ).order_by(
+                func.date(Persona.created_at)
+            ).all()
+            personas_por_dia = [
+                {"fecha": str(fecha), "total": total} for fecha, total in altas_dia
+            ]
+
+            # Personas creadas hoy, este mes, este año
+            total_hoy = session.query(Persona).filter(
+                Persona.deleted_at.is_(None),
+                func.date(Persona.created_at) == hoy
+            ).count()
+            ahora = datetime.now()
+            total_este_mes = session.query(Persona).filter(
+                Persona.deleted_at.is_(None),
+                extract("year", Persona.created_at) == ahora.year,
+                extract("month", Persona.created_at) == ahora.month
+            ).count()
+            total_este_anio = session.query(Persona).filter(
+                Persona.deleted_at.is_(None),
+                extract("year", Persona.created_at) == ahora.year
+            ).count()
+
+            return {
+                "total_personas": total_personas,
+                "total_activas": total_activas,
+                "total_inactivas": total_inactivas,
+                "total_vinculadas": total_vinculadas,
+                "total_no_vinculadas": total_no_vinculadas,
+                "personas_creadas_hoy": total_hoy,
+                "personas_creadas_este_mes": total_este_mes,
+                "personas_creadas_este_anio": total_este_anio,
+                "personas_por_dia_ultimos_30": personas_por_dia,
+                "personas_por_mes": personas_por_mes,
+            }
         finally:
             session.close()
 
@@ -490,3 +593,71 @@ class PersonaService(IPersonaInterface):
             session.commit()  # guarda los cambios en la base de datos
         finally:
             session.close()
+
+
+#VERIFICACION DE DATOS PERSONALES PARA VINCULACION DE USUARIO Y PERSONA
+def verificar_datos_personales(
+    self,
+    persona_id: int,
+    datos_usuario: dict
+) -> dict:
+    #recibe id_persona que ya estaba localizada, para no volver a verificar el documento
+    session = SessionLocal()
+    try:
+        persona = (
+            session.query(Persona)
+            .filter(
+                Persona.id_persona == persona_id,
+                Persona.deleted_at.is_(None),
+                Persona.usuario_id.is_(None),
+            )
+            .first()
+        )
+
+        if not persona:
+            return {
+                "encontrada": False,
+                "coinciden": False,
+                "mensaje": "No existe una persona con este identificador."
+            }
+        try:
+            fecha_nac_dt = datetime.strptime(
+            datos_usuario["fecha_nacimiento"], "%Y-%m-%d"
+            ).date()
+        except ValueError:
+            return {
+                "encontrada": True,
+                "coinciden": False,
+                "mensaje": "Formato de fecha inválido. Debe ser YYYY-MM-DD."
+            }
+
+
+        if fecha_nac_dt > date.today():
+            return {
+                "encontrada": True,
+                "coinciden": False,
+                "mensaje": "La fecha de nacimiento no puede ser futura."
+            }
+
+        coinciden = (
+            persona.nombre_persona.strip().lower() == datos_usuario["nombre"].strip().lower()
+            and persona.apellido_persona.strip().lower() == datos_usuario["apellido"].strip().lower()
+            and persona.fecha_nacimiento_persona == fecha_nac_dt
+            and persona.contacto.telefono_movil.strip() == datos_usuario["telefono_movil"].strip()
+        )
+
+        # Enviar notificación al administrador
+        enviar_notificacion_verificacion_admin(persona, datos_usuario, coinciden)
+
+        return {
+            "encontrada": True,
+            "coinciden": coinciden,
+            "mensaje": (
+                "Tus datos concuerdan, contacta al administrador para continuar la verificación."
+                if coinciden
+                else "Los datos proporcionados no coinciden. Contacta al administrador para continuar la verificación."
+            )
+        }
+
+    finally:
+        session.close()

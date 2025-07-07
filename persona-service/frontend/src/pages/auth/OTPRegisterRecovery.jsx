@@ -15,7 +15,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import InputValidate from "@/components/inputValidate/InputValidate";
-import {useRef} from "react";
+import { useRef } from "react";
 
 function OTPRegisterRecovery() {
   const navigate = useNavigate();
@@ -38,7 +38,7 @@ function OTPRegisterRecovery() {
     setIsLoading(true);
 
     AuthService
-      .requestOtp({ email })
+      .resendOtp({ email })
       .then(() => {
         setMessage("Se ha reenviado el código al correo electrónico.");
         setIsOK(true);
@@ -132,13 +132,13 @@ function OTPRegisterRecovery() {
             </div>
           </div>
           <InputValidate
-                id="email_usuario"
-                type="email"
-                placeholder="Email"
-                labelText="Email"
-                validationMessage="Email inválido"
-                required
-            />
+            id="email_usuario"
+            type="email"
+            placeholder="Email"
+            labelText="Email"
+            validationMessage="Email inválido"
+            required
+          />
           <Button type="button" variant="link" className="p-0 mt-4" onClick={handleResendOtp}>
             ¿No te llegó el código? Reenviar
           </Button>

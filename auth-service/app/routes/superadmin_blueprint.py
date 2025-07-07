@@ -301,7 +301,7 @@ def obtener_permisos():
 @superadmin_bp.route("/usuarios", methods=["GET"])
 @api_access(
     is_public=False,
-    limiter=["5 per minute"],
+    limiter=["25 per minute"],
     access_permissions=["auth.admin.obtener_usuarios"],
     cache=CacheSettings(expiration=10),
 )

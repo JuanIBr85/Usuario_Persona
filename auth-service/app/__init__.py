@@ -12,11 +12,9 @@ import logging
 from common.decorators.receiver import receiver
 from common.utils.component_service import component_service
 from common.services.send_message_service import send_message
-from common.utils.component_service import component_service
 from common.decorators.api_access import api_access
+from common.services.component_service_api import ComponentServiceApi
 
-
-import requests
 from app.script.reset_db import crear_base, eliminar_base
 from app.script.seed_data import seed
 from app.routes.usuarios_blueprint import usuario_bp
@@ -99,16 +97,11 @@ def init_app():
         print("[✓] Base de datos ya existente. No se reinicia.")
 
 
-import requests
-
-COMPONENT_SERVICE_URL = "http://localhost:5002"
-
 
 def actualizar_permisos():
     # Obtengo el listado de permisos del servicio de componentes
-    response = requests.get(
-        f"{COMPONENT_SERVICE_URL}/internal/services/recolect_perms", timeout=5
-    )
+    response = ComponentServiceApi.internal_services_recolect_perms()
+
     if response.status_code == 200:
 
         # Extraigo los permisos

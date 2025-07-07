@@ -31,13 +31,13 @@ port = os.environ.get("MYSQL_PORT", "3306")
 password_enc = urllib.parse.quote(password)
 
 # port = os.environ.get("MYSQL_PORT", "3306")
-
+'''
 SQLALCHEMY_DATABASE_URI = (
     f"mysql+pymysql://{user}:{password_enc}@{host}:{port}/{database}"
 )
-
+'''
 # cambiar las dos lineas de arriba por la de abajo para levantar mysql con docker. no olvidar configurar .env antes.
-# SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{user}:{password_enc}@{host}/{database}"
+SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{user}:{password_enc}@{host}/{database}"
 
 
 SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -71,3 +71,7 @@ MAIL_USE_SSL = os.getenv("MAIL_USE_SSL", "False") == "True"
 MAIL_USERNAME = os.getenv("MAIL_USERNAME")
 MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")
 MAIL_DEFAULT_SENDER = os.getenv("MAIL_DEFAULT_SENDER")
+
+
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
+

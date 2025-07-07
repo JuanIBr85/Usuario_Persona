@@ -27,14 +27,14 @@ VENV_DIR=".venv"
 echo "  Iniciando proceso de build y distribucin..."
 echo "================================================="
 
-# Incrementar versin en setup.py
-echo " Actualizando nmero de versin..."
+# Incrementar version en setup.py
+echo " Actualizando numero de version..."
 CURRENT_VERSION=$(grep -oP "version=['\"]\K[0-9]+\.[0-9]+\.[0-9]+(?=['\"])" setup.py)
 IFS='.' read -r -a VERSION_PARTS <<< "$CURRENT_VERSION"
 MINOR_VERSION=$((VERSION_PARTS[2] + 1))
 NEW_VERSION="${VERSION_PARTS[0]}.${VERSION_PARTS[1]}.$MINOR_VERSION"
 sed -i "s/version=\"$CURRENT_VERSION\"/version=\"$NEW_VERSION\"/" setup.py
-echo " Versin actualizada de $CURRENT_VERSION a $NEW_VERSION"
+echo " version actualizada de $CURRENT_VERSION a $NEW_VERSION"
 
 # Crear el entorno virtual
 echo "Creando entorno virtual en el directorio $VENV_DIR..."

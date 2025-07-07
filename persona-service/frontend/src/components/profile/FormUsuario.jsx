@@ -88,6 +88,8 @@ export default function FormUsuario() {
             labelText="Nombre de usuario"
             placeholder="Ingresa tu nombre de usuario"
             value={authData.user.nombre_usuario || ""}
+            validatePattern=".{4,}"
+            validationMessage="El nombre debe tener al menos 4 caracteres"
             required
           />
           <InputValidate
@@ -96,6 +98,7 @@ export default function FormUsuario() {
             labelText="Email"
             placeholder="Ingresa tu email"
             value={authData.user.email_usuario || ""}
+            validationMessage="Email inválido"
             required
           />
 

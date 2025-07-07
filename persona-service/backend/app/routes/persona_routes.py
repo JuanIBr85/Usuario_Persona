@@ -1,3 +1,4 @@
+import datetime
 from common.utils.component_request import ComponentRequest
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity, decode_token
@@ -21,7 +22,7 @@ persona_schema = PersonaSchema()
 validar_otp_schema = ValidarOtpSchema()
 validar_documento_email_schema = ValidarDocumentoEmailSchema()
 
-
+#Retorna un listado completo de personas registradas
 @api_access(
     cache=CacheSettings(expiration=30), access_permissions=["persona.admin.ver_persona"]
 )
@@ -76,7 +77,7 @@ def _obtener_persona_x_id(id):
         200,
     )
 
-
+#Devuelve la persona vinculada al usuario autenticado
 @api_access(cache=CacheSettings(expiration=10))
 @persona_bp.route("/persona_by_id", methods=["GET"])
 def persona_by_id():
@@ -93,7 +94,7 @@ def persona_by_id():
             500,
         )
 
-
+#Recupera los datos extendidos de una persona
 @api_access(
     cache=CacheSettings(expiration=10), access_permissions=["persona.admin.ver_persona"]
 )
@@ -113,7 +114,7 @@ def obtener_persona(id):
         )
 
 
-# crea una persona
+# Crea una nueva persona con su información básica y relacionescrea una persona
 @api_access(access_permissions=["persona.admin.crear_persona"])
 @persona_bp.route("/crear_persona", methods=["POST"])
 def crear_persona():
@@ -163,7 +164,7 @@ def crear_persona():
             500,
         )
 
-
+#Crea la persona asociada al usuario autenticado
 @api_access()  # limiter=["2 per hour"]
 @persona_bp.route("/crear_persona_restringido", methods=["POST"])
 def crear_persona_restringido():
@@ -242,7 +243,7 @@ def crear_persona_restringido():
         )
 
 
-# modificar persona, siguiendo el formato json sugerido
+#Modifica los datos de una persona existente
 @api_access(access_permissions=["persona.admin.modificar_persona"])
 @persona_bp.route("/modificar_persona/<int:id>", methods=["PUT"])
 def modificar_persona(id):
@@ -288,7 +289,7 @@ def modificar_persona(id):
             500,
         )
 
-
+#Modifica la persona vinculada al usuario
 @api_access()
 @persona_bp.route("/modificar_persona_restringido", methods=["PUT"])
 def modificar_persona_restringido():
@@ -340,7 +341,7 @@ def modificar_persona_restringido():
         )
 
 
-# borrar una persona
+#Elimina lógicamente una persona
 @api_access(access_permissions=["persona.admin.eliminar_persona"])
 @persona_bp.route("/borrar_persona/<int:id>", methods=["DELETE"])
 def borrar_persona(id):
@@ -376,7 +377,7 @@ def borrar_persona(id):
         )
 
 
-# Restaurar una persona
+# Restaura una persona previamente eliminada
 @api_access(access_permissions=["persona.admin.restaurar_persona"])
 @persona_bp.route("/restaurar_persona/<int:id>", methods=["PATCH"])
 def restaurar_persona(id):
@@ -424,7 +425,7 @@ def restaurar_persona(id):
             500,
         )
 
-
+#Obtiene la persona asociada a un usuario específico
 @api_access(access_permissions=[])
 @persona_bp.route("/personas_by_usuario/<int:id>", methods=["GET"])
 def obtener_persona_usuario(id):
@@ -462,7 +463,7 @@ def obtener_persona_usuario(id):
             500,
         )
 
-
+#Devuelve la cantidad total de personas
 @api_access(access_permissions=[])
 @persona_bp.route("/personas/count", methods=["GET"])
 def contar_personas():
@@ -491,8 +492,7 @@ def contar_personas():
 ruta para iniciar lqa verificacion de persona mediante codigo otp
 el usuario debe estar autenticado jwt_required
 """
-
-
+#Inicia verificación de persona mediante OTP
 @persona_bp.route("/personas/verify", methods=["POST"])
 @api_access()
 def verificar_persona():
@@ -554,9 +554,8 @@ def verificar_persona():
 """
 ruta paqra verificar el codigo otp recibido y vincular la persona con el usuario
 """
-
-
 # cambios para usar X-USER-ID
+#Confirma el OTP y vincula la persona con el usuario
 @api_access()
 @persona_bp.route("/personas/verify-otp", methods=["POST"])
 def verificar_otp_persona():
@@ -591,3 +590,57 @@ def verificar_otp_persona():
     # aca se vincula la persona con el usuario
     persona_service.vincular_persona(int(usuario_id), claims.get("persona_id"))
     return make_response(ResponseStatus.SUCCESS, "Persona vinculada con usuario"), 200
+
+"""VERIFICACIÓN DE DATOS DEL USUARIO
+caso de uso: cuando un usuario registrado coincide documento, pero no reconoce el email,
+se verifican datos personales, deben coincidir los cuatro: nombre, apellido, fecha_de_nac, telefono
+tanto si coinciden o no, el usuario debe contactar al administrador
+"""
+
+#Verifica datos personales cuando no coincide el email
+@api_access()
+@persona_bp.route('/personas/verificar-identidad', methods=['POST'])
+def verificar_identidad():
+    try:
+        data = request.get_json() or {}
+
+        required_fields = ["persona_id", "nombre", "apellido", "fecha_nacimiento", "telefono_movil"]
+        if not all(field in data and data[field] for field in required_fields):
+            return (
+                make_response(
+                    ResponseStatus.ERROR,
+                    "Todos los campos son obligatorios.",
+                ),
+                400,
+            )
+
+        result = persona_service.verificar_datos_personales(
+            persona_id=data["persona_id"],
+            datos_usuario={
+                "nombre": data["nombre"],
+                "apellido": data["apellido"],
+                "fecha_nacimiento": data["fecha_nacimiento"],
+                "telefono_movil": data["telefono_movil"],
+            },
+        )
+
+        if not result["encontrada"]:
+            return (
+                make_response(ResponseStatus.ERROR, result["mensaje"]),
+                404,
+            )
+
+        status = ResponseStatus.SUCCESS if result["coinciden"] else ResponseStatus.ERROR
+
+        return (
+            make_response(status, result["mensaje"]),
+            200 if result["coinciden"] else 400,
+        )
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return (
+            make_response(ResponseStatus.FAIL, "Error interno al verificar identidad."),
+            500,
+        )

@@ -41,29 +41,40 @@ class PersonaExtendidaService(IPersonaExtendidaInterface):
             if cerrar:
                 session.close()    
 
-    def modificar_persona_extendida(self, id, data,session=None):
+    def modificar_persona_extendida(self, id, data, session=None):
 
         cerrar = False
         if session is None:
-            session=SessionLocal()
+            session = SessionLocal()
             cerrar = True
 
         try:
 
-            persona_ext = session.query(PersonaExtendida).filter_by(id_extendida=id).first()
+            persona_ext = (
+                session.query(PersonaExtendida).filter_by(id_extendida=id).first()
+            )
+
             if not persona_ext:
                 raise Exception("Persona extendida no encontrada")
 
             data_validada = self.schema.load(data, partial=True)
 
+            cambios = False    
             for campo, valor in data_validada.items():
-                setattr(persona_ext,campo,valor)
+                if getattr(persona_ext, campo) != valor:
+                    setattr(persona_ext,campo,valor)
+                    cambios = True
 
-            persona_ext.updated_at = datetime.now(timezone.utc)    
+            if cambios:
+                persona_ext.updated_at = datetime.now(timezone.utc)    
 
-            session.commit()    
+                if cerrar:    
+                    session.commit()    
+                else:
+                    session.flush()    
             session.refresh(persona_ext)
-            return persona_ext
+
+            return cambios
 
         except Exception as e:
             session.rollback()

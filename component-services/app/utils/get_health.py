@@ -1,5 +1,5 @@
 import time
-import requests
+from common.services.service_request import ServiceRequest
 from cachetools import TTLCache
 
 # Este cache esta para evitar estar consultando al servicio si esta levantado
@@ -16,7 +16,7 @@ def get_health(service_url) -> bool:
         return health_cache[service_url]
     try:
         # Si no esta en cache se lo consulto al servicio
-        req = requests.get(f"{service_url}/component_service/health", timeout=2)
+        req = ServiceRequest.get(f"{service_url}/component_service/health")
         status = req.status_code == 200
         health_cache[service_url] = status
         return status
