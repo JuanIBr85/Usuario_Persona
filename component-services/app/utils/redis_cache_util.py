@@ -1,9 +1,10 @@
 from typing import Callable, Any
 from app.extensions import redis_client_cache as r
 from cachetools import TTLCache
+from common.utils.ttl_cache_util import TTLCacheUtil
 import pickle
 
-class RedisCacheUtil(TTLCache):
+class RedisCacheUtil(TTLCacheUtil):
     """
         Esta clase es un cache que genera un cache intermedio entre redis y TTLCache
         para evitar la llamadas repetitivas a redis y mejorar el rendimiento
@@ -40,28 +41,29 @@ class RedisCacheUtil(TTLCache):
             >>> datos = cache.from_cache('clave_datos', 10, obtener_datos)#almacena los datos 10s
 
         """
-        # Compruebo primero si esta en cache la respuesta
-        if key in self:
-            return self[key]
 
-        #Compruebo si esta en redis la respuesta
-        retrieved_data = r.get(key)
-        if retrieved_data:
-            # Deserializo la respuesta
-            data = pickle.loads(retrieved_data)
-            # Guardo los datos en el cache
-            self[key]= data
+        # Funcion que comprueba si esta en redis la respuesta, sino llama al callback para generarla
+        def redis_callback():
+            #Compruebo si esta en redis la respuesta
+            retrieved_data = r.get(key)
+            if retrieved_data:
+                # Deserializo la respuesta
+                data = pickle.loads(retrieved_data)
+                # Guardo los datos en el cache
+                return data
+
+            #Si no esta ni en redis se genera la respuesta
+            data = callback()
+
+            #Serializo los datos
+            serialized_data = pickle.dumps(data)
+
+            #Los guardo en redis con una expiracion igual al del TTLCache
+            r.set(key, serialized_data)
+            r.expire(key, ttl)
+            import logging
+            logging.warning(f"Guardado en redis la clave {key} con TTL {data}")
             return data
 
-        #Si no esta ni en el cache ni redis se genera la respuesta
-        data = callback()
-        self[key]= data
-
-        #Serializo los datos
-        serialized_data = pickle.dumps(data)
-
-        #Los guardo en redis con una expiracion igual al del TTLCache
-        r.set(key, serialized_data)
-        r.expire(key, ttl)
-
-        return data
+        # Si los datos no estan en el cache, se usa redis_callback para resolver
+        return self.get_or_cache(key, redis_callback)
