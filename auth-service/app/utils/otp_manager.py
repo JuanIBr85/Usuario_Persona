@@ -11,12 +11,12 @@ MAX_INTENTOS_FALLIDOS = 3  # máximo de intentos permitidos
 
 
 def guardar_otp(email: str, codigo: str):
-    key = f"otp:{email}"
+    key = f"otp:{email.strip().lower()}"
     redis_client = get_redis()
     redis_client.setex(key, OTP_EXPIRATION_SECONDS, codigo)
 
 def verificar_otp_redis(email: str, codigo: str) -> bool:
-    key = f"otp:{email}"
+    key = f"otp:{email.strip().lower()}"
     redis_client = get_redis()
     valor = redis_client.get(key)
     if valor and valor == codigo:
