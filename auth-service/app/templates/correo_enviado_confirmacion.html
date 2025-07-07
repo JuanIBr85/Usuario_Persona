@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block title %}Correo enviado{% endblock %}
+{% block body_class %}ok{% endblock %}
+
+{% block content %}
+    <h1>📧 Correo enviado</h1>
+    <p>Se envió un correo a <strong>{{ email }}</strong> con un enlace para que confirme la restauración de su cuenta.</p>
+{% endblock %}

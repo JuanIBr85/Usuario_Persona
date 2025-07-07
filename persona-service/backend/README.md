@@ -67,67 +67,72 @@ python run.py
 docker build -t persona-backend .
 docker run -p 5001:5001 persona-backend
 ```
-## 5. 🧠 Modelos de Datos
+## 5. 🧠 Modelos de Datos y schemas
 
-A continuación se describen los modelos de datos principales definidos mediante SQLAlchemy en el microservicio `persona-service`. Estos modelos representan las entidades relacionadas con la gestión de personas, contactos y domicilios.
+Se resume la definición de los modelos de base de datos y los schemas de validación usados por el microservicio.
 
-### 📘 Modelo: Contacto
-**Archivo**: `contacto_model.py`
+## 📚 Modelos
 
-- `id_contacto`: Integer, clave primaria
-- `telefono_fijo`: String(15)
-- `telefono_movil`: String(15)
-- `red_social_contacto`: String(50)
-- `red_social_nombre`: String(20)
+- **Persona**: datos principales de la persona.
+  - `id_persona` (PK)
+  - `nombre_persona`
+  - `apellido_persona`
+  - `fecha_nacimiento_persona`
+  - `tipo_documento`
+  - `num_doc_persona`
+  - `usuario_id`
+  - `domicilio_id` (FK)
+  - `contacto_id` (FK)
+  - `extendida_id` (FK)
+  - `created_at`, `updated_at`, `deleted_at`
 
-### 🏠 Modelo: Domicilio
-**Archivo**: `domicilio_model.py`
+- **PersonaExtendida**: información adicional.
+  - `id_extendida` (PK)
+  - `estado_civil`
+  - `ocupacion`
+  - `estudios_alcanzados`
+  - `vencimiento_dni`
+  - `foto_perfil`
+  - `created_at`, `updated_at`, `deleted_at`
 
-- `id_domicilio`: Integer, clave primaria
-- `calle`: String(60)
-- `numero`: String(10)
-- `piso`: String(5)
-- `departamento`: String(5)
-- `localidad`: String(30)
-- `provincia`: String(30)
-- `codigo_postal`: String(10)
+- **Contacto**: formas de contacto de la persona.
+  - `id_contacto` (PK)
+  - `telefono_fijo`
+  - `telefono_movil`
+  - `red_social_contacto`
+  - `red_social_nombre`
+  - `email_contacto`
+  - `observacion_contacto`
+  - `created_at`, `updated_at`, `deleted_at`
 
-### 🏤 Modelo: DomicilioPostal
-**Archivo**: `domicilio_postal_model.py`
+- **Domicilio**: dirección física.
+  - `id_domicilio` (PK)
+  - `domicilio_calle`
+  - `domicilio_numero`
+  - `domicilio_piso`
+  - `domicilio_dpto`
+  - `domicilio_referencia`
+  - `codigo_postal_id` (FK)
+  - `created_at`, `updated_at`, `deleted_at`
 
-- `id_domicilio_postal`: Integer, clave primaria
-- `calle`: String(60)
-- `numero`: String(10)
-- `piso`: String(5)
-- `departamento`: String(5)
-- `localidad`: String(30)
-- `provincia`: String(30)
-- `codigo_postal`: String(10)
+- **DomicilioPostal**: valores normalizados de localidades.
+  - `id_domicilio_postal` (PK)
+  - `codigo_postal`
+  - `localidad`
+  - `partido`
+  - `provincia`
 
-### 👤 Modelo: Persona
-**Archivo**: `persona_model.py`
+## 📝 Schemas
 
-- `id_persona`: Integer, clave primaria
-- `nombre`: String(50)
-- `apellido`: String(50)
-- `tipo_documento`: String(10)
-- `num_doc_persona`: String(15)
-- `fecha_nacimiento`: Date
-- `genero`: String(20)
-- `estado_civil`: String(30)
-- `ocupacion`: String(50)
-- `estudios`: String(50)
+- **PersonaSchema**: valida el cuerpo completo de una persona, incluyendo domicilio, contacto y datos extendidos.
+- **PersonaResumidaSchema**: versión condensada para listados.
+- **PersonaExtendidaSchema**: reglas de estado civil, ocupación y estudios alcanzados.
+- **ContactoSchema**: valida teléfonos, redes y correo electrónico.
+- **DomicilioSchema**: estructura de un domicilio y la relación con `DomicilioPostal`.
+- **DomicilioPostalSchema**: atributos de código postal, localidad y provincia.
+- **ValidarDocumentoSchema**, **ValidarDocumentoEmailSchema** y **ValidarOtpSchema**: se utilizan en los flujos de verificación y vinculación de persona con usuario.
 
-### 📄 Modelo: PersonaExtendida
-**Archivo**: `persona_extendida_model.py`
-
-- `id_persona_extendida`: Integer, clave primaria
-- `id_persona`: Integer, clave foránea (Persona)
-- `contacto_id`: Integer, clave foránea (Contacto)
-- `domicilio_id`: Integer, clave foránea (Domicilio)
-- `domicilio_postal_id`: Integer, clave foránea (DomicilioPostal)
-
-Este modelo actúa como un agregador de relaciones entre las entidades que conforman los datos extendidos de una persona.
+Las implementaciones se encuentran en [`app/models`](app/models) y [`app/schema`](app/schema).
 
 ## 6. 📬 Endpoints disponibles
 
@@ -136,29 +141,41 @@ El microservicio `persona-service` expone una serie de endpoints organizados pri
 - **Opciones generales**: para obtener listas de valores permitidos como tipos de documento, ocupaciones, etc.
 - **Gestión de persona**: incluye verificación, creación y vinculación de datos personales.
 
-### 🧩 Rutas: `/api` – Opciones generales
+### 🧩 Rutas de opciones
 
 Estos endpoints devuelven catálogos de valores utilizados para completar formularios y validar datos:
 
-| Ruta                      | Método | Función asociada             | Descripción breve                               |
-|---------------------------|--------|------------------------------|--------------------------------------------------|
-| `/tipos_documento`        | GET    | `obtener_tipos_documento`    | Lista de tipos válidos de documento              |
-| `/redes_sociales`         | GET    | `obtener_red_social`         | Lista de redes sociales válidas                  |
-| `/estados_civiles`        | GET    | `obtener_estado_civile`      | Estados civiles posibles                         |
-| `/ocupaciones`            | GET    | `obtener_ocupacion`          | Ocupaciones disponibles                          |
-| `/estudios_alcanzados`    | GET    | `obtener_estudios_alcanzados`| Niveles educativos posibles                      |
+| Ruta                               | Método | Función asociada                       | Descripción breve                                |
+|----------------------------------- |--------|----------------------------------------|--------------------------------------------------|
+| `/tipos_documento`                 | GET    | `obtener_tipos_documento`              | Lista de tipos válidos de documento              |
+| `/redes_sociales`                  | GET    | `obtener_red_social`                   | Lista de redes sociales válidas                  |
+| `/estados_civiles`                 | GET    | `obtener_estado_civile`                | Estados civiles posibles                         |
+| `/ocupaciones`                     | GET    | `obtener_ocupacion`                    | Ocupaciones disponibles                          |
+| `/estudios_alcanzados`             | GET    | `obtener_estudios_alcanzados`          | Niveles educativos posibles                      |
+| `/domicilios_postales/localidades` | GET    | `buscar_localidades_por_codigo_postal` | Localidades según el código postal               |
+| `/domicilios_postales/buscar`      | GET    | `buscar_domicilio_postal`              | Busca un domicilio postal por código y localidad |
+| `/opciones/verificar-documento`    | POST   | `verificar_documento`                  | Comprueba si un documento ya está registrado     |
 
-### 👤 Rutas: `/api` – Gestión de Persona
+### 👤 Rutas de gestión de persona
 
 Este conjunto de endpoints permite gestionar datos personales, consultar por ID, crear y modificar personas en el sistema.
 
-| Ruta                             | Método | Función               | Descripción breve                                |
-|----------------------------------|--------|------------------------|--------------------------------------------------|
-| `/personas`                      | GET    | `listar_personas`     | Retorna un listado completo de personas registradas |
-| `/persona_by_id/<int:id>`        | GET    | `persona_by_id`       | Devuelve una persona buscando directamente por ID |
-| `/personas/<int:id>`             | GET    | `obtener_persona`     | Recupera los datos extendidos de una persona     |
-| `/crear_persona`                 | POST   | `crear_persona`       | Crea una nueva persona con su información básica y relaciones |
-| `/modificar_persona/<int:id>`    | PUT    | `modificar_persona`   | Modifica los datos de una persona existente      |
+| Ruta                             | Método | Función                          | Descripción breve                                             |
+|----------------------------------|--------|----------------------------------|---------------------------------------------------------------|
+| `/personas`                      | GET    | `listar_personas`                | Retorna un listado completo de personas registradas           |
+| `/persona_by_id`                 | GET    | `persona_by_id`                  | Devuelve la persona vinculada al usuario autenticado          |
+| `/personas/<int:id>`             | GET    | `obtener_persona`                | Recupera los datos extendidos de una persona                  |
+| `/crear_persona`                 | POST   | `crear_persona`                  | Crea una nueva persona con su información básica y relaciones |
+| `/modificar_persona/<int:id>`    | PUT    | `modificar_persona`              | Modifica los datos de una persona existente                   |
+| `/crear_persona_restringido`     | POST   | `crear_persona_restringido`      | Crea la persona asociada al usuario autenticado               |
+| `/modificar_persona_restringido` | PUT    | `modificar_persona_restringido`  | Modifica la persona vinculada al usuario                      |
+| `/borrar_persona/<int:id>`       | DELETE | `borrar_persona`                 | Elimina lógicamente una persona                               |
+| `/restaurar_persona/<int:id>`    | PATCH  | `restaurar_persona`              | Restaura una persona previamente eliminada                    |
+| `/personas_by_usuario/<int:id>`  | GET    | `obtener_persona_usuario`        | Obtiene la persona asociada a un usuario específico           |
+| `/personas/count`                | GET    | `contar_personas`                | Devuelve la cantidad total de personas                        |
+| `/personas/verify`               | POST   | `verificar_persona`              | Inicia verificación de persona mediante OTP                   |
+| `/personas/verify-otp`           | POST   | `verificar_otp_persona`          | Confirma el OTP y vincula la persona con el usuario           |
+| `/personas/verificar-identidad`  | POST   | `verificar_identidad`            | Verifica datos personales cuando no coincide el email         |
 
 > ℹ️ Estos endpoints son parte central del flujo de verificación y registro de personas dentro del sistema.
 
