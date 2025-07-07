@@ -119,14 +119,14 @@
     #  depends_on:
     #  - mysql    
 
-    example-service:
-      build: ./example-service
-      ports:
-        - "5003:5003"
-      volumes:
-        - ./example-service:/app
-      environment:
-        - COMPONENT_SERVICE_HOST=component-service
+    #example-service:
+    #  build: ./example-service
+    #  ports:
+    #    - "5003:5003"
+    #  volumes:
+    #    - ./example-service:/app
+    #  environment:
+    #    - COMPONENT_SERVICE_HOST=component-service
 
     #alternativa a mailtrap en local!!!
     mailpit:
