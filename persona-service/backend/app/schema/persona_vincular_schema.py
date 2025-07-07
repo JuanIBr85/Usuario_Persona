@@ -1,4 +1,5 @@
 from marshmallow import Schema, fields, validate
+#from app.schema.base_schema import BaseSchema
 
 
 class ValidarDocumentoSchema(Schema):
