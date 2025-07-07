@@ -1,4 +1,4 @@
-from flask import abort, request, g, current_app
+from flask import abort, request, g, current_app, jsonify
 from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
 from app.services.endpoints_search_service import EndpointsSearchService
 from common.models.endpoint_route_model import EndpointRouteModel
@@ -82,6 +82,57 @@ def missing_token_callback(error):
 
 def authenticate_config(app):
     # Rate limit handler
+    @app.route("/", methods=["GET", "POST"])
+    @jwt_required(optional=True)
+    def auth_test():
+        data = request.get_json()
+        method = data["method"]
+        path = data["path"]
+
+        try:
+            # Obtengo el endpoint del diccionario
+            service_route, args, matched_endpoint = (
+                endpoints_search_service.get_route_by_path(path, method) or (None, None, None)
+            )
+        except Exception as e:
+            return jsonify({
+                "error": str(e),
+                "method":method,
+                "path":path,
+            }), 500
+        
+        identity = get_jwt_identity()
+        payload = get_jwt()
+
+
+        # Si no tiene el token y no es publico, aborto con 401
+        if not service_route.is_public:
+            # Si no tiene token se rechaza el acceso
+            if not identity or payload is None:
+                abort(
+                    401,
+                    description=f"El endpoint <{request.path}> requiere autenticación",
+                )
+            # Obtengo los permisos del usuario
+            permisos_usuario = get_jwt_permissions(payload["jti"])
+
+            # Si no tiene los permisos necesario para acceder al endpoint se rechaza el acceso
+            if not service_route.access_permissions.issubset(permisos_usuario):
+                abort(
+                    403,
+                    description=f"Acceso denegado: se requieren permisos {service_route.access_permissions}",
+                )
+
+        return jsonify({
+            "method":method,
+            "path":path,
+            "matched_endpoint":service_route.to_dict(),
+            "identity":identity,
+            "payload":payload
+        }),200
+
+
+    # Rate limit handler
     @app.errorhandler(429)
     def ratelimit_handler(e):
         return (
@@ -93,10 +144,20 @@ def authenticate_config(app):
             429,
         )
 
-    @app.before_request
-    @jwt_required(optional=True)
-    def authenticate_request():
+    # Rate limit handler
+    @app.errorhandler(401)
+    def ratelimit_handler(e):
+        return (
+            make_response(
+                ResponseStatus.FAIL,
+                f"No se proporciono un token de autenticación",
+                {"message": "No se proporciono un token de autenticación"},
+            ),
+            401,
+        )
 
+
+    def pass_(func):
         if request.method == "OPTIONS":
             return
 
@@ -143,6 +204,8 @@ def authenticate_config(app):
                     403,
                     description=f"Acceso denegado: se requieren permisos {service_route.access_permissions}",
                 )
+
+    
 
 
 # Funcion que obtiene el endpoint del diccionario de servicios del core

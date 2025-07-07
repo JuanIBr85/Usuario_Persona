@@ -131,6 +131,18 @@
         - "1025:1025"  # SMTP
         - "8025:8025"  # Web UI
 
+    nginx:
+      container_name: nginx
+      build: ./nginx
+      ports:
+        - "80:80"
+        - "433:433"
+      volumes:
+        - ./nginx/conf/conf.d:/etc/nginx/conf.d
+        - ./nginx/cert:/etc/nginx/cert
+        - ./nginx/logs:/var/log/nginx
+        - ./nginx/lua:/etc/nginx/lua
+        
   volumes:
     mysql_data:
     #postgres_data:

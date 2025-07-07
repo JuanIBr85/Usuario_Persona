@@ -1,0 +1,120 @@
+2025/07/07 01:12:30 [error] 7#7: *1 lua entry thread aborted: runtime error: /etc/nginx/lua/gateway.lua:2: module 'resty.http' not found:
+	no field package.preload['resty.http']
+	no file '/usr/local/openresty/site/lualib/resty/http.ljbc'
+	no file '/usr/local/openresty/site/lualib/resty/http/init.ljbc'
+	no file '/usr/local/openresty/lualib/resty/http.ljbc'
+	no file '/usr/local/openresty/lualib/resty/http/init.ljbc'
+	no file '/usr/local/openresty/site/lualib/resty/http.lua'
+	no file '/usr/local/openresty/site/lualib/resty/http/init.lua'
+	no file '/usr/local/openresty/lualib/resty/http.lua'
+	no file '/usr/local/openresty/lualib/resty/http/init.lua'
+	no file './resty/http.lua'
+	no file '/usr/local/openresty/luajit/share/luajit-2.1/resty/http.lua'
+	no file '/usr/local/share/lua/5.1/resty/http.lua'
+	no file '/usr/local/share/lua/5.1/resty/http/init.lua'
+	no file '/usr/local/openresty/luajit/share/lua/5.1/resty/http.lua'
+	no file '/usr/local/openresty/luajit/share/lua/5.1/resty/http/init.lua'
+	no file '/usr/local/openresty/site/lualib/resty/http.so'
+	no file '/usr/local/openresty/lualib/resty/http.so'
+	no file './resty/http.so'
+	no file '/usr/local/lib/lua/5.1/resty/http.so'
+	no file '/usr/local/openresty/luajit/lib/lua/5.1/resty/http.so'
+	no file '/usr/local/lib/lua/5.1/loadall.so'
+	no file '/usr/local/openresty/site/lualib/resty.so'
+	no file '/usr/local/openresty/lualib/resty.so'
+	no file './resty.so'
+	no file '/usr/local/lib/lua/5.1/resty.so'
+	no file '/usr/local/openresty/luajit/lib/lua/5.1/resty.so'
+	no file '/usr/local/lib/lua/5.1/loadall.so'
+stack traceback:
+coroutine 0:
+	[C]: in function 'require'
+	/etc/nginx/lua/gateway.lua:2: in main chunk, client: 172.20.0.1, server: localhost, request: "GET /api HTTP/1.1", host: "localhost"
+2025/07/07 01:28:41 [error] 7#7: *1 lua entry thread aborted: runtime error: /etc/nginx/lua/gateway.lua:37: bad argument #1 to 'say' (non-array table found)
+stack traceback:
+coroutine 0:
+	[C]: in function 'say'
+	/etc/nginx/lua/gateway.lua:37: in main chunk while sending to client, client: 172.20.0.1, server: localhost, request: "GET /api HTTP/1.1", host: "localhost"
+2025/07/07 01:28:43 [error] 8#8: *3 lua entry thread aborted: runtime error: /etc/nginx/lua/gateway.lua:37: bad argument #1 to 'say' (non-array table found)
+stack traceback:
+coroutine 0:
+	[C]: in function 'say'
+	/etc/nginx/lua/gateway.lua:37: in main chunk while sending to client, client: 172.20.0.1, server: localhost, request: "GET /api HTTP/1.1", host: "localhost"
+2025/07/07 01:32:47 [error] 9#9: *5 lua entry thread aborted: runtime error: /etc/nginx/lua/gateway.lua:6: attempt to call field 'encode_json' (a nil value)
+stack traceback:
+coroutine 0:
+	/etc/nginx/lua/gateway.lua: in main chunk, client: 172.20.0.1, server: localhost, request: "GET /api HTTP/1.1", host: "localhost"
+2025/07/07 01:32:48 [error] 10#10: *6 lua entry thread aborted: runtime error: /etc/nginx/lua/gateway.lua:6: attempt to call field 'encode_json' (a nil value)
+stack traceback:
+coroutine 0:
+	/etc/nginx/lua/gateway.lua: in main chunk, client: 172.20.0.1, server: localhost, request: "GET /api HTTP/1.1", host: "localhost"
+2025/07/07 01:33:28 [error] 7#7: *1 lua entry thread aborted: runtime error: /etc/nginx/lua/gateway.lua:6: attempt to call field 'encode_json' (a nil value)
+stack traceback:
+coroutine 0:
+	/etc/nginx/lua/gateway.lua: in main chunk, client: 172.20.0.1, server: localhost, request: "GET /api HTTP/1.1", host: "localhost"
+2025/07/07 01:33:29 [error] 8#8: *2 lua entry thread aborted: runtime error: /etc/nginx/lua/gateway.lua:6: attempt to call field 'encode_json' (a nil value)
+stack traceback:
+coroutine 0:
+	/etc/nginx/lua/gateway.lua: in main chunk, client: 172.20.0.1, server: localhost, request: "GET /api HTTP/1.1", host: "localhost"
+2025/07/07 01:33:30 [error] 9#9: *3 lua entry thread aborted: runtime error: /etc/nginx/lua/gateway.lua:6: attempt to call field 'encode_json' (a nil value)
+stack traceback:
+coroutine 0:
+	/etc/nginx/lua/gateway.lua: in main chunk, client: 172.20.0.1, server: localhost, request: "GET /api HTTP/1.1", host: "localhost"
+2025/07/07 01:45:10 [error] 8#8: *3 recv() failed (104: Connection reset by peer) while reading response header from upstream, client: 172.20.0.1, server: localhost, request: "GET /api/loco/2/3/4/puto HTTP/1.1", subrequest: "/component", upstream: "http://172.20.0.10:5002/", host: "localhost"
+2025/07/07 01:45:22 [error] 9#9: *5 connect() failed (113: Host is unreachable) while connecting to upstream, client: 172.20.0.1, server: localhost, request: "GET /api/loco/2/3/4/puto HTTP/1.1", subrequest: "/component", upstream: "http://172.20.0.10:5002/", host: "localhost"
+2025/07/07 01:45:48 [error] 9#9: *5 connect() failed (113: Host is unreachable) while connecting to upstream, client: 172.20.0.1, server: localhost, request: "GET /api/loco/2/3/4/puto HTTP/1.1", subrequest: "/component", upstream: "http://172.20.0.10:5002/", host: "localhost"
+2025/07/07 02:09:32 [error] 8#8: *1 no resolver defined to resolve persona-backend while sending to client, client: 172.20.0.1, server: localhost, request: "GET /api/persona/tipos_documento HTTP/1.1", host: "localhost"
+2025/07/07 02:09:34 [error] 8#8: *1 no resolver defined to resolve persona-backend while sending to client, client: 172.20.0.1, server: localhost, request: "GET /api/persona/tipos_documento HTTP/1.1", host: "localhost"
+2025/07/07 02:10:34 [error] 7#7: *1 no resolver defined to resolve persona-backend while sending to client, client: 172.20.0.1, server: localhost, request: "GET /api/persona/tipos_documento HTTP/1.1", host: "localhost"
+2025/07/07 02:16:16 [error] 8#8: *1 no resolver defined to resolve persona-backend while sending to client, client: 172.20.0.1, server: localhost, request: "GET /api/persona/tipos_documento HTTP/1.1", host: "localhost"
+2025/07/07 02:16:49 [error] 7#7: *1 no resolver defined to resolve persona-backend while sending to client, client: 172.20.0.1, server: localhost, request: "GET /api/persona/tipos_documento HTTP/1.1", host: "localhost"
+2025/07/07 02:16:58 [error] 7#7: *1 no resolver defined to resolve persona-backend while sending to client, client: 172.20.0.1, server: localhost, request: "GET /api/persona/tipos_documento HTTP/1.1", host: "localhost"
+2025/07/07 02:24:12 [error] 7#7: *1 no resolver defined to resolve persona-backend while sending to client, client: 172.20.0.1, server: localhost, request: "GET /api/persona/tipos_documento HTTP/1.1", host: "localhost"
+2025/07/07 02:26:37 [error] 7#7: *1 no resolver defined to resolve persona-backend while sending to client, client: 172.20.0.1, server: localhost, request: "GET /api/persona/tipos_documento HTTP/1.1", host: "localhost"
+2025/07/07 02:27:00 [error] 7#7: *1 no resolver defined to resolve persona-backend while sending to client, client: 172.20.0.1, server: localhost, request: "GET /api/persona/tipos_documento HTTP/1.1", host: "localhost"
+2025/07/07 02:27:09 [error] 8#8: *3 no resolver defined to resolve persona-backend while sending to client, client: 172.20.0.1, server: localhost, request: "GET /api/persona/tipos_documento HTTP/1.1", host: "localhost"
+2025/07/07 02:27:26 [error] 7#7: *1 [lua] gateway.lua:7: Servicio: persona, client: 172.20.0.1, server: localhost, request: "GET /api/persona/tipos_documento HTTP/1.1", host: "localhost"
+2025/07/07 02:27:26 [error] 7#7: *1 [lua] gateway.lua:8: Endpoint: tipos_documento, client: 172.20.0.1, server: localhost, request: "GET /api/persona/tipos_documento HTTP/1.1", host: "localhost"
+2025/07/07 02:27:26 [error] 7#7: *1 no resolver defined to resolve persona-backend while sending to client, client: 172.20.0.1, server: localhost, request: "GET /api/persona/tipos_documento HTTP/1.1", host: "localhost"
+2025/07/07 02:33:06 [error] 6#6: *1 no resolver defined to resolve persona-backend while sending to client, client: 172.20.0.1, server: localhost, request: "GET /api/persona/tipos_documento HTTP/1.1", host: "localhost"
+2025/07/07 02:33:12 [error] 9#9: *3 no resolver defined to resolve persona-backend while sending to client, client: 172.20.0.1, server: localhost, request: "GET /api/persona/tipos_documento HTTP/1.1", host: "localhost"
+2025/07/07 02:53:17 [error] 6#6: *3 lua entry thread aborted: runtime error: /etc/nginx/lua/gateway.lua:18: Expected value but found invalid token at character 1
+stack traceback:
+coroutine 0:
+	[C]: in function 'decode'
+	/etc/nginx/lua/gateway.lua:18: in main chunk while sending to client, client: 172.20.0.1, server: localhost, request: "OPTIONS /api/auth/login HTTP/1.1", host: "localhost", referrer: "http://localhost:5173/"
+2025/07/07 02:54:26 [error] 8#8: *5 lua entry thread aborted: runtime error: /etc/nginx/lua/gateway.lua:24: Expected value but found invalid token at character 1
+stack traceback:
+coroutine 0:
+	[C]: in function 'decode'
+	/etc/nginx/lua/gateway.lua:24: in main chunk while sending to client, client: 172.20.0.1, server: localhost, request: "OPTIONS /api/auth/login HTTP/1.1", host: "localhost", referrer: "http://localhost:5173/"
+2025/07/07 03:03:16 [error] 7#7: *1 lua entry thread aborted: runtime error: /etc/nginx/lua/gateway.lua:18: Expected value but found invalid token at character 1
+stack traceback:
+coroutine 0:
+	[C]: in function 'decode'
+	/etc/nginx/lua/gateway.lua:18: in main chunk while sending to client, client: 172.20.0.1, server: localhost, request: "GET /api/auth/verificar-dispositivo?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN1cGVyYWRtaW5AYWRtaW4uY29tIiwidXNlcl9hZ2VudCI6bnVsbCwiaXAiOm51bGwsImV4cCI6MTc1MTg1OTEzOX0.4ToPF6PasQD2m6A7k5eYMdP6ygJIFKhpoz3pejSRakU HTTP/1.1", host: "localhost"
+2025/07/07 03:04:17 [error] 8#8: *3 lua entry thread aborted: runtime error: /etc/nginx/lua/gateway.lua:18: Expected value but found invalid token at character 1
+stack traceback:
+coroutine 0:
+	[C]: in function 'decode'
+	/etc/nginx/lua/gateway.lua:18: in main chunk while sending to client, client: 172.20.0.1, server: localhost, request: "GET /api/auth/verificar-dispositivo?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN1cGVyYWRtaW5AYWRtaW4uY29tIiwidXNlcl9hZ2VudCI6bnVsbCwiaXAiOm51bGwsImV4cCI6MTc1MTg1OTEzOX0.4ToPF6PasQD2m6A7k5eYMdP6ygJIFKhpoz3pejSRakU HTTP/1.1", host: "localhost"
+2025/07/07 03:06:06 [error] 9#9: *6 lua entry thread aborted: runtime error: /etc/nginx/lua/gateway.lua:19: attempt to index field 'matched_endpoint' (a nil value)
+stack traceback:
+coroutine 0:
+	/etc/nginx/lua/gateway.lua: in main chunk while sending to client, client: 172.20.0.1, server: localhost, request: "GET /api/auth/verificar-dispositivo?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN1cGVyYWRtaW5AYWRtaW4uY29tIiwidXNlcl9hZ2VudCI6bnVsbCwiaXAiOm51bGwsImV4cCI6MTc1MTg1OTEzOX0.4ToPF6PasQD2m6A7k5eYMdP6ygJIFKhpoz3pejSRakU HTTP/1.1", host: "localhost"
+2025/07/07 03:21:40 [error] 7#7: *1 lua entry thread aborted: runtime error: /etc/nginx/lua/gateway.lua:20: attempt to index field 'matched_endpoint' (a nil value)
+stack traceback:
+coroutine 0:
+	/etc/nginx/lua/gateway.lua: in main chunk while sending to client, client: 172.20.0.1, server: localhost, request: "GET /api/auth/verificar-dispositivo?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN1cGVyYWRtaW5AYWRtaW4uY29tIiwidXNlcl9hZ2VudCI6bnVsbCwiaXAiOm51bGwsImV4cCI6MTc1MTg1OTEzOX0.4ToPF6PasQD2m6A7k5eYMdP6ygJIFKhpoz3pejSRakU HTTP/1.1", host: "localhost"
+2025/07/07 03:22:19 [error] 8#8: *3 lua entry thread aborted: runtime error: /etc/nginx/lua/gateway.lua:20: attempt to index field 'matched_endpoint' (a nil value)
+stack traceback:
+coroutine 0:
+	/etc/nginx/lua/gateway.lua: in main chunk while sending to client, client: 172.20.0.1, server: localhost, request: "GET /api/auth/verificar-dispositivo?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN1cGVyYWRtaW5AYWRtaW4uY29tIiwidXNlcl9hZ2VudCI6bnVsbCwiaXAiOm51bGwsImV4cCI6MTc1MTg1OTEzOX0.4ToPF6PasQD2m6A7k5eYMdP6ygJIFKhpoz3pejSRakU HTTP/1.1", host: "localhost"
+2025/07/07 03:35:19 [error] 7#7: *1 lua entry thread aborted: runtime error: /etc/nginx/lua/gateway.lua:20: attempt to index field 'matched_endpoint' (a nil value)
+stack traceback:
+coroutine 0:
+	/etc/nginx/lua/gateway.lua: in main chunk while sending to client, client: 172.20.0.1, server: localhost, request: "GET /api/persona/estudios_alcanzados HTTP/1.1", host: "localhost"
+2025/07/07 03:35:20 [error] 8#8: *3 lua entry thread aborted: runtime error: /etc/nginx/lua/gateway.lua:20: attempt to index field 'matched_endpoint' (a nil value)
+stack traceback:
+coroutine 0:
+	/etc/nginx/lua/gateway.lua: in main chunk while sending to client, client: 172.20.0.1, server: localhost, request: "GET /api/persona/estudios_alcanzados HTTP/1.1", host: "localhost"

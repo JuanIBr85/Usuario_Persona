@@ -69,7 +69,7 @@ class EndpointsSearchService:
                 return {
                     f"{service_prefix}/{k}": {
                         **v,
-                        "api_url": f"{service_url}{v['api_url']}",
+                        "api_url": f"{service_url}",
                         "access_url": f"{service_prefix}/{v['access_url']}",
                     }
                     for k, v in response.items()
@@ -210,6 +210,23 @@ class EndpointsSearchService:
         # Busca coincidencia para la URL solicitada
         # Retorna el nombre del endpoint y sus argumentos
         matched_endpoint, args = adapter.match()
+
+        # Retorna la configuración completa del endpoint desde el diccionario
+        endpoint_route = self._services_route[matched_endpoint]
+        # Convertimos args a dict[str, str] para cumplir con el tipo de retorno
+        args_dict = {k: str(v) for k, v in args.items()}
+        return endpoint_route, args_dict, str(matched_endpoint)
+    
+    def get_route_by_path(self, path:str, method:str) -> tuple[EndpointRouteModel, dict[str, str], str] | None:
+        if self._url_map is None:
+            raise Exception("No se ha cargado el mapa de URLs")
+
+        # Crea un adaptador para el entorno actual de la petición
+        adapter = self._url_map.bind_to_environ(request.environ)
+
+        # Busca coincidencia para la URL solicitada
+        # Retorna el nombre del endpoint y sus argumentos
+        matched_endpoint, args = adapter.match(path, method)
 
         # Retorna la configuración completa del endpoint desde el diccionario
         endpoint_route = self._services_route[matched_endpoint]

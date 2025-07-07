@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
 import os
@@ -35,17 +34,7 @@ def create_app():
     # inicializo extensiones
     mail.init_app(app_flask)
     JWTManager(app_flask)
-    CORS(
-        app_flask,
-        resources={r"/*": {"origins": "*"}},
-        supports_credentials=True,
-        allow_headers=[
-            "Content-Type",
-            "Authentication",
-            "authorization",
-            "Authorization",
-        ],
-    )
+    
     component_service(app_flask)
     # registro blueprints
     app_flask.register_blueprint(superadmin_bp, url_prefix="/super-admin")
