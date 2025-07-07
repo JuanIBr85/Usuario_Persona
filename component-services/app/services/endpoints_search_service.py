@@ -1,3 +1,4 @@
+import logging
 import traceback
 from flask import request
 from werkzeug.routing import Map, Rule
@@ -9,6 +10,7 @@ from app.extensions import logger
 from app.services.event_service import EventService
 from app.utils.service_endpoint_log import ServiceEndpointLog
 from common.services.service_request import ServiceRequest
+from app.utils.get_health import get_health
 
 event_service: EventService = EventService()
 
@@ -57,7 +59,8 @@ class EndpointsSearchService:
                 service_url = service.service_url
                 service_prefix = service.service_prefix
                 response = ServiceRequest.get(
-                    f"{service_url}/component_service/endpoints"
+                    f"{service_url}/component_service/endpoints",
+                    timeout=0.2,
                 ).json()
 
                 # Resetea contador de errores en éxito
@@ -84,10 +87,9 @@ class EndpointsSearchService:
                     logger.error(f"Error conectando con {service.service_name}")
                 service_endpoint_log.set_error(str(e))
 
-                if not service.service_wait and error_cnt > 10:
+                if not service.service_wait:
                     service_endpoint_log.set_timeout()
                     return None
-
                 # Espera 1 segundo entre reintentos
                 time.sleep(1)
 
@@ -115,10 +117,19 @@ class EndpointsSearchService:
             if is_core_services and not service.service_core:
                 is_core_services = False
                 self._update_map()
+                logger.warning("Cargando servicios del core")
 
             # Inicializa el log
             service_endpoint_log = ServiceEndpointLog(service.service_name)
             self._search_log[service.service_name] = service_endpoint_log
+
+            # Si no es un servicio del core, verifica que el servicio este activo
+            if not is_core_services:
+                # Si el servicio no esta activo, continua con el siguiente
+                if not get_health(service.service_url):
+                    service_endpoint_log.set_not_available()
+                    logger.warning(f"El servicio {service.service_name} no esta activo")
+                    continue
 
             #Si el servicio no esta disponible, continua con el siguiene
             if service.service_available is False:

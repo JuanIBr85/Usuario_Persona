@@ -1,9 +1,11 @@
 import os
+from sqlalchemy import text
 import time
 import json
 from pathlib import Path
 from sqlalchemy import event
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import inspect
 from app.models.service_model import ServiceModel
 from config import SERVICES_CONFIG_FILE
 from app.utils.get_component_info import get_component_info
@@ -32,12 +34,11 @@ def insert_initial_services(target, connection, **kw):
     session = Session()
     logger.warning("Iniciando la carga de servicios base")
     try:
-        # Verificar si ya existen servicios
-        existing_services = session.query(ServiceModel).count()
-        if existing_services > 0:
-            logger.warning("Ya existe servicios en la base de datos")
-            return  # No hacer nada si ya hay servicios
-
+        result = connection.execute(text(f"SELECT COUNT(*) FROM {target.name}"))
+        logger.warning(f"La tabla {target.name} tiene {result.scalar()} filas")
+        if result.scalar() > 0:
+            logger.warning("La tabla ya tiene datos")
+            return
         # Cargar servicios desde el archivo de configuración
         services = load_services_from_config()
 
