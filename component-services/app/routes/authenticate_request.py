@@ -19,7 +19,12 @@ jwt_cache = TTLCacheUtil(maxsize=1000, ttl=20)
 def get_jwt_permissions(jti):
     # Si esta en el cache devuelvo los permisos
     # sino consulto a redis
-    return jwt_cache.get_or_cache(jti, lambda: set(redis_client_auth.lrange(jti, 0, -1)))
+    def get_perms():
+        perms = redis_client_auth.lrange(jti, 0, -1)
+        if not perms:
+            return None
+        return set(perms)
+    return jwt_cache.get_or_cache(jti, get_perms)
 
 
 # Comprueba que el token no alla sido revocado
@@ -129,7 +134,7 @@ def authenticate_config(app):
             permisos_usuario = get_jwt_permissions(payload["jti"])
 
             # Si no tiene los permisos necesario para acceder al endpoint se rechaza el acceso
-            if not service_route.access_permissions.issubset(permisos_usuario):
+            if permisos_usuario is None or not service_route.access_permissions.issubset(permisos_usuario):
                 abort(
                     403,
                     description=f"Acceso denegado: se requieren permisos {service_route.access_permissions}",
