@@ -12,9 +12,6 @@ import threading
 from app.utils.redis_message import redis_stream_start, register_redis_receiver
 from app.services.event_service import EventService
 
-import asyncio
-
-
 endpoints_search_service = EndpointsSearchService()
 # Defino los modelos
 import app.models
