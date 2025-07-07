@@ -1,10 +1,11 @@
-from marshmallow import Schema, fields, validate
+from marshmallow import fields, validate
 from marshmallow.validate import Length,Email
+from app.schema.base_schema import BaseSchema
 from config import REDES_SOCIALES_VALIDAS
 from app.utils.vacios import permitir_vacios
 
 
-class ContactoSchema(Schema):
+class ContactoSchema(BaseSchema):
 
     id_contacto=fields.Int(dump_only=True)
     telefono_fijo=fields.Str()

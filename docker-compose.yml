@@ -81,6 +81,10 @@
       environment:
         - SERVICES_CONFIG_FILE=services-docker.json
         - REDIS_HOST=redis
+        #Estas variables de entorno son requeridas por common 
+        #para encontrar los servicios para poder usar su api
+        - AUTH_SERVICE_HOST=auth-service
+        - PERSONA_SERVICE_HOST=persona-backend
 
     redis:
       image: redis:latest
@@ -115,14 +119,14 @@
     #  depends_on:
     #  - mysql    
 
-    #servicio-adicional:
-    #  build: ./servicio-adicional-ejemplo
-    #  ports:
-    #    - "5003:5003"
-    #  volumes:
-    #    - ./servicio-adicional-ejemplo:/app
-    #  environment:
-    #    - COMPONENT_SERVICE_HOST=component-service
+    example-service:
+      build: ./example-service
+      ports:
+        - "5003:5003"
+      volumes:
+        - ./example-service:/app
+      environment:
+        - COMPONENT_SERVICE_HOST=component-service
 
     #alternativa a mailtrap en local!!!
     mailpit:

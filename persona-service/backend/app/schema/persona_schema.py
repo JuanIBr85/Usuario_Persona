@@ -1,11 +1,11 @@
-from marshmallow import Schema, fields, validate
+from marshmallow import fields, validate
 from config import TIPOS_DOCUMENTO_VALIDOS
 from app.schema.contacto_schema import ContactoSchema
 from app.schema.domicilio_schema import DomicilioSchema
 from app.schema.persona_extendida_schema import PersonaExtendidaSchema
+from app.schema.base_schema import BaseSchema
 
-
-class PersonaSchema(Schema):
+class PersonaSchema(BaseSchema):
     id_persona = fields.Int(dump_only=True)
     nombre_persona = fields.Str(required=True)
     apellido_persona = fields.Str(required=True)
@@ -26,7 +26,7 @@ class PersonaSchema(Schema):
     deleted_at = fields.DateTime(dump_only=True)
 
 
-class PersonaResumidaSchema(Schema):
+class PersonaResumidaSchema(BaseSchema):
     id_persona = fields.Int(dump_only=True)
     nombre_persona = fields.Str(required=True)
     apellido_persona = fields.Str(required=True)

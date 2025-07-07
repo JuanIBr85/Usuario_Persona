@@ -14,6 +14,7 @@ def example():
     return (
         make_response(
             ResponseStatus.SUCCESS,
+            "Bienvenido",
             {
                 "message": "Bienvenido a la API de Componentes",
                 "USER_ID": ComponentRequest.get_user_id()
@@ -35,6 +36,7 @@ def ruta_solo_registrado():
     return (
         make_response(
             ResponseStatus.SUCCESS,
+            "Bienvenido",
             {
                 "message": "Bienvenido a la API de Componentes usuario registrado",
                 "USER_ID": ComponentRequest.get_user_id()
@@ -98,6 +100,7 @@ def rutas_cacheadas_parametros():
     return (
         make_response(
             ResponseStatus.SUCCESS,
+            "rutas_cacheadas_parametros",
             {
                 "a": a,
                 "b": b,

@@ -2,6 +2,7 @@ from app.models.service_model import ServiceModel
 from app.services.servicio_base import ServicioBase
 from app.schemas.service_schema import ServiceSchema
 from app.utils.get_component_info import get_component_info
+from app.utils.get_health import get_health
 from app.extensions import logger
 from typing import Dict
 
@@ -25,15 +26,23 @@ class ServicesSearchService:
             cls._instance = super(ServicesSearchService, cls).__new__(cls)
         return cls._instance
 
-    def get_services(self) -> list[ServiceModel]:
+    def get_services(self, ignore_not_live:bool=False) -> list[ServiceModel]:
         """
         Obtiene todos los servicios registrados en el sistema.
 
         Returns:
             list[ServiceModel]: Lista de modelos de servicios
         """
-        return services_service.get_all(not_dump=True)
+        services = services_service.get_all(not_dump=True)
+        if services is None:
+            return []
 
+        if ignore_not_live:
+            return list(filter(lambda x: get_health(x.service_url), services))
+        else:
+            return services
+
+            
     def get_redirect(self, code: str) -> str | None:
         """
         Obtiene la URL de redirección asociada a un código.

@@ -4,7 +4,7 @@ from flask_jwt_extended import JWTManager
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from config import SQLALCHEMY_DATABASE_URI, SERVICES_CONFIG_FILE
-from diskcache import FanoutCache
+#from diskcache import FanoutCache
 import logging
 import redis
 import os
@@ -25,21 +25,26 @@ jwt = JWTManager()
 
 services_config = []  # json.load(open(SERVICES_CONFIG_FILE))
 
-limiter = Limiter(key_func=get_remote_address, default_limits=["100/minute"])
+limiter = Limiter(
+    key_func=get_remote_address, 
+    default_limits=["100/minute"],
+    enabled=False#Para desactivar durante los berchmarks
+)
 
 # Este es el cache de los endpoints
-cache = FanoutCache(
-    "cache-db",
-    shards=4,  # Número de shards para mejor concurrencia
-    timeout=1,  # Timeout para operaciones
-    size_limit=2**30,  # Limita el tamaño de la cache 1GB
-)
+#cache = FanoutCache(
+#    "cache-db",
+#    shards=4,  # Número de shards para mejor concurrencia
+#    timeout=1,  # Timeout para operaciones
+#    size_limit=2**30,  # Limita el tamaño de la cache 1GB
+#)
 
 logger = logging.getLogger(__name__)
 
 # Configuracion de redis
 redis_client_auth = None # Aca se almacenan los tokens
 redis_client_core = None # Es para intercambiar mensajes para sincronizar los workers
+redis_client_cache = None # Este es para manejar cualquier dato de cache
 try:
     redis_client_auth = redis.StrictRedis(
         host=os.getenv("REDIS_HOST", "localhost"),
@@ -55,6 +60,14 @@ try:
         port=int(os.getenv("REDIS_PORT", 6379)),
         db=1,
         decode_responses=True,
+    )
+    redis_client_core.ping()  # test de conexión
+
+    redis_client_cache = redis.StrictRedis(
+        host=os.getenv("REDIS_HOST", "localhost"),
+        port=int(os.getenv("REDIS_PORT", 6379)),
+        db=2,
+        decode_responses=False,
     )
     redis_client_core.ping()  # test de conexión
     print("[✓] Redis core conectado correctamente.")

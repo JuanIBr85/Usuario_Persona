@@ -3,6 +3,7 @@ from app.services.services_search_service import ServicesSearchService
 from app.extensions import logger
 import uuid
 import logging
+from app.utils.get_health import get_health
 
 message_service = MessageService()
 
@@ -29,16 +30,21 @@ class EventService:
         )
 
     def _send_event_all(self, event_type: str, data: dict = {}):
-        for service in ServicesSearchService().get_services():
-            response, status_code, error = self._send_event(
-                service.service_name,
-                event_type,
-                data,
-            )
+        for service in ServicesSearchService().get_services(ignore_not_live=True):
+            try:
+                response, status_code, error = self._send_event(
+                    service.service_name,
+                    event_type,
+                    data,
+                )
 
-            if status_code != 200:
+                if status_code != 200:
+                    logger.warning(
+                        f"Error enviando evento <{event_type}> a {service.service_name}: {error}"
+                    )
+            except Exception as e:
                 logger.warning(
-                    f"Error enviando evento <{event_type}> a {service.service_name}: {error}"
+                    f"Error enviando evento <{event_type}> a {service.service_name}: {str(e)}"
                 )
 
     def gateway_research(self, isEnd=False):

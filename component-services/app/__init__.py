@@ -54,19 +54,15 @@ def create_app() -> Flask:
     app.route("/sys_detenido", methods=["NONE"])(sys_detenido)
 
     # Inicializa el servicio de busqueda de endpoints
-    # Iniciar el refresco en segundo plano
-    thread = threading.Thread(target=endpoints_search_service.refresh_endpoints)
-    thread.daemon = True  # El hilo se cerrará cuando el programa principal termine
-    thread.start()
+    endpoints_search_service.refresh_endpoints()
 
     # Cargo el listado de redirecciones
-    thread = threading.Thread(target=ServicesSearchService().update_redirect)
-    thread.daemon = True  # El hilo se cerrará cuando el programa principal termine
-    thread.start()
+    ServicesSearchService().update_redirect()
 
     # Inicializa el servicio de mensajeria
     redis_stream_start(app)
 
+    #Se desactivo este evento por alguna razon provoca un retrazo
     # Aviso a los servicios que inicio el servicio de componentes
     EventService().component_start_service()
 

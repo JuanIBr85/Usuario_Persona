@@ -1,3 +1,4 @@
+import logging
 import traceback
 from flask import request
 from werkzeug.routing import Map, Rule
@@ -9,6 +10,7 @@ from app.extensions import logger
 from app.services.event_service import EventService
 from app.utils.service_endpoint_log import ServiceEndpointLog
 from common.services.service_request import ServiceRequest
+from app.utils.get_health import get_health
 
 event_service: EventService = EventService()
 
@@ -57,7 +59,8 @@ class EndpointsSearchService:
                 service_url = service.service_url
                 service_prefix = service.service_prefix
                 response = ServiceRequest.get(
-                    f"{service_url}/component_service/endpoints"
+                    f"{service_url}/component_service/endpoints",
+                    timeout=0.2,
                 ).json()
 
                 # Resetea contador de errores en éxito
@@ -84,10 +87,9 @@ class EndpointsSearchService:
                     logger.error(f"Error conectando con {service.service_name}")
                 service_endpoint_log.set_error(str(e))
 
-                if not service.service_wait and error_cnt > 10:
+                if not service.service_wait:
                     service_endpoint_log.set_timeout()
                     return None
-
                 # Espera 1 segundo entre reintentos
                 time.sleep(1)
 
@@ -100,11 +102,36 @@ class EndpointsSearchService:
 
         self._stop_search = False
         services = ServicesSearchService().get_services()
+
+        # Ordena los servicios, para cargar primero los servicios del core
+        services = tuple(sorted(services, key=lambda x: (not x.service_core, x.service_name)))
+        
+        # Una bandera para saber cuando terminan de cargar los servicios del core
+        is_core_services = True
+
         # Itera sobre cada servicio en la configuración
         for service in services:
+
+            # Si se pasa de los servicios del core, actualiza el mapa
+            # Para tener el acceso minimo
+            if is_core_services and not service.service_core:
+                is_core_services = False
+                self._update_map()
+                logger.warning("Cargando servicios del core")
+
+            # Inicializa el log
             service_endpoint_log = ServiceEndpointLog(service.service_name)
             self._search_log[service.service_name] = service_endpoint_log
 
+            # Si no es un servicio del core, verifica que el servicio este activo
+            if not is_core_services:
+                # Si el servicio no esta activo, continua con el siguiente
+                if not get_health(service.service_url):
+                    service_endpoint_log.set_not_available()
+                    logger.warning(f"El servicio {service.service_name} no esta activo")
+                    continue
+
+            #Si el servicio no esta disponible, continua con el siguiene
             if service.service_available is False:
                 service_endpoint_log.set_not_available()
                 continue
@@ -135,12 +162,15 @@ class EndpointsSearchService:
         # Finalización de la carga
         self._search_in_progress = False
         logger.warning(f"Carga completada. Total de endpoints: {len(self._endpoints)}")
+        self._update_map()
+
+    def _update_map(self):
         # Crea modelos de ruta para cada endpoint
         self._services_route = {
             k: EndpointRouteModel(**v) for k, v in self._endpoints.items()
         }
         # Actualiza el mapa de URLs
-        self._update_url_map()
+        self._update_url_map()        
 
     def _update_url_map(self):
         """

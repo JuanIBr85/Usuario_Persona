@@ -1,14 +1,15 @@
 from common.services.service_request import ServiceRequest
-from cachetools import TTLCache
+from common.utils.ttl_cache_util import TTLCacheUtil
 from app.models.service_model import ServiceModel
 from app.schemas.service_schema import ServiceSchema
 from app.services.servicio_base import ServicioBase
 import uuid
+from app.utils.get_health import get_health
 
 
 services_service: ServicioBase = ServicioBase(ServiceModel, ServiceSchema())
 # Cache para los servicios 10s
-cache_ttl = TTLCache(maxsize=300, ttl=10)
+cache_ttl = TTLCacheUtil(maxsize=300, ttl=10)
 
 
 class MessageService:
@@ -22,16 +23,18 @@ class MessageService:
     def send_message(
         self, to_service: str, channel: str = "default", message: dict = {}
     ):
-        # Si el servicio no esta cacheado lo buscamos en la base de datos
-        if to_service in cache_ttl:
-            service = cache_ttl[to_service]
-        else:
-            service = services_service.query(
-                lambda session: session.filter_by(service_name=to_service).first(),
-                not_dump=True,
-            )
-            cache_ttl[to_service] = service
+        
 
+
+        # Si el servicio no esta cacheado lo buscamos en la base de datos
+        service = cache_ttl.get_or_cache(to_service, lambda: services_service.query(
+            lambda session: session.filter_by(service_name=to_service).first(),
+            not_dump=True,
+        ))
+        if not get_health(service.service_url):
+            return None, 400, "Servicio no disponible"
+
+            
         # Si el servicio no existe
         if service is None:
             return None, 404, "Servicio no encontrado"
@@ -48,6 +51,8 @@ class MessageService:
             if response.status_code != 200:
                 return None, response.status_code, "Error al enviar mensaje"
         except Exception as e:
+            import logging
+            logging.error(e)
             return None, 500, str(e)
 
         return response.text, response.status_code, None
