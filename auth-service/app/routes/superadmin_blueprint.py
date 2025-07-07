@@ -1,4 +1,4 @@
-from flask import Blueprint, Response, request, current_app
+from flask import Blueprint, Response, request, current_app,render_template
 import json
 from app.database.session import SessionLocal
 from app.services.superadmin_service import SuperAdminService
@@ -356,20 +356,12 @@ def restaurar_usuario_desde_token():
     try:
         email = verificar_token_restauracion(token, tipo="restauracion_admin")
         if not email:
-            return make_response(ResponseStatus.FAIL, "Token inválido o expirado", None, 400)
+            return render_template("token_invalido.html"), 400
 
         usuario = session.query(Usuario).filter_by(email_usuario=email, eliminado=True).first()
 
         if not usuario:
-            return """
-            <!DOCTYPE html>
-            <html>
-            <body style="font-family:sans-serif;text-align:center;padding:2rem;">
-            <h1>⚠️ Usuario no encontrado</h1>
-            <p>Es posible que el usuario ya haya sido restaurado o no exista.</p>
-            </body>
-            </html>
-            """, 404
+            return render_template("usuario_no_encontrado.html"), 404
 
         # 1) Generar nuevo token para que el usuario confirme
         token_usuario = generar_token_confirmacion_usuario(email)
@@ -378,15 +370,7 @@ def restaurar_usuario_desde_token():
         # 2) Enviar mail de confirmación al usuario
         enviar_mail_confirmacion_usuario(usuario, enlace_usuario)
 
-        return f"""
-        <!DOCTYPE html>
-        <html>
-        <body style="font-family:sans-serif;text-align:center;padding:2rem;">
-        <h1>📧 Correo enviado</h1>
-        <p>Se envió un correo a <strong>{email}</strong> con un enlace para que confirme la restauración de su cuenta.</p>
-        </body>
-        </html>
-        """, 200
+        return render_template("correo_enviado_confirmacion.html", email=email), 200
 
     except ExpiredSignatureError:
         return "El enlace ha expirado.", 400
