@@ -138,6 +138,7 @@ function PersonCreateDialog({
                 labelText="Nro. documento"
                 value={newUser.nro_documento || ""}
                 validatePattern={tiposDocumentos[tipoDoc]}
+                validationMessage="Número de documento inválido"
                 required
               />
             </ResponsiveColumnForm>

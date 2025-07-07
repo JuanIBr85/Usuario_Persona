@@ -110,6 +110,7 @@ function PersonEditDialog({
                 labelText="Número de Documento"
                 value={editingUser.nro_documento || ""}
                 validatePattern={tiposDocumentos[tipoDoc]}
+                validationMessage="Número de documento inválido"
                 onChange={(e) => setEditingUser({ ...editingUser, nro_documento: e.target.value })}
               />
 
