@@ -82,6 +82,7 @@ export default function FormDatos({
             labelText="Nº de documento"
             value={personaData.num_doc_persona || ""}
             validatePattern={tipoDocumento[tipoDoc]}
+            validationMessage="Número de documento inválido"
           />
         </ResponsiveColumnForm>
 

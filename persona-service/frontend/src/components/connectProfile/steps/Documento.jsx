@@ -29,6 +29,7 @@ export function Documento({ formRef, tipoDocumento, onSubmit, loading }) {
         labelText="Ingresa el número de documento"
         placeholder="Nº de documento"
         validatePattern={tipoDocumento[tipoDoc]}
+        validationMessage="Número de documento inválido"
         containerClassName="sm:col-span-3"
         required
       />
