@@ -73,8 +73,6 @@ def solicitar_otp():
 @api_access(
     is_public=True,
     limiter=["3 per minute", "10 per hour"],
-    # 1hs previene que reenvien el token correcto para evitar abusos
-    cache=CacheSettings(expiration=1, params=["email", "otp"]),
 )
 def verificar_otp():
     session = SessionLocal()
