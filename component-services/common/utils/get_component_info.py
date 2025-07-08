@@ -10,7 +10,7 @@ with open(os.path.join(os.getcwd(), "component-info.yml"), "r") as file:
 #Por motivos de compatibilidad con versiones anteriores
 #Esto lo que hace es sumar las listas de permisos de todos los roles definidos en el archivo yml
 #Y convertirlo en una lista(tupla) de permisos
-_component_info["permissions"] = tuple(sum(_component_info["roles"].values(), []))
+_component_info["permissions"] = tuple(set(sum(_component_info["roles"].values(), [])))
 
 for permission in _component_info["permissions"]:
     if not isinstance(permission, str) or not permission or not re.match(

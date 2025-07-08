@@ -130,6 +130,11 @@ def authenticate_config(app):
                     401,
                     description=f"El endpoint <{request.path}> requiere autenticación",
                 )
+
+            # Si el endpoint no requiere permisos, se permite el acceso
+            if not service_route.access_permissions or len(service_route.access_permissions) == 0:
+                return
+
             # Obtengo los permisos del usuario
             permisos_usuario = get_jwt_permissions(payload["jti"])
 
@@ -137,7 +142,7 @@ def authenticate_config(app):
             if permisos_usuario is None or not service_route.access_permissions.issubset(permisos_usuario):
                 abort(
                     403,
-                    description=f"Acceso denegado: se requieren permisos {service_route.access_permissions}",
+                    description=f"Acceso denegado: se requieren permisos {', '.join(tuple(service_route.access_permissions))}",
                 )
 
 
