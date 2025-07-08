@@ -1,24 +1,9 @@
 
   services:
 
-    auth-service:
-      build: ./auth-service
-      ports:
-        - "5000:5000"
-      env_file:
-        - ./auth-service/.env
-      environment:
-        - COMPONENT_SERVICE_HOST=component-service
-        - REDIS_HOST=redis
-        - POSTGRES_HOST=auth-db
-        - MAIL_SERVER=mailpit
-      volumes:
-        - ./auth-service:/app
-        - ./auth-service/auth_data:/app/auth_data
-      depends_on:
-        auth-db:
-          condition: service_healthy
-
+    #============================================================================#
+    # Primera etapa de inicio (bases de datos y redis)
+    #============================================================================#
     auth-db:
       image: postgres:13
       #volumes:
@@ -42,12 +27,74 @@
         timeout: 5s
         retries: 5
 
+    #DB de componentes
+    #component-db:
+    #  image: postgres:13
+    #  #volumes:
+    #    #- component_db_data:/var/lib/postgresql/data
+    #  restart: unless-stopped
+    #  shm_size: 128mb
+    #  ports:
+    #    - 5433:5432
+    #  environment:
+    #    - POSTGRES_USER=usuario
+    #    - POSTGRES_PASSWORD=pass
+    #    - POSTGRES_DB=component_db
+
     adminer:
       image: adminer
       restart: unless-stopped
       ports:
         - 8080:8080
 
+    #alternativa a mailtrap en local!!!
+    mailpit:
+      image: axllent/mailpit:latest
+      ports:
+        - "1025:1025"  # SMTP
+        - "8025:8025"  # Web UI
+
+
+    redis:
+      image: redis:latest
+      container_name: redis-dev
+      ports:
+        - "6379:6379"
+    mysql:
+      image: mysql:5.7
+      container_name: mysql-persona
+      restart: unless-stopped
+      environment:
+        MYSQL_ROOT_PASSWORD: rootpass
+        MYSQL_DATABASE: persona_db
+        MYSQL_USER: persona_user
+        MYSQL_PASSWORD: persona_pass
+      ports:
+        - "3306:3306"  # El 3307 es el puerto en tu máquina host (no pisa XAMPP en 3306)
+      volumes:
+        - mysql_data:/var/lib/mysql
+
+    #============================================================================#
+    # Segunda etapa de inicio (servicios CORE)
+    #============================================================================#
+
+    auth-service:
+      build: ./auth-service
+      ports:
+        - "5000:5000"
+      env_file:
+        - ./auth-service/.env
+      environment:
+        - COMPONENT_SERVICE_HOST=component-service
+        - REDIS_HOST=redis
+        - POSTGRES_HOST=auth-db
+        - MAIL_SERVER=mailpit
+      volumes:
+        - ./auth-service:/app
+        - ./auth-service/auth_data:/app/auth_data
+      depends_on:
+        auth-db:
+          condition: service_healthy
 
     persona-backend:
       build: ./persona-service/backend
@@ -63,13 +110,22 @@
         - ./persona-service/backend:/app
         - ./persona-service/backend/persona.db:/app/persona.db
 
-    persona-frontend:
-      build: ./persona-service/frontend
-      ports:
-        - "5173:5173"
-      env_file:
-        - ./persona-service/frontend/.env
+    #============================================================================#
+    # Tercera etapa de inicio (servicios adicionales)
+    #============================================================================#
 
+    #example-service:
+    #  build: ./example-service
+    #  ports:
+    #    - "5003:5003"
+    #  volumes:
+    #    - ./example-service:/app
+    #  environment:
+    #    - COMPONENT_SERVICE_HOST=component-service
+
+    #============================================================================#
+    # Cuarta etapa de inicio (Component Service)
+    #============================================================================#
     component-service:
       build: ./component-services
       ports:
@@ -81,60 +137,23 @@
       environment:
         - SERVICES_CONFIG_FILE=services-docker.json
         - REDIS_HOST=redis
+        - DB_HOST=component-db
         #Estas variables de entorno son requeridas por common 
         #para encontrar los servicios para poder usar su api
         - AUTH_SERVICE_HOST=auth-service
         - PERSONA_SERVICE_HOST=persona-backend
 
-    redis:
-      image: redis:latest
-      container_name: redis-dev
+    #============================================================================#
+    # Quinta etapa de inicio (Frontend)
+    #============================================================================#
+    persona-frontend:
+      build: ./persona-service/frontend
       ports:
-        - "6379:6379"
-
-
-    mysql:
-      image: mysql:5.7
-      container_name: mysql-persona
-      restart: unless-stopped
-      environment:
-        MYSQL_ROOT_PASSWORD: rootpass
-        MYSQL_DATABASE: persona_db
-        MYSQL_USER: persona_user
-        MYSQL_PASSWORD: persona_pass
-      ports:
-        - "3306:3306"  # El 3307 es el puerto en tu máquina host (no pisa XAMPP en 3306)
-      volumes:
-        - mysql_data:/var/lib/mysql
-
-    #phpmyadmin:
-    #  image: phpmyadmin/phpmyadmin
-    #  container_name: phpmyadmin
-    #  restart: unless-stopped
-    #  ports:
-    #  - "8080:80"
-    #  environment:
-    #    PMA_HOST: mysql
-    #    PMA_PORT: 3306
-    #  depends_on:
-    #  - mysql    
-
-    example-service:
-      build: ./example-service
-      ports:
-        - "5003:5003"
-      volumes:
-        - ./example-service:/app
-      environment:
-        - COMPONENT_SERVICE_HOST=component-service
-
-    #alternativa a mailtrap en local!!!
-    mailpit:
-      image: axllent/mailpit:latest
-      ports:
-        - "1025:1025"  # SMTP
-        - "8025:8025"  # Web UI
+        - "5173:5173"
+      env_file:
+        - ./persona-service/frontend/.env
 
   volumes:
     mysql_data:
     #postgres_data:
+    #component_db_data
