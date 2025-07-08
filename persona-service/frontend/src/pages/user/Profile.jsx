@@ -90,7 +90,7 @@ const ProfileForm = () => {
                   <TabsTrigger value="datos">Datos Personales</TabsTrigger>
                   <TabsTrigger value="contacto">Contacto</TabsTrigger>
                   <TabsTrigger value="domicilio">Domicilio</TabsTrigger>
-                  <TabsTrigger value="personaExtendida">Datos Extendidos</TabsTrigger>
+                  <TabsTrigger value="personaExtendida">Datos Complementarios</TabsTrigger>
                   <TabsTrigger value="usuario">Mi Usuario</TabsTrigger>
                 </TabsList>
 
