@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, validate,ValidationError,validates_schema
+from marshmallow import Schema, fields, validate,ValidationError,validates_schema,pre_load
 
 class UsuarioInputSchema(Schema):
     id_usuario = fields.Int(
@@ -29,15 +29,16 @@ class UsuarioInputSchema(Schema):
         error_messages={"Requerido": "La contraseña es obligatoria."}
     )
     
-    persona_id = fields.Int(
-        required=False, 
-        allow_none=True
-    )        #cuando la tabla de la db persona este conectada cambiar a: persona_id = fields.Int(required=True)
-
     # Solo para devolver si querés mostrar timestamps
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
     deleted_at = fields.DateTime(dump_only=True)
+
+    @pre_load
+    def lower_case_fields(self, data, **kwargs):
+        if "email_usuario" in data and isinstance(data["email_usuario"], str):
+            data["email_usuario"] = data["email_usuario"].lower()
+        return data
 
 class UsuarioOutputSchema(Schema):
     id_usuario = fields.Int()
@@ -60,6 +61,12 @@ class LoginSchema(Schema):
         validate=validate.Length(min=6, error="La contraseña debe tener al menos 6 caracteres."),
         error_messages={"Requerido": "La contraseña es obligatoria."}
     )
+    
+    @pre_load
+    def lower_case_email(self, data, **kwargs):
+        if "email_usuario" in data and isinstance(data["email_usuario"], str):
+            data["email_usuario"] = data["email_usuario"].lower()
+        return data
 
 class RecuperarPasswordSchema(Schema):
     email = fields.Email(required=True)
@@ -106,3 +113,9 @@ class UsuarioModificarSchema(Schema):
             "invalido": "Debe ser un email válido."
         }
     )
+    @pre_load
+    def lower_case_fields(self, data, **kwargs):
+        if "email_usuario" in data and isinstance(data["email_usuario"], str):
+            data["email_usuario"] = data["email_usuario"].lower()
+        return data
+    

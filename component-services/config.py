@@ -1,6 +1,7 @@
+import logging
 import os
 from dotenv import load_dotenv
-
+import yaml
 # carga las variables de entorno desde .env
 load_dotenv()
 
@@ -25,7 +26,14 @@ SQLALCHEMY_ECHO = False
 
 JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
 
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
+
 SERVICES_CONFIG_FILE: str = (
     os.environ.get("SERVICES_CONFIG_FILE") or "services-dev.json"
 )
- 
+logging.info("Cargando configuracion de CORS")
+with open("cors.yml", "r") as f:
+    CORS_CONFIG = yaml.safe_load(f)
+
+logging.info(f"{CORS_CONFIG}")

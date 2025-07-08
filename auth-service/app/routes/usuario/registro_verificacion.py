@@ -57,7 +57,7 @@ def iniciar_registro_usuario():
 @api_access(
     is_public=True, 
     limiter=["10 per minute , 50 per hour"], 
-    cache=CacheSettings(expiration=1, params=["email_usuario", "otp"]),
+
 )
 def confirmar_registro_usuario():
     data = request.get_json()

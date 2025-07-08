@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { Fade } from "react-awesome-reveal";
 import { Button } from "@/components/ui/button";
-import { BadgePlus } from "lucide-react";
+import { BadgePlus, X } from "lucide-react";
 import RolesBreadcrumb from "@/components/roles/RolesBreadcrumb";
 import RolesDeleteDialog from "@/components/roles/RolesDeleteDialog";
 import RolesErrorDialog from "@/components/roles/RolesErrorDialog";
 import RoleForm from "@/components/roles/RoleForm";
 import RoleList from "@/components/roles/RoleList";
 import RoleAssignmentWithSearch from "@/components/roles/RoleAssignmentWithSearch";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 // Services
 import { roleService } from "@/services/roleService";
@@ -26,6 +27,14 @@ export default function AdminRoles() {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [roleToDelete, setRoleToDelete] = useState(null);
 
+  // Estado para los alerts de shadcn
+  const [alert, setAlert] = useState({
+    open: false,
+    title: "",
+    description: "",
+    variant: "default", // "default" | "destructive"
+  });
+
   const {
     roles,
     setRoles,
@@ -42,6 +51,13 @@ export default function AdminRoles() {
 
   function showError(message) {
     setErrorDialog({ open: true, message });
+  }
+
+  function showShadcnAlert(title, description, variant = "default", timeout = 4000) {
+    setAlert({ open: true, title, description, variant });
+    setTimeout(() => {
+      setAlert((prev) => ({ ...prev, open: false }));
+    }, timeout);
   }
 
   function resetForm() {
@@ -182,22 +198,49 @@ export default function AdminRoles() {
 
   async function handleAsignar() {
     if (!selectedUserId || selectedRoleIds.length === 0) {
-      alert("Seleccioná un usuario y al menos un rol.");
+      showShadcnAlert(
+        "Advertencia",
+        "Seleccioná un usuario y al menos un rol.",
+        "destructive"
+      );
       return;
     }
     try {
       await userService.updateUser(selectedUserId, {
         roles: selectedRoleIds,
       });
-      alert("Roles asignados correctamente.");
+      showShadcnAlert("Éxito", "Roles asignados correctamente.", "default");
     } catch (error) {
-      alert("Error al asignar los roles.");
+      showShadcnAlert("Error", "Error al asignar los roles.", "destructive");
       console.log(error);
     }
   }
 
   return (
     <div className="p-6 space-y-6 py-15 px-3 md:py-10 md:px-15">
+      {/* ALERT FLOATING TOAST */}
+      {alert.open && (
+        <div className="fixed bottom-16 right-4 z-50 w-96">
+          <Alert
+            variant={alert.variant || "default"}
+            className="animate-in slide-in-from-right-8 duration-300 bg-white border-black relative"
+          >
+            <AlertTitle>{alert.title}</AlertTitle>
+            {alert.description && (
+              <AlertDescription>{alert.description}</AlertDescription>
+            )}
+            <button
+              onClick={() => setAlert((prev) => ({ ...prev, open: false }))}
+              className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+              aria-label="Cerrar"
+              type="button"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </Alert>
+        </div>
+      )}
+
       <Fade duration={300} triggerOnce>
         <RoleList
           roles={roles}
@@ -208,7 +251,7 @@ export default function AdminRoles() {
           {!showNewRoleForm && (
             <div>
               <Button onClick={openNewRoleForm} className="mb-4">
-                <BadgePlus/> Agregar Rol
+                <BadgePlus /> Agregar Rol
               </Button>
             </div>
           )}

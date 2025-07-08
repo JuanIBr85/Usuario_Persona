@@ -9,7 +9,6 @@ from os import getenv
 from flask import request, Blueprint, Response
 from app.database.session import SessionLocal
 from app.services.usuario_service import UsuarioService
-from app.extensions import limiter
 from app.utils.jwt import verificar_token_reset,verificar_token_restauracion_usuario
 from jwt import ExpiredSignatureError, InvalidTokenError
 from app.utils.email import decodificar_token_verificacion, generar_token_dispositivo
@@ -41,6 +40,7 @@ def solicitar_otp():
     session = SessionLocal()
     try:
         email = request.json.get("email")
+        email = email.strip().lower()
         if not email:
             return (
                 make_response(
@@ -52,7 +52,7 @@ def solicitar_otp():
         status, mensaje, data, code = usuario_service.solicitar_codigo_reset(
             session, email
         )
-        return make_response(status, mensaje, data, code), code
+        return make_response(status, mensaje, data), code
 
     except Exception as e:
         return (
@@ -73,14 +73,13 @@ def solicitar_otp():
 @api_access(
     is_public=True,
     limiter=["3 per minute", "10 per hour"],
-    # 1hs previene que reenvien el token correcto para evitar abusos
-    cache=CacheSettings(expiration=3600, params=["email", "otp"]),
 )
 def verificar_otp():
     session = SessionLocal()
     try:
         data = request.get_json()
         email = data.get("email")
+        email = email.strip().lower()
         otp = data.get("otp")
 
         if not email or not otp:
@@ -95,7 +94,7 @@ def verificar_otp():
 
         status, mensaje, data, code = usuario_service.verificar_otp(
             session, email, otp)
-        return make_response(status, mensaje, data, code), code
+        return make_response(status, mensaje, data), code
 
     except Exception as e:
         return (
@@ -155,7 +154,7 @@ def reset_con_otp():
         status, mensaje, data, code = usuario_service.cambiar_password_con_codigo(
             session, data, token, email_from_token
         )
-        return make_response(status, mensaje, data, code), code
+        return make_response(status, mensaje, data), code
 
     except Exception as e:
         import traceback

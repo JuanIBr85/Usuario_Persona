@@ -1,6 +1,7 @@
 from datetime import datetime, timezone, timedelta
 import traceback
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from app.models.usuarios import Usuario, PasswordLog, UsuarioLog
 from app.models.dispositivos_confiable import DispositivoConfiable
@@ -63,14 +64,10 @@ class UsuarioService(ServicioBase):
         except ValidationError as e:
             return ResponseStatus.FAIL, "Error en los datos de entrada", e.messages, 400
 
-        usuario_existente = (
-            session.query(Usuario)
-            .filter(
-                (Usuario.email_usuario == data_validada["email_usuario"])
-                | (Usuario.nombre_usuario == data_validada["nombre_usuario"])
-            )
-            .first()
-        )
+        usuario_existente = session.query(Usuario).filter(
+            (func.lower(Usuario.email_usuario) == data_validada["email_usuario"].lower()) |
+            (func.lower(Usuario.nombre_usuario) == data_validada["nombre_usuario"].lower())
+        ).first()
 
         if usuario_existente:
             if usuario_existente.eliminado:
@@ -360,30 +357,11 @@ class UsuarioService(ServicioBase):
             "fecha_creacion": (
                 usuario.fecha_creacion.isoformat() if usuario.fecha_creacion else None
             ),
-            "activo": usuario.activo,
+            "activo": usuario.eliminado,
             "rol": [
                 r.rol.nombre for r in usuario.roles
             ],  # si tenés relación con RolUsuario
         }
-
-        # Si tiene persona asociada, llamamos al microservicio persona-service
-        if usuario.persona_id:
-            try:
-                import requests
-                import os
-
-                url = f"{os.getenv('PERSONA_SERVICE_URL', 'http://localhost:5001')}/personas/{usuario.persona_id}"
-                response = requests.get(url, timeout=5)
-                if response.status_code == 200:
-                    perfil["persona"] = response.json()
-                else:
-                    perfil["persona"] = (
-                        f"Error al consultar persona ({response.status_code})"
-                    )
-            except Exception as e:
-                perfil["persona"] = f"Error al conectar con persona-service: {str(e)}"
-        else:
-            perfil["persona"] = "Sin persona asociada"
 
         return (ResponseStatus.SUCCESS, "Perfil obtenido correctamente.", perfil, 200)
 
@@ -396,7 +374,8 @@ class UsuarioService(ServicioBase):
                 return ResponseStatus.FAIL, "Usuario no encontrado", None, 404
 
             if nuevo_nombre_usuario and nuevo_nombre_usuario != usuario.nombre_usuario:
-                existente = session.query(Usuario).filter_by(nombre_usuario=nuevo_nombre_usuario).first()
+                existente = session.query(Usuario).filter(func.lower(Usuario.nombre_usuario) == nuevo_nombre_usuario.lower()
+                    ).first()
                 if existente:
                     return ResponseStatus.FAIL, "El nombre de usuario ya está en uso", None, 409
                 usuario.nombre_usuario = nuevo_nombre_usuario
