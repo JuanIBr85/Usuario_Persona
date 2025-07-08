@@ -6,27 +6,33 @@ service:
   service_core: true
   service_wait: true
 
-permissions:
-  - auth.admin.crear_usuario
-  - auth.admin.ver_usuario
-  - auth.admin.modificar_usuario
-  - auth.admin.eliminar_usuario
-  - auth.admin.crear_rol
-  - auth.admin.asignar_rol
-  - auth.admin.ver_roles
-  - auth.admin.ver_permisos
-  - auth.admin.crear_permiso
-  - auth.admin.asignar_permiso
-  - auth.admin.crear_usuario_con_rol
-  - auth.admin.asignar_permisos_rol
-  - auth.admin.modificar_admin
-  - auth.admin.modificar_usuario_con_rol
-  - auth.admin.logout
-  - auth.admin.obtener_roles
-  - auth.admin.borrar_rol
-  - auth.admin.obtener_permisos
-  - auth.admin.modificar_rol
-  - auth.admin.obtener_usuarios
-  - auth.admin.modificar_usuario_con_rol
-  - "auth.admin.obtener_usuarios_eliminados"
-  - "auth.admin.restaurar_usuario"
+roles:
+  #Role del super usuario
+  superadmin:
+    - auth.admin.crear_usuario
+    - auth.admin.ver_usuario
+    - auth.admin.modificar_usuario
+    - auth.admin.eliminar_usuario
+    - auth.admin.crear_rol
+    - auth.admin.asignar_rol
+    - auth.admin.ver_roles
+    - auth.admin.ver_permisos
+    - auth.admin.crear_permiso
+    - auth.admin.asignar_permiso
+    - auth.admin.crear_usuario_con_rol
+    - auth.admin.asignar_permisos_rol
+    - auth.admin.modificar_admin
+    - auth.admin.modificar_usuario_con_rol
+    - auth.admin.logout
+    - auth.admin.obtener_roles
+    - auth.admin.borrar_rol
+    - auth.admin.obtener_permisos
+    - auth.admin.modificar_rol
+    - auth.admin.obtener_usuarios
+    - auth.admin.modificar_usuario_con_rol
+    - auth.admin.obtener_usuarios_eliminados
+    - auth.admin.restaurar_usuario
+
+
+  #Role del usuario normal, no tiene permisos especiales
+  usuario: []

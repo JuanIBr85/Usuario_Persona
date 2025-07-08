@@ -1,0 +1,11 @@
+resources:
+  "/*":
+    origins: "*"
+
+supports_credentials: true
+
+allow_headers:
+  - Content-Type
+  - Authentication
+  - Authorization
+  - authorization

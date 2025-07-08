@@ -6,9 +6,10 @@ service:
   service_core: true
   service_wait: true
 
-permissions:
-  - persona.admin.crear_persona
-  - persona.admin.ver_persona
-  - persona.admin.modificar_persona
-  - persona.admin.eliminar_persona
-  - persona.admin.restaurar_persona
+roles:
+  admin-persona:
+    - persona.admin.crear_persona
+    - persona.admin.ver_persona
+    - persona.admin.modificar_persona
+    - persona.admin.eliminar_persona
+    - persona.admin.restaurar_persona

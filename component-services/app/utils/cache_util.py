@@ -10,6 +10,7 @@ r_cache = RedisCacheUtil(200, 10)
 # Este metodo sirve para cachear respuestas de los endpoints
 def cache_response(callback:Callable, url:str, endpoint:EndpointRouteModel):
     cache_params = ""
+
     params = endpoint.cache["params"]
 
     # Genero la key para el endpoint

@@ -6,8 +6,12 @@ service:
   service_core: true
   service_wait: true
 
-permissions:
-  - component.admin.crear_componente
-  - component.admin.ver_componente
-  - component.admin.modificar_componente
-  - component.admin.eliminar_componente
+#Aca se definen los roles y permisos del servicio
+roles:
+  admin-componentes:
+    - component.admin.crear_componente
+    - component.admin.ver_componente
+    - component.admin.modificar_componente
+    - component.admin.eliminar_componente
+    
+    
