@@ -38,8 +38,6 @@ class UsuarioInputSchema(Schema):
     def lower_case_fields(self, data, **kwargs):
         if "email_usuario" in data and isinstance(data["email_usuario"], str):
             data["email_usuario"] = data["email_usuario"].lower()
-        if "nombre_usuario" in data and isinstance(data["nombre_usuario"], str):
-            data["nombre_usuario"] = data["nombre_usuario"].lower()
         return data
 
 class UsuarioOutputSchema(Schema):
@@ -115,3 +113,9 @@ class UsuarioModificarSchema(Schema):
             "invalido": "Debe ser un email válido."
         }
     )
+    @pre_load
+    def lower_case_fields(self, data, **kwargs):
+        if "email_usuario" in data and isinstance(data["email_usuario"], str):
+            data["email_usuario"] = data["email_usuario"].lower()
+        return data
+    

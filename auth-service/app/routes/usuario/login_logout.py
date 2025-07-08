@@ -99,7 +99,6 @@ def logout_usuario() -> tuple[dict[Any, Any], Any] | tuple[dict[Any, Any], Liter
 @bp.route("/modificar", methods=["POST"])
 @api_access(
     is_public=False, 
-    #access_permissions=["auth.admin.modificar_usuario"],
     limiter=["6 per minute"],
 )
 def modificar_perfil():
@@ -107,7 +106,6 @@ def modificar_perfil():
     try:
         usuario_id = ComponentRequest.get_user_id()
         datos = request.get_json()
-
         schema = UsuarioModificarSchema()
         campos = schema.load(datos)
 
@@ -139,7 +137,6 @@ def modificar_perfil():
 @bp.route("/eliminar", methods=["DELETE"])
 @api_access(
     is_public=False, 
-    #access_permissions=["auth.admin.eliminar_usuario"],
     limiter="2 per day",
 )
 def eliminar_usuario():
@@ -166,7 +163,6 @@ def eliminar_usuario():
     is_public=False, 
     limiter=["10 per minute"],
     cache=CacheSettings(expiration=60, params=["id_usuario"]),
-    #access_permissions=["auth.admin.ver_usuario"],
 )
 def perfil_usuario():
     session = SessionLocal()
