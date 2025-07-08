@@ -249,7 +249,7 @@ export default function AdminRoles() {
         <div className="fixed bottom-16 right-4 z-50 w-96">
           <Alert
             variant={alert.variant || "default"}
-            className="animate-in slide-in-from-right-8 duration-300 bg-white border-black relative"
+            className="animate-in slide-in-from-right-8 duration-300 bg-card border-black relative"
           >
             <AlertTitle>{alert.title}</AlertTitle>
             {alert.description && (
