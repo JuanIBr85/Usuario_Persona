@@ -46,6 +46,11 @@ def actualizar_roles():
 
             # Sincronizar permisos para cada rol
             for nombre_rol, permisos_rol in roles_data.items():
+                #El super admin es un rol especial, y posee todos los permisos
+                #Por lo tanto, no se le asignan permisos en este punto
+                if nombre_rol == "superadmin":
+                    continue
+
                 rol = roles_existentes.get(nombre_rol)
                 if not rol:
                     continue
