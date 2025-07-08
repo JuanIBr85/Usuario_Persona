@@ -149,56 +149,9 @@
     persona-frontend:
       build: ./persona-service/frontend
       ports:
-<<<<<<< HEAD
-        - "6379:6379"
-
-
-    mysql:
-      image: mysql:5.7
-      container_name: mysql-persona
-      restart: unless-stopped
-      environment:
-        MYSQL_ROOT_PASSWORD: rootpass
-        MYSQL_DATABASE: persona_db
-        MYSQL_USER: persona_user
-        MYSQL_PASSWORD: persona_pass
-      ports:
-        - "3306:3306"  # El 3307 es el puerto en tu máquina host (no pisa XAMPP en 3306)
-      volumes:
-        - mysql_data:/var/lib/mysql
-
-    #phpmyadmin:
-    #  image: phpmyadmin/phpmyadmin
-    #  container_name: phpmyadmin
-    #  restart: unless-stopped
-    #  ports:
-    #  - "8080:80"
-    #  environment:
-    #    PMA_HOST: mysql
-    #    PMA_PORT: 3306
-    #  depends_on:
-    #  - mysql    
-
-    #example-service:
-    #  build: ./example-service
-    #  ports:
-    #    - "5003:5003"
-    #  volumes:
-    #    - ./example-service:/app
-    #  environment:
-    #    - COMPONENT_SERVICE_HOST=component-service
-
-    #alternativa a mailtrap en local!!!
-    mailpit:
-      image: axllent/mailpit:latest
-      ports:
-        - "1025:1025"  # SMTP
-        - "8025:8025"  # Web UI
-=======
         - "5173:5173"
       env_file:
         - ./persona-service/frontend/.env
->>>>>>> master
 
   volumes:
     mysql_data:

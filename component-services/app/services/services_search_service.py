@@ -2,6 +2,7 @@ from app.models.service_model import ServiceModel
 from app.services.servicio_base import ServicioBase
 from app.schemas.service_schema import ServiceSchema
 from app.utils.get_component_info import get_component_info
+from common.utils.get_component_info import get_component_info as get_component_info_common
 from app.utils.get_health import get_health
 from app.extensions import logger
 from typing import Dict
@@ -104,14 +105,23 @@ class ServicesSearchService:
 
     def get_permissions(self):
         """
-        Recolecta y consolida los permisos de todos los servicios registrados.
+        Recolecta y consolida roles y permisos de todos los servicios registrados.
 
         Returns:
             list: Lista consolidada de todos los permisos de los servicios
         """
-        services: list[ServiceModel] = services_service.get_all(not_dump=True)
+        # Obtiene todos los servicios que esten activos
+        services: list[ServiceModel] = self.get_services(True)
         perms = []
+        roles = {}
         redirect = []
+
+        # Recolecta permisos y redirecciones del servicio de componentes
+        component_info = get_component_info_common()
+        perms.extend(component_info["permissions"])
+        roles.update(component_info["roles"])
+        if "redirect" in component_info:
+            redirect.append(component_info["redirect"])
 
         # Itera sobre cada servicio para recolectar permisos
         for service in services:
@@ -123,11 +133,12 @@ class ServicesSearchService:
 
             # Agrega los permisos del servicio actual a la lista general
             perms.extend(info["permissions"])
-
+            roles.update(info["roles"])
             # Aprovecha para actualizar la lista de redireccionamiento
             if "redirect" in info:
                 redirect.append(info["redirect"])
 
         # Actualiza las redirecciones con la información más reciente
         self._update_redirect_list(redirect)
-        return perms
+
+        return perms, roles

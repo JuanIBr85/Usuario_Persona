@@ -5,7 +5,15 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="component-services",
+<<<<<<< Updated upstream
     version="0.2.70",
+=======
+<<<<<<< Updated upstream
+    version="0.2.67",
+=======
+    version="0.2.72",
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
     description="Servicio de componentes",
     long_description=long_description,
     long_description_content_type="text/markdown",
