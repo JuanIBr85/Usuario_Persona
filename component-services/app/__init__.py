@@ -11,6 +11,7 @@ from app.services.services_search_service import ServicesSearchService
 import threading
 from app.utils.redis_message import redis_stream_start, register_redis_receiver
 from app.services.event_service import EventService
+from config import CORS_CONFIG
 
 endpoints_search_service = EndpointsSearchService()
 # Defino los modelos
@@ -30,14 +31,7 @@ def create_app() -> Flask:
 
     CORS(
         app,
-        resources={r"/*": {"origins": "*"}},
-        supports_credentials=True,
-        allow_headers=[
-            "Content-Type",
-            "Authentication",
-            "Authorization",
-            "authorization",
-        ],
+        **CORS_CONFIG
     )
 
     limiter.init_app(app)
