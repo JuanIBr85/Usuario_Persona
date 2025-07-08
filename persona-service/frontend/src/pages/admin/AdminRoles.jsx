@@ -86,6 +86,32 @@ export default function AdminRoles() {
     });
   }
 
+  function groupPermissionsByModule(permisos) {
+    const resultado = {};
+    console.log("Formateando permisos:", permisos);
+    if (!Array.isArray(permisos)) return resultado;
+
+    permisos.forEach((permiso) => {
+      if (typeof permiso !== "string") return;
+      // Extraer el módulo antes del primer punto
+      const modulo = permiso.split(".")[0];
+
+      // Formatear la última parte como en tu función original
+      const ultimaParte = permiso.substring(permiso.lastIndexOf(".") + 1);
+      const formateado = ultimaParte
+        .replace(/_/g, " ")
+        .split(" ")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+
+      if (!resultado[modulo]) resultado[modulo] = [];
+      resultado[modulo].push(formateado);
+      console.log(`Agregando permiso: ${formateado} al módulo: ${modulo}`);
+    });
+    return resultado;
+  }
+
+
   function handleRoleToggle(roleId) {
     setSelectedRoleIds((prev) =>
       prev.includes(roleId)
@@ -247,6 +273,7 @@ export default function AdminRoles() {
           onEdit={handleEditClick}
           onDelete={openDeleteConfirmDialog}
           formatPermissionName={formatPermissionName}
+          groupPermissionsByModule = {groupPermissionsByModule}
         >
           {!showNewRoleForm && (
             <div>
