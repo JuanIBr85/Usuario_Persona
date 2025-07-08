@@ -164,7 +164,7 @@ function AdminPersons() {
 
       await PersonaService.crear(body).then((res) => {
         const newUserForTable = {
-          id: res?.data?.id_persona,
+          id: res?.data?.id,
           nombre: formData.nombre || "",
           apellido: formData.apellido || "",
           tipo_documento: formData.tipo_documento || "DNI",
