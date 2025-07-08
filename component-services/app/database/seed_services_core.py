@@ -34,14 +34,14 @@ def insert_initial_services(target, connection, **kw):
     session = Session()
     logger.warning("Iniciando la carga de servicios base")
     try:
-        result = connection.execute(text(f"SELECT COUNT(*) FROM {target.name}"))
-        logger.warning(f"La tabla {target.name} tiene {result.scalar()} filas")
-        if result.scalar() > 0:
-            logger.warning("La tabla ya tiene datos")
-            return
+        existing_services = session.query(ServiceModel).count()
+        if existing_services > 0:
+            logger.warning("Ya existe servicios en la base de datos")
+            return  # No hacer nada si ya hay servicios
+
         # Cargar servicios desde el archivo de configuración
         services = load_services_from_config()
-
+        
         # Insertar cada servicio en la base de datos
         for service_data in services:
             logger.warning(f"Conectando con {service_data['service_name']}...")
