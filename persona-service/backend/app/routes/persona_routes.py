@@ -488,22 +488,10 @@ def contar_personas():
         )
 
 
-"""
-ruta para iniciar lqa verificacion de persona mediante codigo otp
-el usuario debe estar autenticado jwt_required
-"""
 #Inicia verificación de persona mediante OTP
 @persona_bp.route("/personas/verify", methods=["POST"])
 @api_access()
 def verificar_persona():
-    # envia otp si el usuario confirma el mail de contacto de persona
-    """
-    Respuestas:
-      400  Datos faltantes o inválidos
-      404  Documento no registrado
-      400  Email no coincide
-      200 { otp_token }
-    """
     try:
         usuario_id = ComponentRequest.get_user_id()
         data = request.get_json() or {}
@@ -550,11 +538,6 @@ def verificar_persona():
         traceback.print_exc()
         return make_response(ResponseStatus.FAIL, "Error al verificar persona"), 500
 
-
-"""
-ruta paqra verificar el codigo otp recibido y vincular la persona con el usuario
-"""
-# cambios para usar X-USER-ID
 #Confirma el OTP y vincula la persona con el usuario
 @api_access()
 @persona_bp.route("/personas/verify-otp", methods=["POST"])
@@ -590,12 +573,6 @@ def verificar_otp_persona():
     # aca se vincula la persona con el usuario
     persona_service.vincular_persona(int(usuario_id), claims.get("persona_id"))
     return make_response(ResponseStatus.SUCCESS, "Persona vinculada con usuario"), 200
-
-"""VERIFICACIÓN DE DATOS DEL USUARIO
-caso de uso: cuando un usuario registrado coincide documento, pero no reconoce el email,
-se verifican datos personales, deben coincidir los cuatro: nombre, apellido, fecha_de_nac, telefono
-tanto si coinciden o no, el usuario debe contactar al administrador
-"""
 
 #Verifica datos personales cuando no coincide el email
 @api_access()

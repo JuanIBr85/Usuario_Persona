@@ -548,8 +548,6 @@ class PersonaService(IPersonaInterface):
             session.close()
 
     # VERIFICACION DE PERSONA CON DOCUMENTO
-    # dividi el verificar_persona en 3
-    # lo cambie para que tambien devuelva el id_persona
     def verificar_documento_mas_get_id(self, tipo_documento: str, num_doc_persona: str):
         session = SessionLocal()
         try:
