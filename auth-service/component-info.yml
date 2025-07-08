@@ -35,4 +35,5 @@ roles:
 
 
   #Role del usuario normal, no tiene permisos especiales
-  usuario: []
+  usuario: 
+    - auth.user.usuario
