@@ -2,7 +2,9 @@ from jwt import decode, encode, ExpiredSignatureError, InvalidTokenError
 from datetime import datetime, timedelta, timezone
 from os import getenv
 from flask_jwt_extended import create_access_token
-import jwt
+from uuid import uuid4
+from app.extensions import get_redis
+from typing import Optional,Tuple
 
 
 def crear_token_acceso(usuario_id, email):
@@ -16,8 +18,6 @@ def crear_token_acceso(usuario_id, email):
             additional_claims={
                 "sub": str(usuario_id),
                 "email": email,
-                # "rol": rol,
-                # "permisos": permisos,
                 "exp": expires_at,
             },
             expires_delta=expires_delta,
@@ -35,7 +35,7 @@ def crear_token_reset_password(otp_id: int, usuario_id: int) -> str:
         "scope": "reset_password",
         "exp": datetime.now(timezone.utc) + timedelta(minutes=10),
     }
-    return encode(payload, getenv("JWT_SECRET_KEY", "clave_jwt_123"), algorithm="HS256")
+    return encode(payload, getenv("JWT_SECRET_KEY"), algorithm="HS256")
 
 
 def generar_token_reset(email: str):
@@ -45,13 +45,13 @@ def generar_token_reset(email: str):
         "type": "reset",
         "exp": datetime.now(timezone.utc) + timedelta(minutes=10),
     }
-    return encode(payload, getenv("JWT_SECRET", "clave_jwt_123"), algorithm="HS256")
+    return encode(payload, getenv("JWT_SECRET_KEY"), algorithm="HS256")
 
 
 def verificar_token_reset(token: str):
     try:
         payload = decode(
-            token, getenv("JWT_SECRET", "clave_jwt_123"), algorithms=["HS256"]
+            token, getenv("JWT_SECRET_KEY"), algorithms=["HS256"]
         )
         if payload.get("type") != "reset":
             return None
@@ -61,16 +61,45 @@ def verificar_token_reset(token: str):
 
 
 def crear_token_refresh(usuario_id):
-    expires_in = datetime.now(timezone.utc) + timedelta(
-        days=int(getenv("JWT_REFRESH_TOKEN_EXPIRES_DAYS", 7))
+    jti = str(uuid4())
+    expires_in = datetime.now(timezone.utc) + timedelta(days=int(getenv("JWT_REFRESH_TOKEN_EXPIRES"))
     )
-    payload = {"sub": str(usuario_id), "scope": "refresh_token", "exp": expires_in}
-    return (
-        encode(
-            payload, getenv("JWT_SECRET_KEY", "clave_jwt_123"), algorithm="HS256"
-        ),
-        expires_in,
-    )
+    payload = {
+            "sub": str(usuario_id), 
+            "scope": "refresh_token",
+            "exp": expires_in,
+            "jti":jti,
+
+        }
+    return (encode(payload, getenv("JWT_SECRET_KEY"), algorithm="HS256"),expires_in,jti)
+
+
+def verificar_refresh_token_valido(token: str) -> Tuple[Optional[dict], Optional[str]]:
+    """
+    Verifica que el refresh token sea válido, con scope correcto y jti registrado en Redis.
+    Devuelve (payload, None) si es válido, o (None, error_str) si es inválido.
+    """
+    try:
+        payload = decode(token, getenv("JWT_SECRET_KEY"), algorithms=["HS256"])
+    except ExpiredSignatureError:
+        return None, "Token de refresh expirado"
+    except InvalidTokenError:
+        return None, "Token inválido"
+
+    if payload.get("scope") != "refresh_token":
+        return None, "Token inválido para refresh"
+
+    jti = payload.get("jti")
+    if not jti:
+        return None, "Refresh token sin JTI"
+
+    estado_token = get_redis().get(f"refresh:{jti}")
+    if not estado_token or estado_token != "valid":
+        return None, "Refresh token revocado o inválido"
+
+    return payload, None
+
+
 
 def generar_token_restauracion(email: str) -> str:
     payload = {
@@ -79,7 +108,7 @@ def generar_token_restauracion(email: str) -> str:
         "type": "restauracion_admin",
         "exp": datetime.now(timezone.utc) + timedelta(minutes=720),
     }
-    return encode(payload, getenv("JWT_SECRET", "clave_jwt_123"), algorithm="HS256")
+    return encode(payload, getenv("JWT_SECRET"), algorithm="HS256")
 
 def generar_token_confirmacion_usuario(email: str) -> str:
     payload = {
@@ -88,11 +117,11 @@ def generar_token_confirmacion_usuario(email: str) -> str:
         "type": "restauracion_usuario",
         "exp": datetime.now(timezone.utc) + timedelta(minutes=30),
     }
-    return encode(payload, getenv("JWT_SECRET", "clave_jwt_123"), algorithm="HS256")
+    return encode(payload, getenv("JWT_SECRET"), algorithm="HS256")
 
 def verificar_token_restauracion(token: str, tipo: str = "restauracion_admin") -> str | None:
     try:
-        payload = decode(token, getenv("JWT_SECRET", "clave_jwt_123"), algorithms=["HS256"])
+        payload = decode(token, getenv("JWT_SECRET"), algorithms=["HS256"])
         if payload.get("type") != tipo:
             return None
         return payload.get("email")
@@ -101,9 +130,34 @@ def verificar_token_restauracion(token: str, tipo: str = "restauracion_admin") -
     
 def verificar_token_restauracion_usuario(token: str, tipo: str = "restauracion_usuario") -> str | None:
     try:
-        payload = decode(token, getenv("JWT_SECRET", "clave_jwt_123"), algorithms=["HS256"])
+        payload = decode(token, getenv("JWT_SECRET"), algorithms=["HS256"])
         if payload.get("type") != tipo:
             return None
         return payload.get("email")
     except (ExpiredSignatureError, InvalidTokenError):
         return None
+    
+def generar_token_dispositivo(email, user_agent, ip):
+    payload = {
+        "email": email,
+        "user_agent": user_agent,
+        "ip": ip,
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=30)
+    }
+    return encode(payload, getenv['JWT_SECRET_KEY'], algorithm='HS256')
+
+
+def generar_token_verificacion(email):
+    payload = {
+        "email": email,
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=30)
+    }
+    return encode(payload, getenv['JWT_SECRET_KEY'], algorithm='HS256')
+
+def decodificar_token_verificacion(token: str) -> dict:
+    try:
+        return decode(token, getenv['JWT_SECRET_KEY'], algorithms=['HS256'])
+    except ExpiredSignatureError:
+        raise ValueError("Token expirado.")
+    except InvalidTokenError:
+        raise ValueError("Token inválido.")

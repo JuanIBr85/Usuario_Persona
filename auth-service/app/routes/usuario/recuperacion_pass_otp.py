@@ -1,24 +1,18 @@
 import json
 import traceback
 from flask import render_template
-from app.schemas.usuarios_schema import UsuarioModificarSchema
-from marshmallow import ValidationError
 from common.utils.component_request import ComponentRequest
-import jwt
-from os import getenv
 from flask import request, Blueprint, Response
 from app.database.session import SessionLocal
 from app.services.usuario_service import UsuarioService
-from app.utils.jwt import verificar_token_reset,verificar_token_restauracion_usuario
+from app.utils.jwt import verificar_token_reset,verificar_token_restauracion_usuario,verificar_refresh_token_valido
 from jwt import ExpiredSignatureError, InvalidTokenError
-from app.utils.email import decodificar_token_verificacion, generar_token_dispositivo
 from app.models.usuarios import Usuario
 from app.models.dispositivos_confiable import DispositivoConfiable
 from datetime import datetime, timezone, timedelta
 from common.decorators.api_access import api_access
-from common.models.cache_settings import CacheSettings
 from common.utils.response import make_response, ResponseStatus
-
+from app.utils.jwt import decodificar_token_verificacion,generar_token_dispositivo
 
 bp = Blueprint(
     "usuario_recuperacion_pass_otp", __name__, cli_group="usuario"
@@ -182,7 +176,7 @@ def reset_con_otp():
     is_public=True,
     limiter=["2 per minute", "5 per hour"],
     # Cache para evitar abusos
-    cache=CacheSettings(expiration=1800, params=["token"]),
+    #cache=CacheSettings(expiration=1800, params=["token"]),
 )
 def verificar_dispositivo():
     token = request.args.get("token")
@@ -228,7 +222,7 @@ def verificar_dispositivo():
 @bp.route("/refresh", methods=["POST"])
 @api_access(
     is_public=True,
-    limiter=["5 per minute", "20 per hour"],
+    limiter=["1 per 30 seconds", "5 per hour"],  # limitacion estricta para no dejar crear mas de 5 jti_refresh basado en los 15 min q dura el access token.
 )
 def refresh_token():
     session = SessionLocal()
@@ -244,38 +238,19 @@ def refresh_token():
             )
 
         # Validar y decodificar manualmente el refresh token
-        try:
-            payload = jwt.decode(
-                token, getenv("JWT_SECRET_KEY", "clave_jwt_123"), algorithms=["HS256"]
-            )
-            if payload.get("scope") != "refresh_token":
-                return Response(
-                    json.dumps({"error": "Token inválido para refresh"}),
+        
+        payload, error = verificar_refresh_token_valido(token)
+        if error:
+            return Response(
+                    json.dumps({"error": error}),
                     status=401,
                     mimetype="application/json",
                 )
-        except jwt.ExpiredSignatureError:
-            return Response(
-                json.dumps({"error": "Token de refresh expirado"}),
-                status=401,
-                mimetype="application/json",
-            )
-        except jwt.InvalidTokenError:
-            return Response(
-                json.dumps({"error": "Token inválido"}),
-                status=401,
-                mimetype="application/json",
-            )
 
-        # Usar el sub (id de usuario) para generar un nuevo access token
-        usuario_id = int(payload["sub"])
-        result = usuario_service.refresh_token(session, usuario_id)
-
-        return Response(
-            json.dumps(result),
-            status=result.get("code", 200),
-            mimetype="application/json",
-        )
+        status,mensaje,resultado,code = usuario_service.rotar_refresh_token(session, payload)
+        
+        
+        return make_response(status, mensaje, resultado), code
 
     finally:
         session.close()

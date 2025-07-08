@@ -1,22 +1,10 @@
-import json
-import traceback
-from typing import Any, Literal, Dict
-from flask import render_template_string
+from typing import Any, Literal
 from app.schemas.usuarios_schema import UsuarioModificarSchema
 from marshmallow import ValidationError
 from common.utils.component_request import ComponentRequest
-import jwt
-from os import getenv
-from flask import request, Blueprint, Response
+from flask import request, Blueprint
 from app.database.session import SessionLocal
 from app.services.usuario_service import UsuarioService
-from app.extensions import limiter
-from app.utils.jwt import verificar_token_reset,verificar_token_restauracion_usuario
-from jwt import ExpiredSignatureError, InvalidTokenError
-from app.utils.email import decodificar_token_verificacion, generar_token_dispositivo
-from app.models.usuarios import Usuario
-from app.models.dispositivos_confiable import DispositivoConfiable
-from datetime import datetime, timezone, timedelta
 from common.decorators.api_access import api_access
 from common.models.cache_settings import CacheSettings
 from common.utils.response import make_response, ResponseStatus
@@ -54,7 +42,7 @@ def login1():
         status, mensaje, data, code = usuario_service.login_usuario(
             session, data, user_agent, ip
         )
-        return make_response(status, mensaje, data, code), code
+        return make_response(status, mensaje, data), code
 
     except Exception as e:
         return (
@@ -75,12 +63,22 @@ def login1():
 def logout_usuario() -> tuple[dict[Any, Any], Any] | tuple[dict[Any, Any], Literal[500]]:
     session = SessionLocal()
     try:
+        data = request.get_json()
+        refresh_jti = data.get("refresh_jti")
         jwt_jti = ComponentRequest.get_jti()
         usuario_id = ComponentRequest.get_user_id()
+        
+        if not all([jwt_jti, refresh_jti, usuario_id]):
+            return make_response(
+                ResponseStatus.FAIL,
+                "Faltan campos obligatorios: access_jti, refresh_jti, usuario_id",
+                error_code="CAMPOS_FALTANTES"
+            ), 400
+        
         status, mensaje, data, code = usuario_service.logout_usuario(
-            session, usuario_id, jwt_jti
+            session, usuario_id, jwt_jti, refresh_jti
         )
-        return make_response(status, mensaje, data, code), code
+        return make_response(status, mensaje, data), code
 
     except Exception as e:
         return (
@@ -115,7 +113,7 @@ def modificar_perfil():
         status, mensaje, data, code = usuario_service.modificar_usuario(
             session, usuario_id, nuevo_username, nuevo_email
         )
-        return make_response(status, mensaje, data, code), code
+        return make_response(status, mensaje, data), code
     
     except ValidationError as err:
         return make_response(ResponseStatus.FAIL, "Datos inválidos", err.messages), 400

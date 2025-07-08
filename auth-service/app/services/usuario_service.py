@@ -26,7 +26,6 @@ from marshmallow import ValidationError
 from app.services.servicio_base import ServicioBase
 from app.models.permisos import Permiso
 from app.utils.email import (
-    generar_codigo_otp,
     enviar_codigo_por_email,
     enviar_codigo_por_email_registro,
     enviar_solicitud_restauracion_admin,
@@ -39,6 +38,9 @@ from app.utils.otp_manager import (
     verificar_token_recuperacion,
     guardar_datos_registro_temporal,
     obtener_datos_registro_temporal,
+    registrar_refresh_token,
+    revocar_refresh_token,
+    generar_codigo_otp,
 )
 from flask_jwt_extended import decode_token
 from app.extensions import get_redis
@@ -315,7 +317,12 @@ class UsuarioService(ServicioBase):
         except Exception as error:
             return ResponseStatus.FAIL, "error de dispositivo ", error.messages, 400
 
-        refresh_token, refresh_expires = crear_token_refresh(usuario.id_usuario)
+        refresh_token, refresh_expires, jti_refresh = crear_token_refresh(usuario.id_usuario)
+        try:
+            registrar_refresh_token(jti_refresh, refresh_expires)
+        except Exception as e:
+            traceback.print_exc() 
+
         # Registrar log de login
         session.add(
             UsuarioLog(
@@ -334,12 +341,17 @@ class UsuarioService(ServicioBase):
             get_redis().expire(decoded["jti"], expires_seconds)
         except Exception as e:
             traceback.print_exc()
+        
+        # Guardar los jti para logout posterior
+        jti_acceso = decoded["jti"]
 
         usuario_data["token"] = token
         usuario_data["expires_in"] = expires_in
         usuario_data["refresh_token"] = refresh_token
         usuario_data["refresh_expires"] = refresh_expires.isoformat()
         usuario_data["rol"] = roles_nombres
+        usuario_data["access_jti"] = jti_acceso
+        usuario_data["refresh_jti"] = jti_refresh
 
         return ResponseStatus.SUCCESS, "Login exitoso.", usuario_data, 200
 
@@ -428,7 +440,7 @@ class UsuarioService(ServicioBase):
         return ResponseStatus.SUCCESS, "Usuario eliminado correctamente", None, 200
     # -----------------------------------------------------------------------------------------------------------------------------
     
-    def logout_usuario(self, session: Session, usuario_id: int, jwt_jti: str) -> dict:
+    def logout_usuario(self, session: Session, usuario_id: int, jwt_jti: str, refresh_jti: str) -> dict:
 
         usuario = session.query(Usuario).filter_by(id_usuario=usuario_id,eliminado=False).first()
         if not usuario:
@@ -445,6 +457,7 @@ class UsuarioService(ServicioBase):
 
         # Limpiar redis
         get_redis().delete(jwt_jti)
+        revocar_refresh_token(refresh_jti)
 
         return ResponseStatus.SUCCESS, "Logout exitoso.", None, 200
 
@@ -562,15 +575,11 @@ class UsuarioService(ServicioBase):
 
         return ResponseStatus.SUCCESS, "Contraseña actualizada correctamente", None, 200
 
+
     def refresh_token(self, session: Session, usuario_id: int) -> dict:
         usuario = session.query(Usuario).filter_by(id_usuario=usuario_id,eliminado=False).first()
         if not usuario:
-            return {
-                "status": ResponseStatus.UNAUTHORIZED,
-                "message": "Usuario no encontrado",
-                "data": None,
-                "code": 400,
-            }
+            return None
 
         rol = (
             session.query(Rol)
@@ -589,18 +598,61 @@ class UsuarioService(ServicioBase):
         permisos = [p.nombre_permiso for p in permisos_query]
 
         nuevo_access_token = create_access_token(
-            identity=usuario_id,
+            identity=str(usuario_id),
             additional_claims={
-                "sub": usuario.id_usuario,
+                "sub": str(usuario.id_usuario),
                 "email": usuario.email_usuario,
                 "rol": rol_nombre,
                 "permisos": permisos,
             },
         )
 
+        # Decodificar el token para obtener jti y expiración
+        access_decoded = decode_token(nuevo_access_token)
+        access_jti = access_decoded["jti"]
+        access_exp = datetime.fromtimestamp(access_decoded["exp"], tz=timezone.utc)
+        ttl = int((access_exp - datetime.now(timezone.utc)).total_seconds())
+
+        # Guardar en Redis
+        try:
+            get_redis().rpush(access_jti, *permisos)
+            get_redis().expire(access_jti, ttl)
+        except Exception as e:
+            print(f"[!] Error al registrar access token en Redis: {e}")
+
         return {
-            "status": ResponseStatus.SUCCESS.value,
-            "message": "Nuevo token generado exitosamente.",
-            "data": {"access_token": nuevo_access_token},
-            "code": 200,
-        }
+                "access_token": nuevo_access_token,
+                "access_jti": access_jti
+            }
+        
+
+
+    def rotar_refresh_token(self, session: Session, payload: str) -> dict:
+
+        # Revocar el refresh token anterior
+        jti_viejo = payload["jti"]
+        revocar_refresh_token(jti_viejo)
+
+        # Crear nuevo refresh token
+        usuario_id = int(payload["sub"])
+        nuevo_refresh_token, refresh_expires, jti_nuevo = crear_token_refresh(usuario_id)
+        registrar_refresh_token(jti_nuevo, refresh_expires)
+
+        tokens = self.refresh_token(session, usuario_id)
+        if tokens is None:
+            return (
+                ResponseStatus.FAIL,
+                "Usuario no encontrado",
+                None,
+                404
+        )
+
+        tokens["refresh_token"] = nuevo_refresh_token
+        tokens["refresh_jti"] = jti_nuevo
+
+        return (
+            ResponseStatus.SUCCESS,
+            "Nuevo token generado exitosamente.",
+            tokens,
+            200
+        )

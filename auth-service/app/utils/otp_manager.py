@@ -1,13 +1,16 @@
-
-from datetime import timedelta
-from dotenv import load_dotenv
+from datetime import datetime,timezone
 import json
 from app.extensions import get_redis
+import random
 
 DATOS_REGISTRO_EXPIRATION_SECONDS=21600 # 6 horitas
 OTP_EXPIRATION_SECONDS = 1500  # 15 minutos
 TOKEN_EXPIRATION_SECONDS = 1800  # 30 minutos
 MAX_INTENTOS_FALLIDOS = 3  # máximo de intentos permitidos
+
+
+def generar_codigo_otp():
+    return "{:06d}".format(random.randint(0, 999999))
 
 
 def guardar_otp(email: str, codigo: str):
@@ -107,3 +110,20 @@ def verificar_token_recuperacion(token: str) -> str | None:
         #redis_client.delete(key)
         return email
     return None
+
+def registrar_refresh_token(jti: str, expiracion: datetime):
+
+    """
+    Registra un refresh token en Redis como válido con un TTL basado en su expiración.
+    """
+    key = f"refresh:{jti}"
+    ttl = int((expiracion - datetime.now(timezone.utc)).total_seconds())
+    get_redis().setex(key, ttl, "valid")
+
+def revocar_refresh_token(jti: str):
+
+    """
+    Revoca un refresh token eliminando su jti de Redis.
+    """
+    key = f"refresh:{jti}"
+    get_redis().delete(key)

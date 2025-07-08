@@ -1,16 +1,9 @@
 from flask_mail import Message
 from flask import current_app
 from app.extensions import mail
-import jwt
-from datetime import datetime, timedelta,timezone
-from jwt import decode, ExpiredSignatureError, InvalidTokenError
 from app.utils.render_template_email import render_email_template
-from app.utils.jwt import generar_token_restauracion
+from app.utils.jwt import generar_token_restauracion,generar_token_dispositivo,generar_token_verificacion
 import random
-
-
-
-
 
 
 
@@ -25,26 +18,6 @@ def enviar_email_verificacion(usuario):
     )
     mail.send(msg)
 
-def generar_token_verificacion(email):
-    payload = {
-        "email": email,
-        "exp": datetime.now(timezone.utc) + timedelta(minutes=30)
-    }
-    return jwt.encode(payload, current_app.config['JWT_SECRET_KEY'], algorithm='HS256')
-
-def decodificar_token_verificacion(token: str) -> dict:
-    try:
-        return decode(token, current_app.config['JWT_SECRET_KEY'], algorithms=['HS256'])
-    except ExpiredSignatureError:
-        raise ValueError("Token expirado.")
-    except InvalidTokenError:
-        raise ValueError("Token inválido.")
-    
-    
-
-
-def generar_codigo_otp():
-    return "{:06d}".format(random.randint(0, 999999))
 
 def enviar_codigo_por_email(usuario, codigo_otp):
     saludo = f"""
@@ -104,19 +77,6 @@ def enviar_codigo_por_email_registro(email: str, codigo_otp: str):
     )
     mail.send(msg)
     
-
-
-
-
-def generar_token_dispositivo(email, user_agent, ip):
-    payload = {
-        "email": email,
-        "user_agent": user_agent,
-        "ip": ip,
-        "exp": datetime.now(timezone.utc) + timedelta(minutes=30)
-    }
-    return jwt.encode(payload, current_app.config['JWT_SECRET_KEY'], algorithm='HS256')
-
 
 def enviar_email_validacion_dispositivo(usuario, user_agent, ip):
     token   = generar_token_dispositivo(usuario.email_usuario, user_agent, ip)
