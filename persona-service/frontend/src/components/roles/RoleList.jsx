@@ -2,7 +2,8 @@ import { Trash2, Pencil, Users, BadgeCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default function RoleList({ roles, onEdit, onDelete, formatPermissionName, children }) {
+
+export default function RoleList({ roles, onEdit, onDelete, formatPermissionName, groupPermissionsByModule, children }) {
     return (
         <div className="flex flex-col gap-5">
             <Card>
@@ -19,9 +20,16 @@ export default function RoleList({ roles, onEdit, onDelete, formatPermissionName
                                     <div>
                                         <CardTitle className="text-base">{role.name}</CardTitle>
                                         <p className="text-xs text-muted-foreground">
-                                            {role.permissions?.length > 0
-                                                ? role.permissions.map(formatPermissionName).join(", ")
-                                                : "Sin permisos asignados"}
+                                            {Object.entries(groupPermissionsByModule(role.permissions)).map(([modulo, permisos]) => (
+                                                <div key={modulo} className="mb-1 flex flex-wrap items-center gap-1">
+                                                    <span className="font-semibold capitalize mr-1">{modulo}:</span>
+                                                    {permisos.map((permiso, idx) => (
+                                                        <span key={idx} className="bg-gray-100 text-gray-700 rounded px-1.5 py-0.5 text-xs mr-1 mb-1">
+                                                            {permiso}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            ))}
                                         </p>
                                     </div>
                                 </div>
