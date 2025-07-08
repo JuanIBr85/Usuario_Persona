@@ -144,7 +144,7 @@ def generar_token_dispositivo(email, user_agent, ip):
         "ip": ip,
         "exp": datetime.now(timezone.utc) + timedelta(minutes=30)
     }
-    return encode(payload, getenv['JWT_SECRET_KEY'], algorithm='HS256')
+    return encode(payload, getenv("JWT_SECRET_KEY"), algorithm='HS256')
 
 
 def generar_token_verificacion(email):
@@ -152,11 +152,11 @@ def generar_token_verificacion(email):
         "email": email,
         "exp": datetime.now(timezone.utc) + timedelta(minutes=30)
     }
-    return encode(payload, getenv['JWT_SECRET_KEY'], algorithm='HS256')
+    return encode(payload, getenv("JWT_SECRET_KEY"), algorithm='HS256')
 
 def decodificar_token_verificacion(token: str) -> dict:
     try:
-        return decode(token, getenv['JWT_SECRET_KEY'], algorithms=['HS256'])
+        return decode(token, getenv("JWT_SECRET_KEY"), algorithms=['HS256'])
     except ExpiredSignatureError:
         raise ValueError("Token expirado.")
     except InvalidTokenError:
