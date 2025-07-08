@@ -1,6 +1,5 @@
 import logging
 from flask import Flask, jsonify
-from flask_cors import CORS
 import os
 from app.extensions import jwt, engine, Base, mail
 from app.models.persona_model import Persona
@@ -20,8 +19,6 @@ def create_app():
     app = Flask(__name__)
 
     app.config.from_object("config")
-
-    CORS(app, supports_credentials=True)
 
     # Inicializa de las exteniciones
     jwt.init_app(app)
