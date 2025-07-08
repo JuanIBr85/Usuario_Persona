@@ -18,7 +18,7 @@ export function VerificarEmail({ formRef, email, onSubmit, onEmailIncorrecto, lo
         labelText="Escribe tu email"
         placeholder={email}
         containerClassName="sm:col-span-3"
-        validatePattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+        validatePattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         validationMessage="Por favor, ingresa un correo electrónico válido."
         required
       />
