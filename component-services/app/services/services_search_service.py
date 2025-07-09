@@ -1,10 +1,10 @@
+import logging
 from app.models.service_model import ServiceModel
 from app.services.servicio_base import ServicioBase
 from app.schemas.service_schema import ServiceSchema
 from app.utils.get_component_info import get_component_info
 from common.utils.get_component_info import get_component_info as get_component_info_common
 from app.utils.get_health import get_health
-from app.extensions import logger
 from typing import Dict
 
 # Inicialización del servicio base para operaciones CRUD en la tabla de servicios
@@ -96,12 +96,15 @@ class ServicesSearchService:
         Args:
             redirect_list (list[Dict]): Lista de diccionarios con reglas de redirección
         """
-        _redirect_list = {}
-        # Procesa cada regla de redirección
-        for redirect in redirect_list:
-            for key, value in redirect.items():
-                _redirect_list[value["code"]] = value["url"]
-        self._redirect_list = _redirect_list
+        try:
+            _redirect_list = {}
+            # Procesa cada regla de redirección
+            for redirect in redirect_list:
+                for key, value in redirect.items():
+                    _redirect_list[value["code"]] = value["url"]
+            self._redirect_list = _redirect_list
+        except Exception as e:
+            logging.error(f"Error al actualizar la lista de redirecciones: {str(e)}")
 
     def get_permissions(self):
         """
@@ -125,10 +128,10 @@ class ServicesSearchService:
 
         # Itera sobre cada servicio para recolectar permisos
         for service in services:
-            logger.info(f"Recolectando permisos de {service.service_name}")
+            logging.info(f"Recolectando permisos de {service.service_name}")
             info = get_component_info(service.service_url, wait=True)
             if info is None:
-                logger.error(f"Error al recolectar permisos de {service.service_name}")
+                logging.error(f"Error al recolectar permisos de {service.service_name}")
                 continue
 
             # Agrega los permisos del servicio actual a la lista general

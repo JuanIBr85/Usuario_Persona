@@ -8,7 +8,6 @@ from app.utils.is_local_connection import is_local_connection
 from common.utils.ttl_cache_util import TTLCacheUtil
 from common.utils.response import make_response, ResponseStatus
 
-logger = logging.getLogger(__name__)
 endpoints_search_service = EndpointsSearchService()
 
 # Cache para los permisos de los usuarios para evitar sobre cargar redis

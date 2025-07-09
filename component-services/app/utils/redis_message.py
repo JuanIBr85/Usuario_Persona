@@ -1,7 +1,8 @@
 import threading
 from flask import Flask
-from app.extensions import redis_client_core as r, WORKER_ID, logger
+from app.extensions import redis_client_core as r, WORKER_ID
 import json
+import logging
 
 # component-service-internal-events
 # Por que csie por que estaba aburrido y queria hacer algo distinto
@@ -44,7 +45,7 @@ def register_redis_receiver(stream_name: str):
             # Ignora el error si el grupo ya existe
             # Cuando se esta en gunicorn, es muy probable que los workers provoquen este error
             if "BUSYGROUP" not in str(e):
-                logger.error(f"Error al crear grupo en {_group_stream}: {str(e)}")
+                logging.error(f"Error al crear grupo en {_group_stream}: {str(e)}")
                 raise
 
         return f
@@ -53,7 +54,7 @@ def register_redis_receiver(stream_name: str):
 
 
 def redis_receiver(app: Flask):
-    logger.info(f"Worker {WORKER_ID} conectado a Redis")
+    logging.info(f"Worker {WORKER_ID} conectado a Redis")
 
     while True:
         # 2hs luchando con esto, cloude es un angel
@@ -83,7 +84,7 @@ def redis_receiver(app: Flask):
 #Este endpoint esta escuchando el stream "test"
 @register_redis_receiver("test")
 def test(app: Flask, message_data: dict):
-    logger.warning(f"Worker {WORKER_ID} recibio mensaje: {message_data}")
+    logging.info(f"Worker {WORKER_ID} recibio mensaje: {message_data}")
 
 
 # Envio un evento a un stream

@@ -13,3 +13,5 @@ roles:
     - persona.admin.modificar_persona
     - persona.admin.eliminar_persona
     - persona.admin.restaurar_persona
+    #Este es un permiso de auth, es requerido para que el admin pueda vincular usuarios
+    - auth.admin.obtener_usuarios

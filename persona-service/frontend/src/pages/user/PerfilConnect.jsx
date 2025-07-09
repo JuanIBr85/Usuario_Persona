@@ -9,12 +9,19 @@ import React from "react";
 import { PersonaService } from "@/services/personaService";
 import { formSubmitJson } from "@/utils/formUtils";
 import { useNavigate } from "react-router-dom";
-import { ProgressBar } from "@/components/connectProfile/ProgressBar";
+import { ProgressBar } from "@/components/createProfile/ProgressBar";
 import { Documento } from "@/components/connectProfile/steps/Documento";
 import { VerificarEmail } from "@/components/connectProfile/steps/VerificarEmail";
 import { VerificarOTP } from "@/components/connectProfile/steps/VerificarOTP";
 import { VerificarIdentidad } from "@/components/connectProfile/steps/VerificarIdentidad";
+import { useAuthContext } from "@/context/AuthContext";
 
+const steps = [
+  'Documento',
+  'Email',
+  'Código',
+  'Identidad',
+];
 
 function PerfilConnect() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -25,6 +32,13 @@ function PerfilConnect() {
   const [tempData, setTempData] = useState({});
   const formRef = useRef(null);
   const navigate = useNavigate();
+  const { authData } = useAuthContext();
+
+  useEffect(()=>{
+    if(authData?.user?.id_persona && authData?.user?.id_persona !== 0){
+      //navigate('/profile');
+    }
+  }, [authData])
 
   useEffect(() => {
     PersonaService.get_tipos_documentos()
@@ -49,8 +63,19 @@ function PerfilConnect() {
     } catch (error) {
       console.error(error);
       if (error.statusCode === 404) {
-        alert("No se encontró el documento, vamos a crear un nuevo perfil");
-        navigate("/createperfil");
+        setDialog({
+          title: "Crear perfil",
+          action: () => navigate("/createperfil",{state: formData}),
+          cancelAction: () => setDialog(null),
+          description: <>
+            No se encontró el documento, vamos a crear un nuevo perfil
+
+            Estos datos son correctos antes de continuar?
+            <br/><br/>
+            <b>Tipo: </b>{formData.tipo_documento}<br/>
+            <b>Documento: </b>{formData.num_doc_persona}
+          </>
+        })
       }
     } finally {
       setLoading(false);
@@ -87,7 +112,7 @@ function PerfilConnect() {
         ...tempData,
         ...formData
       });
-      navigate('/profile');
+      navigate('/searchprofile');
     } catch (error) {
       console.error(error);
     } finally {
@@ -150,6 +175,9 @@ function PerfilConnect() {
       <SimpleDialog
         title={dialog?.title}
         description={dialog?.description}
+        actionHandle={dialog?.action}
+        cancelHandle={dialog?.cancelAction}
+        cancel={dialog?.cancelAction && "Cancelar"}
         isOpen={dialog}
         setIsOpen={() => setDialog(null)}
         className="sm:max-w-3xl"
@@ -170,7 +198,7 @@ function PerfilConnect() {
 
             <CardContent className="flex flex-col flex-1 min-h-70">
               <div className="space-y-8 flex-1">
-                <ProgressBar currentStep={currentStep} />
+                <ProgressBar currentStep={currentStep} steps={steps} size={10}/>
                 <div className="mb-6">
                   {renderStep()}
                 </div>

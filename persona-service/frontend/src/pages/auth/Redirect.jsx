@@ -28,7 +28,7 @@ const Redirect = () => {
             setLoadingText("Perfil encontrado");
         } catch (error) {
             setLoadingText("No se a completado los datos del perfil");
-            setTimeout(() => navigate('/profile'), 1000);
+            setTimeout(() => navigate('/searchprofile'), 1000);
             return;
         }
 

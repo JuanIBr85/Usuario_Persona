@@ -59,30 +59,21 @@ export default function FormDatos({
         </ResponsiveColumnForm>
 
         <ResponsiveColumnForm>
-          <SimpleSelect
-            name="tipo_documento"
-            label="Tipo de documento"
+          <InputValidate
+            labelText="Tipo de documento"
             placeholder="Selecciona un tipo de documento"
             value={personaData.tipo_documento || tipoDoc}
-            onValueChange={(value) => {
-              setTipoDoc(value);
-              handleChange('tipo_documento', value);
-            }}
-            required
-          >
-            {Object.keys(tipoDocumento).map((tipo) => (
-              <SelectItem key={tipo} value={tipo}>
-                {tipo}
-              </SelectItem>
-            ))}
-          </SimpleSelect>
+            className="bg-gray-100 cursor-not-allowed w-full"
+            readOnly
+          />
           <InputValidate
-            id="num_doc_persona"
             type="text"
             labelText="Nº de documento"
             value={personaData.num_doc_persona || ""}
             validatePattern={tipoDocumento[tipoDoc]}
             validationMessage="Número de documento inválido"
+            className="bg-gray-100 cursor-not-allowed w-full"
+            readOnly
           />
         </ResponsiveColumnForm>
 

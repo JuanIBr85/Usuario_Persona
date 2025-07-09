@@ -7,7 +7,6 @@ from common.schemas.message_schema import MessageSchema
 import traceback
 import logging
 
-logger = logging.getLogger(__name__)
 message_schema = MessageSchema()
 
 bp = Blueprint("service", __name__, cli_group="component")
@@ -66,5 +65,5 @@ def receiver():
         return "OK", 200
     except Exception as e:
         traceback.print_exc()
-        logger.error(f"Error al recibir mensaje: {str(e)}")
+        logging.error(f"Error al recibir mensaje: {str(e)}")
         return "Error al recibir mensaje", 500

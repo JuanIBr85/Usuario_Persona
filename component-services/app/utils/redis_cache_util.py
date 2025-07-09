@@ -61,8 +61,8 @@ class RedisCacheUtil(TTLCacheUtil):
             #Los guardo en redis con una expiracion igual al del TTLCache
             r.set(key, serialized_data)
             r.expire(key, ttl)
-            import logging
-            logging.warning(f"Guardado en redis la clave {key} con TTL {data}")
+            #import logging
+            #logging.warning(f"Guardado en redis la clave {key} con TTL {data}")
             return data
 
         # Si los datos no estan en el cache, se usa redis_callback para resolver

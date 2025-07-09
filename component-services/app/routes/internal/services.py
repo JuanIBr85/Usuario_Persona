@@ -5,7 +5,6 @@ from common.utils.response import make_response, ResponseStatus
 from app.models.service_model import ServiceModel
 from app.schemas.service_schema import ServiceSchema
 from app.services.services_search_service import ServicesSearchService
-from app.extensions import logger
 
 
 bp = Blueprint(
