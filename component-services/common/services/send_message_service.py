@@ -6,7 +6,6 @@ from common.schemas.message_schema import MessageSchema
 import logging
 
 message_schema = MessageSchema()
-logger = logging.getLogger(__name__)
 
 def send_message(
     to_service: str,
@@ -32,7 +31,7 @@ def send_message(
         if error:
             return None, 400, error
 
-        logger.error(
+        logging.error(
             f"Enviando mensaje a {to_service} en el canal {channel}: {message}"
         )
 

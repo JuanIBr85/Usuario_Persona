@@ -8,7 +8,6 @@ from app.models.service_model import ServiceModel
 from app.schemas.service_schema import ServiceSchema
 from app.utils.get_health import get_health
 from app.utils.get_component_info import get_component_info
-from app.extensions import logger
 from datetime import datetime, timezone, timedelta
 from flask import current_app
 import time

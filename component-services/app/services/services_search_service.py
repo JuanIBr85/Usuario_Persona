@@ -5,7 +5,6 @@ from app.schemas.service_schema import ServiceSchema
 from app.utils.get_component_info import get_component_info
 from common.utils.get_component_info import get_component_info as get_component_info_common
 from app.utils.get_health import get_health
-from app.extensions import logger
 from typing import Dict
 
 # Inicialización del servicio base para operaciones CRUD en la tabla de servicios
@@ -129,10 +128,10 @@ class ServicesSearchService:
 
         # Itera sobre cada servicio para recolectar permisos
         for service in services:
-            logger.info(f"Recolectando permisos de {service.service_name}")
+            logging.info(f"Recolectando permisos de {service.service_name}")
             info = get_component_info(service.service_url, wait=True)
             if info is None:
-                logger.error(f"Error al recolectar permisos de {service.service_name}")
+                logging.error(f"Error al recolectar permisos de {service.service_name}")
                 continue
 
             # Agrega los permisos del servicio actual a la lista general

@@ -6,7 +6,6 @@ from app.services.services_search_service import ServicesSearchService
 from common.models.endpoint_route_model import EndpointRouteModel
 from app.models.service_model import ServiceModel
 import time
-from app.extensions import logger
 from app.services.event_service import EventService
 from app.utils.service_endpoint_log import ServiceEndpointLog
 from common.services.service_request import ServiceRequest
@@ -84,7 +83,7 @@ class EndpointsSearchService:
                 error_cnt += 1
                 # Logea error cada minuto (60 intentos)
                 if error_cnt % (5 * 1) == 0:
-                    logger.error(f"Error conectando con {service.service_name}")
+                    logging.error(f"Error conectando con {service.service_name}")
                 service_endpoint_log.set_error(str(e))
 
                 if not service.service_wait:
@@ -95,7 +94,7 @@ class EndpointsSearchService:
 
     def _load_endpoints(self):
         # Inicialización de variables y registro de inicio
-        logger.warning("Iniciando carga de servicios")
+        logging.info("Iniciando carga de servicios")
         self._endpoints = {}
         self._search_in_progress = True
         self._search_log = {}
@@ -117,7 +116,7 @@ class EndpointsSearchService:
             if is_core_services and not service.service_core:
                 is_core_services = False
                 self._update_map()
-                logger.warning("Cargando servicios del core")
+                logging.info("Cargando servicios del core")
 
             # Inicializa el log
             service_endpoint_log = ServiceEndpointLog(service.service_name)
@@ -128,7 +127,7 @@ class EndpointsSearchService:
                 # Si el servicio no esta activo, continua con el siguiente
                 if not get_health(service.service_url):
                     service_endpoint_log.set_not_available()
-                    logger.warning(f"El servicio {service.service_name} no esta activo")
+                    logging.info(f"El servicio {service.service_name} no esta activo")
                     continue
 
             #Si el servicio no esta disponible, continua con el siguiene
@@ -138,10 +137,10 @@ class EndpointsSearchService:
 
             if self._stop_search:  # Verifica señal de parada
                 service_endpoint_log.set_stop()
-                logger.warning(f"Parada de búsqueda de endpoints")
+                logging.info(f"Parada de búsqueda de endpoints")
                 break
 
-            logger.warning(f"Conectando con {service.service_name}...")
+            logging.info(f"Conectando con {service.service_name}...")
             try:
                 # Obtiene endpoints del servicio actual
                 service_endpoints = self._wait_for_service(service)
@@ -152,16 +151,16 @@ class EndpointsSearchService:
                 # Actualiza el diccionario de endpoints
                 self._endpoints.update(service_endpoints)
                 service_endpoint_log.set_success(len(service_endpoints))
-                logger.warning(
+                logging.info(
                     f"{service.service_name} - {len(service_endpoints)} endpoints cargados"
                 )
             except Exception as e:
-                logger.error(f"Error cargando {service.service_name}: {str(e)}")
+                logging.error(f"Error cargando {service.service_name}: {str(e)}")
                 service_endpoint_log.set_error(str(e))
         
         # Finalización de la carga
         self._search_in_progress = False
-        logger.warning(f"Carga completada. Total de endpoints: {len(self._endpoints)}")
+        logging.info(f"Carga completada. Total de endpoints: {len(self._endpoints)}")
         self._update_map()
 
     def _update_map(self):

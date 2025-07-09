@@ -1,6 +1,5 @@
 from app.services.message_service import MessageService
 from app.services.services_search_service import ServicesSearchService
-from app.extensions import logger
 import uuid
 import logging
 from app.utils.get_health import get_health
@@ -39,11 +38,11 @@ class EventService:
                 )
 
                 if status_code != 200:
-                    logger.warning(
+                    logging.warning(
                         f"Error enviando evento <{event_type}> a {service.service_name}: {error}"
                     )
             except Exception as e:
-                logger.warning(
+                logging.warning(
                     f"Error enviando evento <{event_type}> a {service.service_name}: {str(e)}"
                 )
 

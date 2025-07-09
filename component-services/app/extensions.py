@@ -39,7 +39,6 @@ limiter = Limiter(
 #    size_limit=2**30,  # Limita el tamaño de la cache 1GB
 #)
 
-logger = logging.getLogger(__name__)
 
 # Configuracion de redis
 redis_client_auth = None # Aca se almacenan los tokens
