@@ -1,6 +1,6 @@
 service:
   service_name: component-service
-  service_prefix: control
+  service_prefix: component
   service_available: true
   service_description: Backend para el manejo de componentes
   service_core: true

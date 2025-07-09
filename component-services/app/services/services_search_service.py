@@ -1,3 +1,4 @@
+import logging
 from app.models.service_model import ServiceModel
 from app.services.servicio_base import ServicioBase
 from app.schemas.service_schema import ServiceSchema
@@ -96,12 +97,15 @@ class ServicesSearchService:
         Args:
             redirect_list (list[Dict]): Lista de diccionarios con reglas de redirección
         """
-        _redirect_list = {}
-        # Procesa cada regla de redirección
-        for redirect in redirect_list:
-            for key, value in redirect.items():
-                _redirect_list[value["code"]] = value["url"]
-        self._redirect_list = _redirect_list
+        try:
+            _redirect_list = {}
+            # Procesa cada regla de redirección
+            for redirect in redirect_list:
+                for key, value in redirect.items():
+                    _redirect_list[value["code"]] = value["url"]
+            self._redirect_list = _redirect_list
+        except Exception as e:
+            logging.error(f"Error al actualizar la lista de redirecciones: {str(e)}")
 
     def get_permissions(self):
         """

@@ -1,10 +1,13 @@
 import { isAdmin, hasRol, hasToken, isSuperAdmin } from "@/context/AuthContext";
 
-/**
- *La idea de esto es poder definir los permisos de acceso a distintas rutas del front
- *Solo se implemento la parte de roles 
- */
-
+function get_env(env, orDefault=[]){
+    if(!import.meta.env[env]) return orDefault;
+    return import.meta.env[env].split(';').filter((rol) => rol.trim() !== '')
+}
+const ADMIN_ROLES = get_env("VITE_ADMIN_ROLES");
+const ADMIN_PERSONA = get_env("VITE_ADMIN_PERSONA");
+const ADMIN_COMPONENTES = get_env("VITE_ADMIN_COMPONENTES");
+const ADMIN_LOG = get_env("VITE_ADMIN_LOG");
 
 function makeAuthRouteConfig({ roles = [], loginRequired = true, isAdmin = true }) {
     return {
@@ -31,14 +34,14 @@ export const AuthRouteConfig = {
     // Rutas de administrador
     "/": makeAuthRouteConfig({ isAdmin: true }),
     "/adminpanel": makeAuthRouteConfig({  isAdmin: true }),
-    "/logs": makeAuthRouteConfig({roles: ["admin-persona"], isAdmin: true }),
-    "/adminpersons": makeAuthRouteConfig({ roles: ["admin-persona"], isAdmin: true }),
-    "/adminservices": makeAuthRouteConfig({ roles: ["admin-componentes"], isAdmin: true }),
-    "/adminroles": makeAuthRouteConfig({ roles: ["admin-roles"], isAdmin: true }),
-    "/adminservices/components": makeAuthRouteConfig({ roles: ["admin-componentes"], isAdmin: true }),
-    "/adminservices/components/:id": makeAuthRouteConfig({ roles: ["admin-componentes"], isAdmin: true }),
-    "/adminservices/endpoints-research": makeAuthRouteConfig({ roles: ["admin-componentes"], isAdmin: true }),
-    "/persondetails/:id": makeAuthRouteConfig({ roles: ["admin-persona"], isAdmin: true }),
+    "/logs": makeAuthRouteConfig({roles: ADMIN_LOG, isAdmin: true }),
+    "/adminpersons": makeAuthRouteConfig({ roles: ADMIN_PERSONA, isAdmin: true }),
+    "/adminservices": makeAuthRouteConfig({ roles: ADMIN_COMPONENTES, isAdmin: true }),
+    "/adminroles": makeAuthRouteConfig({ roles: ADMIN_ROLES, isAdmin: true }),
+    "/adminservices/components": makeAuthRouteConfig({ roles: ADMIN_COMPONENTES, isAdmin: true }),
+    "/adminservices/components/:id": makeAuthRouteConfig({ roles: ADMIN_COMPONENTES, isAdmin: true }),
+    "/adminservices/endpoints-research": makeAuthRouteConfig({ roles: ADMIN_COMPONENTES, isAdmin: true }),
+    "/persondetails/:id": makeAuthRouteConfig({ roles: ADMIN_PERSONA, isAdmin: true }),
 
     // Rutas de usuario
     "/profile": makeAuthRouteConfig({  isAdmin: false }),
@@ -63,5 +66,33 @@ export const hasAccess = (path) => {
     //Si la ruta no requiere un rol especifico se permite acceso
     if (routeConfig.roles.length === 0) return true;
     //Si la ruta requiere de un rol y el usuario no tiene el rol se deniega acceso
-    return Array.isArray(routeConfig.roles) ? Array.from(routeConfig.roles).every(hasRol) : hasRol(routeConfig.roles);;
+
+    //Compruebo primero los roles obligatorios para acceder a esta area
+
+    const required_roles = Array
+    .from(routeConfig.roles)
+    //Filtro los roles que empiezan con "!"
+    .filter((rol) => rol.startsWith("!"))
+    //Quito el "!" del rol
+    .map((rol) => rol.slice(1));
+
+    //Compruebo que el usuario tenga ninguno de los roles 
+    const every = required_roles.every(hasRol);
+
+    //Si el usuario no tiene ninguno de los roles obligatorios se deniega acceso
+    if (!every && required_roles.length!==0) return false;
+
+    //Compruebo los roles opcionales para acceder a esta area
+    const opcionales = Array
+    .from(routeConfig.roles)
+    //Filtro los roles que no empiezan con "!"
+    .filter((rol) => !rol.startsWith("!"))
+    //Compruebo que el usuario tenga almenos uno de estos roles
+    .some(hasRol)||false;
+
+    
+    //Si el usuario no tiene ninguno de los roles opcionales se deniega acceso
+    if (!opcionales && !every) return false;
+
+    return true;
 }
