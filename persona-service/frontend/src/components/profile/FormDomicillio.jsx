@@ -12,7 +12,7 @@ import { useState } from "react"
 
 export default function FormDomicillio({ domicilio, setPersonaData, persona_id, showDialog, okDialog, errorDialog }) {
 
-    const { handleSubmit, localidades, codigoPostal, setCodigoPostal, inputCPRef, localidad, loading } = useFormDomicilio({ domicilio, setPersonaData, persona_id, showDialog, okDialog, errorDialog });
+    const { handleSubmit, localidades, codigoPostal, setCodigoPostal, inputCPRef, localidad, loading } = useFormDomicilio(domicilio, setPersonaData, persona_id, showDialog, okDialog, errorDialog);
 
     return (
         <>

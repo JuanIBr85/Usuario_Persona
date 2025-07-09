@@ -6,7 +6,7 @@ import { useCallback } from "react"
 import { formSubmitJson } from "@/utils/formUtils"
 import { Ban } from "lucide-react"
 
-export function useFormDomicilio({domicilio, setPersonaData, persona_id, showDialog, okDialog, errorDialog}) {
+export function useFormDomicilio(domicilio, setPersonaData, persona_id, showDialog, okDialog, errorDialog) {
     const [codigoPostal, setCodigoPostal] = useState(domicilio.domicilio_postal.codigo_postal);
     const [localidades, setLocalidades] = useState([]);
     const [localidad, setLocalidad] = useState(domicilio.domicilio_postal.localidad);
