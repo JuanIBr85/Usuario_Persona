@@ -22,7 +22,7 @@ function PersonDetailsBreadcrumb() {
         </BreadcrumbSeparator>
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
-            <Link to="/adminusers" className="flex items-center gap-1">
+            <Link to="/adminpersons" className="flex items-center gap-1">
               <User className="w-4 h-4" />
               Panel de Personas
             </Link>
