@@ -39,7 +39,7 @@ const adminOptions = [
     hasAccess: ()=>hasAccess("/adminroles")
   },
   {
-    title: "Logs",
+    title: "Registros",
     description: "Ver registros del sistema",
     icon: <FileText className="w-14 h-14 text-primary" />,
     path: "/logs",

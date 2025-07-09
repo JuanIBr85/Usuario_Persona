@@ -31,7 +31,7 @@ function BreadcrumbsNav() {
         <BreadcrumbItem>
           <BreadcrumbPage className="flex items-center gap-1">
             <Eye className="w-4 h-4" />
-            Monitoreo de Endpoints
+            Monitoreo de Servicios
           </BreadcrumbPage>
         </BreadcrumbItem>
       </BreadcrumbList>

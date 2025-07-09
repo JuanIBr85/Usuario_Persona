@@ -350,7 +350,7 @@ export default function Logs() {
             <BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbPage className="flex items-center gap-1">
-                <ChartArea className="w-4 h-4" /> Logs
+                <ChartArea className="w-4 h-4" /> Registros
               </BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
