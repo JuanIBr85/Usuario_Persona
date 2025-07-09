@@ -146,7 +146,7 @@ logout: async () => {
 
   changeEmail: async (body) => {
     return fetchService.fetch({
-      url: `${ServiceURL.auth}/cambiar-email`,
+      url: `${ServiceURL.auth}/Modificar-email`,
       method: HttpMethod.POST,
       body: body,
       useToken: true,

@@ -142,6 +142,24 @@ export default function FormUsuario() {
       {loading && <Loading isFixed />}
 
       <div className="w-full max-w-md mx-auto space-y-4 px-4">
+        <div className="space-y-3 pt-4">
+          <InputValidate
+            id="info_nombre_usuario"
+            type="text"
+            labelText="Nombre de usuario"
+            value={authData.user.nombre_usuario || ""}
+            className="bg-gray-100 cursor-not-allowed w-full"
+            readOnly
+          />
+          <InputValidate
+            id="info_email_usuario"
+            type="email"
+            labelText="Correo"
+            value={authData.user.email_usuario || ""}
+            className="bg-gray-100 cursor-not-allowed w-full"
+            readOnly
+          />
+        </div>
         <div className="flex flex-col gap-3 pt-4">
           <Button onClick={requestOtp}>Cambiar Contraseña</Button>
 
@@ -198,6 +216,8 @@ export default function FormUsuario() {
               type="password"
               labelText="Contraseña"
               placeholder="Ingresa tu contraseña"
+              validatePattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$"
+              validationMessage="La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula, un número y un carácter especial."
               required
             />
             <AlertDialogFooter>
