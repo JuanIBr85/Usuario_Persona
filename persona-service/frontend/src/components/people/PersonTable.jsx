@@ -12,6 +12,13 @@ import { Button } from "@/components/ui/button";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import PersonaDeleteDialog from "./PersonDeleteDialog";
 
+// Función para formatear la fecha en formato DD-MM-YYYY
+function formatearFecha(fechaStr) {
+  if (!fechaStr) return "-";
+  const [a, m, d] = fechaStr.split("-");
+  return `${d}-${m}-${a}`;
+}
+
 function PersonTable({ persons, users, onEdit, onSeeDetails, onDelete }) {
   const [isTimeout, setIsTimeout] = useState(true);
   const [countdown, setCountdown] = useState(3);
@@ -62,7 +69,7 @@ function PersonTable({ persons, users, onEdit, onSeeDetails, onDelete }) {
               </TableCell>
               <TableCell>{user.tipo_documento}</TableCell>
               <TableCell>{user.nro_documento}</TableCell>
-              <TableCell>{user.fecha_nacimiento}</TableCell>
+              <TableCell>{formatearFecha(user.fecha_nacimiento)}</TableCell>
               <TableCell>
                 {users.find((u) => u.id === user.usuario_id)
                   ? users.find((u) => u.id === user.usuario_id).email_usuario

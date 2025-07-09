@@ -8,6 +8,13 @@ import {
   User, Mail, Phone, BadgeCheck, MapPin, IdCard, Calendar, Pencil
 } from "lucide-react";
 
+// Función para formatear fecha en formato DD-MM-YYYY
+function formatearFecha(fechaStr) {
+  if (!fechaStr) return "-";
+  const [a, m, d] = fechaStr.split("-");
+  return `${d}-${m}-${a}`;
+}
+
 function PersonDetailsCard({ person, onEdit }) {
   const campos = [
     {
@@ -83,7 +90,7 @@ function PersonDetailsCard({ person, onEdit }) {
     {
       label: "Fecha de nacimiento",
       icon: Calendar,
-      value: person.fecha_nacimiento_persona || "-",
+      value: formatearFecha(person.fecha_nacimiento_persona),
     },
   ];
 
