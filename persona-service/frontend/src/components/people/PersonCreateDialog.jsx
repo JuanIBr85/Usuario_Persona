@@ -59,6 +59,7 @@ function PersonCreateDialog({
 
   const [userSearch, setUserSearch] = useState("");
   const [tipoDoc, setTipoDoc] = useState(Object.keys(tiposDocumentos)[0] || "");
+  const today = new Date().toISOString().slice(0, 10);
 
   const filteredUsuarios = useMemo(() => {
     if (!userSearch) return usuarios;
@@ -151,6 +152,7 @@ function PersonCreateDialog({
                 labelText="Fecha de nacimiento"
                 value={newUser.fecha_nacimiento || ""}
                 required
+                max={today}
               />
 
               {/* Select de usuario */}

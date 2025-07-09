@@ -53,6 +53,9 @@ function PersonEditDialog({
       ? "none"
       : String(editingUser.usuario_id);
 
+  // es la fecha actual para limitar la fecha de nacimiento
+  const today = new Date().toISOString().slice(0, 10);
+
   return (
     <Dialog open={!!editingUser} onOpenChange={(open) => !open && setEditingUser(null)}>
       <DialogContent className="sm:max-w-[425px]">
@@ -121,6 +124,7 @@ function PersonEditDialog({
                 labelText="Fecha de Nacimiento"
                 value={editingUser.fecha_nacimiento || ""}
                 onChange={(e) => setEditingUser({ ...editingUser, fecha_nacimiento: e.target.value })}
+                max={today}
               />
 
               <SimpleSelect
