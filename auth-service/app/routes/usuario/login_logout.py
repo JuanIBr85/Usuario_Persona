@@ -15,6 +15,19 @@ bp = Blueprint(
 
 usuario_service = UsuarioService()
 
+"""
+Módulo de autenticación de usuario.
+
+Contiene las rutas:
+- POST /login: Inicio de sesión con validación de dispositivo.
+- POST /logout: Finaliza sesión y limpia tokens.
+- POST /modificar: Actualiza datos de perfil.
+- DELETE /eliminar: Elimina al usuario (soft delete).
+- GET /perfil: Devuelve los datos del usuario autenticado (con caché).
+
+Todas las rutas están protegidas con `@api_access` y limitaciones por rate limiting y/o cache.
+"""
+
 
 # -----------------------------------------------------------------------------------------------------------------------------
 # LOGIN Y LOGOUT
@@ -27,6 +40,21 @@ usuario_service = UsuarioService()
     limiter=["5 per minute", "20 per hour"]
 )
 def login1():
+    """
+    Inicia sesión para un usuario.
+
+    Requiere:
+        - JSON con email y contraseña.
+    
+    Funcionalidad:
+        - Valida credenciales.
+        - Verifica si el dispositivo es confiable.
+        - Aplica límites de acceso por IP.
+        - Retorna tokens de acceso y refresh si la autenticación es exitosa.
+
+    Returns:
+        JSON con status, mensaje, datos (tokens) y código HTTP correspondiente.
+    """
     session = SessionLocal()
     try:
         data = request.get_json()
@@ -61,6 +89,20 @@ def login1():
     is_public=False
 )
 def logout_usuario() -> tuple[dict[Any, Any], Any] | tuple[dict[Any, Any], Literal[500]]:
+    """
+    Finaliza la sesión del usuario autenticado.
+
+    Requiere:
+        - JWT válido.
+        - JSON con el campo `refresh_jti`.
+
+    Funcionalidad:
+        - Invalida los tokens `access` y `refresh`.
+        - Elimina el refresh token de la base de datos o blacklist.
+
+    Returns:
+        JSON indicando éxito o error, con código HTTP adecuado.
+    """
     session = SessionLocal()
     try:
         data = request.get_json()
@@ -100,6 +142,21 @@ def logout_usuario() -> tuple[dict[Any, Any], Any] | tuple[dict[Any, Any], Liter
     limiter=["6 per minute"],
 )
 def modificar_perfil():
+    """
+    Modifica el nombre de usuario y/o email del usuario autenticado.
+
+    Requiere:
+        - JWT válido.
+        - JSON con uno o ambos campos: `nombre_usuario`, `email_usuario`.
+
+    Funcionalidad:
+        - Valida datos con `UsuarioModificarSchema`.
+        - Aplica los cambios al perfil.
+        - Devuelve el nuevo estado del usuario.
+
+    Returns:
+        JSON con status, mensaje y nuevos datos del perfil.
+    """
     session = SessionLocal()
     try:
         usuario_id = ComponentRequest.get_user_id()
@@ -138,6 +195,19 @@ def modificar_perfil():
     limiter="2 per day",
 )
 def eliminar_usuario():
+    """
+    Elimina lógicamente al usuario autenticado.
+
+    Requiere:
+        - JWT válido.
+
+    Funcionalidad:
+        - Marca el usuario como eliminado (`eliminado = True`).
+        - Setea el campo `deleted_at` con timestamp actual.
+
+    Returns:
+        JSON indicando éxito o error.
+    """
     session = SessionLocal()
     try:
         usuario_id = ComponentRequest.get_user_id()
@@ -163,6 +233,19 @@ def eliminar_usuario():
     cache=CacheSettings(expiration=60, params=["id_usuario"]),
 )
 def perfil_usuario():
+    """
+    Devuelve los datos del usuario autenticado.
+
+    Requiere:
+        - JWT válido.
+
+    Funcionalidad:
+        - Retorna nombre, email y otros datos del perfil.
+        - Usa sistema de caché por `id_usuario` para mejorar rendimiento.
+
+    Returns:
+        JSON con datos del perfil del usuario y código HTTP correspondiente.
+    """
     session = SessionLocal()
     try:
         usuario_id = ComponentRequest.get_user_id()
