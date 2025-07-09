@@ -3,6 +3,17 @@ import { Separator } from "@/components/ui/separator";
 import { Link } from "react-router-dom";
 import { isAdmin, hasToken } from "@/context/AuthContext";
 
+// Variables de entorno
+const {
+  VITE_PAGINA_WEB: paginaWeb = 'coronelsuarez.gob.ar',
+  VITE_TELEFONOS: telefonos = '2926429200;2926429371',
+  VITE_EMAILS: emails = 'coronelsuarez@gob.ar',
+  VITE_DIRECCION: direccion = 'Av. Alsina 150 (7540) Coronel Suárez Buenos Aires - Argentina',
+  VITE_DIRECCION_URL: direccionUrl = 'https://www.openstreetmap.org/#map=20/-37.4445931/-61.9241133&layers=H',
+  VITE_FACEBOOK: facebook = 'https://www.facebook.com/suarezmunicipio/?locale=es_LA',
+  VITE_INSTAGRAM: instagram = 'https://www.instagram.com/suarezmunicipio/?hl=es'
+} = import.meta.env;
+
 const Footer = () => {
   const [_isAdmin, setIsAdmin] = useState(false);
   useEffect(() => {
@@ -28,7 +39,7 @@ const Footer = () => {
               Plataforma de Registro de Identidades, Servicios y Módulos Asociados
             </p>
             <p className="mt-4 text-sm text-gray-800">
-              <a href="https://www.coronelsuarez.gob.ar">coronelsuarez.gob.ar</a>
+              <a href={`https://${paginaWeb}`}>{paginaWeb}</a>
             </p>
           </div>
         </div>
@@ -38,45 +49,40 @@ const Footer = () => {
           </p>
           <div className="flex">
             <p className="mr-1 text-gray-800 ">Teléfono:</p>
-            <a
-              href="tel:2926429200"
-              aria-label="Nuestro teléfono"
-              title="Nuestro teléfono"
-              className="transition-colors duration-300 text-deep-purple-accent-400 hover:text-deep-purple-800 mr-1"
-            >
-              +54 (2926) 429200
-            </a>
-            <a
-              href="tel:2926429371"
-              aria-label="Nuestro teléfono"
-              title="Nuestro teléfono"
-              className="transition-colors duration-300 text-deep-purple-accent-400 hover:text-deep-purple-800 mr-1"
-            >
-              +54 (2926) 429371
-            </a>
+            {telefonos.split(';').map((telefono, index) => (
+              <a
+                key={index}
+                href={`tel:${telefono.replace(/[^\d+]/g, '')}`}
+                aria-label="Nuestro teléfono"
+                title="Nuestro teléfono"
+                className="transition-colors duration-300 text-deep-purple-accent-400 hover:text-deep-purple-800 mr-1"
+              >
+                {telefono}
+              </a>
+            ))}
           </div>
           <div className="flex">
             <p className="mr-1 text-gray-800">Correo electrónico:</p>
             <a
-              href="mailto:comunicaciones@coronelsuarez.gob.ar"
+              href={`mailto:${emails}`}
               aria-label="Nuestro correo"
               title="Nuestro correo"
               className="transition-colors duration-300 text-deep-purple-accent-400 hover:text-deep-purple-800"
             >
-              comunicaciones@coronelsuarez.gob.ar
+              {emails}
             </a>
           </div>
           <div className="flex">
             <p className="mr-1 text-gray-800">Dirección:</p>
             <a
-              href="https://www.openstreetmap.org/#map=20/-37.4445931/-61.9241133&layers=H"
+              href={direccionUrl}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Nuestra dirección"
               title="Nuestra dirección"
               className="transition-colors duration-300 text-deep-purple-accent-400 hover:text-deep-purple-800"
             >
-              Av. Alsina 150 (7540) Coronel Suárez Buenos Aires - Argentina
+              {direccion}
             </a>
           </div>
         </div>
@@ -86,7 +92,7 @@ const Footer = () => {
           </span>
           <div className="flex items-center mt-1 space-x-3">
             <a
-              href="https://www.instagram.com/suarezmunicipio/?hl=es"
+              href={instagram}
               className="text-gray-500 transition-colors duration-300 hover:text-deep-purple-accent-400"
             >
               <svg viewBox="0 0 30 30" fill="currentColor" className="h-6">
@@ -95,7 +101,7 @@ const Footer = () => {
               </svg>
             </a>
             <a
-              href="https://www.facebook.com/suarezmunicipio/?locale=es_LA"
+              href={facebook}
               className="text-gray-500 transition-colors duration-300 hover:text-deep-purple-accent-400"
             >
               <svg viewBox="0 0 24 24" fill="currentColor" className="h-5">
