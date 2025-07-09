@@ -88,7 +88,6 @@ export default function AdminRoles() {
 
   function groupPermissionsByModule(permisos) {
     const resultado = {};
-    console.log("Formateando permisos:", permisos);
     if (!Array.isArray(permisos)) return resultado;
 
     permisos.forEach((permiso) => {
@@ -106,7 +105,6 @@ export default function AdminRoles() {
 
       if (!resultado[modulo]) resultado[modulo] = [];
       resultado[modulo].push(formateado);
-      console.log(`Agregando permiso: ${formateado} al módulo: ${modulo}`);
     });
     return resultado;
   }
@@ -299,7 +297,7 @@ export default function AdminRoles() {
         )}
 
         <RoleAssignmentWithSearch
-          usuarios={usuarios}
+          usuarios={usuarios.filter(u => u.nombre_usuario !== "superadmin")}
           selectedUserId={selectedUserId}
           setSelectedUserId={setSelectedUserId}
           roles={roles}

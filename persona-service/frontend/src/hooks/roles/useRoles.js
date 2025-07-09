@@ -37,6 +37,7 @@ export function useRoles(showError = (msg) => console.error(msg)) {
             try {
                 const userData = await userService.getAllUsers();
                 setUsuarios(Array.isArray(userData) ? userData : []);
+                console.log("Usuarios obtenidos:", userData);
             } catch (error) {
                 console.error(error);
             }
