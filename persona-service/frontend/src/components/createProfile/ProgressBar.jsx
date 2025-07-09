@@ -6,7 +6,7 @@ export const ProgressBar = ({ currentStep, setCurrentStep, steps, size = 10 }) =
       {steps.map((step, index) => (
         <div key={index} className="flex flex-col items-center cursor-pointer" onClick={() => setCurrentStep&&setCurrentStep(index)}>
           <div
-            className={`w-${size} h-${size} rounded-full flex items-center justify-center text-sm font-medium
+            className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium
               ${currentStep >= index ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}
           >
             {index + 1}

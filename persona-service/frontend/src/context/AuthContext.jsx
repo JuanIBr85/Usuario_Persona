@@ -11,14 +11,12 @@ const defaultData = Object.freeze({
     token: "",
     otp_code: "",
     user: {
-        access_jti: "",
         email_usuario: "",
         expires_in: null, // Date
         id_usuario: 0,
         id_persona: 0,
         nombre_usuario: "",
         refresh_expires: "",
-        refresh_jti: "",
         refresh_token: "",
         rol: [],
         token: ""
