@@ -2,9 +2,11 @@ from typing import Any, Literal
 from app.schemas.usuarios_schema import UsuarioModificarSchema
 from marshmallow import ValidationError
 from common.utils.component_request import ComponentRequest
-from flask import request, Blueprint
+from flask import request, Blueprint, render_template
 from app.database.session import SessionLocal
 from app.services.usuario_service import UsuarioService
+from app.models.usuarios import Usuario
+from app.utils.jwt import decodificar_token_cambio_email
 from common.decorators.api_access import api_access
 from common.models.cache_settings import CacheSettings
 from common.utils.response import make_response, ResponseStatus
@@ -264,6 +266,69 @@ def perfil_usuario():
             500,
         )
 
+    finally:
+        session.close()
+
+@bp.route("/cambiar-email", methods=["POST"])
+@api_access(
+    is_public=False,
+)
+def solicitar_cambio_email():
+    session = SessionLocal()
+    try:
+        usuario_id = ComponentRequest.get_user_id()
+        data = request.get_json()
+        nuevo_email = data.get("nuevo_email")
+        password = data.get("password")
+
+        if not nuevo_email or not password:
+            return make_response(
+                ResponseStatus.FAIL,
+                "Nuevo email y contraseña requeridos",
+                error_code="NO_INPUT",
+            ), 400
+
+        status, mensaje, contenido, code = usuario_service.solicitar_cambio_email(
+            session, usuario_id, password, nuevo_email
+        )
+        return make_response(status, mensaje, contenido), code
+    except Exception as e:
+        return (
+            make_response(
+                ResponseStatus.ERROR,
+                "Error al solicitar cambio de correo",
+                str(e),
+                error_code="CAMBIO_EMAIL_ERROR",
+            ),
+            500,
+        )
+    finally:
+        session.close()
+
+
+@bp.route("/confirmar-cambio-email", methods=["GET"])
+@api_access(
+    is_public=True,
+    limiter=["1 per minute", "5 per day"],
+)
+def confirmar_cambio_email():
+    token = request.args.get("token")
+    if not token:
+        return "Token faltante", 400
+    session = SessionLocal()
+    try:
+        datos = decodificar_token_cambio_email(token)
+        usuario_id = datos.get("sub")
+        nuevo_email = datos.get("nuevo_email")
+        usuario = session.query(Usuario).filter_by(id_usuario=usuario_id, eliminado=False).first()
+        if not usuario:
+            return render_template("usuario_no_encontrado.html"), 404
+        usuario.email_usuario = nuevo_email
+        usuario.email_verificado = False
+        session.commit()
+        return render_template("correo_actualizado.html", email=nuevo_email)
+    except ValueError:
+        return render_template("token_invalido.html"), 400
     finally:
         session.close()
 

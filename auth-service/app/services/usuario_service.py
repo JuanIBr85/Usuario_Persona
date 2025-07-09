@@ -13,6 +13,7 @@ from app.utils.jwt import (
     generar_token_reset,
     crear_token_refresh,
     create_access_token,
+    generar_token_cambio_email,
 )
 from app.schemas.usuarios_schema import (
     LoginSchema,
@@ -25,11 +26,13 @@ from app.schemas.usuarios_schema import (
 from marshmallow import ValidationError
 from app.services.servicio_base import ServicioBase
 from app.models.permisos import Permiso
+from flask import current_app
 from app.utils.email import (
     enviar_codigo_por_email,
     enviar_codigo_por_email_registro,
     enviar_solicitud_restauracion_admin,
     enviar_email_validacion_dispositivo,
+    enviar_mail_cambio_email,
 )
 from app.utils.otp_manager import (
     guardar_otp,
@@ -574,6 +577,32 @@ class UsuarioService(ServicioBase):
         session.commit()
 
         return ResponseStatus.SUCCESS, "Contraseña actualizada correctamente", None, 200
+    
+    def solicitar_cambio_email(
+        self, session: Session, usuario_id: int, password: str, nuevo_email: str
+    ) -> dict:
+        usuario = session.query(Usuario).filter_by(id_usuario=usuario_id, eliminado=False).first()
+        if not usuario:
+            return ResponseStatus.FAIL, "Usuario no encontrado", None, 404
+
+        if not check_password_hash(usuario.password, password):
+            return ResponseStatus.FAIL, "Contraseña incorrecta", None, 401
+
+        if usuario.email_usuario == nuevo_email:
+            return ResponseStatus.FAIL, "El nuevo email es igual al actual", None, 400
+
+        existente = session.query(Usuario).filter_by(email_usuario=nuevo_email).first()
+        if existente:
+            return ResponseStatus.FAIL, "El email ya está en uso", None, 409
+
+        try:
+            token = generar_token_cambio_email(usuario.id_usuario, nuevo_email)
+            enlace = f"{current_app.config['EMAIL_CHANGE_URL']}?token={token}"
+            enviar_mail_cambio_email(usuario, nuevo_email, enlace)
+            return ResponseStatus.SUCCESS, "Correo de confirmación enviado", None, 200
+        except Exception as e:
+            traceback.print_exc()
+            return ResponseStatus.ERROR, "Error al enviar correo", str(e), 500
 
 
     def refresh_token(self, session: Session, usuario_id: int) -> dict:

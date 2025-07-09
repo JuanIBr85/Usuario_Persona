@@ -194,4 +194,27 @@ def enviar_mail_confirmacion_usuario(usuario, enlace):
         recipients=[usuario.email_usuario],
         html=html,
     )
+    
     mail.send(msg)
+
+def enviar_mail_cambio_email(usuario, nuevo_email, enlace):
+    saludo = f"<p>Hola <strong>{usuario.nombre_usuario}</strong>,</p>"
+    cuerpo = """
+        <p>Para confirmar tu nuevo correo electrónico, hacé clic en el botón a continuación:</p>
+    """
+    extra = f"""
+        <p style="margin-top:20px;text-align:center;">
+            <a href="{enlace}" style="background-color:white;color:black;padding:12px 24px;text-decoration:none;border-radius:5px;font-weight:bold;">Confirmar correo</a>
+        </p>
+    """
+
+    html = render_email_template(saludo, cuerpo, extra)
+
+    msg = Message(
+        subject="Confirmar cambio de correo",
+        recipients=[nuevo_email],
+        html=html,
+    )
+    
+    mail.send(msg)
+    

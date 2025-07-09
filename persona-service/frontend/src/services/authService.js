@@ -144,6 +144,26 @@ logout: async () => {
     });
   },
 
+  changeEmail: async (body) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/cambiar-email`,
+      method: HttpMethod.POST,
+      body: body,
+      useToken: true,
+      showError: AuthService.showError,
+    });
+  },
+
+  changeUsername: async (body) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/modificar`,
+      method: HttpMethod.POST,
+      body: body,
+      useToken: true,
+      showError: AuthService.showError,
+    });
+  },
+
   deleteUser: async () => {
     return fetchService.fetch({
       url: `${ServiceURL.auth}/eliminar`,

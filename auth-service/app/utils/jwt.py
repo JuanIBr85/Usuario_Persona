@@ -161,3 +161,24 @@ def decodificar_token_verificacion(token: str) -> dict:
         raise ValueError("Token expirado.")
     except InvalidTokenError:
         raise ValueError("Token inválido.")
+    
+def generar_token_cambio_email(user_id: int, nuevo_email: str) -> str:
+    payload = {
+        "sub": user_id,
+        "nuevo_email": nuevo_email,
+        "type": "cambio_email",
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=30)
+    }
+    return encode(payload, getenv("JWT_SECRET_KEY"), algorithm="HS256")
+
+
+def decodificar_token_cambio_email(token: str) -> dict:
+    try:
+        datos = decode(token, getenv("JWT_SECRET_KEY"), algorithms=["HS256"])
+        if datos.get("type") != "cambio_email":
+            raise ValueError("Token inválido.")
+        return datos
+    except ExpiredSignatureError:
+        raise ValueError("Token expirado.")
+    except InvalidTokenError:
+        raise ValueError("Token inválido.")
