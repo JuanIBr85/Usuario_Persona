@@ -9,6 +9,7 @@ from app.services.persona_service import PersonaService
 from app.schema.persona_vincular_schema import (
     ValidarDocumentoEmailSchema,
     ValidarOtpSchema,
+    VerificarIdentidadSchema
 )
 from app.schema.persona_schema import PersonaSchema
 from app.models.persona_model import Persona
@@ -627,23 +628,16 @@ def verificar_identidad():
     try:
         data = request.get_json() or {}
 
-        required_fields = ["persona_id", "nombre", "apellido", "fecha_nacimiento", "telefono_movil"]
-        if not all(field in data and data[field] for field in required_fields):
-            return (
-                make_response(
-                    ResponseStatus.ERROR,
-                    "Todos los campos son obligatorios.",
-                ),
-                400,
-            )
+        schema = VerificarIdentidadSchema()
+        datos_validados = schema.load(data)
 
         result = persona_service.verificar_datos_personales(
-            persona_id=data["persona_id"],
+            persona_id=datos_validados["persona_id"],
             datos_usuario={
-                "nombre": data["nombre"],
-                "apellido": data["apellido"],
-                "fecha_nacimiento": data["fecha_nacimiento"],
-                "telefono_movil": data["telefono_movil"],
+                "nombre": datos_validados["nombre"],
+                "apellido": datos_validados["apellido"],
+                "fecha_nacimiento": datos_validados["fecha_nacimiento"],
+                "telefono_movil": datos_validados["telefono_movil"],
             },
         )
 
@@ -659,6 +653,9 @@ def verificar_identidad():
             make_response(status, result["mensaje"]),
             200 if result["coinciden"] else 400,
         )
+    
+    except ValidationError as err:
+        return make_response(ResponseStatus.ERROR, "Datos inválidos.", err.messages), 400
     
     except SQLAlchemyError as e:
         logging.error(f"Database error: {type(e).__name__}")
