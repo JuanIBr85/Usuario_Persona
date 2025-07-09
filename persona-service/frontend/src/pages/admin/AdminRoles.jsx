@@ -297,7 +297,7 @@ export default function AdminRoles() {
         )}
 
         <RoleAssignmentWithSearch
-          usuarios={usuarios.filter(u => u.nombre_usuario !== "superadmin")}
+          usuarios={usuarios.filter(u => u.id !== 1)}
           selectedUserId={selectedUserId}
           setSelectedUserId={setSelectedUserId}
           roles={roles}

@@ -12,7 +12,7 @@ export default function RoleList({ roles, onEdit, onDelete, formatPermissionName
                 </CardHeader>
                 <CardContent className="flex flex-col gap-4">
                     {roles.map((role) => {
-                        const isSuperadminRole = role.name.trim().toLowerCase() === "superadmin";
+                        const isSuperadminRole = role.id === 1;
                         return (
                             <Card key={role.id} className="shadow-sm">
                                 <CardHeader className="flex flex-col justify-between pb-2 md:flex-row md:items-center">
