@@ -42,6 +42,8 @@ def request_to_service(url:str):
         # Guardo el id del usuario en X-USER-ID en el header
         headers["X-USER-ID"] = g.jwt["sub"]
         headers["X-JWT-JTI"] = g.jwt["jti"]
+        headers["X-JWT-JTI-REFRESH"] = g.jwt["jti_refresh"]
+        
 
     headers["X-CLIENT-IP"] = request.remote_addr
     headers["X-CLIENT-USER-AGENT"] = request.user_agent.string

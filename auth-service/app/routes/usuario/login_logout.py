@@ -1,3 +1,4 @@
+import traceback
 from typing import Any, Literal
 from app.schemas.usuarios_schema import UsuarioModificarSchema
 from marshmallow import ValidationError
@@ -73,6 +74,7 @@ def login1():
         return make_response(status, mensaje, data), code
 
     except Exception as e:
+        traceback.print_exc()
         return (
             make_response(
                 ResponseStatus.ERROR, "Error en login", str(e), error_code="LOGIN_ERROR"
@@ -103,12 +105,17 @@ def logout_usuario() -> tuple[dict[Any, Any], Any] | tuple[dict[Any, Any], Liter
     Returns:
         JSON indicando éxito o error, con código HTTP adecuado.
     """
+    usuario_id = ComponentRequest.get_user_id()
+
+    if not usuario_id: 
+        return "ok", 200
+
     session = SessionLocal()
     try:
-        data = request.get_json()
-        refresh_jti = data.get("refresh_jti")
+        #data = request.get_json()
+        refresh_jti = ComponentRequest.get_refresh_jti()#data.get("refresh_jti")
         jwt_jti = ComponentRequest.get_jti()
-        usuario_id = ComponentRequest.get_user_id()
+        #usuario_id = ComponentRequest.get_user_id()
         
         if not all([jwt_jti, refresh_jti, usuario_id]):
             return make_response(

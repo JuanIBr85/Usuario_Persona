@@ -48,3 +48,14 @@ class ComponentRequest:
             Optional[str]: El JTI del token JWT si está presente, None en caso contrario.
         """
         return request.headers.get("X-JWT-JTI")
+
+    @staticmethod
+    def get_refresh_jti() -> Optional[str]:
+        """
+        Obtiene el JTI del token de refresco JWT desde los headers de la solicitud.
+
+        Returns:
+            Optional[str]: El JTI del token de refresco JWT si está presente, None en caso contrario.
+        """
+        return request.headers.get("X-JWT-JTI-REFRESH")
+

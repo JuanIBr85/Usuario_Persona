@@ -310,14 +310,16 @@ class UsuarioService(ServicioBase):
                 )
 
             else:
+                # Crear token de refresh
+                refresh_token, refresh_expires, jti_refresh = crear_token_refresh(usuario.id_usuario)
                 # Crear token con permisos incluidos
                 token, expires_in, expires_seconds = crear_token_acceso(
-                    usuario.id_usuario, usuario.email_usuario
+                    usuario.id_usuario, usuario.email_usuario, jti_refresh
                 )
         except Exception as error:
-            return ResponseStatus.FAIL, "error de dispositivo ", error.messages, 400
+            return ResponseStatus.FAIL, "error de dispositivo ", str(error), 400
 
-        refresh_token, refresh_expires, jti_refresh = crear_token_refresh(usuario.id_usuario)
+        
         try:
             registrar_refresh_token(jti_refresh, refresh_expires)
         except Exception as e:
@@ -350,8 +352,8 @@ class UsuarioService(ServicioBase):
         usuario_data["refresh_token"] = refresh_token
         usuario_data["refresh_expires"] = refresh_expires.isoformat()
         usuario_data["rol"] = roles_nombres
-        usuario_data["access_jti"] = jti_acceso
-        usuario_data["refresh_jti"] = jti_refresh
+        #usuario_data["access_jti"] = jti_acceso
+        #usuario_data["refresh_jti"] = jti_refresh
 
         return ResponseStatus.SUCCESS, "Login exitoso.", usuario_data, 200
 

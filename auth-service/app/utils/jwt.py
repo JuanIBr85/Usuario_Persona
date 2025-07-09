@@ -7,7 +7,7 @@ from app.extensions import get_redis
 from typing import Optional,Tuple
 
 
-def crear_token_acceso(usuario_id, email):
+def crear_token_acceso(usuario_id, email,jti_refresh):
     expires_seconds = int(getenv("JWT_ACCESS_TOKEN_EXPIRES", 60 * 15))
     expires_delta = timedelta(seconds=expires_seconds)
     expires_at = datetime.now(timezone.utc) + expires_delta
@@ -18,6 +18,7 @@ def crear_token_acceso(usuario_id, email):
             additional_claims={
                 "sub": str(usuario_id),
                 "email": email,
+                "jti_refresh":jti_refresh,
                 "exp": expires_at,
             },
             expires_delta=expires_delta,

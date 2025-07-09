@@ -18,6 +18,7 @@ function makeAuthRouteConfig({ roles = [], loginRequired = true, isAdmin = true 
 }
 
 export const AuthRouteConfig = {
+    "*": makeAuthRouteConfig({ loginRequired: false }),  
     // Rutas públicas (sin autenticación)
     "/auth/login": makeAuthRouteConfig({ loginRequired: false }),
     "/auth/logout": makeAuthRouteConfig({ loginRequired: true, isAdmin: false }),
