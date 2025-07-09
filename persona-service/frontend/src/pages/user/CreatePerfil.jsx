@@ -11,6 +11,7 @@ import Contacto from '@/components/createProfile/steps/Contacto';
 import Domicilio from '@/components/createProfile/steps/Domicilio';
 import InfoAdicional from '@/components/createProfile/steps/InfoAdicional';
 import Resumen from '@/components/createProfile/steps/Resumen';
+import { useAuthContext } from "@/context/AuthContext";
 
 import { PersonaService } from '@/services/personaService';
 
@@ -20,6 +21,13 @@ function CreatePerfil() {
   const refForm = useRef(null);
   const [newUser, setNewUser] = useState({});
   const navigate = useNavigate();
+  const { authData } = useAuthContext();
+
+  useEffect(() => {
+    if (authData?.user?.id_persona && authData?.user?.id_persona !== 0) {
+      navigate('/profile');
+    }
+  }, [authData])
 
   const [staticData, setStaticData] = useState({
     estados_civiles: [],
@@ -111,7 +119,7 @@ function CreatePerfil() {
       .crear_perfil(data)
       .then(response => {
         alert("Perfil creado exitosamente");
-        setTimeout(() => navigate("/profile"), 2000);
+        setTimeout(() => navigate("/searchprofile"), 2000);
       })
       .catch(error => {
         console.log(error)

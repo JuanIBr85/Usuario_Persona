@@ -46,17 +46,23 @@ export const AuthRouteConfig = {
     // Rutas de usuario
     "/profile": makeAuthRouteConfig({  isAdmin: false }),
     "/createperfil": makeAuthRouteConfig({  isAdmin: false }),
-    "/perfilconnect": makeAuthRouteConfig({  isAdmin: false }),
+    "/searchprofile": makeAuthRouteConfig({  isAdmin: false }),
+    "/profileconnect": makeAuthRouteConfig({  isAdmin: false }),
 
     // Ruta de cierre de sesión
     "/auth/logout": makeAuthRouteConfig({ isAdmin: false })
 };
 
 export const hasAccess = (path) => {
-    //Si el usuario es super administrador se permite acceso
-    if(isSuperAdmin()) return true;
+    const routeConfig = AuthRouteConfig[path.toLowerCase()];
 
-    const routeConfig = AuthRouteConfig[path];
+    if(!routeConfig){
+        alert("Ruta sin configurar");
+    }
+
+     //Si el usuario es super administrador se permite acceso
+     if(isSuperAdmin()) return true;
+
     //Si la ruta no requiere autenticacion se permite acceso
     if (!routeConfig.loginRequired) return true;
     //Si no hay token se deniega acceso
@@ -74,7 +80,7 @@ export const hasAccess = (path) => {
     //Filtro los roles que empiezan con "!"
     .filter((rol) => rol.startsWith("!"))
     //Quito el "!" del rol
-    .map((rol) => rol.slice(1));
+    .map((rol) => rol.slice(1).toLowerCase());
 
     //Compruebo que el usuario tenga ninguno de los roles 
     const every = required_roles.every(hasRol);
@@ -87,6 +93,7 @@ export const hasAccess = (path) => {
     .from(routeConfig.roles)
     //Filtro los roles que no empiezan con "!"
     .filter((rol) => !rol.startsWith("!"))
+    .map((rol) => rol.toLowerCase())
     //Compruebo que el usuario tenga almenos uno de estos roles
     .some(hasRol)||false;
 

@@ -14,7 +14,7 @@ import { Documento } from "@/components/connectProfile/steps/Documento";
 import { VerificarEmail } from "@/components/connectProfile/steps/VerificarEmail";
 import { VerificarOTP } from "@/components/connectProfile/steps/VerificarOTP";
 import { VerificarIdentidad } from "@/components/connectProfile/steps/VerificarIdentidad";
-
+import { useAuthContext } from "@/context/AuthContext";
 
 function PerfilConnect() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -25,6 +25,13 @@ function PerfilConnect() {
   const [tempData, setTempData] = useState({});
   const formRef = useRef(null);
   const navigate = useNavigate();
+  const { authData } = useAuthContext();
+
+  useEffect(()=>{
+    if(authData?.user?.id_persona && authData?.user?.id_persona !== 0){
+      navigate('/profile');
+    }
+  }, [authData])
 
   useEffect(() => {
     PersonaService.get_tipos_documentos()
@@ -87,7 +94,7 @@ function PerfilConnect() {
         ...tempData,
         ...formData
       });
-      navigate('/profile');
+      navigate('/searchprofile');
     } catch (error) {
       console.error(error);
     } finally {

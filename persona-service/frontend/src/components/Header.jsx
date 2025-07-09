@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import Hamburger from "hamburger-react";
 
-import {isAdmin, hasToken} from "@/context/AuthContext";
+import {isAdmin, hasToken, hasProfile} from "@/context/AuthContext";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -62,7 +62,7 @@ const Header = () => {
                   Panel de Administrador
                 </NavLink>
               </li>
-              <li>
+              {hasProfile() ? <li>
                 <NavLink
                   to="/profile"
                   className={({ isActive }) =>
@@ -76,7 +76,7 @@ const Header = () => {
                 >
                   Perfil
                 </NavLink>
-              </li>
+              </li>:<></>}
               <li>
                 <NavLink to="/auth/logout">Cerrar Sesión</NavLink>
               </li>
@@ -101,11 +101,11 @@ const Header = () => {
                 Panel de Administrador
               </NavLink>
             </li>
-            <li>
+            {hasProfile() ? <li>
               <NavLink to="/profile" onClick={() => setIsOpen(false)}>
                 Perfil
               </NavLink>
-            </li>
+            </li>:<></>}
             <li>
               <NavLink to="/auth/logout" onClick={() => setIsOpen(false)}>
                 Cerrar Sesión

@@ -11,11 +11,17 @@ const defaultData = Object.freeze({
     token: "",
     otp_code: "",
     user: {
-        id_usuario: 0,
-        nombre_usuario: "",
+        access_jti: "",
         email_usuario: "",
+        expires_in: null, // Date
+        id_usuario: 0,
+        id_persona: 0,
+        nombre_usuario: "",
+        refresh_expires: "",
+        refresh_jti: "",
+        refresh_token: "",
         rol: [],
-        expires_in: null//Date
+        token: ""
     },
 });
 
@@ -84,6 +90,12 @@ function AuthContextProvider({ children }) {
             //console.log("Datos de usuario actualizados", newData.user);
             return newData;
         });
+    };
+
+    const updateUserData = (values) => {
+        updateData({
+            user: { ...authData.user, ...values }
+        })
     };
 
 
@@ -168,7 +180,7 @@ function AuthContextProvider({ children }) {
         }
 
         if(check && !hasAccess(location.pathname)){
-            _navigate("/profile")
+            _navigate("/searchprofile")
         }
         
     }, [location]);
@@ -275,9 +287,9 @@ function AuthContextProvider({ children }) {
             title: "No autorizado",
             description: errorMessage,
             action: async () => {
-                //await _navigate('/profile');
+                //await _navigate('/searchprofile');
                 //Me aseguro de que se recargue la pagina
-                window.location.href = "/profile";
+                window.location.href = "/searchprofile";
                 //location.reload();
                 setIsUnauthorizedRoute(false);
             },
@@ -293,7 +305,8 @@ function AuthContextProvider({ children }) {
             encode,
             decode,
             timeLeftToExpire,
-            unauthorizedUser
+            unauthorizedUser,
+            updateUserData
         }}>
             {dialog && <SimpleDialog
                 title={dialog.title}
@@ -331,6 +344,10 @@ export const isUsuario = () => {
 
 export const hasToken = () => {
     return tempAuthData?.user?.expires_in !== null && tempAuthData?.user?.expires_in !== undefined;
+}
+
+export const hasProfile = () => {
+    return tempAuthData?.user?.id_persona && tempAuthData?.user?.id_persona !== 0;
 }
 
 export default AuthContextProvider;
