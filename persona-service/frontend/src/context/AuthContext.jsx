@@ -179,7 +179,8 @@ function AuthContextProvider({ children }) {
             setTimeout(() => setIsFirstCheck(false), 1000);
         }
 
-        if(check && !hasAccess(location.pathname)){
+        const pathname = location.pathname.replace(/\/\d+$/, '')
+        if(check && !hasAccess(pathname)){
             _navigate("/searchprofile")
         }
         

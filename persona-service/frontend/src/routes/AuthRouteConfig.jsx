@@ -41,9 +41,9 @@ export const AuthRouteConfig = {
     "/adminservices": makeAuthRouteConfig({ roles: ADMIN_COMPONENTES, isAdmin: true }),
     "/adminroles": makeAuthRouteConfig({ roles: ADMIN_ROLES, isAdmin: true }),
     "/adminservices/components": makeAuthRouteConfig({ roles: ADMIN_COMPONENTES, isAdmin: true }),
-    "/adminservices/components/:id": makeAuthRouteConfig({ roles: ADMIN_COMPONENTES, isAdmin: true }),
+    "/adminservices/components": makeAuthRouteConfig({ roles: ADMIN_COMPONENTES, isAdmin: true }),
     "/adminservices/endpoints-research": makeAuthRouteConfig({ roles: ADMIN_COMPONENTES, isAdmin: true }),
-    "/persondetails/:id": makeAuthRouteConfig({ roles: ADMIN_PERSONA, isAdmin: true }),
+    "/persondetails": makeAuthRouteConfig({ roles: ADMIN_PERSONA, isAdmin: true }),
 
     // Rutas de usuario
     "/profile": makeAuthRouteConfig({  isAdmin: false }),
