@@ -36,7 +36,7 @@ function PerfilConnect() {
 
   useEffect(()=>{
     if(authData?.user?.id_persona && authData?.user?.id_persona !== 0){
-      //navigate('/profile');
+      navigate('/profile');
     }
   }, [authData])
 
@@ -46,8 +46,13 @@ function PerfilConnect() {
         setTipoDocumento(response.data)
       })
       .catch(error => {
-        console.log(error)
-      })
+        setDialog({
+          title: "Hubo un error",
+          actionName: "Cerrar",
+          description: "Hubo un error al obtener los tipos de documentos",
+          action: () => window.location.reload(),
+        });
+      });
   }, [])
 
   const handleDNIVerificacion = async (event) => {
@@ -93,10 +98,19 @@ function PerfilConnect() {
         ...formData
       });
       setTempData({ ...response.data });
-      nextStep();
+
+      setDialog({
+        title: "Verificación exitosa",
+        actionName: "Continuar",
+        description: "Se envio un codigo de verificación a su correo electrónico",
+        action: () => nextStep(),
+      });
     } catch (error) {
-      console.error(error);
-      alert(error.data.message)
+      setDialog({
+        title: "Hubo un error",
+        actionName: "Cerrar",
+        description: error.data.message,
+      });
     } finally {
       setLoading(false);
     }
@@ -112,9 +126,19 @@ function PerfilConnect() {
         ...tempData,
         ...formData
       });
-      navigate('/searchprofile');
+
+      setDialog({
+        title: "Vinculacion exitosa",
+        actionName: "Continuar",
+        description: "Se vinculo exitosamente su perfil",
+        action: () => navigate('/searchprofile'),
+      });
     } catch (error) {
-      console.error(error);
+      setDialog({
+        title: "Hubo un error",
+        actionName: "Cerrar",
+        description: error.data.message,
+      });
     } finally {
       setLoading(false);
     }
@@ -178,6 +202,7 @@ function PerfilConnect() {
         actionHandle={dialog?.action}
         cancelHandle={dialog?.cancelAction}
         cancel={dialog?.cancelAction && "Cancelar"}
+        action={dialog?.actionName}
         isOpen={dialog}
         setIsOpen={() => setDialog(null)}
         className="sm:max-w-3xl"

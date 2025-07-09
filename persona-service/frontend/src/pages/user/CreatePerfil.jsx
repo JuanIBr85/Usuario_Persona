@@ -12,7 +12,7 @@ import Domicilio from '@/components/createProfile/steps/Domicilio';
 import InfoAdicional from '@/components/createProfile/steps/InfoAdicional';
 import Resumen from '@/components/createProfile/steps/Resumen';
 import { useAuthContext } from "@/context/AuthContext";
-
+import { SimpleDialog } from '@/components/SimpleDialog';
 import { PersonaService } from '@/services/personaService';
 const steps = ['Datos Personales', 'Contacto', 'Domicilio', 'Información Adicional', 'Resumen'];
 
@@ -24,6 +24,8 @@ function CreatePerfil() {
   const navigate = useNavigate();
   const { authData } = useAuthContext();
   const location = useLocation();
+  const [dialog, setDialog] = useState(null);
+  
 
 
   useEffect(() => {
@@ -119,7 +121,11 @@ function CreatePerfil() {
 
   const handleSubmit = async () => {
     if (!refForm.current.checkValidity()) {
-      alert("Por favor, completa todos los campos correctamente.")
+      setDialog({
+        title: "Error",
+        actionName: "Cerrar",
+        description: "Por favor, completa todos los campos correctamente.",
+      });
       return;
     }
 
@@ -128,12 +134,19 @@ function CreatePerfil() {
     PersonaService
       .crear_perfil(data)
       .then(response => {
-        alert("Perfil creado exitosamente");
-        setTimeout(() => navigate("/searchprofile"), 2000);
+        setDialog({
+          title:"Exito",
+          description: "Perfil creado exitosamente",
+          action:()=>navigate("/searchprofile")
+        })
       })
       .catch(error => {
         console.log(error)
-        alert("Error al crear el perfil");
+        setDialog({
+          title: "Error",
+          actionName: "Cerrar",
+          description: "Error al crear el perfil",
+        })
       });
   };
 
@@ -162,7 +175,7 @@ function CreatePerfil() {
         PersonaService.get_ocupaciones(),
         PersonaService.get_estudios_alcanzados()
       ]);
-
+ 
       setStaticData({
         estados_civiles: estados_civilesResponse?.data || [],
         ocupaciones: ocupacionesResponse?.data || [],
@@ -172,8 +185,12 @@ function CreatePerfil() {
       });
     } catch (error) {
       console.log(error);
-      alert("Error al cargar datos");
-      navigate("/*");
+      setDialog({
+        title: "Error",
+        actionName: "Cerrar",
+        description: "Error al cargar datos",
+        action:()=>window.location.reload()
+      });
     } finally {
       setIsLoading(false);
     }
@@ -199,6 +216,17 @@ function CreatePerfil() {
 
   return (
     <>
+    <SimpleDialog
+        title={dialog?.title}
+        description={dialog?.description}
+        actionHandle={dialog?.action}
+        cancelHandle={dialog?.cancelAction}
+        cancel={dialog?.cancelAction && "Cancelar"}
+        action={dialog?.actionName}
+        isOpen={dialog}
+        setIsOpen={() => setDialog(null)}
+        className="sm:max-w-3xl"
+      />
       <div className="container sm:mx-auto py-8">
         <Card className="sm:max-w-4xl mx-auto">
           <CardHeader className="text-center">
