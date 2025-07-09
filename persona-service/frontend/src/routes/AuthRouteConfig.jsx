@@ -20,6 +20,7 @@ function makeAuthRouteConfig({ roles = [], loginRequired = true, isAdmin = true 
 export const AuthRouteConfig = {
     // Rutas públicas (sin autenticación)
     "/auth/login": makeAuthRouteConfig({ loginRequired: false }),
+    "/auth/logout": makeAuthRouteConfig({ loginRequired: true, isAdmin: false }),
     "/auth/sign": makeAuthRouteConfig({ loginRequired: false }),
     "/auth/forgotpassword": makeAuthRouteConfig({ loginRequired: false }),
     "/auth/resetpassword": makeAuthRouteConfig({ loginRequired: false }),
@@ -27,7 +28,7 @@ export const AuthRouteConfig = {
     "/auth/otpregister": makeAuthRouteConfig({ loginRequired: false }),
     "/auth/otpregisterrecovery": makeAuthRouteConfig({ loginRequired: false }),
     "/auth/redirect": makeAuthRouteConfig({ loginRequired: false }),
-    "/termsofservice": makeAuthRouteConfig({ loginRequired: false }),
+    "/faq/termsofservice": makeAuthRouteConfig({ loginRequired: false }),
     "/faq/privacypolicy": makeAuthRouteConfig({ loginRequired: false }),
     "/faq/faq": makeAuthRouteConfig({ loginRequired: false }),
 
@@ -49,15 +50,14 @@ export const AuthRouteConfig = {
     "/searchprofile": makeAuthRouteConfig({  isAdmin: false }),
     "/profileconnect": makeAuthRouteConfig({  isAdmin: false }),
 
-    // Ruta de cierre de sesión
-    "/auth/logout": makeAuthRouteConfig({ isAdmin: false })
 };
 
 export const hasAccess = (path) => {
     const routeConfig = AuthRouteConfig[path.toLowerCase()];
 
     if(!routeConfig){
-        alert("Ruta sin configurar");
+        alert(`Ruta sin configurar: ${path}`);
+        return false;
     }
 
      //Si el usuario es super administrador se permite acceso
