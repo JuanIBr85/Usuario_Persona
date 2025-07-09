@@ -20,6 +20,22 @@ bp = Blueprint(
 
 usuario_service = UsuarioService()
 
+"""
+Blueprint: usuario_recuperacion_pass_otp
+
+Este módulo gestiona todas las rutas relacionadas con recuperación de contraseña, validación de dispositivos y rotación de tokens.
+
+Incluye:
+- Solicitud y verificación de códigos OTP.
+- Cambio de contraseña mediante token validado.
+- Confirmación de dispositivos confiables.
+- Rotación de tokens refresh.
+- Restauración de cuentas eliminadas.
+
+Cada endpoint valida los datos de entrada, maneja sesiones de base de datos y retorna respuestas uniformes usando `make_response`.
+
+Uso intensivo de JWT para seguridad y tokens temporales.
+"""
 # -----------------------------------------------------------------------------------------------------------------------------
 # RECUPERACIÓN DE PASSWORD CON OTP
 # -----------------------------------------------------------------------------------------------------------------------------
@@ -31,6 +47,19 @@ usuario_service = UsuarioService()
     limiter=["2 per minute", "5 per hour"]
 )
 def solicitar_otp():
+    """
+    Inicia el proceso de recuperación de contraseña.
+
+    Requiere:
+        - JSON con campo "email".
+
+    Funcionalidad:
+        - Verifica existencia del email.
+        - Genera y envía un código OTP temporal para el usuario.
+
+    Returns:
+        JSON con estado de la operación o errores.
+    """
     session = SessionLocal()
     try:
         email = request.json.get("email")
@@ -69,6 +98,19 @@ def solicitar_otp():
     limiter=["3 per minute", "10 per hour"],
 )
 def verificar_otp():
+    """
+    Verifica que el código OTP ingresado sea válido para el email.
+
+    Requiere:
+        - JSON con "email" y "otp".
+
+    Funcionalidad:
+        - Busca OTP válido para el email.
+        - Si es correcto, permite continuar con cambio de contraseña.
+
+    Returns:
+        JSON indicando éxito o error.
+    """
     session = SessionLocal()
     try:
         data = request.get_json()
@@ -111,6 +153,19 @@ def verificar_otp():
     limiter=["3 per day"],
 )
 def reset_con_otp():
+    """
+    Permite cambiar la contraseña usando un token válido previamente emitido.
+
+    Requiere:
+        - JSON con el nuevo password y token (JWT).
+
+    Funcionalidad:
+        - Verifica validez y formato del token.
+        - Cambia la contraseña del usuario correspondiente.
+
+    Returns:
+        JSON con resultado de la operación.
+    """
     session = SessionLocal()
     try:
         data = request.get_json()
@@ -179,6 +234,19 @@ def reset_con_otp():
     #cache=CacheSettings(expiration=1800, params=["token"]),
 )
 def verificar_dispositivo():
+    """
+    Confirma un nuevo dispositivo confiable a través de un token enviado por mail.
+
+    Requiere:
+        - Parámetro GET `token`.
+
+    Funcionalidad:
+        - Decodifica el token para obtener email, IP y user-agent.
+        - Registra un nuevo dispositivo confiable para ese usuario.
+
+    Returns:
+        HTML de confirmación o error.
+    """
     token = request.args.get("token")
     if not token:
         return "Token faltante", 400
@@ -225,6 +293,19 @@ def verificar_dispositivo():
     limiter=["1 per 30 seconds", "5 per hour"],  # limitacion estricta para no dejar crear mas de 5 jti_refresh basado en los 15 min q dura el access token.
 )
 def refresh_token():
+    """
+    Rota el refresh token para obtener nuevos tokens de acceso.
+
+    Requiere:
+        - JSON con campo "refresh_token".
+
+    Funcionalidad:
+        - Verifica validez del refresh token.
+        - Si es válido, genera nuevos tokens (access + refresh).
+
+    Returns:
+        JSON con nuevos tokens o error.
+    """
     session = SessionLocal()
     try:
         data = request.get_json()
@@ -262,6 +343,19 @@ def refresh_token():
     limiter=["1 per minute", "5 per day"]
 )
 def confirmar_restauracion():
+    """
+    Restaura una cuenta de usuario eliminada lógicamente.
+
+    Requiere:
+        - Parámetro `token` (verificación por email).
+
+    Funcionalidad:
+        - Verifica token válido.
+        - Restaura el estado del usuario (eliminado=False).
+
+    Returns:
+        HTML de cuenta restaurada o error.
+    """
     token = request.args.get("token")
     try:
         email = verificar_token_restauracion_usuario(token)
