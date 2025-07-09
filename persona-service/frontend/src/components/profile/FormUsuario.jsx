@@ -22,13 +22,15 @@ import { useAuthContext } from "@/context/AuthContext";
 
 
 export default function FormUsuario() {
-  /* ──────────────── contexto y estado ───────────────── */
-  const { authData, updateData, removeAuthData } = useAuthContext();
+
+  const { authData, updateData } = useAuthContext();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
-  const [openDialog, setOpenDialog] = useState(false);  // diálogo genérico de error
+  const [openDialog, setOpenDialog] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [deleteResultOpen, setDeleteResultOpen] = useState(false);
+  const [deleteMessage, setDeleteMessage] = useState("");
 
   const [otpDialogOpen, setOtpDialogOpen] = useState(false);
   const [otpMessage, setOtpMessage] = useState("");
@@ -42,19 +44,28 @@ export default function FormUsuario() {
   const [usernameResultOpen, setUsernameResultOpen] = useState(false);
   const [usernameMessage, setUsernameMessage] = useState("");
 
-  /* ──────────────── handlers ───────────────── */
 
-  const confirmDelete = () => {
+  const submitDeleteRequest = async (event) => {
+    const formData = await formSubmitJson(event);
     setLoading(true);
-    AuthService.deleteUser()
-      .then(() => {
-        removeAuthData("Usuario eliminado");
-        window.location.href = "/auth/login";
-      })
-      .catch(() => setOpenDialog(true))
+    AuthService.requestDelete({
+      email: formData.email,
+      password: formData.password,
+    })
+      .then(() =>
+        setDeleteMessage(
+          "Se envió un correo de confirmación para eliminar la cuenta."
+        )
+      )
+      .catch((error) =>
+        setDeleteMessage(
+          error?.data?.message || error?.message || "Error al solicitar eliminación"
+        )
+      )
       .finally(() => {
         setLoading(false);
         setOpenDeleteDialog(false);
+        setDeleteResultOpen(true);
       });
   };
 
@@ -124,7 +135,7 @@ export default function FormUsuario() {
       });
   };
 
-  /* ──────────────── UI ───────────────── */
+
 
   return (
     <>
@@ -163,15 +174,39 @@ export default function FormUsuario() {
       />
 
       {/* eliminar cuenta */}
-      <SimpleDialog
-        title="¿Eliminar cuenta?"
-        description="Esta acción no se puede deshacer. ¿Deseas eliminar tu cuenta?"
-        isOpen={openDeleteDialog}
-        cancel="Cancelar"
-        action="Eliminar"
-        cancelHandle={() => setOpenDeleteDialog(false)}
-        actionHandle={confirmDelete}
-      />
+      <AlertDialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Eliminar cuenta</AlertDialogTitle>
+            <AlertDialogDescription>
+              Ingresá tu correo y contraseña para confirmar la eliminación
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <form onSubmit={submitDeleteRequest} className="space-y-4">
+            <InputValidate
+              id="email"
+              type="email"
+              labelText="Correo"
+              placeholder="Ingresa tu correo"
+              defaultValue={authData.user.email_usuario || ""}
+              validationMessage="Email inválido"
+              required
+            />
+            <InputValidate
+              id="password"
+              type="password"
+              labelText="Contraseña"
+              placeholder="Ingresa tu contraseña"
+              required
+            />
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction type="submit">Enviar</AlertDialogAction>
+            </AlertDialogFooter>
+          </form>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* OTP / cambio de contraseña */}
       <SimpleDialog
@@ -267,6 +302,13 @@ export default function FormUsuario() {
         isOpen={emailResultOpen}
         actionHandle={() => setEmailResultOpen(false)}
       />
+      <SimpleDialog
+        title="Eliminar cuenta"
+        description={deleteMessage}
+        isOpen={deleteResultOpen}
+        actionHandle={() => setDeleteResultOpen(false)}
+      />
+
     </>
   );
 }

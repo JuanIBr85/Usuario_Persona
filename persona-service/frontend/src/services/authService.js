@@ -164,6 +164,16 @@ logout: async () => {
     });
   },
 
+  requestDelete: async (body) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/solicitar-eliminacion`,
+      method: HttpMethod.POST,
+      body: body,
+      useToken: true,
+      showError: AuthService.showError,
+    });
+  },
+
   deleteUser: async () => {
     return fetchService.fetch({
       url: `${ServiceURL.auth}/eliminar`,
