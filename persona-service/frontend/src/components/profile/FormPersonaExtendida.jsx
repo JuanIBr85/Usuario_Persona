@@ -9,6 +9,7 @@ import Loading from "@/components/loading/Loading";
 import { Ban } from "lucide-react";
 import { SimpleDialog } from "@/components/SimpleDialog";
 import ResponsiveColumnForm from "@/components/ResponsiveColumnForm";
+
 export default function FormPersonaExtendida({
   persona_id,
   personaExtendida,
@@ -18,7 +19,7 @@ export default function FormPersonaExtendida({
   setPersonaData, showDialog, okDialog, errorDialog
 }) {
   const [loading, setLoading] = useState(false);
-
+  
 
   const handleSubmit = async (event) => {
     const formData = await formSubmitJson(event);
@@ -114,7 +115,7 @@ export default function FormPersonaExtendida({
         </div>
         <div className="flex flex-col gap-3 pt-4">
           <Button type="submit" className="w-full">
-            {personaExtendida ? "Actualizar Datos" : "Guardar Datos"}
+            Guardar Cambios
           </Button>
         </div>
       </form>
