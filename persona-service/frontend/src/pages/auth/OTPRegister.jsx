@@ -15,22 +15,47 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 
+/**
+ * OTPRegister.jsx
+ *
+ * Vista de verificación de correo electrónico mediante código OTP
+ * enviada al usuario durante el proceso de registro.
+ *
+ * Este componente permite al usuario ingresar un código de verificación de 6 dígitos
+ * enviado por email para completar su registro. Si el código no fue recibido, el usuario
+ * puede solicitar el reenvío del mismo. Al validarse correctamente, se redirige al usuario
+ * a la pantalla de login.
+ *
+ * Funcionalidades:
+ * - Muestra un formulario para ingresar el código OTP.
+ * - Permite reenviar el código OTP si no fue recibido.
+ * - Muestra mensajes de éxito o error mediante un diálogo modal.
+ * - Navega automáticamente tras una verificación exitosa.
+ */
+
 function OTPRegister() {
+  // Hooks de navegación y estado
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Ruta a redirigir luego de una verificación exitosa
   const toRedirect = location.state?.from || "/auth/login";
+
+  // Email guardado en sesión (usado para validar/verificar)
   const email = sessionStorage.getItem("email_verificar");
 
+  // Estados para manejo del flujo
   const [shouldRedirect, setShouldRedirect] = React.useState(false);
   const [isOpen, setIsOpen] = React.useState(false);
   const [dialogMessage, setMessage] = React.useState("");
   const [isOK, setIsOK] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
 
-
-
+  /**
+   * Solicita el reenvío del código OTP al correo electrónico del usuario.
+   * Actualiza el estado con mensajes informativos o de error.
+   */
   const handleResendOtp = async () => {
-
     console.log("Reenviando OTP a:", email);
     if (!email) return;
     setIsLoading(true);
@@ -54,7 +79,10 @@ function OTPRegister() {
       });
   };
 
-
+  /**
+   * Envía el código OTP ingresado por el usuario para validarlo.
+   * Si es exitoso, se elimina el email de sesión y se redirige.
+   */
   const handleSubmit = async (event) => {
     const formData = await formSubmitJson(event);
     document.activeElement.blur();
@@ -94,6 +122,7 @@ function OTPRegister() {
     <>
       {isLoading && <Loading isFixed={true} />}
 
+      {/* Diálogo modal de confirmación o error */}
       <SimpleDialog
         title={isOK ? "Verificación exitosa" : "Error de verificación"}
         description={dialogMessage}
@@ -106,6 +135,7 @@ function OTPRegister() {
         }}
       />
 
+      {/* Layout principal de autenticación */}
       <AuthLayout
         title="Verificación de dos factores"
         visualContent={<ShieldCheck className="text-white w-42 h-42" />}
@@ -130,10 +160,12 @@ function OTPRegister() {
             </div>
           </div>
 
+          {/* Enlace para reenviar el código */}
           <Button type="button" variant="link" className="p-0 mt-4" onClick={handleResendOtp}>
             ¿No te llegó el código? Reenviar
           </Button>
 
+          {/* Botón para enviar el formulario */}
           <Button type="submit" className="mt-4">Validar</Button>
         </form>
       </AuthLayout>

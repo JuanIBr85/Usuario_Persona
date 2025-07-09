@@ -17,24 +17,50 @@ import {
 import InputValidate from "@/components/inputValidate/InputValidate";
 import { useRef } from "react";
 
+/**
+ * OTPRegisterRecovery.jsx
+ *
+ * Vista para validar el código OTP enviado al correo electrónico
+ * de un usuario que ha solicitado la verificación por recuperación, sin depender del
+ * `sessionStorage`.
+ * 
+ *
+ * Funcionalidades:
+ * - Permite ingresar el email y el código OTP manualmente.
+ * - Verifica el código ingresado y muestra resultado mediante diálogo modal.
+ * - Permite reenviar el código OTP.
+ * - Redirige al login en caso de éxito.
+ *
+ */
+
 function OTPRegisterRecovery() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Destino post-verificación (login)
   const toRedirect = location.state?.from || "/auth/login";
 
+  // Referencia al formulario para acceder a los valores sin evento submit
   const formRef = useRef(null);
 
+  // Estado del componente
   const [shouldRedirect, setShouldRedirect] = React.useState(false);
   const [isOpen, setIsOpen] = React.useState(false);
   const [dialogMessage, setMessage] = React.useState("");
   const [isOK, setIsOK] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
 
+  /**
+   * Reenvía el código OTP al correo ingresado en el formulario.
+   * Usa `formRef` para extraer el email sin necesidad de un submit.
+   */
   const handleResendOtp = async () => {
     const formData = await formJson(formRef.current);
     const email = formData.email_usuario;
+
     console.log("Reenviando OTP a:", email);
     if (!email) return;
+
     setIsLoading(true);
 
     AuthService
@@ -56,7 +82,10 @@ function OTPRegisterRecovery() {
       });
   };
 
-
+  /**
+   * Envía el formulario para verificar el código OTP y el correo.
+   * En caso de éxito, redirige al login.
+   */
   const handleSubmit = async (event) => {
     const formData = await formSubmitJson(event);
     document.activeElement.blur();
@@ -68,7 +97,6 @@ function OTPRegisterRecovery() {
         email_usuario: formData.email_usuario
       })
       .then(() => {
-
         setMessage("Se ha verificado correctamente el código de verificación.");
         sessionStorage.removeItem("email_verificar")
         setIsOK(true);
@@ -94,8 +122,10 @@ function OTPRegisterRecovery() {
 
   return (
     <>
+      {/* Spinner de carga */}
       {isLoading && <Loading isFixed={true} />}
 
+      {/* Modal de éxito o error */}
       <SimpleDialog
         title={isOK ? "Verificación exitosa" : "Error de verificación"}
         description={dialogMessage}
@@ -108,11 +138,13 @@ function OTPRegisterRecovery() {
         }}
       />
 
+      {/* Layout con ícono y título */}
       <AuthLayout
         title="Verificación de dos factores"
         visualContent={<ShieldCheck className="text-white w-42 h-42" />}
       >
         <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-4 h-full">
+          {/* Campo OTP */}
           <div className="grid w-full items-center gap-1.5">
             <Label htmlFor="otp">Código de verificación <span className="text-destructive">*</span></Label>
             <div className="relative">
@@ -131,6 +163,8 @@ function OTPRegisterRecovery() {
               </InputOTP>
             </div>
           </div>
+
+          {/* Campo Email */}
           <InputValidate
             id="email_usuario"
             type="email"
@@ -139,6 +173,8 @@ function OTPRegisterRecovery() {
             validationMessage="Email inválido"
             required
           />
+
+          {/* Reenviar código */}
           <Button type="button" variant="link" className="p-0 mt-4" onClick={handleResendOtp}>
             ¿No te llegó el código? Reenviar
           </Button>
@@ -148,6 +184,7 @@ function OTPRegisterRecovery() {
             <Link to="/auth/sign">¿No tienes una cuenta? Regístrate</Link>
           </Button>
 
+          {/* Enviar formulario */}
           <Button type="submit" className="mt-4">Validar</Button>
         </form>
       </AuthLayout>
