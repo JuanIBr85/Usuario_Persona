@@ -81,46 +81,48 @@ export default function FormUsuario() {
       {loading && <Loading isFixed={true} />}
 
       <div className="w-full max-w-md mx-auto space-y-4 px-4">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <InputValidate
-            id="nombre_usuario"
-            type="text"
-            labelText="Nombre de usuario"
-            placeholder="Ingresa tu nombre de usuario"
-            value={authData.user.nombre_usuario || ""}
-            validatePattern=".{4,}"
-            validationMessage="El nombre debe tener al menos 4 caracteres"
-            required
-          />
-          <InputValidate
-            id="email_usuario"
-            type="email"
-            labelText="Email"
-            placeholder="Ingresa tu email"
-            value={authData.user.email_usuario || ""}
-            validationMessage="Email inválido"
-            required
-          />
+        <form onSubmit={handleSubmit}>
+          <div className="min-h-69 space-y-4">
+            <InputValidate
+              id="nombre_usuario"
+              type="text"
+              labelText="Nombre de usuario"
+              placeholder="Ingresa tu nombre de usuario"
+              value={authData.user.nombre_usuario || ""}
+              validatePattern=".{4,}"
+              validationMessage="El nombre debe tener al menos 4 caracteres"
+              required
+            />
+            <InputValidate
+              id="email_usuario"
+              type="email"
+              labelText="Email"
+              placeholder="Ingresa tu email"
+              value={authData.user.email_usuario || ""}
+              validationMessage="Email inválido"
+              required
+            />
 
-          <div className="flex flex-col gap-3 pt-4">
-            <Button type="submit" className="w-full sm:w-auto">
-              Guardar Cambios
-            </Button>
-            <Button
-              type="button"
-              className="w-full sm:w-auto"
-              onClick={requestOtp}
-            >
-              Cambiar Contraseña
-            </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              className="w-full sm:w-auto"
-              onClick={() => setOpenDeleteDialog(true)}
-            >
-              Eliminar Cuenta
-            </Button>
+            <div className="flex flex-col gap-3 pt-4">
+              <Button type="submit" className="w-full sm:w-auto">
+                Guardar Cambios
+              </Button>
+              <Button
+                type="button"
+                className="w-full sm:w-auto"
+                onClick={requestOtp}
+              >
+                Cambiar Contraseña
+              </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                className="w-full sm:w-auto"
+                onClick={() => setOpenDeleteDialog(true)}
+              >
+                Eliminar Cuenta
+              </Button>
+            </div>
           </div>
         </form>
       </div>

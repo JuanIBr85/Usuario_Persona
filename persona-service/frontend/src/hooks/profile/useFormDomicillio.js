@@ -4,8 +4,9 @@ import { useRef } from "react"
 import { PersonaService } from "@/services/personaService"
 import { useCallback } from "react"
 import { formSubmitJson } from "@/utils/formUtils"
+import { Ban } from "lucide-react"
 
-export function useFormDomicilio(domicilio, setPersonaData, persona_id) {
+export function useFormDomicilio({domicilio, setPersonaData, persona_id, showDialog, okDialog, errorDialog}) {
     const [codigoPostal, setCodigoPostal] = useState(domicilio.domicilio_postal.codigo_postal);
     const [localidades, setLocalidades] = useState([]);
     const [localidad, setLocalidad] = useState(domicilio.domicilio_postal.localidad);
@@ -38,6 +39,10 @@ export function useFormDomicilio(domicilio, setPersonaData, persona_id) {
             })
             .catch(error => {
                 console.error('Error fetching localidades:', error);
+                showDialog(
+                    "Ocurrió un error",
+                    "No se pudieron obtener las localidades. Intenta nuevamente.",
+                );
                 setLocalidades([]);
             });
     }, [codigoPostal]);
@@ -48,7 +53,7 @@ export function useFormDomicilio(domicilio, setPersonaData, persona_id) {
     const handleSubmit = async (event) => {
         const { localidad, codigo_postal, ...domicilio } = await formSubmitJson(event);
         document.activeElement.blur();
-
+        
         const domicilioData = {
             domicilio: {
                 ...domicilio,
@@ -64,12 +69,10 @@ export function useFormDomicilio(domicilio, setPersonaData, persona_id) {
             .then(response => {
                 setLoading(false);
                 setPersonaData(response.data);
+                okDialog();
             })
             .catch(error => {
-                console.error('Error updating domicilio:', error.data);
-
-                setOpenDialog(true);
-                setError(true);
+                errorDialog();
             })
             .finally(() => setLoading(false));
     };

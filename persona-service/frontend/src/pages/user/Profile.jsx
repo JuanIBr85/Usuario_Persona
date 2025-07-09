@@ -16,6 +16,7 @@ import { useProfile } from "@/hooks/profile/useProfile"
 import { tiempoTranscurrido } from "@/utils/dateUtils"
 import ProfileNick from '@/components/ProfileNick'
 
+import { Ban, Check } from "lucide-react";
 
 /**
  * Componente principal del perfil de usuario
@@ -33,6 +34,28 @@ const ProfileForm = () => {
     isCriticalError
   } = useProfile();
 
+  const showDialog = (title, description, actionName=undefined, action=undefined) => {
+    setDialog({
+      title,
+      description,
+      action,
+      actionName
+    })
+  };
+
+  const okDialog = () => {
+    showDialog(
+      <div className="flex flex-row items-center gap-2"><Check /> Exito</div>,
+      "Datos actualizados correctamente.",
+      "Cerrar"
+    );
+  }
+
+  const errorDialog = () => {
+    const title=<div className="flex flex-row items-center gap-2"><Ban /> Ocurrió un error</div>;
+    const description="No se pudieron guardar los datos. Intenta nuevamente.";
+    showDialog(title, description, "Cerrar");
+  }
 
   if (isLoading) {
     return <Loading />;
@@ -61,6 +84,7 @@ const ProfileForm = () => {
         title={dialog?.title}
         description={dialog?.description}
         isOpen={dialog}
+        action={dialog?.actionName}
         actionHandle={() => {
           setTimeout(() => {
             setDialog(null);
@@ -100,6 +124,9 @@ const ProfileForm = () => {
                     personaData={{ ...personaData, email }}
                     persona_id={personaData.id_persona}
                     setPersonaData={setPersonaData}
+                    showDialog={showDialog}
+                    okDialog={okDialog}
+                    errorDialog={errorDialog}
                   />
                 </TabsContent>
 
@@ -109,6 +136,9 @@ const ProfileForm = () => {
                     contacto={personaData.contacto || {}}
                     redes_sociales={staticData.redes_sociales}
                     setPersonaData={setPersonaData}
+                    showDialog={showDialog}
+                    okDialog={okDialog}
+                    errorDialog={errorDialog}
                   />
                 </TabsContent>
 
@@ -117,6 +147,9 @@ const ProfileForm = () => {
                     domicilio={personaData.domicilio || {}}
                     persona_id={personaData.id_persona}
                     setPersonaData={setPersonaData}
+                    showDialog={showDialog}
+                    okDialog={okDialog}
+                    errorDialog={errorDialog}
                   />
                 </TabsContent>
 
@@ -128,6 +161,9 @@ const ProfileForm = () => {
                     ocupaciones={staticData.ocupaciones}
                     estudiosAlcanzados={staticData.estudios_alcanzados}
                     setPersonaData={setPersonaData}
+                    showDialog={showDialog}
+                    okDialog={okDialog}
+                    errorDialog={errorDialog}
                   />
                 </TabsContent>
 

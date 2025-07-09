@@ -16,10 +16,11 @@ export default function FormDatos({
   personaData,
   handleChange,
   setPersonaData,
+  showDialog,
+  okDialog,
+  errorDialog
 }) {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
-  const [openDialog, setOpenDialog] = useState(false);
   const [tipoDoc, setTipoDoc] = useState(personaData.tipo_documento || Object.keys(tipoDocumento)[0] || "");
 
   const handleSubmit = async (event) => {
@@ -29,11 +30,11 @@ export default function FormDatos({
     PersonaService.editar_restringido(formData)
       .then((response) => {
         setPersonaData(response.data);
+        okDialog();
       })
       .catch((error) => {
         console.error("Error updating domicilio:", error.data);
-        setError(true);
-        setOpenDialog(true);
+        errorDialog();
       })
       .finally(() => setLoading(false));
   };
@@ -41,7 +42,8 @@ export default function FormDatos({
   return (
     <>
       {loading && <Loading isFixed={true} />}
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit}>
+      <div className="min-h-69 space-y-4">
         {/* Datos fijos */}
         <ResponsiveColumnForm>
           <InputValidate
@@ -99,28 +101,12 @@ export default function FormDatos({
             readOnly
           />
         </ResponsiveColumnForm>
+        </div>
         <div className="flex flex-col gap-3 pt-4">
           <Button type="submit" className="w-full">
             Guardar Cambios
           </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            className="w-full"
-            onClick={() => window.history.back()}
-          >
-            Volver
-          </Button>
         </div>
-        {error && <SimpleDialog
-          title={<div className="flex flex-row items-center gap-2"><Ban /> Ocurrió un error</div>}
-          description={"No se pudieron guardar los datos. Intenta nuevamente."}
-          isOpen={openDialog}
-          actionHandle={() => {
-            setOpenDialog(null);
-          }}
-          action="Cerrar"
-        />}
       </form>
     </>
   );
