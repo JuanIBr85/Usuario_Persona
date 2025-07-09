@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import Loading from '@/components/loading/Loading';
 import { formJson } from '@/utils/formUtils';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 // Importar componentes
 import { ProgressBar } from '@/components/createProfile/ProgressBar';
 import DatosPersonales from '@/components/createProfile/steps/DatosPersonales';
@@ -14,6 +14,7 @@ import Resumen from '@/components/createProfile/steps/Resumen';
 import { useAuthContext } from "@/context/AuthContext";
 
 import { PersonaService } from '@/services/personaService';
+const steps = ['Datos Personales', 'Contacto', 'Domicilio', 'Información Adicional', 'Resumen'];
 
 function CreatePerfil() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -22,12 +23,21 @@ function CreatePerfil() {
   const [newUser, setNewUser] = useState({});
   const navigate = useNavigate();
   const { authData } = useAuthContext();
+  const location = useLocation();
+
 
   useEffect(() => {
     if (authData?.user?.id_persona && authData?.user?.id_persona !== 0) {
       navigate('/profile');
     }
   }, [authData])
+
+
+  useEffect(() => {
+    if (!location?.state || !location?.state?.tipo_documento || !location?.state?.num_doc_persona) {
+      navigate('/profileconnect');
+    }
+  }, [location]);
 
   const [staticData, setStaticData] = useState({
     estados_civiles: [],
@@ -54,8 +64,8 @@ function CreatePerfil() {
       nombre_persona: formData.nombre_persona,
       apellido_persona: formData.apellido_persona,
       fecha_nacimiento_persona: formData.fecha_nacimiento_persona,
-      tipo_documento: formData.tipo_documento,
-      num_doc_persona: formData.num_doc_persona,
+      tipo_documento: location.state.tipo_documento,
+      num_doc_persona: location.state.num_doc_persona,
       domicilio: {
         domicilio_calle: formData.domicilio_calle,
         domicilio_numero: formData.domicilio_numero,
@@ -178,7 +188,7 @@ function CreatePerfil() {
 
   const renderStep = () => {
     return <>
-      <DatosPersonales hidden={currentStep !== 0} staticData={staticData} />
+      <DatosPersonales hidden={currentStep !== 0} staticData={staticData} documento={location.state ?? {}}/>
       <Contacto hidden={currentStep !== 1} staticData={staticData} />
       <Domicilio hidden={currentStep !== 2} staticData={staticData} />
       <InfoAdicional hidden={currentStep !== 3} staticData={staticData} />
@@ -201,7 +211,7 @@ function CreatePerfil() {
           <CardContent className="flex flex-col flex-1 min-h-107">
             <form className="flex flex-col h-full" ref={refForm}>
               <div className="space-y-8 flex-1">
-                <ProgressBar currentStep={currentStep} setCurrentStep={setCurrentStep} />
+                <ProgressBar currentStep={currentStep} setCurrentStep={setCurrentStep} steps={steps}/>
                 <div className="mb-6">
                   {renderStep()}
                 </div>

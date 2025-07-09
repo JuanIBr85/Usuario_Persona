@@ -6,7 +6,7 @@ import ResponsiveColumnForm from '@/components/ResponsiveColumnForm';
 
 
 
-const DatosPersonales = ({ hidden, staticData }) => {
+const DatosPersonales = ({ hidden, staticData, documento }) => {
   const [tipoDoc, setTipoDoc] = useState(Object.keys(staticData.tipos_documento)[0] || '');
 
   return (
@@ -27,28 +27,22 @@ const DatosPersonales = ({ hidden, staticData }) => {
         />
       </ResponsiveColumnForm>
       <ResponsiveColumnForm>
-        <SimpleSelect
-          name="tipo_documento"
-          label="Tipo de documento"
-          placeholder="Selecciona un tipo de documento"
-
-          onValueChange={(value) => setTipoDoc(value)}
-
-          required
-        >
-          {Object.keys(staticData.tipos_documento).map((tipo) => (
-            <SelectItem key={tipo} value={tipo}>
-              {tipo}
-            </SelectItem>
-          ))}
-        </SimpleSelect>
         <InputValidate
-          id="num_doc_persona"
+          type="text"
+          labelText="Tipo de documento"
+          value={documento?.tipo_documento}
+          validationMessage="Número de documento inválido"
+          className="bg-gray-100 cursor-not-allowed w-full"
+          readOnly
+        />
+        <InputValidate
           type="text"
           labelText="Nº de documento"
+          value={documento?.num_doc_persona}
           validatePattern={staticData.tipos_documento[tipoDoc]}
           validationMessage="Número de documento inválido"
-          required
+          className="bg-gray-100 cursor-not-allowed w-full"
+          readOnly
         />
       </ResponsiveColumnForm>
       <ResponsiveColumnForm>
