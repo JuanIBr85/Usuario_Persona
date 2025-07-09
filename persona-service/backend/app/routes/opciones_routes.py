@@ -1,5 +1,7 @@
 from flask import Blueprint, jsonify, request
 from common.utils.response import make_response, ResponseStatus
+import logging
+from sqlalchemy.exc import SQLAlchemyError
 from config import (
     TIPOS_DOCUMENTO_VALIDOS,
     REDES_SOCIALES_VALIDAS,
@@ -128,6 +130,10 @@ def buscar_localidades_por_codigo_postal():
             ),
             200,
         )
+    
+    except SQLAlchemyError as e:
+        logging.error(f"Database error: {type(e).__name__}")
+        return make_response(ResponseStatus.ERROR, str(type(e).__name__), None, "DB ERROR"), 500
 
     except Exception as e:
         return (
@@ -182,6 +188,10 @@ def buscar_domicilio_postal():
             ),
             200,
         )
+    
+    except SQLAlchemyError as e:
+        logging.error(f"Database error: {type(e).__name__}")
+        return make_response(ResponseStatus.ERROR, str(type(e).__name__), None, "DB ERROR"), 500
 
     except Exception as e:
         return (
@@ -245,6 +255,10 @@ def verificar_documento():
             ),
             200,
         )
+    except SQLAlchemyError as e:
+        logging.error(f"Database error: {type(e).__name__}")
+        return make_response(ResponseStatus.ERROR, str(type(e).__name__), None, "DB ERROR"), 500
+
     except Exception as e:
         return (
             make_response(

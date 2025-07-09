@@ -1,4 +1,5 @@
 import datetime
+import logging
 from common.utils.component_request import ComponentRequest
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity, decode_token
@@ -14,6 +15,8 @@ from app.models.persona_model import Persona
 from common.decorators.api_access import api_access
 from common.utils.response import make_response, ResponseStatus
 from common.models.cache_settings import CacheSettings
+from sqlalchemy.exc import SQLAlchemyError
+
 
 
 persona_bp = Blueprint("persona_bp", __name__)
@@ -43,6 +46,10 @@ def listar_personas():
             ),
             200,
         )
+    
+    except SQLAlchemyError as e:
+        logging.error(f"Database error: {type(e).__name__}")
+        return make_response(ResponseStatus.ERROR, str(type(e).__name__), None, "DB ERROR"), 500    
 
     except Exception as e:
         return (
@@ -84,6 +91,11 @@ def persona_by_id():
     try:
         usuario_id = ComponentRequest.get_user_id()
         return obtener_persona_usuario(usuario_id)
+    
+    except SQLAlchemyError as e:
+        logging.error(f"Database error: {type(e).__name__}")
+        return make_response(ResponseStatus.ERROR, str(type(e).__name__), None, "DB ERROR"), 500
+
     except Exception as e:
         return (
             make_response(
@@ -102,6 +114,10 @@ def persona_by_id():
 def obtener_persona(id):
     try:
         return _obtener_persona_x_id(id)
+    
+    except SQLAlchemyError as e:
+        logging.error(f"Database error: {type(e).__name__}")
+        return make_response(ResponseStatus.ERROR, str(type(e).__name__), None, "DB ERROR"), 500
 
     except Exception as e:
         return (
@@ -153,6 +169,10 @@ def crear_persona():
             ),
             201,
         )
+    
+    except SQLAlchemyError as e:
+        logging.error(f"Database error: {type(e).__name__}")
+        return make_response(ResponseStatus.ERROR, str(type(e).__name__), None, "DB ERROR"), 500    
 
     except Exception as e:
         return (
@@ -278,6 +298,10 @@ def modificar_persona(id):
             ),
             200,
         )
+    
+    except SQLAlchemyError as e:
+        logging.error(f"Database error: {type(e).__name__}")
+        return make_response(ResponseStatus.ERROR, str(type(e).__name__), None, "DB ERROR"), 500    
 
     except Exception as e:
         return (
@@ -365,6 +389,10 @@ def borrar_persona(id):
             ),
             200,
         )
+    
+    except SQLAlchemyError as e:
+        logging.error(f"Database error: {type(e).__name__}")
+        return make_response(ResponseStatus.ERROR, str(type(e).__name__), None, "DB ERROR"), 500
 
     except Exception as e:
         return (
@@ -414,6 +442,10 @@ def restaurar_persona(id):
             ),
             200,
         )
+    
+    except SQLAlchemyError as e:
+        logging.error(f"Database error: {type(e).__name__}")
+        return make_response(ResponseStatus.ERROR, str(type(e).__name__), None, "DB ERROR"), 500    
 
     except Exception as e:
         return (
@@ -453,6 +485,10 @@ def obtener_persona_usuario(id):
             200,
         )
 
+    except SQLAlchemyError as e:
+        logging.error(f"Database error: {type(e).__name__}")
+        return make_response(ResponseStatus.ERROR, str(type(e).__name__), None, "DB ERROR"), 500    
+
     except Exception as e:
         return (
             make_response(
@@ -477,6 +513,11 @@ def contar_personas():
             ),
             200,
         )
+    
+    except SQLAlchemyError as e:
+        logging.error(f"Database error: {type(e).__name__}")
+        return make_response(ResponseStatus.ERROR, str(type(e).__name__), None, "DB ERROR"), 500
+
     except Exception as e:
         return (
             make_response(
@@ -532,6 +573,11 @@ def verificar_persona():
             ),
             200,
         )
+    
+    except SQLAlchemyError as e:
+        logging.error(f"Database error: {type(e).__name__}")
+        return make_response(ResponseStatus.ERROR, str(type(e).__name__), None, "DB ERROR"), 500
+
     except Exception as e:
         import traceback
 
@@ -613,6 +659,10 @@ def verificar_identidad():
             make_response(status, result["mensaje"]),
             200 if result["coinciden"] else 400,
         )
+    
+    except SQLAlchemyError as e:
+        logging.error(f"Database error: {type(e).__name__}")
+        return make_response(ResponseStatus.ERROR, str(type(e).__name__), None, "DB ERROR"), 500        
 
     except Exception as e:
         import traceback
