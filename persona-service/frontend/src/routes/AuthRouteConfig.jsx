@@ -20,7 +20,7 @@ function makeAuthRouteConfig({ roles = [], loginRequired = true, isAdmin = true 
 export const AuthRouteConfig = {
     // Rutas públicas (sin autenticación)
     "/auth/login": makeAuthRouteConfig({ loginRequired: false }),
-    "/auth/logout": makeAuthRouteConfig({ loginRequired: true }),
+    "/auth/logout": makeAuthRouteConfig({ loginRequired: true, isAdmin: false }),
     "/auth/sign": makeAuthRouteConfig({ loginRequired: false }),
     "/auth/forgotpassword": makeAuthRouteConfig({ loginRequired: false }),
     "/auth/resetpassword": makeAuthRouteConfig({ loginRequired: false }),
@@ -50,8 +50,6 @@ export const AuthRouteConfig = {
     "/searchprofile": makeAuthRouteConfig({  isAdmin: false }),
     "/profileconnect": makeAuthRouteConfig({  isAdmin: false }),
 
-    // Ruta de cierre de sesión
-    "/auth/logout": makeAuthRouteConfig({ isAdmin: false })
 };
 
 export const hasAccess = (path) => {
