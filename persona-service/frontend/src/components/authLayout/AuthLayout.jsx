@@ -59,8 +59,8 @@ const AuthLayout = ({
               {children}
             </CardContent>
             <CardFooter className="justify-center flex gap-2">
-              <Button variant="link" asChild><Link to="/termsofservice">Términos de uso</Link></Button>
-              <Button variant="link" asChild><Link to="/privacypolicy">Política de privacidad</Link></Button>
+              <Button variant="link" asChild><Link to="/faq/termsofservice">Términos de uso</Link></Button>
+              <Button variant="link" asChild><Link to="/faq/privacypolicy">Política de privacidad</Link></Button>
             </CardFooter>
           </Card>
         </div>

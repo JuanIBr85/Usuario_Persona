@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import Hamburger from "hamburger-react";
 
-import {isAdmin} from "@/context/AuthContext";
+import {isAdmin, hasToken} from "@/context/AuthContext";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,6 +10,8 @@ const Header = () => {
 
   const mobileMenuRef = useRef(null);
   const hamburgerRef = useRef(null);
+
+  if(!hasToken())return<></>;
 
   useEffect(() => {
 

@@ -1,7 +1,9 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { SimpleDialog } from '@/components/SimpleDialog';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthService } from '@/services/authService';
+import {AuthRouteConfig} from "@/routes/AuthRouteConfig";
+import { hasAccess } from '@/routes/AuthRouteConfig';
 
 const AuthContext = createContext();
 
@@ -24,8 +26,8 @@ const saveAuthData = _authData ? JSON.parse(_authData) : defaultData;
 const tempAuthData = { ...saveAuthData };
 
 // Función para verificar si el usuario está en una ruta de autenticación
-const isAuthRoute = () => {
-    return window.location.pathname.includes("/auth/");
+const isPublicRoute = () => {
+    return window.location.pathname.includes("/auth/") || window.location.pathname.includes("/faq/");
 };
 
 //Funcion para crear dialogos
@@ -42,6 +44,7 @@ function AuthContextProvider({ children }) {
     const _navigate = useNavigate();
     const [isUnauthorizedRoute, setIsUnauthorizedRoute] = useState(true);
     const [isFirstCheck, setIsFirstCheck] = useState(true);
+    const location = useLocation();
 
     const timeLeftToExpire = () => (new Date(authData.user.expires_in) - new Date()) / 1000;
 
@@ -115,7 +118,7 @@ function AuthContextProvider({ children }) {
 
 
     const checkAuth = () => {
-        if (isAuthRoute()) {
+        if (isPublicRoute()) {
             //Evitar cualquier error por dialogo de autorizacion
             sessionStorage.removeItem("unauthorized_401");
             return true;
@@ -157,17 +160,24 @@ function AuthContextProvider({ children }) {
 
     //Verifica si el usuario esta autenticado al cambiar la ruta
     useEffect(() => {
+        let check = false;
         if (!isUnauthorizedRoute || isFirstCheck) {
-            setIsUnauthorizedRoute(!checkAuth());
+            check = checkAuth();
+            setIsUnauthorizedRoute(!check);
             setTimeout(() => setIsFirstCheck(false), 1000);
         }
-    }, [navigate]);
+
+        if(check && !hasAccess(location.pathname)){
+            _navigate("/profile")
+        }
+        
+    }, [location]);
 
     //Verifica si el usuario esta autenticado al cambiar la ruta
     useEffect(() => {
         if (!(authData.user?.expires_in)) return;
         const interval = setInterval(() => {
-            if (isAuthRoute()) return;
+            if (isPublicRoute()) return;
             if (isTokenValid()) return;
             //console.log("Token expirado");
             setDialog({
@@ -300,20 +310,27 @@ export const useAuthContext = () => {
     return useContext(AuthContext);
 };
 
-export const hasRole = (role) => {
+export const hasRol = (role) => {
+    if(!tempAuthData?.user?.rol) return false;
     return (tempAuthData?.user?.rol.includes(role)) ?? false;
 }
 
 export const isAdmin = () => {
-    return hasRole("admin") || hasRole("superadmin");
+    if(!tempAuthData?.user?.rol) return false;
+
+    return Array.from(tempAuthData?.user?.rol).find((rol) => rol.toLowerCase().includes("admin")) ?? isSuperAdmin();
 }
 
 export const isSuperAdmin = () => {
-    return hasRole("superadmin");
+    return hasRol("superadmin");
 }
 
 export const isUsuario = () => {
-    return hasRole("usuario");
+    return hasRol("usuario");
+}
+
+export const hasToken = () => {
+    return tempAuthData?.user?.expires_in !== null && tempAuthData?.user?.expires_in !== undefined;
 }
 
 export default AuthContextProvider;

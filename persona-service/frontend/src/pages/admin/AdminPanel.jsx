@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Card,
@@ -12,6 +12,7 @@ import { Users, ShieldCheck, FileText, HandPlatter } from "lucide-react";
 import { Fade } from "react-awesome-reveal";
 import { isAdmin } from "@/context/AuthContext";
 import { useAuthContext } from "@/context/AuthContext";
+import { hasAccess } from "@/routes/AuthRouteConfig";
 /**
  * Lista de opciones disponibles en el panel de administración.
  * Cada opción incluye un título, una descripción, un ícono y la ruta correspondiente.
@@ -28,24 +29,28 @@ const adminOptions = [
     description: "Gestionar cuentas de personas",
     icon: <Users className="w-14 h-14 text-primary" />,
     path: "/adminpersons",
+    hasAccess: ()=>hasAccess("/adminpersons")
   },
   {
     title: "Roles",
     description: "Administrar permisos y roles",
     icon: <ShieldCheck className="w-14 h-14 text-primary" />,
     path: "/adminroles",
+    hasAccess: ()=>hasAccess("/adminroles")
   },
   {
     title: "Logs",
     description: "Ver registros del sistema",
     icon: <FileText className="w-14 h-14 text-primary" />,
     path: "/logs",
+    hasAccess: ()=>hasAccess("/logs")
   },
   {
     title: "Gestión de Servicios",
     description: "Controlar y administrar servicios activos",
     icon: <HandPlatter className="w-14 h-14 text-primary" />,
     path: "/adminservices",
+    hasAccess: ()=>hasAccess("/adminservices")
   },
 ];
 
@@ -60,13 +65,6 @@ const adminOptions = [
 
 const AdminPanel = () => {
   const navigate = useNavigate();
-  const { unauthorizedUser } = useAuthContext();
-  useEffect(() => {
-    if (!isAdmin()) {
-      unauthorizedUser("No tienes permiso para acceder a esta página");
-    }
-  }, []);
-
   return (
     <div className="py-6 px-4 md:py-10 md:px-10 2xl:pl-[5%] 2xl:pr-[5%]">
       <Fade duration={300} triggerOnce>
@@ -74,7 +72,7 @@ const AdminPanel = () => {
           Panel de Administración
         </h2>{" "}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {adminOptions.map((option) => (
+          {adminOptions.filter((option) => option.hasAccess()).map((option) => (
             <Card
               key={option.title}
               className="flex flex-col justify-between text-center transition-transform duration-300 ease-in-out hover:scale-103 hover:shadow-xl cursor-pointer"

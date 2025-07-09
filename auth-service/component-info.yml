@@ -29,10 +29,19 @@ roles:
     - auth.admin.obtener_permisos
     - auth.admin.modificar_rol
     - auth.admin.obtener_usuarios
-    - auth.admin.modificar_usuario_con_rol
     - auth.admin.obtener_usuarios_eliminados
     - auth.admin.restaurar_usuario
 
+  admin-roles:
+    - auth.admin.obtener_roles
+    - auth.admin.obtener_usuarios
+    - auth.admin.modificar_rol
+    - auth.admin.borrar_rol
+    - auth.admin.asignar_permisos_rol
+    - auth.admin.obtener_permisos
+    - auth.admin.modificar_usuario_con_rol
+    - auth.admin.crear_rol
+    - auth.admin.asignar_rol
 
   #Role del usuario normal, no tiene permisos especiales
   usuario: 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Separator } from "@/components/ui/separator";
 import { Link } from "react-router-dom";
-import { isAdmin } from "@/context/AuthContext";
+import { isAdmin, hasToken } from "@/context/AuthContext";
 
 const Footer = () => {
   const [_isAdmin, setIsAdmin] = useState(false);
@@ -13,7 +13,7 @@ const Footer = () => {
       <div className="grid gap-10 row-gap-6 mb-8 sm:grid-cols-2 lg:grid-cols-3">
         <div className="sm:col-span-1">
           <Link
-            to={_isAdmin ? "/" : "/profile"}
+            to={hasToken()?(_isAdmin ? "/" : "/profile"):"/auth/login"}
             aria-label="Ir a inicio"
             title="PRISMA"
             className="inline-flex items-center"
@@ -113,7 +113,7 @@ const Footer = () => {
         <ul className="flex flex-col mb-3 space-y-2 lg:mb-0 sm:space-y-0 sm:space-x-5 sm:flex-row">
           <li>
             <Link
-              to="/faq"
+              to="/faq/faq"
               className="text-sm text-gray-600 transition-colors duration-300 hover:text-deep-purple-accent-400"
             >
               Preguntas frecuentes
@@ -121,7 +121,7 @@ const Footer = () => {
           </li>
           <li>
             <Link
-              to="/privacypolicy"
+              to="/faq/privacypolicy"
               className="text-sm text-gray-600 transition-colors duration-300 hover:text-deep-purple-accent-400"
             >
               Política de privacidad
@@ -129,7 +129,7 @@ const Footer = () => {
           </li>
           <li>
             <Link
-              to="/termsofservice"
+              to="/faq/termsofservice"
               className="text-sm text-gray-600 transition-colors duration-300 hover:text-deep-purple-accent-400"
             >
               Términos y condiciones

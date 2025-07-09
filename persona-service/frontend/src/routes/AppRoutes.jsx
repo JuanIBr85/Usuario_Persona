@@ -51,9 +51,9 @@ function AppRoutes() {
       <Route path="adminservices/endpoints-research/" element={<EndpointsResearch />} />
 
       <Route path="persondetails/:id" element={<PersonDetails />} />
-      <Route path="privacypolicy" element={<AboutPrivacyPolicy />} />
-      <Route path="termsofservice" element={<TermsOfService />} />
-      <Route path="faq" element={<Faq />} />
+      <Route path="faq/privacypolicy" element={<AboutPrivacyPolicy />} />
+      <Route path="faq/termsofservice" element={<TermsOfService />} />
+      <Route path="faq/faq" element={<Faq />} />
       <Route path="*" element={<NotFound />} />
 
       <Route path="auth/forgotpassword" element={<ForgotPassword />} />
