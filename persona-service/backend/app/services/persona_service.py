@@ -618,17 +618,8 @@ def verificar_datos_personales(
                 "coinciden": False,
                 "mensaje": "No existe una persona con este identificador."
             }
-        try:
-            fecha_nac_dt = datetime.strptime(
-            datos_usuario["fecha_nacimiento"], "%Y-%m-%d"
-            ).date()
-        except ValueError:
-            return {
-                "encontrada": True,
-                "coinciden": False,
-                "mensaje": "Formato de fecha inválido. Debe ser YYYY-MM-DD."
-            }
-
+        
+        fecha_nac_dt = datos_usuario["fecha_nacimiento"]
 
         if fecha_nac_dt > date.today():
             return {
@@ -647,14 +638,13 @@ def verificar_datos_personales(
         # Enviar notificación al administrador
         enviar_notificacion_verificacion_admin(persona, datos_usuario, coinciden)
 
+        mensaje = ("Tus datos concuerdan, se enviara la informacion al administrador para continuar con la vinculación."
+                if coinciden
+                else "Los datos proporcionados no coinciden. Contacta al administrador para continuar la verificación.")
         return {
             "encontrada": True,
             "coinciden": coinciden,
-            "mensaje": (
-                "Tus datos concuerdan, contacta al administrador para continuar la verificación."
-                if coinciden
-                else "Los datos proporcionados no coinciden. Contacta al administrador para continuar la verificación."
-            )
+            "mensaje": mensaje        
         }
 
     finally:
