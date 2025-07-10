@@ -28,18 +28,18 @@
         retries: 5
 
     #DB de componentes
-    #component-db:
-    #  image: postgres:13
-    #  #volumes:
-    #    #- component_db_data:/var/lib/postgresql/data
-    #  restart: unless-stopped
-    #  shm_size: 128mb
-    #  ports:
-    #    - 5433:5432
-    #  environment:
-    #    - POSTGRES_USER=usuario
-    #    - POSTGRES_PASSWORD=pass
-    #    - POSTGRES_DB=component_db
+    component-db:
+      image: postgres:13
+      #volumes:
+        #- component_db_data:/var/lib/postgresql/data
+      restart: unless-stopped
+      shm_size: 128mb
+      ports:
+        - 5433:5432
+      environment:
+        - POSTGRES_USER=component_user
+        - POSTGRES_PASSWORD=component_pass
+        - POSTGRES_DB=component_db
 
     adminer:
       image: adminer
@@ -138,6 +138,7 @@
         - SERVICES_CONFIG_FILE=services-docker.json
         - REDIS_HOST=redis
         - DB_HOST=component-db
+        - DB_PORT=5432
         #Estas variables de entorno son requeridas por common 
         #para encontrar los servicios para poder usar su api
         - AUTH_SERVICE_HOST=auth-service

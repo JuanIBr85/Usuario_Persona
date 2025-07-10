@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-
+import { useNavigate } from "react-router-dom"; import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button";
 import InputValidate from "@/components/inputValidate/InputValidate";
 import { SimpleDialog } from "@/components/SimpleDialog";
@@ -12,12 +11,13 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogCancel,
-  AlertDialogAction,
+
 } from "@/components/ui/alert-dialog";
 import Loading from "@/components/loading/Loading";
 import { AuthService } from "@/services/authService";
 import { formSubmitJson } from "@/utils/formUtils";
 import { useAuthContext } from "@/context/AuthContext";
+import { set } from "date-fns";
 
 
 
@@ -27,10 +27,10 @@ export default function FormUsuario() {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [deleteResultOpen, setDeleteResultOpen] = useState(false);
-  const [deleteMessage, setDeleteMessage] = useState("");
+
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);//modal de eliminar cuenta
+  const [deleteResultOpen, setDeleteResultOpen] = useState(false);//respuesta de eliminar cuenta
+  const [deleteMessage, setDeleteMessage] = useState("");//mensaje de eliminar cuenta
 
   const [otpDialogOpen, setOtpDialogOpen] = useState(false);
   const [otpMessage, setOtpMessage] = useState("");
@@ -45,18 +45,23 @@ export default function FormUsuario() {
   const [usernameMessage, setUsernameMessage] = useState("");
 
 
+
   const submitDeleteRequest = async (event) => {
+
     const formData = await formSubmitJson(event);
     setLoading(true);
+
     AuthService.requestDelete({
       email: formData.email,
       password: formData.password,
     })
-      .then(() =>
+      .then((response) => {
+        console.log("Respuesta de solicitud de eliminación:", response);
+
         setDeleteMessage(
           "Se envió un correo de confirmación para eliminar la cuenta."
         )
-      )
+      })
       .catch((error) =>
         setDeleteMessage(
           error?.data?.message || error?.message || "Error al solicitar eliminación"
@@ -94,15 +99,19 @@ export default function FormUsuario() {
   const submitChangeEmail = async (event) => {
     const formData = await formSubmitJson(event);
     setLoading(true);
+
     AuthService.changeEmail({
       nuevo_email: formData.nuevo_email,
       password: formData.password,
     })
-      .then(() =>
+      .then(() => {
+
+
         setEmailMessage(
           "Se ha enviado un correo de confirmación al nuevo email."
         )
-      )
+
+      })
       .catch((error) =>
         setEmailMessage(
           error?.data?.message || error?.message || "Error al cambiar correo"
@@ -182,17 +191,11 @@ export default function FormUsuario() {
 
       {/* ─────────── Diálogos ─────────── */}
 
-      {/* error genérico */}
-      <SimpleDialog
-        title="Ocurrió un error"
-        description="No se pudieron completar la acción. Intenta nuevamente."
-        isOpen={openDialog}
-        action="Cerrar"
-        actionHandle={() => setOpenDialog(false)}
-      />
-
       {/* eliminar cuenta */}
-      <AlertDialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+      <AlertDialog
+        open={openDeleteDialog}
+        onOpenChange={setOpenDeleteDialog}   // 👈 más simple
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Eliminar cuenta</AlertDialogTitle>
@@ -216,13 +219,13 @@ export default function FormUsuario() {
               type="password"
               labelText="Contraseña"
               placeholder="Ingresa tu contraseña"
-              validatePattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$"
-              validationMessage="La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula, un número y un carácter especial."
               required
             />
+
             <AlertDialogFooter>
               <AlertDialogCancel>Cancelar</AlertDialogCancel>
-              <AlertDialogAction type="submit">Enviar</AlertDialogAction>
+              {/* Botón que envía, pero NO cierra automáticamente */}
+              <Button type="submit">Eliminar</Button>
             </AlertDialogFooter>
           </form>
         </AlertDialogContent>
@@ -264,7 +267,8 @@ export default function FormUsuario() {
             />
             <AlertDialogFooter>
               <AlertDialogCancel>Cancelar</AlertDialogCancel>
-              <AlertDialogAction type="submit">Enviar</AlertDialogAction>
+              {/* Botón que envía, pero NO cierra automáticamente */}
+              <Button type="submit">Guardar</Button>
             </AlertDialogFooter>
           </form>
         </AlertDialogContent>
@@ -279,7 +283,7 @@ export default function FormUsuario() {
           <AlertDialogHeader>
             <AlertDialogTitle>Cambiar correo</AlertDialogTitle>
             <AlertDialogDescription>
-              Ingresa tu contraseña y el nuevo correo
+              Ingresa tu nuevo correo y tu contraseña actual para confirmar el cambio.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
@@ -289,7 +293,7 @@ export default function FormUsuario() {
               type="email"
               labelText="Nuevo correo"
               placeholder="Ingresa tu nuevo correo"
-              defaultValue={authData.user.email_usuario || ""}
+
               validationMessage="Email inválido"
               required
             />
@@ -302,7 +306,8 @@ export default function FormUsuario() {
             />
             <AlertDialogFooter>
               <AlertDialogCancel>Cancelar</AlertDialogCancel>
-              <AlertDialogAction type="submit">Enviar</AlertDialogAction>
+              {/* Botón que envía, pero NO cierra automáticamente */}
+              <Button type="submit">Guardar</Button>
             </AlertDialogFooter>
           </form>
         </AlertDialogContent>
