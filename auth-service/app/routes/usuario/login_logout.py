@@ -10,7 +10,7 @@ from common.decorators.api_access import api_access
 from common.models.cache_settings import CacheSettings
 from common.utils.response import make_response, ResponseStatus
 from app.utils.jwt import verificar_token_modificar_email,verificar_token_eliminacion
-from app.utils.email import enviar_email_confirmacion_eliminacion
+
 bp = Blueprint(
     "usuario_login_logout", __name__, cli_group="usuario"
 )
@@ -113,10 +113,8 @@ def logout_usuario() -> tuple[dict[Any, Any], Any] | tuple[dict[Any, Any], Liter
 
     session = SessionLocal()
     try:
-        #data = request.get_json()
         refresh_jti = ComponentRequest.get_refresh_jti()#data.get("refresh_jti")
         jwt_jti = ComponentRequest.get_jti()
-        #usuario_id = ComponentRequest.get_user_id()
         
         if not all([jwt_jti, refresh_jti, usuario_id]):
             return make_response(
@@ -206,15 +204,14 @@ def modificar_email_usuario():
 
     Requiere:
         - JWT válido.
-        - JSON con uno o ambos campos: `email_usuario`.
+        - JSON con campos: `email_usuario`,`password`.
 
     Funcionalidad:
         - Valida datos con `UsuarioModificarEmailSchema`.
-        - Aplica el cambio al perfil.
-        - Devuelve el nuevo estado del usuario.
+        - Envia un mail para confirmación.
 
     Returns:
-        JSON con status, mensaje y nuevos datos del perfil.
+        JSON con status, mensaje.
     """
     session = SessionLocal()
     try:
@@ -250,6 +247,22 @@ def modificar_email_usuario():
 @bp.route("/confirmar-modificar-email", methods=["GET"])
 @api_access(is_public=True)
 def confirmar_cambio_email():
+    """
+    Endpoint para la confirmación del mail que envia la ruta /cambiar-email.
+
+    Requiere:
+        - JWT válido.
+        - String con : `token`.
+
+    Funcionalidad:
+        - Recibe el token que se envia por el email.
+        - Verifica que este correcto.
+        - Extrae los datos.
+        - Confirma al servicio que se hagan los cambios en la db.
+
+    Returns:
+        Html de exito o fallo según corresponda.
+    """
     session = SessionLocal()
     token = request.args.get("token")
     try:
@@ -278,12 +291,15 @@ def confirmar_cambio_email():
 )
 def eliminar_usuario():
     """
-    Elimina lógicamente al usuario autenticado.
+    Envia un mail para que el usuario confirme la eliminacion de la cuenta.
 
     Requiere:
         - JWT válido.
+        - JSON con campos: `email_usuario`,`password`.
 
     Funcionalidad:
+        - Valida datos con `UsuarioModificarEmailSchema`.
+        - Envia un mail para confirmación.
         - Marca el usuario como eliminado (`eliminado = True`).
         - Setea el campo `deleted_at` con timestamp actual.
 
@@ -319,6 +335,21 @@ def eliminar_usuario():
 @bp.route("/confirmar-eliminacion", methods=["GET"])
 @api_access(is_public=True)
 def confirmar_eliminacion_usuario():
+    """
+    Envia un mail para que el usuario confirme la eliminacion de la cuenta.
+
+    Requiere:
+        - JWT válido.
+        - String : `token`.
+
+    Funcionalidad:
+        - Marca el usuario como eliminado (`eliminado = True`).
+        - Setea el campo `deleted_at` con timestamp actual.
+
+    Returns:
+        Html indicando éxito o error.
+        En el caso de exito también se explica la razon por la que no se elimina totalmente.
+    """    
     session = SessionLocal()
     token = request.args.get("token")
     try:

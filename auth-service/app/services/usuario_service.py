@@ -347,16 +347,13 @@ class UsuarioService(ServicioBase):
         except Exception as e:
             traceback.print_exc()
         
-        # Guardar los jti para logout posterior
-        jti_acceso = decoded["jti"]
 
         usuario_data["token"] = token
         usuario_data["expires_in"] = expires_in
         usuario_data["refresh_token"] = refresh_token
         usuario_data["refresh_expires"] = refresh_expires.isoformat()
         usuario_data["rol"] = roles_nombres
-        #usuario_data["access_jti"] = jti_acceso
-        #usuario_data["refresh_jti"] = jti_refresh
+
 
         return ResponseStatus.SUCCESS, "Login exitoso.", usuario_data, 200
 
