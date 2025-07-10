@@ -112,7 +112,7 @@ function Sign() {
           </Button>
 
           <Button variant="link" asChild className="p-0">
-            <Link to="/auth/otpregisterrecovery">¿Tiene un OTP de registro?</Link>
+            <Link to="/auth/otpregisterrecovery">¿Tenés un código de registro?</Link>
           </Button>
 
           {/* Botón de envío del formulario */}

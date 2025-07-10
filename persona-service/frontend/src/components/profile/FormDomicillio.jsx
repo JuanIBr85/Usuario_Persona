@@ -74,7 +74,7 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id, 
                             id="codigo_postal"
                             type="text"
                             placeholder="Código postal"
-                            labelText={<>Código Postal<a href="https://www.correoargentino.com.ar/formularios/cpa" target="_blank" className="text-indigo-600 hover:underline cursor-pointer">¿no sabes el codigo?</a></>}
+                            labelText={<>Código Postal<a href="https://www.correoargentino.com.ar/formularios/cpa" target="_blank" className="text-indigo-600 hover:underline cursor-pointer">¿no sabés el código?</a></>}
                             value={codigoPostal}
                             ref={inputCPRef}
                             onChange={(e) => setCodigoPostal(e.target.value)}
