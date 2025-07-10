@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Switch } from "@/components/ui/switch"
 
 import { Button } from "@/components/ui/button";
 import InputValidate from "@/components/inputValidate/InputValidate";
@@ -43,6 +44,7 @@ export default function FormUsuario() {
   const [openUsernameDialog, setOpenUsernameDialog] = useState(false);
   const [usernameResultOpen, setUsernameResultOpen] = useState(false);
   const [usernameMessage, setUsernameMessage] = useState("");
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
 
   const submitDeleteRequest = async (event) => {
@@ -98,11 +100,13 @@ export default function FormUsuario() {
       nuevo_email: formData.nuevo_email,
       password: formData.password,
     })
-      .then(() =>
+      .then((response) => {
+        console.log("Respuesta del cambio de email:", response);
+        updateData({ user: { ...authData.user, ...response.data } });
         setEmailMessage(
           "Se ha enviado un correo de confirmación al nuevo email."
         )
-      )
+      })
       .catch((error) =>
         setEmailMessage(
           error?.data?.message || error?.message || "Error al cambiar correo"
@@ -192,7 +196,13 @@ export default function FormUsuario() {
       />
 
       {/* eliminar cuenta */}
-      <AlertDialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+      <AlertDialog
+        open={openDeleteDialog}
+        onOpenChange={(open) => {
+          if (!open) setConfirmDelete(false);
+          setOpenDeleteDialog(open);
+        }}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Eliminar cuenta</AlertDialogTitle>
@@ -216,13 +226,21 @@ export default function FormUsuario() {
               type="password"
               labelText="Contraseña"
               placeholder="Ingresa tu contraseña"
-              validatePattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$"
-              validationMessage="La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula, un número y un carácter especial."
               required
             />
+            <div className="flex items-center gap-2">
+              <Switch
+                id="confirm_delete"
+                checked={confirmDelete}
+                onCheckedChange={setConfirmDelete}
+              />
+              <label htmlFor="confirm_delete" className="text-sm">
+                Confirmo eliminar mi cuenta
+              </label>
+            </div>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancelar</AlertDialogCancel>
-              <AlertDialogAction type="submit">Enviar</AlertDialogAction>
+              <AlertDialogAction type="submit" disabled={!confirmDelete}>Eliminar</AlertDialogAction>
             </AlertDialogFooter>
           </form>
         </AlertDialogContent>
@@ -264,7 +282,7 @@ export default function FormUsuario() {
             />
             <AlertDialogFooter>
               <AlertDialogCancel>Cancelar</AlertDialogCancel>
-              <AlertDialogAction type="submit">Enviar</AlertDialogAction>
+              <AlertDialogAction type="submit">Guardar</AlertDialogAction>
             </AlertDialogFooter>
           </form>
         </AlertDialogContent>
@@ -302,7 +320,7 @@ export default function FormUsuario() {
             />
             <AlertDialogFooter>
               <AlertDialogCancel>Cancelar</AlertDialogCancel>
-              <AlertDialogAction type="submit">Enviar</AlertDialogAction>
+              <AlertDialogAction type="submit">Guardar</AlertDialogAction>
             </AlertDialogFooter>
           </form>
         </AlertDialogContent>
