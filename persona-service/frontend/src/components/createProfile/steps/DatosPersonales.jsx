@@ -53,6 +53,7 @@ const DatosPersonales = ({ hidden, staticData, documento }) => {
           labelText="Fecha de nacimiento"
           validationMessage="La fecha de nacimiento es requerida"
           required
+          max={new Date().toISOString().split('T')[0]}
         />
       </ResponsiveColumnForm>
     </div>

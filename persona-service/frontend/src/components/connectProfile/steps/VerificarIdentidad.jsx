@@ -2,6 +2,9 @@ import InputValidate from "@/components/inputValidate/InputValidate";
 import { Button } from "@/components/ui/button";
 
 export function VerificarIdentidad({ formRef, setDialog, onSubmit }) {
+  const today = new Date().toISOString().slice(0, 10);
+  
+  console.log(today)
   return (
     <form onSubmit={onSubmit} ref={formRef}>
       <div className="flex flex-col gap-4">
@@ -30,6 +33,7 @@ export function VerificarIdentidad({ formRef, setDialog, onSubmit }) {
             labelText="Fecha de nacimiento"
             validationMessage="La fecha de nacimiento es requerida"
             required
+            max={today}
           />
           <InputValidate
             id="telefono_movil"
