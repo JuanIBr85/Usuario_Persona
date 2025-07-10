@@ -21,7 +21,7 @@ export const AuthRouteConfig = {
     "*": makeAuthRouteConfig({ loginRequired: false }),  
     // Rutas públicas (sin autenticación)
     "/auth/login": makeAuthRouteConfig({ loginRequired: false }),
-    "/auth/logout": makeAuthRouteConfig({ loginRequired: true, isAdmin: false }),
+    "/auth/logout": makeAuthRouteConfig({ loginRequired: false }),
     "/auth/sign": makeAuthRouteConfig({ loginRequired: false }),
     "/auth/forgotpassword": makeAuthRouteConfig({ loginRequired: false }),
     "/auth/resetpassword": makeAuthRouteConfig({ loginRequired: false }),
