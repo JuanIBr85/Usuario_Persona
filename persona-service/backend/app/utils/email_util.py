@@ -72,14 +72,15 @@ def enviar_notificacion_verificacion_admin(persona, datos_usuario: dict, coincid
         <p style="font-size:16px;">
             Verificación de identidad - <strong>{estado}</strong>
         </p>
+        <p>
+            El usuario <strong>{datos_usuario['nombre_persona']} {datos_usuario['apellido_persona']}</strong> 
+            está solicitando verificar su perfil.
+        </p>
     """
 
     cuerpo = f"""
-        <p>
-            El usuario <strong>{usuario_email}</strong> está solicitando verificar su perfil.
-        </p>
 
-        <p><strong>Persona en base de datos:</strong></p>
+        <p><strong>Datos registrados en la base de datos:</strong></p>
         <ul>
             <li>Tipo documento: {persona.tipo_documento}</li>
             <li>Nro documento: {persona.num_doc_persona}</li>
