@@ -90,7 +90,7 @@ export default function WaitingView() {
     //Actualiza el mensaje
     function updateMessage(){
         return <>
-            {`Esperando a que un administrador te vincule, vuelva a intentar en ${timeLeftHours}:${timeLeftMinutes}:${timeLeftSeconds}`}
+            {`Esperando a que un administrador te vincule, vuelva a intentar en ${timeLeftHours.toString().padStart(2, '0')}:${timeLeftMinutes.toString().padStart(2, '0')}:${timeLeftSeconds.toString().padStart(2, '0')}`}
             <br/>
             Esta pantalla no desaparecera hasta que el administrador te vincule o se repita {count} veces.
             <br/>

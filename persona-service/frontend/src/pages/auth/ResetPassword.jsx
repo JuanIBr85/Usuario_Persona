@@ -8,6 +8,26 @@ import Loading from "@/components/loading/Loading";
 import AuthLayout from "@/components/authLayout/AuthLayout";
 import { AuthService } from "@/services/authService";
 
+/**
+ * ResetPassword.jsx
+ * 
+ * Componente para restablecer la contraseña del usuario.
+ * 
+ * Este componente se utiliza como parte del flujo de recuperación de contraseña.
+ * Permite al usuario ingresar una nueva contraseña luego de haber verificado
+ * su identidad mediante un código OTP (token).
+ * 
+ * Flujo general:
+ * 1. El usuario accede a esta vista después de verificar su email.
+ * 2. Introduce su nueva contraseña y la confirma.
+ * 3. El formulario es enviado al backend con el email y el token de verificación.
+ * 4. Si todo es correcto, se muestra un diálogo de éxito y se redirige al login.
+ * 
+ * Requiere que:
+ * - El email esté guardado en `location.state` o `sessionStorage`.
+ * - El token de recuperación esté disponible desde el OTP anterior.
+ */
+
 const ResetPassword = () => {
   // Navegación y ubicación actual para recuperar el email
   const navigate = useNavigate();
@@ -26,7 +46,10 @@ const ResetPassword = () => {
   // Obtenemos el token guardado en sessionStorage (recibido al verificar OTP)
   const token = location.state?.token || sessionStorage.getItem("reset_token");
 
-  // Manejador del envío del formulario
+  /**
+   * Maneja el envío del formulario de cambio de contraseña.
+   * Valida los campos, envía los datos al backend y gestiona la respuesta.
+   */
   const handleSubmit = async (event) => {
     event.preventDefault(); // Prevenir comportamiento por defecto
 
@@ -35,7 +58,7 @@ const ResetPassword = () => {
     const password = formData.get("password");
     const confirm = formData.get("confirm_password");
 
-    setIsLoading(true); // Activar estado de carga
+    setIsLoading(true); // Activa spinner de carga
 
     try {
       // Enviamos la nueva contraseña al backend
@@ -63,7 +86,7 @@ const ResetPassword = () => {
     } finally {
       // Cerramos el loading y abrimos el diálogo
       setIsLoading(false);
-      setIsOpen(true);
+      setIsOpen(true); // Abre diálogo (éxito o error)
     }
   };
 
@@ -101,7 +124,8 @@ const ResetPassword = () => {
             validationMessage="Debe tener al menos 8 caracteres, mayúscula, minúscula, número y un símbolo."
             required
           />
-          {/* Campo para confirmar contraseña */}
+
+          {/* Campo para confirmar la contraseña */}
           <InputValidate
             id="confirm_password"
             name="confirm_password"
@@ -111,6 +135,7 @@ const ResetPassword = () => {
             validationMessage="Debe repetir la contraseña."
             required
           />
+
           {/* Botón para enviar el formulario */}
           <Button type="submit" className="mt-4">
             Cambiar contraseña

@@ -17,7 +17,7 @@ import Loading from "@/components/loading/Loading";
 import { AuthService } from "@/services/authService";
 import { formSubmitJson } from "@/utils/formUtils";
 import { useAuthContext } from "@/context/AuthContext";
-import { set } from "date-fns";
+
 
 
 
@@ -55,22 +55,25 @@ export default function FormUsuario() {
       email: formData.email,
       password: formData.password,
     })
-      .then((response) => {
-        console.log("Respuesta de solicitud de eliminación:", response);
+      .then(() => {
+
 
         setDeleteMessage(
           "Se envió un correo de confirmación para eliminar la cuenta."
-        )
+        );
+        setDeleteResultOpen(true);
+        setOpenDeleteDialog(false);
       })
-      .catch((error) =>
+      .catch((error) => {
         setDeleteMessage(
           error?.data?.message || error?.message || "Error al solicitar eliminación"
-        )
-      )
+        );
+        setDeleteResultOpen(true);
+        setOpenDeleteDialog(true);
+      })
       .finally(() => {
         setLoading(false);
-        setOpenDeleteDialog(false);
-        setDeleteResultOpen(true);
+
       });
   };
 
@@ -109,18 +112,21 @@ export default function FormUsuario() {
 
         setEmailMessage(
           "Se ha enviado un correo de confirmación al nuevo email."
-        )
+        );
+        setEmailResultOpen(true);
+        setOpenEmailDialog(false);
 
       })
-      .catch((error) =>
+      .catch((error) => {
         setEmailMessage(
           error?.data?.message || error?.message || "Error al cambiar correo"
         )
-      )
+        setOpenEmailDialog(true);
+        setEmailResultOpen(true);
+      })
       .finally(() => {
         setLoading(false);
-        setOpenEmailDialog(false);
-        setEmailResultOpen(true);
+
       });
   };
 
@@ -131,16 +137,19 @@ export default function FormUsuario() {
       .then((response) => {
         updateData({ user: { ...authData.user, ...response.data } });
         setUsernameMessage("Nombre de usuario actualizado correctamente.");
+        setUsernameResultOpen(true);
+        setOpenUsernameDialog(false);
       })
-      .catch((error) =>
+      .catch((error) => {
         setUsernameMessage(
           error?.data?.message || error?.message || "Error al cambiar nombre"
-        )
-      )
+        );
+        setOpenUsernameDialog(true);
+        setUsernameResultOpen(true);
+      })
       .finally(() => {
         setLoading(false);
-        setOpenUsernameDialog(false);
-        setUsernameResultOpen(true);
+
       });
   };
 
