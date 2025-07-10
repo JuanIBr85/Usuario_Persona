@@ -44,21 +44,25 @@ export default function FormUsuario() {
   const [openUsernameDialog, setOpenUsernameDialog] = useState(false);
   const [usernameResultOpen, setUsernameResultOpen] = useState(false);
   const [usernameMessage, setUsernameMessage] = useState("");
-  const [confirmDelete, setConfirmDelete] = useState(false);
+
 
 
   const submitDeleteRequest = async (event) => {
+
     const formData = await formSubmitJson(event);
     setLoading(true);
+
     AuthService.requestDelete({
       email: formData.email,
       password: formData.password,
     })
-      .then(() =>
+      .then((response) => {
+        console.log("Respuesta de solicitud de eliminación:", response);
+
         setDeleteMessage(
           "Se envió un correo de confirmación para eliminar la cuenta."
         )
-      )
+      })
       .catch((error) =>
         setDeleteMessage(
           error?.data?.message || error?.message || "Error al solicitar eliminación"
@@ -96,16 +100,18 @@ export default function FormUsuario() {
   const submitChangeEmail = async (event) => {
     const formData = await formSubmitJson(event);
     setLoading(true);
+
     AuthService.changeEmail({
       nuevo_email: formData.nuevo_email,
       password: formData.password,
     })
-      .then((response) => {
-        console.log("Respuesta del cambio de email:", response);
-        updateData({ user: { ...authData.user, ...response.data } });
+      .then(() => {
+
+
         setEmailMessage(
           "Se ha enviado un correo de confirmación al nuevo email."
         )
+        setOpenEmailDialog(false);
       })
       .catch((error) =>
         setEmailMessage(
@@ -114,7 +120,6 @@ export default function FormUsuario() {
       )
       .finally(() => {
         setLoading(false);
-        setOpenEmailDialog(false);
         setEmailResultOpen(true);
       });
   };
@@ -198,10 +203,7 @@ export default function FormUsuario() {
       {/* eliminar cuenta */}
       <AlertDialog
         open={openDeleteDialog}
-        onOpenChange={(open) => {
-          if (!open) setConfirmDelete(false);
-          setOpenDeleteDialog(open);
-        }}
+        onOpenChange={setOpenDeleteDialog}   // 👈 más simple
       >
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -228,19 +230,11 @@ export default function FormUsuario() {
               placeholder="Ingresa tu contraseña"
               required
             />
-            <div className="flex items-center gap-2">
-              <Switch
-                id="confirm_delete"
-                checked={confirmDelete}
-                onCheckedChange={setConfirmDelete}
-              />
-              <label htmlFor="confirm_delete" className="text-sm">
-                Confirmo eliminar mi cuenta
-              </label>
-            </div>
+
             <AlertDialogFooter>
               <AlertDialogCancel>Cancelar</AlertDialogCancel>
-              <AlertDialogAction type="submit" disabled={!confirmDelete}>Eliminar</AlertDialogAction>
+              {/* Botón que envía, pero NO cierra automáticamente */}
+              <Button type="submit">Eliminar</Button>
             </AlertDialogFooter>
           </form>
         </AlertDialogContent>
@@ -282,7 +276,8 @@ export default function FormUsuario() {
             />
             <AlertDialogFooter>
               <AlertDialogCancel>Cancelar</AlertDialogCancel>
-              <AlertDialogAction type="submit">Guardar</AlertDialogAction>
+              {/* Botón que envía, pero NO cierra automáticamente */}
+              <Button type="submit">Guardar</Button>
             </AlertDialogFooter>
           </form>
         </AlertDialogContent>
@@ -297,7 +292,7 @@ export default function FormUsuario() {
           <AlertDialogHeader>
             <AlertDialogTitle>Cambiar correo</AlertDialogTitle>
             <AlertDialogDescription>
-              Ingresa tu contraseña y el nuevo correo
+              Ingresa tu nuevo correo y tu contraseña actual para confirmar el cambio.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
@@ -307,7 +302,7 @@ export default function FormUsuario() {
               type="email"
               labelText="Nuevo correo"
               placeholder="Ingresa tu nuevo correo"
-              defaultValue={authData.user.email_usuario || ""}
+
               validationMessage="Email inválido"
               required
             />
@@ -320,7 +315,8 @@ export default function FormUsuario() {
             />
             <AlertDialogFooter>
               <AlertDialogCancel>Cancelar</AlertDialogCancel>
-              <AlertDialogAction type="submit">Guardar</AlertDialogAction>
+              {/* Botón que envía, pero NO cierra automáticamente */}
+              <Button type="submit">Guardar</Button>
             </AlertDialogFooter>
           </form>
         </AlertDialogContent>
