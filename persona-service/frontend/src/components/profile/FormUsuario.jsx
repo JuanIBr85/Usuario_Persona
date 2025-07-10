@@ -1,7 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Switch } from "@/components/ui/switch"
-
+import { useNavigate } from "react-router-dom"; import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button";
 import InputValidate from "@/components/inputValidate/InputValidate";
 import { SimpleDialog } from "@/components/SimpleDialog";
@@ -13,12 +11,13 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogCancel,
-  AlertDialogAction,
+
 } from "@/components/ui/alert-dialog";
 import Loading from "@/components/loading/Loading";
 import { AuthService } from "@/services/authService";
 import { formSubmitJson } from "@/utils/formUtils";
 import { useAuthContext } from "@/context/AuthContext";
+import { set } from "date-fns";
 
 
 
@@ -28,10 +27,10 @@ export default function FormUsuario() {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [deleteResultOpen, setDeleteResultOpen] = useState(false);
-  const [deleteMessage, setDeleteMessage] = useState("");
+
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);//modal de eliminar cuenta
+  const [deleteResultOpen, setDeleteResultOpen] = useState(false);//respuesta de eliminar cuenta
+  const [deleteMessage, setDeleteMessage] = useState("");//mensaje de eliminar cuenta
 
   const [otpDialogOpen, setOtpDialogOpen] = useState(false);
   const [otpMessage, setOtpMessage] = useState("");
@@ -111,7 +110,7 @@ export default function FormUsuario() {
         setEmailMessage(
           "Se ha enviado un correo de confirmación al nuevo email."
         )
-        setOpenEmailDialog(false);
+
       })
       .catch((error) =>
         setEmailMessage(
@@ -120,6 +119,7 @@ export default function FormUsuario() {
       )
       .finally(() => {
         setLoading(false);
+        setOpenEmailDialog(false);
         setEmailResultOpen(true);
       });
   };
@@ -190,15 +190,6 @@ export default function FormUsuario() {
       </div>
 
       {/* ─────────── Diálogos ─────────── */}
-
-      {/* error genérico */}
-      <SimpleDialog
-        title="Ocurrió un error"
-        description="No se pudieron completar la acción. Intenta nuevamente."
-        isOpen={openDialog}
-        action="Cerrar"
-        actionHandle={() => setOpenDialog(false)}
-      />
 
       {/* eliminar cuenta */}
       <AlertDialog
