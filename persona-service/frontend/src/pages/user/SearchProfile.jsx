@@ -18,6 +18,11 @@ const SearchProfile = () => {
                 id_persona: response.data.id_persona,
             });
 
+            //Elimino las flags de espera
+            localStorage.removeItem("persona-esperando-admin");
+            localStorage.removeItem("persona-esperando-persona");
+            localStorage.removeItem("persona-esperando-admin-count");
+
             //Si se esta esperando una redireccion, redirigira directamente hacia redirect,
             //Para que este se encargue de redirigir al usuario a la pagina correcta
             if(sessionStorage.getItem('_redirect')){
@@ -32,6 +37,17 @@ const SearchProfile = () => {
             updateUserData({
                 id_persona: 0,
             });
+            
+            //Si esta esperando a que un admin lo vincule lo mando a esperar
+            if(localStorage.getItem("persona-esperando-persona")){
+                const expirationTime = new Date();
+                expirationTime.setMinutes(expirationTime.getMinutes() + 1);
+                //expirationTime.setHours(expirationTime.getHours() + 1);
+                localStorage.setItem("persona-esperando-admin", expirationTime.toISOString());
+
+                navigate("/auth/waiting");
+                return;
+            }
             setTimeout(() => navigate('/profileconnect'), 500);
         });
     }, []);
