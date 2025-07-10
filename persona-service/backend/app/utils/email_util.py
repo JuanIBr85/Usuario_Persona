@@ -92,12 +92,12 @@ def enviar_notificacion_verificacion_admin(persona, datos_usuario: dict, coincid
 
         <p><strong>Datos ingresados por el usuario:</strong></p>
         <ul>
+            <li>Tipo documento: {datos_usuario['tipo_documento']}</li>
+            <li>Nro documento: {datos_usuario['num_doc_persona']}</li>
             <li>Nombre: {datos_usuario['nombre_persona']}</li>
             <li>Apellido: {datos_usuario['apellido_persona']}</li>
             <li>Fecha nacimiento: {datos_usuario['fecha_nacimiento_persona']}</li>
             <li>Teléfono: {datos_usuario['telefono_movil']}</li>
-            <li>Tipo documento: {datos_usuario['tipo_documento']}</li>
-            <li>Nro documento: {datos_usuario['num_doc_persona']}</li>
             <li>Email del usuario: {usuario_email}</li>
         </ul>
 
