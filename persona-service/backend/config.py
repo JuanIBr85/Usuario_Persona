@@ -34,8 +34,7 @@ SQLALCHEMY_DATABASE_URI = (
 )
 '''
 # cambiar las dos lineas de arriba por la de abajo para levantar postgres con docker. no olvidar configurar .env antes.
-SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{user}:{password_enc}@{host}/{database}"
-
+SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{user}:{password_enc}@{host}:{port}/{database}"
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 

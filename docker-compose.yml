@@ -104,6 +104,7 @@
       environment:
         - COMPONENT_SERVICE_HOST=component-service
         - POSTGRES_HOST=persona-db
+        - POSTGRES_PORT=5432
         - MAIL_SERVER=mailpit
       volumes:
         - ./persona-service/backend:/app
