@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Email Actualizado</title>
+    <style>
+        body {
+            background-color: #f9f9fb;
+            font-family: "Segoe UI", sans-serif;
+            text-align: center;
+            padding: 60px;
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: inline-block;
+        }
+        .check {
+            font-size: 60px;
+            color: #4caf50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="check">✔️</div>
+        <h2>¡Email actualizado con éxito!</h2>
+        <p>Tu nuevo correo es: <strong>{{ email }}</strong></p>
+        <p>Gracias por mantener tus datos actualizados. 📨</p>
+    </div>
+</body>
+</html>

@@ -107,15 +107,65 @@ class UsuarioModificarSchema(Schema):
         required=False,
         validate=validate.Length(min=4, error="El nombre de usuario debe tener al menos 4 caracteres.")
     )
-    email_usuario = fields.Email(
+
+
+    
+class UsuarioModificarEmailSchema(Schema):
+        nuevo_email = fields.Email(
         required=False,
         error_messages={
             "invalido": "Debe ser un email válido."
         }
     )
-    @pre_load
-    def lower_case_fields(self, data, **kwargs):
-        if "email_usuario" in data and isinstance(data["email_usuario"], str):
-            data["email_usuario"] = data["email_usuario"].lower()
-        return data
-    
+        password = fields.Str(
+            load_only=True, 
+            required=False, 
+            validate=[
+                validate.Length(min=6, error="La contraseña debe tener al menos 6 caracteres."),
+                validate.Regexp(
+                        regex=r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$",
+                        error="La contraseña debe contener al menos una letra minúscula, una letra mayúscula, " \
+                        "un número y un símbolo."
+                )
+            ],
+            error_messages={"Requerido": "La contraseña es obligatoria."}
+        )
+        
+        @pre_load
+        def lower_case_fields(self, data, **kwargs):
+            if "nuevo_email" in data and isinstance(data["nuevo_email"], str):
+                data["nuevo_email"] = data["nuevo_email"].lower()
+            return data
+
+class UsuarioEliminarSchema(Schema):
+        email_usuario = fields.Email(
+        required=False,
+        error_messages={
+            "invalido": "Debe ser un email válido."
+        }
+    )
+        password = fields.Str(
+            load_only=True, 
+            required=False, 
+            validate=[
+                validate.Length(min=6, error="La contraseña debe tener al menos 6 caracteres."),
+                validate.Regexp(
+                        regex=r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$",
+                        error="La contraseña debe contener al menos una letra minúscula, una letra mayúscula, " \
+                        "un número y un símbolo."
+                )
+            ],
+            error_messages={"Requerido": "La contraseña es obligatoria."}
+        )
+        
+        @pre_load
+        def lower_case_fields(self, data, **kwargs):
+            if "email_usuario" in data and isinstance(data["email_usuario"], str):
+                data["email_usuario"] = data["email_usuario"].lower()
+            return data
+        
+        @pre_load
+        def map_fields(self, data, **kwargs):
+            if "email" in data:
+                data["email_usuario"] = data.pop("email")
+            return data

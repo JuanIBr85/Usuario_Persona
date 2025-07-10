@@ -109,7 +109,7 @@ def generar_token_restauracion(email: str) -> str:
         "type": "restauracion_admin",
         "exp": datetime.now(timezone.utc) + timedelta(minutes=720),
     }
-    return encode(payload, getenv("JWT_SECRET"), algorithm="HS256")
+    return encode(payload, getenv("JWT_SECRET_KEY"), algorithm="HS256")
 
 def generar_token_confirmacion_usuario(email: str) -> str:
     payload = {
@@ -118,11 +118,11 @@ def generar_token_confirmacion_usuario(email: str) -> str:
         "type": "restauracion_usuario",
         "exp": datetime.now(timezone.utc) + timedelta(minutes=30),
     }
-    return encode(payload, getenv("JWT_SECRET"), algorithm="HS256")
+    return encode(payload, getenv("JWT_SECRET_KEY"), algorithm="HS256")
 
 def verificar_token_restauracion(token: str, tipo: str = "restauracion_admin") -> str | None:
     try:
-        payload = decode(token, getenv("JWT_SECRET"), algorithms=["HS256"])
+        payload = decode(token, getenv("JWT_SECRET_KEY"), algorithms=["HS256"])
         if payload.get("type") != tipo:
             return None
         return payload.get("email")
@@ -131,7 +131,7 @@ def verificar_token_restauracion(token: str, tipo: str = "restauracion_admin") -
     
 def verificar_token_restauracion_usuario(token: str, tipo: str = "restauracion_usuario") -> str | None:
     try:
-        payload = decode(token, getenv("JWT_SECRET"), algorithms=["HS256"])
+        payload = decode(token, getenv("JWT_SECRET_KEY"), algorithms=["HS256"])
         if payload.get("type") != tipo:
             return None
         return payload.get("email")
@@ -162,3 +162,38 @@ def decodificar_token_verificacion(token: str) -> dict:
         raise ValueError("Token expirado.")
     except InvalidTokenError:
         raise ValueError("Token inválido.")
+    
+def generar_token_modificar_email(email:str,id_usuario:int)->str:
+    payload = {
+        "sub": str(id_usuario),
+        "nuevo_email": email,
+        "type": "modificar_email",
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=30),
+    }
+    return encode(payload, getenv("JWT_SECRET_KEY"), algorithm="HS256")
+
+def verificar_token_modificar_email(token: str):
+    try:
+        payload = decode(token, getenv("JWT_SECRET_KEY"), algorithms=["HS256"])
+        if payload.get("type") != "modificar_email":
+            return None
+        return payload
+    except (ExpiredSignatureError, InvalidTokenError) as e:
+        return None
+
+def generar_token_eliminacion(id_usuario: int) -> str:
+    payload = {
+        "sub": str(id_usuario),
+        "type": "eliminar_usuario",
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=30),
+    }
+    return encode(payload, getenv("JWT_SECRET_KEY"), algorithm="HS256")
+
+def verificar_token_eliminacion(token: str):
+    try:
+        payload = decode(token, getenv("JWT_SECRET_KEY"), algorithms=["HS256"])
+        if payload.get("type") != "eliminar_usuario":
+            return None
+        return payload
+    except (ExpiredSignatureError, InvalidTokenError) as e:
+        return None

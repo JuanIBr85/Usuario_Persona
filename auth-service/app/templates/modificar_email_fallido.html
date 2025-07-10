@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Error al actualizar</title>
+    <style>
+        body {
+            background-color: #fff3f3;
+            font-family: "Segoe UI", sans-serif;
+            text-align: center;
+            padding: 60px;
+            color: #a33;
+        }
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: inline-block;
+        }
+        .error {
+            font-size: 60px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="error">❌</div>
+        <h2>No se pudo actualizar el email</h2>
+        <p>{{ mensaje }}</p>
+        <p>Intenta de nuevo o contacta soporte.</p>
+    </div>
+</body>
+</html>

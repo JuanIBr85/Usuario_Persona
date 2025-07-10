@@ -13,6 +13,7 @@ from app.utils.jwt import (
     generar_token_reset,
     crear_token_refresh,
     create_access_token,
+    verificar_token_eliminacion,
 )
 from app.schemas.usuarios_schema import (
     LoginSchema,
@@ -26,10 +27,12 @@ from marshmallow import ValidationError
 from app.services.servicio_base import ServicioBase
 from app.models.permisos import Permiso
 from app.utils.email import (
-    enviar_codigo_por_email,
+    enviar_codigo_reset_por_email,
     enviar_codigo_por_email_registro,
     enviar_solicitud_restauracion_admin,
     enviar_email_validacion_dispositivo,
+    enviar_email_modificar_email,
+    enviar_email_confirmacion_eliminacion,
 )
 from app.utils.otp_manager import (
     guardar_otp,
@@ -381,40 +384,148 @@ class UsuarioService(ServicioBase):
 
     # -----------------------------------------------------------------------------------------------------------------------------
 
-    def modificar_usuario(self, session:Session, usuario_id: int, nuevo_nombre_usuario: str = None, nuevo_email: str = None) -> dict:
+    def modificar_nombre_usuario(self, session: Session, usuario_id: int, nuevo_nombre_usuario: str = None) -> dict:
         try:
-            usuario = session.query(Usuario).filter_by(id_usuario=usuario_id,eliminado=False).first()
+            usuario = session.query(Usuario).filter_by(id_usuario=usuario_id, eliminado=False).first()
             if not usuario:
                 return ResponseStatus.FAIL, "Usuario no encontrado", None, 404
 
-            if nuevo_nombre_usuario and nuevo_nombre_usuario != usuario.nombre_usuario:
-                existente = session.query(Usuario).filter(func.lower(Usuario.nombre_usuario) == nuevo_nombre_usuario.lower()
-                    ).first()
-                if existente:
-                    return ResponseStatus.FAIL, "El nombre de usuario ya está en uso", None, 409
-                usuario.nombre_usuario = nuevo_nombre_usuario
+            # Normalizamos para comparar, pero no para guardar
+            nuevo_nombre_normalizado = nuevo_nombre_usuario.strip().lower()
+            nombre_actual_normalizado = usuario.nombre_usuario.strip().lower()
 
-            if nuevo_email and nuevo_email != usuario.email_usuario:
-                existente = session.query(Usuario).filter_by(email_usuario=nuevo_email).first()
-                if existente:
-                    return ResponseStatus.FAIL, "El email ya está en uso", None, 409
-                usuario.email_usuario = nuevo_email
+            # Si es el mismo nombre, no hacer nada
+            if nuevo_nombre_normalizado == nombre_actual_normalizado:
+                return (
+                    ResponseStatus.FAIL,
+                    "El nuevo nombre es igual al actual",
+                    None,
+                    400,
+                )
+
+            # Si ya existe otro usuario con ese nombre (case insensitive)
+            existente = session.query(Usuario).filter(
+                func.lower(Usuario.nombre_usuario) == nuevo_nombre_normalizado,
+                Usuario.id_usuario != usuario_id,  # Importante para no coincidir consigo mismo
+            ).first()
+
+            if existente:
+                return ResponseStatus.FAIL, "El nombre de usuario ya está en uso", None, 409
+
+            # Guardar tal cual lo envió el usuario
+            usuario.nombre_usuario = nuevo_nombre_usuario.strip()
 
             session.commit()
             session.refresh(usuario)
 
-            # Retornamos los nuevos datos actualizados
             return ResponseStatus.SUCCESS, "Usuario modificado con éxito", {
                 "id_usuario": usuario.id_usuario,
                 "nombre_usuario": usuario.nombre_usuario,
-                "email_usuario": usuario.email_usuario
             }, 200
 
         except Exception as e:
             session.rollback()
             raise e
+
     # -----------------------------------------------------------------------------------------------------------------------------
-    
+
+    def modificar_email_usuario(self, session: Session,usuario_id: int,nuevo_email:str,password:str) -> dict:
+        try:
+            usuario = session.query(Usuario).filter_by(id_usuario=usuario_id,eliminado=False).first()
+            if not usuario:
+                return ResponseStatus.FAIL, "Usuario no encontrado", None, 404
+            
+            if not check_password_hash(usuario.password, password):
+                return (
+                    ResponseStatus.UNAUTHORIZED,
+                    "Contraseña incorrecta",
+                    None,
+                    400,
+                )            
+                
+            nuevo_email_normalizado = nuevo_email.strip().lower()
+
+            if nuevo_email_normalizado == usuario.email_usuario:
+                return (
+                    ResponseStatus.FAIL,
+                    "El nuevo email es igual al actual",
+                    None,
+                    400,
+                )
+
+            existente = session.query(Usuario).filter_by(email_usuario=nuevo_email_normalizado).first()
+            if existente:
+                return ResponseStatus.FAIL, "El email ya está en uso", None, 409
+
+            enviar_email_modificar_email(usuario, nuevo_email_normalizado)
+
+            return ResponseStatus.SUCCESS, "Email enviado al nuevo correo", None, 200
+
+        except Exception as e:
+            session.rollback()
+            raise e
+
+    # -----------------------------------------------------------------------------------------------------------------------------
+    def confirmacion_modificar_email(self, session:Session, datos:dict)->dict:
+
+        try:
+            if datos.get("type") != "modificar_email":
+                raise ValueError("Token inválido")
+
+            usuario_id = datos["sub"]
+            nuevo_email = datos["nuevo_email"]
+
+            usuario = session.query(Usuario).filter_by(id_usuario=usuario_id, eliminado=False).first()
+            if not usuario:
+                raise ValueError("Usuario no encontrado")
+
+            usuario.email_usuario = nuevo_email
+            session.commit()
+
+            return ResponseStatus.SUCCESS, "Email de Usuario modificado con éxito", {
+                    "id_usuario": usuario.id_usuario,
+                    "email_usuario": usuario.email_usuario
+                }, 200
+        
+        except Exception as e:
+            session.rollback()
+            raise e
+
+
+    # -----------------------------------------------------------------------------------------------------------------------------
+ 
+    def solicitar_eliminacion(self, session: Session,usuario_id: int,email_data:str,password:str) -> dict:
+            try:
+                usuario = session.query(Usuario).filter_by(id_usuario=usuario_id,eliminado=False).first()
+                if not usuario:
+                    return ResponseStatus.FAIL, "Usuario no encontrado", None, 404
+                
+                if not check_password_hash(usuario.password, password):
+                    return (
+                        ResponseStatus.UNAUTHORIZED,
+                        "Contraseña incorrecta",
+                        None,
+                        400,
+                    )                         
+
+                if email_data != usuario.email_usuario:
+                    
+                    return (
+                        ResponseStatus.FAIL,
+                        "El email debe ser el mismo del usuario.",
+                        None,
+                        400,
+                    )
+
+                enviar_email_confirmacion_eliminacion(usuario)
+                return ResponseStatus.SUCCESS, "Se envió un email al correo para verificar su eliminación de cuenta.", None, 200
+
+            except Exception as e:
+                session.rollback()
+                raise e
+
+    # -----------------------------------------------------------------------------------------------------------------------------
+
     def eliminar_usuario(self, session:Session, usuario_id: int):
         usuario = session.query(Usuario).filter_by(id_usuario=usuario_id).first()
 
@@ -423,7 +534,6 @@ class UsuarioService(ServicioBase):
 
         if usuario.eliminado:
             return ResponseStatus.FAIL, "El usuario ya fue eliminado", None, 400
-
         self.delete(usuario_id, soft=True, session=session)
 
         try:
@@ -476,7 +586,7 @@ class UsuarioService(ServicioBase):
 
             otp = generar_codigo_otp()
             guardar_otp(email, otp)
-            enviar_codigo_por_email(usuario, otp)
+            enviar_codigo_reset_por_email(usuario, otp)
 
             return ResponseStatus.SUCCESS, "Código OTP enviado al correo", None, 200
         except Exception as e:

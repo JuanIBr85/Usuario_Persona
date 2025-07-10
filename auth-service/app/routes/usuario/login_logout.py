@@ -1,15 +1,16 @@
 import traceback
 from typing import Any, Literal
-from app.schemas.usuarios_schema import UsuarioModificarSchema
+from app.schemas.usuarios_schema import UsuarioModificarSchema,UsuarioModificarEmailSchema,UsuarioEliminarSchema
 from marshmallow import ValidationError
 from common.utils.component_request import ComponentRequest
-from flask import request, Blueprint
+from flask import request, Blueprint,render_template
 from app.database.session import SessionLocal
 from app.services.usuario_service import UsuarioService
 from common.decorators.api_access import api_access
 from common.models.cache_settings import CacheSettings
 from common.utils.response import make_response, ResponseStatus
-
+from app.utils.jwt import verificar_token_modificar_email,verificar_token_eliminacion
+from app.utils.email import enviar_email_confirmacion_eliminacion
 bp = Blueprint(
     "usuario_login_logout", __name__, cli_group="usuario"
 )
@@ -148,17 +149,17 @@ def logout_usuario() -> tuple[dict[Any, Any], Any] | tuple[dict[Any, Any], Liter
     is_public=False, 
     limiter=["6 per minute"],
 )
-def modificar_perfil():
+def modificar_nombre_usuario():
     """
-    Modifica el nombre de usuario y/o email del usuario autenticado.
+    Modifica el nombre de usuario
 
     Requiere:
         - JWT válido.
-        - JSON con uno o ambos campos: `nombre_usuario`, `email_usuario`.
+        - JSON con uno o ambos campos: `nombre_usuario`.
 
     Funcionalidad:
         - Valida datos con `UsuarioModificarSchema`.
-        - Aplica los cambios al perfil.
+        - Aplica el cambio al perfil.
         - Devuelve el nuevo estado del usuario.
 
     Returns:
@@ -172,10 +173,9 @@ def modificar_perfil():
         campos = schema.load(datos)
 
         nuevo_username = campos.get("nombre_usuario")
-        nuevo_email = campos.get("email_usuario")
 
-        status, mensaje, data, code = usuario_service.modificar_usuario(
-            session, usuario_id, nuevo_username, nuevo_email
+        status, mensaje, data, code = usuario_service.modificar_nombre_usuario(
+            session, usuario_id, nuevo_username
         )
         return make_response(status, mensaje, data), code
     
@@ -195,8 +195,83 @@ def modificar_perfil():
     finally:
         session.close()
 
+@bp.route("/cambiar-email", methods=["POST"])
+@api_access(
+    is_public=False, 
+    limiter=["6 per minute"],
+)
+def modificar_email_usuario():
+    """
+    Modifica el email de usuario
 
-@bp.route("/eliminar", methods=["DELETE"])
+    Requiere:
+        - JWT válido.
+        - JSON con uno o ambos campos: `email_usuario`.
+
+    Funcionalidad:
+        - Valida datos con `UsuarioModificarEmailSchema`.
+        - Aplica el cambio al perfil.
+        - Devuelve el nuevo estado del usuario.
+
+    Returns:
+        JSON con status, mensaje y nuevos datos del perfil.
+    """
+    session = SessionLocal()
+    try:
+        usuario_id = ComponentRequest.get_user_id()
+        datos = request.get_json()
+        schema = UsuarioModificarEmailSchema()
+        campos = schema.load(datos)
+
+        password = campos.get("password")
+        nuevo_email = campos.get("nuevo_email")
+
+        status, mensaje, data, code = usuario_service.modificar_email_usuario(
+            session, usuario_id, nuevo_email, password
+        )
+        return make_response(status, mensaje, data), code
+    
+    except ValidationError as err:
+        return make_response(ResponseStatus.FAIL, "Datos inválidos", err.messages), 400
+    
+    except Exception as e:
+        return (
+            make_response(
+                ResponseStatus.ERROR,
+                "Error al modificar Email",
+                str(e),
+                error_code="MODIFICAR_USUARIO_ERROR",
+            ),
+            500,
+        )
+    finally:
+        session.close()
+
+@bp.route("/confirmar-modificar-email", methods=["GET"])
+@api_access(is_public=True)
+def confirmar_cambio_email():
+    session = SessionLocal()
+    token = request.args.get("token")
+    try:
+        if not token:
+            raise ValueError("Token faltante")
+        datos = verificar_token_modificar_email(token)
+        if not datos:
+            raise ValueError("Token inválido o expirado")
+        
+        nuevo_email = datos.get("nuevo_email")
+        usuario_service.confirmacion_modificar_email(session,datos)
+        return render_template("modificar_email_exitoso.html", email=nuevo_email)
+
+    except Exception as e:
+        session.rollback()
+        return render_template("modificar_email_fallido.html", mensaje=str(e)), 400
+
+    finally:
+        session.close()
+
+
+@bp.route("/solicitar-eliminacion", methods=["POST"])
 @api_access(
     is_public=False, 
     limiter="2 per day",
@@ -218,7 +293,16 @@ def eliminar_usuario():
     session = SessionLocal()
     try:
         usuario_id = ComponentRequest.get_user_id()
-        status, mensaje, data, code = usuario_service.eliminar_usuario(session, usuario_id)
+        datos = request.get_json()
+        schema = UsuarioEliminarSchema()
+        campos = schema.load(datos)
+
+        password = campos.get("password")
+        email_data = campos.get("email_usuario")
+
+        status, mensaje, data, code = usuario_service.solicitar_eliminacion(
+            session, usuario_id, email_data, password
+        )
         return make_response(status, mensaje, data), code
 
     except Exception as e:
@@ -231,6 +315,34 @@ def eliminar_usuario():
 
     finally:
         session.close()
+
+@bp.route("/confirmar-eliminacion", methods=["GET"])
+@api_access(is_public=True)
+def confirmar_eliminacion_usuario():
+    session = SessionLocal()
+    token = request.args.get("token")
+    try:
+        if not token:
+            raise ValueError("Token faltante")
+
+        datos = verificar_token_eliminacion(token)
+        if not datos:
+            raise ValueError("Token inválido o expirado")
+
+        usuario_id = int(datos.get("sub"))
+        status, mensaje, _, _ = usuario_service.eliminar_usuario(session, usuario_id)
+        if status != ResponseStatus.SUCCESS:
+            raise ValueError(mensaje)
+
+        return render_template("eliminacion_exitosa.html")
+
+    except Exception as e:
+        session.rollback()
+        return render_template("eliminacion_fallida.html", mensaje=str(e)), 400
+
+    finally:
+        session.close()
+
 
 
 @bp.route("/perfil", methods=["GET"])
