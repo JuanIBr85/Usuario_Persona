@@ -46,7 +46,17 @@ def censurar_email(email: str) -> str:
 
 # email a administrador para terminar de vincular un usuario con un perfil de persona ya existente
 def enviar_notificacion_verificacion_admin(persona, datos_usuario: dict, coinciden: bool):
-    admin_email = current_app.config["ADMIN_EMAIL"]
+    admin_email = current_app.config["ADMIN_EMAIL"] or "admin@example.com"
+
+    nombre, apellido, fecha_nac, telefono, tipo_doc, num_doc, email = (
+        datos_usuario['nombre_persona'],
+        datos_usuario['apellido_persona'],
+        datos_usuario['fecha_nacimiento_persona'],
+        datos_usuario['telefono_movil'],
+        datos_usuario['tipo_documento'],
+        datos_usuario['num_doc_persona'],
+        datos_usuario['usuario_email']
+    )
 
     estado = "COINCIDEN" if coinciden else "NO COINCIDEN"
 
@@ -63,10 +73,13 @@ def enviar_notificacion_verificacion_admin(persona, datos_usuario: dict, coincid
             f"- Fecha nacimiento: {persona.fecha_nacimiento_persona}\n"
             f"- Teléfono: {persona.contacto.telefono_movil}\n\n"
             f"Datos proporcionados por el usuario:\n"
-            f"- Nombre: {datos_usuario.get('nombre')}\n"
-            f"- Apellido: {datos_usuario.get('apellido')}\n"
-            f"- Fecha nacimiento: {datos_usuario.get('fecha_nacimiento')}\n"
-            f"- Teléfono: {datos_usuario.get('telefono_movil')}\n\n"
+            f"- Nombre: {nombre}\n"
+            f"- Apellido: {apellido}\n"
+            f"- Fecha nacimiento: {fecha_nac}\n"
+            f"- Teléfono: {telefono}\n"
+            f"- Tipo documento: {tipo_doc}\n"
+            f"- Nro documento: {num_doc}\n"
+            f"- Email del usuario: {email}\n\n"
             f"Resultado de verificación: {estado}\n\n"
             "Por favor, revise esta solicitud en el sistema."
         )

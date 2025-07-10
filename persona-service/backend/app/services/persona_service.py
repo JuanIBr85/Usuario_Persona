@@ -593,59 +593,69 @@ class PersonaService(IPersonaInterface):
             session.close()
 
 
-#VERIFICACION DE DATOS PERSONALES PARA VINCULACION DE USUARIO Y PERSONA
-def verificar_datos_personales(
-    self,
-    persona_id: int,
-    datos_usuario: dict
-) -> dict:
-    #recibe id_persona que ya estaba localizada, para no volver a verificar el documento
-    session = SessionLocal()
-    try:
-        persona = (
-            session.query(Persona)
-            .filter(
-                Persona.id_persona == persona_id,
-                Persona.deleted_at.is_(None),
-                Persona.usuario_id.is_(None),
-            )
-            .first()
+    #VERIFICACION DE DATOS PERSONALES PARA VINCULACION DE USUARIO Y PERSONA
+    def verificar_datos_personales(
+        self,
+        datos_usuario: dict
+    ) -> dict:
+
+        nombre, apellido, fecha_nac, telefono, tipo_doc, num_doc, email = (
+            datos_usuario['nombre_persona'],
+            datos_usuario['apellido_persona'],
+            datos_usuario['fecha_nacimiento_persona'],
+            datos_usuario['telefono_movil'],
+            datos_usuario['tipo_documento'],
+            datos_usuario['num_doc_persona'],
+            datos_usuario['usuario_email']
         )
 
-        if not persona:
-            return {
-                "encontrada": False,
-                "coinciden": False,
-                "mensaje": "No existe una persona con este identificador."
-            }
-        
-        fecha_nac_dt = datos_usuario["fecha_nacimiento"]
+        #recibe id_persona que ya estaba localizada, para no volver a verificar el documento
+        session = SessionLocal()
+        try:
+            persona = (
+                session.query(Persona)
+                .filter(
+                    Persona.tipo_documento == tipo_doc,
+                    Persona.num_doc_persona == num_doc,
+                    Persona.usuario_id.is_(None),
+                )
+                .first()
+            )
+            
+            if not persona:
+                return {
+                    "encontrada": False,
+                    "coinciden": False,
+                    "mensaje": "No existe una persona con este identificador."
+                }
+            
+            fecha_nac_dt = fecha_nac
 
-        if fecha_nac_dt > date.today():
+            if fecha_nac_dt > date.today():
+                return {
+                    "encontrada": True,
+                    "coinciden": False,
+                    "mensaje": "La fecha de nacimiento no puede ser futura."
+                }
+
+            coinciden = (
+                persona.nombre_persona.strip().lower() == nombre.strip().lower()
+                and persona.apellido_persona.strip().lower() == apellido.strip().lower()
+                and persona.fecha_nacimiento_persona == fecha_nac_dt
+                #and persona.contacto.telefono_movil.strip() == telefono.strip()
+            )
+
+            # Enviar notificación al administrador
+            enviar_notificacion_verificacion_admin(persona, datos_usuario, coinciden)
+
+            mensaje = ("Tus datos concuerdan, se enviara la informacion al administrador para continuar con la vinculación."
+                    if coinciden
+                    else "Los datos proporcionados no coinciden. Contacta al administrador para continuar la verificación.")
             return {
                 "encontrada": True,
-                "coinciden": False,
-                "mensaje": "La fecha de nacimiento no puede ser futura."
+                "coinciden": coinciden,
+                "mensaje": mensaje        
             }
 
-        coinciden = (
-            persona.nombre_persona.strip().lower() == datos_usuario["nombre"].strip().lower()
-            and persona.apellido_persona.strip().lower() == datos_usuario["apellido"].strip().lower()
-            and persona.fecha_nacimiento_persona == fecha_nac_dt
-            and persona.contacto.telefono_movil.strip() == datos_usuario["telefono_movil"].strip()
-        )
-
-        # Enviar notificación al administrador
-        enviar_notificacion_verificacion_admin(persona, datos_usuario, coinciden)
-
-        mensaje = ("Tus datos concuerdan, se enviara la informacion al administrador para continuar con la vinculación."
-                if coinciden
-                else "Los datos proporcionados no coinciden. Contacta al administrador para continuar la verificación.")
-        return {
-            "encontrada": True,
-            "coinciden": coinciden,
-            "mensaje": mensaje        
-        }
-
-    finally:
-        session.close()
+        finally:
+            session.close()

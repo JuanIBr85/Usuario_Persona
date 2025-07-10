@@ -144,6 +144,48 @@ function PerfilConnect() {
     }
   }
 
+  const handleIdentidadVerification = async (event) => {
+    event.preventDefault();
+    const formData = await formSubmitJson(event);
+    setLoading(true);
+
+    try {
+      const response = await PersonaService.verificar_identidad({
+        ...formData, 
+        ...tempData,
+        usuario_email:authData.user.email_usuario
+      });
+
+      setDialog({
+        title: "Verificar identidad",
+        action: () => {
+          //Marcamos este cliente como esperando al admin para su vinculacion.
+          const expirationTime = new Date();
+          expirationTime.setMinutes(expirationTime.getMinutes() + 1);
+          //expirationTime.setHours(expirationTime.getHours() + 6);
+          localStorage.setItem("persona-esperando-admin", expirationTime.toISOString());
+          navigate('/searchprofile')
+        },
+        description: <>
+          Tus petición fue aceptada, enviaremos una petición de verificación al administrador, te contactaremos pronto
+          <br />
+          En caso de no ser contactado, puedes contactarnos al correo <a className="text-blue-500" href="mailto:soporte@persona.com">soporte@persona.com</a>
+          <br />
+          o llamar al número <a className="text-blue-500" href="tel:+56912345678">+56912345678</a>
+        </>
+      })
+    } catch (error) {
+      setDialog({
+        title: "Hubo un error",
+        actionName: "Cerrar",
+        description: error.data.message,
+      });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+
   const nextStep = () => {
     setCurrentStep(prev => Math.min(prev + 1, 3));
   };
@@ -187,6 +229,7 @@ function PerfilConnect() {
           <VerificarIdentidad
             formRef={formRef}
             setDialog={setDialog}
+            onSubmit={handleIdentidadVerification}
           />
         );
       default:

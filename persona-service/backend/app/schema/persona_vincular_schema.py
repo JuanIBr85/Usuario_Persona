@@ -1,5 +1,5 @@
 from marshmallow import Schema, fields, validate
-#from app.schema.base_schema import BaseSchema
+from config import TIPOS_DOCUMENTO_VALIDOS
 
 
 class ValidarDocumentoSchema(Schema):
@@ -18,8 +18,13 @@ class ValidarOtpSchema(Schema):
     codigo = fields.Str(required=True, validate=validate.Length(min=6, max=6))
 
 class VerificarIdentidadSchema(Schema):
-    persona_id = fields.Int(required=True)
-    nombre = fields.Str(required=True)
-    apellido = fields.Str(required=True)
-    fecha_nacimiento = fields.Date(required=True, format="%Y-%m-%d")
-    telefono_movil = fields.Str(required=True)
+    nombre_persona = fields.Str(required=True, validate=validate.Length(min=2, max=50))
+    apellido_persona = fields.Str(required=True, validate=validate.Length(min=2, max=50))
+    fecha_nacimiento_persona = fields.Date(required=True, format="%Y-%m-%d")
+    telefono_movil = fields.Str(required=True, validate=validate.Length(min=8, max=20))
+    tipo_documento = fields.Str(
+        required=True, validate=validate.OneOf(list(TIPOS_DOCUMENTO_VALIDOS.keys()))
+    )    
+    num_doc_persona = fields.Str(required=True, validate=validate.Length(min=8, max=30))
+    usuario_email = fields.Email(required=True, validate=validate.Length(max=50))
+

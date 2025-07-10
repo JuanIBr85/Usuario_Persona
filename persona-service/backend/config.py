@@ -18,28 +18,23 @@ if os.path.exists(dotenv_path):
 load_dotenv(".env.example", override=False)
 print("Variables cargadas desde .env.example (solo las faltantes)")
 
-# CONFIGURACIONES GENERALES
-
 # CONFIGURACIONES BASE DE DATOS
 
-user = os.environ["MYSQL_USER"]
-password = os.environ["MYSQL_PASSWORD"]
-host = os.environ["MYSQL_HOST"]
-database = os.environ["MYSQL_DATABASE"]
-port = os.environ.get("MYSQL_PORT", "3306")
+user = os.environ["POSTGRES_USER"]
+password = os.environ["POSTGRES_PASSWORD"]
+host = os.environ["POSTGRES_HOST"]
+database = os.environ["POSTGRES_DB"]
+port = os.environ.get("POSTGRES_PORT", "5432")
 
 password_enc = urllib.parse.quote(password)
 
-# port = os.environ.get("MYSQL_PORT", "3306")
 '''
 SQLALCHEMY_DATABASE_URI = (
-    f"mysql+pymysql://{user}:{password_enc}@{host}:{port}/{database}"
+    f"postgresql+psycopg2://{user}:{password_enc}@{host}:{port}/{database}"
 )
 '''
-# cambiar las dos lineas de arriba por la de abajo para levantar mysql con docker. no olvidar configurar .env antes.
-SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{user}:{password_enc}@{host}/{database}"
-
-
+# cambiar las dos lineas de arriba por la de abajo para levantar postgres con docker. no olvidar configurar .env antes.
+SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{user}:{password_enc}@{host}:{port}/{database}"
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 

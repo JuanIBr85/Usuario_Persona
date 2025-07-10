@@ -27,6 +27,7 @@ import EndpointsResearch from "@/pages/endpoints/EndpointsResearch";
 import CreatePerfil from "@/pages/user/CreatePerfil";
 import OTPRegisterRecovery from "@/pages/auth/OTPRegisterRecovery";
 import SearchProfile from "@/pages/user/SearchProfile";
+import WaitingView from "@/pages/auth/WaitingView";
 /**
  * Componente que define todas las rutas de la aplicación utilizando react-router-dom.
  * Cada ruta se asocia con un componente de página específico para renderizar.
@@ -68,6 +69,7 @@ function AppRoutes() {
       <Route path="auth/redirect" element={<Redirect />} />
       <Route path="auth/otpregister" element={<OTPRegister />} />
       <Route path="auth/otpregisterrecovery" element={<OTPRegisterRecovery />} />
+      <Route path="auth/waiting" element={<WaitingView />} />
     </Routes>
   );
 }

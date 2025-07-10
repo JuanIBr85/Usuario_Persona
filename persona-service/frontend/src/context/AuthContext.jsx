@@ -50,9 +50,10 @@ function AuthContextProvider({ children }) {
     const [isFirstCheck, setIsFirstCheck] = useState(true);
     const location = useLocation();
 
+    //Funcion para calcular el tiempo restante para que expire el token
     const timeLeftToExpire = () => (new Date(authData.user.expires_in) - new Date()) / 1000;
 
-    // Función para verificar si el token es válido
+    //Funcion para verificar si el token es valido
     const isTokenValid = () => {
         if (!authData.user?.expires_in) {
             console.error("No se encontro fecha de expiracion del token", authData);
@@ -64,6 +65,7 @@ function AuthContextProvider({ children }) {
         return now <= expirationDate;
     };
 
+    //Funcion para establecer un dialogo
     const setDialog = (_dialog) => {
         //Si hay un dialogo activo no se permite reemplazarlo por otro
         //Pero si por un null o undefined se permite
@@ -77,6 +79,7 @@ function AuthContextProvider({ children }) {
         _setDialog(_dialog);
     };
 
+    //Funcion para actualizar los datos de autenticación
     const updateData = (values) => {
         setAuthData(data => {
             const newData = { ...data, ...values };
@@ -90,14 +93,17 @@ function AuthContextProvider({ children }) {
         });
     };
 
+    //Funcion para actualizar los datos del usuario
     const updateUserData = (values) => {
         updateData({
             user: { ...authData.user, ...values }
         })
     };
 
-
+    //Funcion para eliminar los datos de autenticación
     const removeAuthData = (rason) => {
+        if (!hasToken()) return;
+
         if (!rason) {
             throw new Error("No se proporciono una razon para eliminar los datos de autenticación");
         }
@@ -114,7 +120,7 @@ function AuthContextProvider({ children }) {
         Object.assign(tempAuthData, defaultData);
     }
 
-
+    //Funcion para redirigir a la pantalla de login
     const navigate = useCallback(
         async (path, rason) => {
             removeAuthData(rason);
@@ -126,7 +132,7 @@ function AuthContextProvider({ children }) {
         [_navigate]
     );
 
-
+    //Verifica si el token es valido
     const checkAuth = () => {
         if (isPublicRoute()) {
             //Evitar cualquier error por dialogo de autorizacion
@@ -170,6 +176,13 @@ function AuthContextProvider({ children }) {
 
     //Verifica si el usuario esta autenticado al cambiar la ruta
     useEffect(() => {
+        //Si el usuario esta esperando a que un admin lo vincule, lo redirijo a la pantalla de espera
+        if(!window.location.pathname.includes("/auth/waiting") && localStorage.getItem("persona-esperando-admin")){
+            _navigate("/auth/waiting")
+            return;
+        }
+
+        //Verifico si el usuario esta autenticado
         let check = false;
         if (!isUnauthorizedRoute || isFirstCheck) {
             check = checkAuth();
@@ -177,6 +190,7 @@ function AuthContextProvider({ children }) {
             setTimeout(() => setIsFirstCheck(false), 1000);
         }
 
+        //Si el usuario no tiene acceso a la ruta, lo redirijo a la pantalla de perfil
         const pathname = location.pathname.replace(/\/\d+$/, '')
         if(check && !hasAccess(pathname)){
             _navigate("/searchprofile")
