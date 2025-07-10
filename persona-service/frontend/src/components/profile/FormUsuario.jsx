@@ -63,6 +63,7 @@ export default function FormUsuario() {
         );
         setDeleteResultOpen(true);
         setOpenDeleteDialog(false);
+
       })
       .catch((error) => {
         setDeleteMessage(
@@ -340,7 +341,12 @@ export default function FormUsuario() {
         title="Eliminar cuenta"
         description={deleteMessage}
         isOpen={deleteResultOpen}
-        actionHandle={() => setDeleteResultOpen(false)}
+        action="Aceptar"
+        actionHandle={() => {
+          setDeleteResultOpen(false);
+          AuthService.logout();
+          navigate("/auth/login");
+        }}
       />
 
     </>
