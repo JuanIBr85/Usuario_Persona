@@ -630,16 +630,8 @@ def verificar_identidad():
 
         schema = VerificarIdentidadSchema()
         datos_validados = schema.load(data)
-
-        result = persona_service.verificar_datos_personales(
-            persona_id=datos_validados["persona_id"],
-            datos_usuario={
-                "nombre": datos_validados["nombre"],
-                "apellido": datos_validados["apellido"],
-                "fecha_nacimiento": datos_validados["fecha_nacimiento"],
-                "telefono_movil": datos_validados["telefono_movil"],
-            },
-        )
+ 
+        result = persona_service.verificar_datos_personales(datos_validados)
 
         if not result["encontrada"]:
             return (
@@ -647,11 +639,12 @@ def verificar_identidad():
                 404,
             )
 
-        status = ResponseStatus.SUCCESS if result["coinciden"] else ResponseStatus.ERROR
+        status = ResponseStatus.SUCCESS if result["coinciden"] else ResponseStatus.FAIL
+
 
         return (
-            make_response(status, result["mensaje"]),
-            200 if result["coinciden"] else 400,
+            make_response(status, result["mensaje"], {"coinciden": result["coinciden"]}),
+            200
         )
     
     except ValidationError as err:
