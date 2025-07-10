@@ -22,6 +22,7 @@ export default function FormDatos({
 }) {
   const [loading, setLoading] = useState(false);
   const [tipoDoc, setTipoDoc] = useState(personaData.tipo_documento || Object.keys(tipoDocumento)[0] || "");
+  const today = new Date().toISOString().slice(0, 10);
 
   const handleSubmit = async (event) => {
     const { email, ...formData } = await formSubmitJson(event);
@@ -91,6 +92,7 @@ export default function FormDatos({
             }
             validationMessage="La fecha de nacimiento es requerida"
             required
+            max={today}
           />
           <InputValidate
             id="email"

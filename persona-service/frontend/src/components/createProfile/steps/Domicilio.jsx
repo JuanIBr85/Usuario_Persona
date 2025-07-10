@@ -11,8 +11,8 @@ const DEFAULT = {
   }
 }
 
-const Domicilio = ({hidden, staticData}) => {
-  const {localidades,  codigoPostal, setCodigoPostal, inputCPRef, localidad} = useFormDomicilio(DEFAULT, ()=>{}, 0, ()=>{}, ()=>{});
+const Domicilio = ({ hidden, staticData }) => {
+  const { localidades, codigoPostal, setCodigoPostal, inputCPRef, localidad } = useFormDomicilio(DEFAULT, () => { }, 0, () => { }, () => { });
 
   return (
     <div className="space-y-4" hidden={hidden}>
@@ -25,8 +25,8 @@ const Domicilio = ({hidden, staticData}) => {
             type="text"
             placeholder="Ingresa el nombre de la calle"
             labelText="Calle"
-            validatePattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s,.]{2,50}$"
-            validationMessage="Ingresa un nombre de calle válido (2-50 caracteres, solo letras, espacios, puntos y comas)"
+            validatePattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s,.]{2,50}$"
+            validationMessage="Ingresa un nombre de calle válido (2-50 caracteres, solo letras, números, espacios, puntos y comas)"
             containerClassName="sm:col-span-3"
             required
           />
