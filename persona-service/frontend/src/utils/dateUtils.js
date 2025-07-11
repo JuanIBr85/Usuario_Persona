@@ -9,9 +9,9 @@ export function tiempoTranscurrido(fechaStr) {
     dias: undefined,
   };
   const ahora = new Date();
-  const fecha = new Date(fechaStr).setHours(2);
+  const fecha = new Date(`${fechaStr}Z`);
   const segundos = Math.floor((ahora - fecha) / 1000);
-
+  console.log(segundos)
   const dias = Math.floor(segundos / 86400);
   const intervalos = {
     año: 31536000,
