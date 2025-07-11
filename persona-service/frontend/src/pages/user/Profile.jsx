@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Fade } from 'react-awesome-reveal';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
@@ -33,6 +33,17 @@ const ProfileForm = () => {
     setDialog,
     isCriticalError
   } = useProfile();
+  const [lastUpdate, setLastUpdate] = useState(undefined);
+  const [dias, setDias] = useState(undefined);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const {lastUpdate, dias} = tiempoTranscurrido(personaData.updated_at);
+      setLastUpdate(lastUpdate);
+      setDias(dias);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [personaData.updated_at]);
 
   const showDialog = (title, description, actionName=undefined, action=undefined) => {
     setDialog({
@@ -75,8 +86,7 @@ const ProfileForm = () => {
     />
   }
 
-  const lastUpdate = tiempoTranscurrido(personaData.updated_at);
-  const subscribedServices = ['Residencia', 'Becas', 'Oferta educativa'];
+  
   return (
     <>
       <SimpleDialog
@@ -126,6 +136,7 @@ const ProfileForm = () => {
                     showDialog={showDialog}
                     okDialog={okDialog}
                     errorDialog={errorDialog}
+                    dias={dias}
                   />
                 </TabsContent>
 
@@ -176,7 +187,7 @@ const ProfileForm = () => {
 
             <CardFooter className="flex justify-between text-sm text-gray-500 border-t">
               {
-                lastUpdate && <span>Última actualización: {lastUpdate}</span>
+                (lastUpdate!==undefined) && <span>Última actualización: {lastUpdate}</span>
               }
             </CardFooter>
           </Card>

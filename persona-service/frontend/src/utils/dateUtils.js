@@ -4,11 +4,15 @@
  * @returns {string} Tiempo transcurrido formateado (ej: "2 días", "1 mes")
  */
 export function tiempoTranscurrido(fechaStr) {
-  if (!fechaStr) return;
+  if (!fechaStr) return{
+    lastUpdate: undefined,
+    dias: undefined,
+  };
   const ahora = new Date();
-  const fecha = new Date(fechaStr);
-  const segundos = Math.floor((ahora - fecha) / 1000)+ 8618;
-  console.log(segundos);
+  const fecha = new Date(fechaStr).setHours(2);
+  const segundos = Math.floor((ahora - fecha) / 1000);
+
+  const dias = Math.floor(segundos / 86400);
   const intervalos = {
     año: 31536000,
     mes: 2592000,
@@ -29,9 +33,15 @@ export function tiempoTranscurrido(fechaStr) {
             intervalo + 's') :
         intervalo;
 
-      return `hace ${cantidad} ${intervaloPlural}`;
+      return {
+        lastUpdate: `hace ${cantidad} ${intervaloPlural}`,
+        dias: dias,
+      };
     }
   }
 
-  return 'hace unos segundos';
+  return {
+    lastUpdate: 'hace unos segundos',
+    dias: dias,
+  };
 }
