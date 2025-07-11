@@ -18,10 +18,12 @@ from app.routes.usuarios_blueprint import usuario_bp
 from app.routes.superadmin_blueprint import superadmin_bp
 from app.routes.admin_microservicios_blueprint import admin_micro_bp
 from app.extensions import mail
-
+import smtplib
 from app.utils.actualizar_roles_permisos import actualizar_roles
 
 def create_app():
+    #monkey patch para no lanzar el log de mails.
+    smtplib.SMTP.set_debuglevel = lambda self, level: None
     load_dotenv()
     app_flask = Flask(__name__)
     app_flask.config.from_object("config.Config")
