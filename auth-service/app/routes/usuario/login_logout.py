@@ -89,7 +89,7 @@ def login1():
 
 @bp.route("/logout", methods=["POST"])
 @api_access(
-    is_public=False
+    is_public=True#SE PUSO EN TRUE POR UNA RAZON Y SE PUSO UNA CONDICION PARA EVITAR QUE UN USUARIO SIN LOGIN PASARA
 )
 def logout_usuario() -> tuple[dict[Any, Any], Any] | tuple[dict[Any, Any], Literal[500]]:
     """

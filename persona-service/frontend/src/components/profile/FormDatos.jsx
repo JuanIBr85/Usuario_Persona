@@ -19,7 +19,8 @@ export default function FormDatos({
   setPersonaData,
   showDialog,
   okDialog,
-  errorDialog
+  errorDialog,
+  dias
 }) {
   const [loading, setLoading] = useState(false);
   const [tipoDoc, setTipoDoc] = useState(personaData.tipo_documento || Object.keys(tipoDocumento)[0] || "");
@@ -60,12 +61,16 @@ export default function FormDatos({
               type="text"
               labelText="Nombre"
               value={personaData.nombre_persona || ""}
+              readOnly={(dias < 30 && dias !== undefined)}
+              className={dias < 30 && dias !== undefined ? "cursor-not-allowed" : ""}
             />
             <InputValidate
               id="apellido_persona"
               type="text"
               labelText="Apellido"
               value={personaData.apellido_persona || ""}
+              readOnly={(dias < 30 && dias !== undefined)}
+              className={dias < 30 && dias !== undefined ? "cursor-not-allowed" : ""}
             />
           </ResponsiveColumnForm>
 
@@ -117,7 +122,7 @@ export default function FormDatos({
           </div>
         </div>
         <div className="flex flex-col gap-3 pt-4">
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full" disabled={(dias < 30 && dias !== undefined)}>
             Guardar Cambios
           </Button>
         </div>
