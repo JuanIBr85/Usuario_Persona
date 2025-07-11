@@ -88,7 +88,7 @@ const ProfileForm = () => {
         actionHandle={() => {
           setTimeout(() => {
             setDialog(null);
-            dialog?.action();
+            dialog?.action && dialog?.action();
           }, 500);
         }}
       />

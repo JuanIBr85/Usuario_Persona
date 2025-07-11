@@ -27,7 +27,7 @@ function SimpleSelect({
     
     return (
         <div className="grid w-full items-center gap-1.5 ">
-            <Label htmlFor={name}>{label}</Label>
+            <Label htmlFor={name}>{label}{required && <span className="text-destructive">*</span>}</Label>
             <div className="relative">
                 <Select id={id} name={name} value={internalValue} onValueChange={(e) => {
                     setInternalValue(e);

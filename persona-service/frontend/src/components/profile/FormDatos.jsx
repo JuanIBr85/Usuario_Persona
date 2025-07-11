@@ -40,7 +40,14 @@ export default function FormDatos({
       })
       .catch((error) => {
         console.error("Error updating domicilio:", error.data);
-        errorDialog();
+        const title=<div className="flex flex-row items-center gap-2"><Ban /> Ocurrió un error</div>;
+        const description=<>
+        No se pudieron guardar los datos.<br/>
+        Los datos personales solo pueden editarse una vez cada 30 dias.
+        </>;
+        showDialog({
+          title, description, action:"Cerrar"
+        });
       })
       .finally(() => setLoading(false));
   };
@@ -87,7 +94,6 @@ export default function FormDatos({
 
           <ResponsiveColumnForm>
             <InputValidate
-              id="fecha_nacimiento_persona"
               type="date"
               placeholder="Ingresa tu fecha de nacimiento"
               labelText="Fecha de nacimiento"
@@ -96,7 +102,8 @@ export default function FormDatos({
                 handleChange("fecha_nacimiento_persona", e.target.value)
               }
               validationMessage="La fecha de nacimiento es requerida"
-              required
+              className="bg-gray-100 cursor-not-allowed w-full"
+              readOnly
               max={maxDate}
             />
             <InputValidate
