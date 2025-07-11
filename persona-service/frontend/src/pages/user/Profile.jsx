@@ -9,6 +9,7 @@ import FormUsuario from "@/components/profile/FormUsuario"
 import FormContacto from "@/components/profile/FormContacto"
 import FormDomicillio from "@/components/profile/FormDomicillio"
 import FormPersonaExtendida from "@/components/profile/FormPersonaExtendida"
+
 import Loading from '@/components/loading/Loading'
 import { SimpleDialog } from '@/components/SimpleDialog'
 // Hooks y utilidades
@@ -19,10 +20,25 @@ import ProfileNick from '@/components/ProfileNick'
 import { Ban, Check } from "lucide-react";
 
 /**
- * Componente principal del perfil de usuario
- * Maneja la visualización y edición de la información del perfil
+ * Profile.jsx
+ *
+ * Vista que permite visualizar y editar la informacion del perfil.
+ * Datos personales, contacto, domicilio, datos complementarios y credenciales del usuario.
+ *
+ * Flujo general:
+ * - Se obtienen los datos del perfil.
+ * - Se muestran los formularios organizados en pestañas mediante el componente `Tabs`.
+ * - Cada formulario puede actualizar secciones específicas del perfil.
+ * - Se muestra un modal (`SimpleDialog`) ante acciones exitosas o errores.
+ *
+ * Características:
+ * - El estado `personaData` contiene los datos actuales del perfil.
+ * - El hook `tiempoTranscurrido` muestra cuándo fue la última actualización.
+ * - Manejo de errores críticos y errores normales con UI de feedback.
  */
+
 const ProfileForm = () => {
+  // Datos provenientes del hook personalizado
   const {
     isLoading,
     personaData,
@@ -33,9 +49,14 @@ const ProfileForm = () => {
     setDialog,
     isCriticalError
   } = useProfile();
-  const [lastUpdate, setLastUpdate] = useState(undefined);
-  const [dias, setDias] = useState(undefined);
 
+  // Estado para mostrar fecha de última actualización
+  const [lastUpdate, setLastUpdate] = useState(undefined);
+  const [dias, setDias] = useState(undefined); // Días desde la última modificación
+
+  /**
+   * Efecto que actualiza cada 5 segundos la diferencia de tiempo desde la última actualización
+   */
   useEffect(() => {
     const updateDate = () => {
       const {lastUpdate, dias} = tiempoTranscurrido(personaData.updated_at);
@@ -47,6 +68,9 @@ const ProfileForm = () => {
     return () => clearInterval(interval);
   }, [personaData.updated_at]);
 
+  /**
+   * Función utilitaria para mostrar un modal de diálogo genérico
+   */
   const showDialog = (title, description, actionName=undefined, action=undefined) => {
     setDialog({
       title,
@@ -56,6 +80,7 @@ const ProfileForm = () => {
     })
   };
 
+  //Modal para confirmar éxito
   const okDialog = () => {
     showDialog(
       <div className="flex flex-row items-center gap-2"><Check /> Exito</div>,
@@ -64,6 +89,7 @@ const ProfileForm = () => {
     );
   }
 
+  //Modal para mostrar un error genérico
   const errorDialog = (description) => {
     const title=<div className="flex flex-row items-center gap-2"><Ban /> Ocurrió un error</div>;
     showDialog(title, description || "No se pudieron guardar los datos. Intenta nuevamente.", "Cerrar");
@@ -75,22 +101,23 @@ const ProfileForm = () => {
 
   if (isCriticalError) {
     return <SimpleDialog
-      title={dialog?.title}
-      description={dialog?.description}
-      isOpen={dialog}
-      actionHandle={() => {
-        setTimeout(() => {
-          console.log(dialog)
-          dialog?.action();
-          setDialog(null);
-        }, 500);
-      }}
-    />
+        title={dialog?.title}
+        description={dialog?.description}
+        isOpen={dialog}
+        actionHandle={() => {
+          setTimeout(() => {
+            console.log(dialog)
+            dialog?.action();
+            setDialog(null);
+          }, 500);
+        }}
+      />
   }
 
-  
+
   return (
     <>
+      {/* Modal reutilizable para mensajes de éxito/error */}
       <SimpleDialog
         title={dialog?.title}
         description={dialog?.description}
@@ -108,6 +135,7 @@ const ProfileForm = () => {
 
         <div className="w-full flex items-center justify-center sm:p-4">
           <Card className="w-full max-w-5xl shadow-lg rounded-xl overflow-hidden">
+            {/* Cabecera del card con título y descripción */}
             <CardHeader className="text-center">
               <CardTitle className="text-2xl">
                 Información Personal
@@ -117,9 +145,12 @@ const ProfileForm = () => {
               </CardDescription>
             </CardHeader>
 
+            {/* Contenido principal con pestañas de formularios */}
             <CardContent className="h-full overflow-y-auto">
+              {/* Componente con el nombre de usuario grande */}
               <ProfileNick firstName={personaData.nombre_persona} lastName={personaData.apellido_persona} />
 
+              {/* Navegación por pestañas */}
               <Tabs defaultValue="datos" className="w-full">
                 <TabsList className="flex flex-wrap gap-2 w-full mb-3 h-auto">
                   <TabsTrigger value="datos">Datos Personales</TabsTrigger>
@@ -129,6 +160,7 @@ const ProfileForm = () => {
                   <TabsTrigger value="usuario">Mi Usuario</TabsTrigger>
                 </TabsList>
 
+                {/* Datos personales */}
                 <TabsContent value="datos">
                   <FormDatos
                     tipoDocumento={staticData.tipos_documento}
@@ -142,6 +174,7 @@ const ProfileForm = () => {
                   />
                 </TabsContent>
 
+                {/* Contacto */}
                 <TabsContent value="contacto">
                   <FormContacto
                     persona_id={personaData.id_persona}
@@ -154,6 +187,7 @@ const ProfileForm = () => {
                   />
                 </TabsContent>
 
+                {/* Domicilio */}
                 <TabsContent value="domicilio">
                   <FormDomicillio
                     domicilio={personaData.domicilio || {}}
@@ -165,6 +199,7 @@ const ProfileForm = () => {
                   />
                 </TabsContent>
 
+                {/* Datos complementarios (estado civil, educación, ocupación, etc) */}
                 <TabsContent value="personaExtendida">
                   <FormPersonaExtendida
                     persona_id={personaData.id_persona}
@@ -181,12 +216,13 @@ const ProfileForm = () => {
 
                 <TabsContent value="usuario">
                   <FormUsuario
-
+                  
                   />
                 </TabsContent>
               </Tabs>
             </CardContent>
 
+            {/* Pie de tarjeta con información adicional */}
             <CardFooter className="flex justify-between text-sm text-gray-500 border-t">
               {
                 (lastUpdate!==undefined) && <span>Última actualización: {lastUpdate}</span>

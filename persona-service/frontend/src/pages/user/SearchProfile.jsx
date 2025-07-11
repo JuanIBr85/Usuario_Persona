@@ -1,4 +1,3 @@
-//SearchProfile
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Loading from '@/components/loading/Loading';
@@ -6,9 +5,36 @@ import { useAuthContext } from '@/context/AuthContext';
 import { useState } from 'react';
 import { PersonaService } from '@/services/personaService';
 
+/**
+ * SearchProfile.jsx
+ *
+ * Componente de transición utilizado luego del proceso de verificación o creación de perfil.
+ * Se encarga de buscar el perfil asociado al usuario logueado y redirigirlo según corresponda.
+ *
+ * Flujo general:
+ * - Se consulta al backend por el perfil asociado al usuario.
+ * - Si el perfil existe:
+ *   - Se actualiza el contexto global (`AuthContext`) con el `id_persona`.
+ *   - Se eliminan posibles flags de espera de la localStorage.
+ *   - Se redirige al usuario:
+ *     - A `/auth/redirect` si existe `_redirect` en sessionStorage.
+ *     - A `/profile` si no hay redirección pendiente.
+ * - Si no existe el perfil:
+ *   - Se actualiza el contexto con `id_persona: 0`.
+ *   - Si está en espera de aprobación de administrador (`persona-esperando-persona`):
+ *     - Se establece flag `persona-esperando-admin` con tiempo de espera.
+ *     - Se redirige a `/auth/waiting`.
+ *   - Si no, se redirige a `/profileconnect` para iniciar el proceso desde cero.
+ *
+ * Componentes utilizados:
+ * - `Loading`: Indicador visual con texto variable según el estado del proceso.
+ * - `useAuthContext`: Actualiza datos del usuario globalmente.
+ * - `PersonaService`: Accede al backend para obtener datos del perfil.
+ */
+
 const SearchProfile = () => {
     const navigate = useNavigate();
-    const { updateUserData } = useAuthContext();
+    const { updateUserData } = useAuthContext(); //para actualizar el contexto de usuario
     const [loadingText, setLoadingText] = useState('Buscando perfil...');
 
     useEffect(()=>{
@@ -18,7 +44,7 @@ const SearchProfile = () => {
                 id_persona: response.data.id_persona,
             });
 
-            //Elimino las flags de espera
+            // Limpieza de flags relacionados al proceso de espera
             localStorage.removeItem("persona-esperando-admin");
             localStorage.removeItem("persona-esperando-persona");
             localStorage.removeItem("persona-esperando-admin-count");
@@ -45,15 +71,17 @@ const SearchProfile = () => {
                 //expirationTime.setHours(expirationTime.getHours() + 1);
                 localStorage.setItem("persona-esperando-admin", expirationTime.toISOString());
 
-                navigate("/auth/waiting");
+                navigate("/auth/waiting"); // Redirige a pantalla de espera
                 return;
             }
+            // Si no está esperando, lo redirige a vinculación desde cero
             setTimeout(() => navigate('/profileconnect'), 500);
         });
     }, []);
 
     return (
         <div>
+            {/* Componente de carga centralizado */}
             <Loading text={loadingText} isFixed></Loading>
         </div>
     );

@@ -50,6 +50,22 @@ from app.extensions import get_redis
 from common.services.send_message_service import send_message
 from common.utils.response import ResponseStatus
 
+"""
+Servicio: UsuarioService
+
+Este módulo implementa la lógica del microservicio de autenticación relacionada
+con usuarios finales. Incluye funcionalidades de:
+- Registro y confirmación por email con OTP
+- Login con validación de dispositivo confiable
+- Recuperación de contraseña
+- Modificación de nombre y email
+- Eliminación lógica de cuenta y restauración
+- Refresh y rotación de tokens
+
+Nota:
+Cada método incluye validaciones, logs de auditoría y en algunos casos
+interacción con otros microservicios mediante eventos.
+"""
 
 class UsuarioService(ServicioBase):
     def __init__(self):

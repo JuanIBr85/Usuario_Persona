@@ -45,6 +45,7 @@ export default function FormUsuario() {
   const [usernameMessage, setUsernameMessage] = useState("");
 
   const [deleteOk, setDeleteOk] = useState(false);
+  const [emailOk, setEmailOk] = useState(false);
 
 
 
@@ -114,15 +115,16 @@ export default function FormUsuario() {
     })
       .then(() => {
 
-
+        setEmailOk(true);
         setEmailMessage(
-          "Se ha enviado un correo de confirmación al nuevo email."
+          "Se ha enviado un correo de verificación al nuevo email. Despues de confirmar inicia sesión con el nuevo correo para continuar."
         );
         setEmailResultOpen(true);
         setOpenEmailDialog(false);
 
       })
       .catch((error) => {
+        setEmailOk(false);
         setEmailMessage(
           error?.data?.message || error?.message || "Error al cambiar correo"
         )
@@ -339,7 +341,19 @@ export default function FormUsuario() {
         title="Cambio de correo"
         description={emailMessage}
         isOpen={emailResultOpen}
-        actionHandle={() => setEmailResultOpen(false)}
+        actionHandle={() => {
+          setEmailResultOpen(false)
+
+          if (emailOk) {
+
+            AuthService.logout();
+            navigate("/auth/login");
+          }
+
+        }}
+
+
+
       />
       <SimpleDialog
         title="Eliminar cuenta"

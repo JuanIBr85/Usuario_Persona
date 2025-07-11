@@ -7,12 +7,35 @@ from datetime import datetime, timezone
 
 
 class SuperAdminService:
+    """
+    Servicio destinado al superadministrador del sistema.
+
+    Incluye funcionalidades avanzadas para gestión de usuarios, roles,
+    permisos y logs de actividad.
+
+    Requiere una sesión SQLAlchemy activa para todas las operaciones.
+    """
 
     # ============================================
     # Crea un usuario nuevo con un rol específico
     # ============================================
     def crear_usuario_con_rol(self, session: Session, nombre: str, email: str, password: str, nombre_rol: str) -> dict:
-        # Verifica si ya existe un usuario con el mismo email
+        """
+        Crea un nuevo usuario con el rol especificado.
+
+        Args:
+            session (Session): Sesión de base de datos.
+            nombre (str): Nombre del usuario.
+            email (str): Correo electrónico.
+            password (str): Contraseña en texto plano.
+            nombre_rol (str): Nombre del rol a asignar.
+
+        Raise:
+            ValueError: Si el email ya existe o el rol no se encuentra.
+
+        Returns:
+            dict: Mensaje de éxito e ID del nuevo usuario.
+        """
         if session.query(Usuario).filter_by(email_usuario=email).first():
             raise ValueError("Ya existe un usuario con ese email.")
 
@@ -51,6 +74,20 @@ class SuperAdminService:
     # ====================================================
 
     def asignar_permisos_rol(self, session: Session, rol_id: int, permisos: list) -> dict:
+        """
+        Asigna un nuevo conjunto de permisos a un rol, reemplazando los anteriores.
+
+        Args:
+            session (Session): Sesión activa.
+            rol_id (int): ID del rol a modificar.
+            permisos (list): Lista de nombres de permisos.
+
+        Raise:
+            ValueError: Si el rol no se encuentra.
+
+        Returns:
+            dict: Mensaje de confirmación.
+        """
         rol = session.query(Rol).filter_by(id_rol=rol_id).first()
         if not rol:
             raise ValueError("No se encontró el rol.")
@@ -89,6 +126,20 @@ class SuperAdminService:
     # =====================================================================
 
     def modificar_usuario_con_rol(self, session: Session, usuario_id: int, datos: dict) -> dict:
+        """
+        Modifica un usuario existente. Puede incluir modificación de roles.
+
+        Args:
+            session (Session): Sesión activa.
+            usuario_id (int): ID del usuario.
+            datos (dict): Diccionario con los campos a modificar. Puede incluir "roles".
+
+        Raise:
+            ValueError: Si el usuario o algún rol no se encuentran.
+
+        Returns:
+            dict: Mensaje de éxito.
+        """
         usuario = session.query(Usuario).filter_by(
             id_usuario=usuario_id).first()
         if not usuario:
@@ -125,6 +176,19 @@ class SuperAdminService:
     # =================================================
 
     def crear_rol(self, session: Session, nombre_rol: str) -> dict:
+        """
+        Crea un nuevo rol si no existe previamente.
+
+        Args:
+            session (Session): Sesión activa.
+            nombre_rol (str): Nombre del rol a crear.
+
+        Raise:
+            ValueError: Si el rol ya existe.
+
+        Returns:
+            dict: Mensaje de éxito y ID del nuevo rol.
+        """
         rol_existente = session.query(Rol).filter_by(
             nombre_rol=nombre_rol).first()
         if rol_existente:
@@ -143,6 +207,19 @@ class SuperAdminService:
     # Devuelve todos los roles
     # =========================
     def obtener_roles(self, session: Session) -> dict:
+        """
+        Obtiene todos los roles activos (no eliminados lógicamente),
+        junto con sus permisos.
+
+        Args:
+            session (Session): Sesión activa.
+
+        Returns:
+            dict: Lista de roles con sus permisos asociados.
+
+        Raise:
+            Exception: Si ocurre un error al consultar la base.
+        """
         try:
             roles = session.query(Rol).filter(Rol.deleted_at == None).all()
             resultado = []
@@ -165,6 +242,19 @@ class SuperAdminService:
     # Realiza borrado lógico de un rol
     # =================================
     def borrar_rol(self, session: Session, rol_id: int) -> dict:
+        """
+        Realiza un borrado lógico sobre el rol especificado.
+
+        Args:
+            session (Session): Sesión activa.
+            rol_id (int): ID del rol a eliminar.
+
+        Raise:
+            ValueError: Si el rol no existe o ya fue eliminado.
+
+        Returns:
+            dict: Mensaje de éxito.
+        """
         rol = session.query(Rol).filter_by(
             id_rol=rol_id, deleted_at=None).first()
         if not rol:
@@ -182,6 +272,18 @@ class SuperAdminService:
     # =============================
 
     def obtener_permisos(self, session: Session) -> dict:
+        """
+        Obtiene todos los permisos activos (no eliminados).
+
+        Args:
+            session (Session): Sesión activa.
+
+        Returns:
+            dict: Lista de permisos.
+
+        Raise:
+            Exception: Si ocurre un error al consultar.
+        """
         try:
             permisos = session.query(Permiso).filter(
                 Permiso.deleted_at == None).all()
@@ -201,6 +303,16 @@ class SuperAdminService:
     # Devuelve todos los usuarios
     # =============================
     def obtener_usuarios(self, session, solo_eliminados=False):
+        """
+        Obtiene todos los usuarios con sus roles y permisos.
+
+        Args:
+            session (Session): Sesión activa.
+            solo_eliminados (bool): Si True, devuelve solo los eliminados lógicamente.
+
+        Returns:
+            list: Lista de usuarios con datos extendidos.
+        """
         query = session.query(Usuario)
         if solo_eliminados:
             query = query.filter_by(eliminado=True).order_by(Usuario.deleted_at.desc())
@@ -248,7 +360,18 @@ from common.utils.response import ResponseStatus
 
 def obtener_logs_usuario(session: Session, usuario_id: int, limite: int = 50) -> tuple:
     """
-    Devuelve los últimos logs de actividad del usuario.
+        Devuelve los últimos logs de actividad del usuario.
+
+        Args:
+            session (Session): Sesión activa.
+            usuario_id (int): ID del usuario.
+            limite (int): Máximo de registros a devolver.
+
+        Returns:
+            tuple: (estado, mensaje, data, código HTTP)
+
+        Raises:
+            Exception: Si ocurre un error al consultar.
     """
     try:
         logs = (

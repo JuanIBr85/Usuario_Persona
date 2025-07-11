@@ -1,0 +1,21 @@
+#El peor
+FROM python:3.13.3
+
+ENV WORKERS=4
+ENV THREADS=2
+
+WORKDIR /app
+
+# Instalar dependencias del sistema
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install eventlet
+
+COPY . .
+
+CMD gunicorn -w ${WORKERS} -k eventlet --threads ${THREADS} --bind 0.0.0.0:5002 run:app
