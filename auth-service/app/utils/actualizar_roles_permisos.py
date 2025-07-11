@@ -64,7 +64,6 @@ def actualizar_roles():
                 for permiso in permisos_actuales.values():
                     db.delete(permiso)
                 db.flush()
-                print(f"Eliminados permisos actuales para el rol {rol.nombre_rol}")
 
                 # Obtengo los permisos de la DB para el rol
                 permisos_rol_db = {
@@ -77,10 +76,8 @@ def actualizar_roles():
 
                 # Agrego los permisos al rol
                 for permiso in permisos_rol_db.values():
-                    print(f"Agregando permiso {permiso.nombre_permiso} al rol {rol.nombre_rol} {rol.id_rol} {permiso.id_permiso}")
                     db.add(RolPermiso(id_rol=rol.id_rol, permiso_id=permiso.id_permiso))
                 db.flush()
-                print(f"Agregados permisos actuales para el rol {rol.nombre_rol}")
                
 
             db.commit()
