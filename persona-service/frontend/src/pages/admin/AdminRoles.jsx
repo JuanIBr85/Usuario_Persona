@@ -126,11 +126,19 @@ export default function AdminRoles() {
   }
 
   async function handleAddRole() {
-    if (!newRoleName.trim())
-      return showError("El nombre del rol no puede estar vacío");
-
+    const trimmedName = newRoleName.trim();
+    // Validación de mínimo 3 caracteres y máximo 50
+    if (trimmedName.length < 3 || trimmedName.length > 50) {
+      return showError("El nombre del rol debe tener entre 3 y 50 caracteres");
+    }
+    // Validación de solo letras y espacios
+    const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{3,50}$/;
+    if (!regex.test(trimmedName)) {
+      return showError("Ingresa un nombre de rol válido (solo letras y espacios)");
+    }
+    // Validación de existencia
     const exists = roles.some(
-      (role) => role.name.toLowerCase() === newRoleName.trim().toLowerCase()
+      (role) => role.name.toLowerCase() === trimmedName.toLowerCase()
     );
     if (exists) return showError("Ya existe un rol con ese nombre");
 
@@ -271,7 +279,7 @@ export default function AdminRoles() {
           onEdit={handleEditClick}
           onDelete={openDeleteConfirmDialog}
           formatPermissionName={formatPermissionName}
-          groupPermissionsByModule = {groupPermissionsByModule}
+          groupPermissionsByModule={groupPermissionsByModule}
         >
           {!showNewRoleForm && (
             <div>
