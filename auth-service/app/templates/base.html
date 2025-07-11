@@ -4,15 +4,23 @@
 <head>
   <meta charset="UTF-8" />
   <title>{% block title %}Mi App{% endblock %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap"
+    rel="stylesheet">
 
 
   <!-- Estilos rápidos para darle mejor presencia a los mensajes -->
   <style>
+    :root {
+      --color-primario: #1c1364;
+      --color-fondo: #E8E8EA;
+    }
+
     body {
-      font-family: Helvetica, Arial, sans-serif;
+      font-family: 'Lexend', Helvetica, Arial, sans-serif;
       padding: 2rem;
       text-align: center;
-      background-color: #f9fafb;
+      background-color: var(--color-fondo);
       color: #374151;
     }
 
@@ -30,8 +38,12 @@
     }
 
     .container {
-      max-width: 600px;
-      margin: 0 auto;
+      max-width: 640px;
+      margin: 4rem auto;
+      background-color: #ffffff;
+      padding: 2rem 3rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     .ok {
@@ -46,7 +58,7 @@
       background-color: #ffffff;
       padding: 1.5rem 2rem;
       border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
       margin-bottom: 2rem;
     }
 
@@ -59,8 +71,9 @@
     }
 
     h1 {
-      font-size: 2rem;
+      font-size: 1.75rem;
       margin-bottom: 1rem;
+      color: var(--color-primario);
     }
 
     .fade {
