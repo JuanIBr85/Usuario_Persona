@@ -4,7 +4,7 @@
  * @returns {string} Tiempo transcurrido formateado (ej: "2 días", "1 mes")
  */
 export function tiempoTranscurrido(fechaStr) {
-  if (!fechaStr) return 'Nunca';
+  if (!fechaStr) return;
   
   const ahora = new Date();
   const fecha = new Date(fechaStr);
