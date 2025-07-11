@@ -252,8 +252,8 @@ def enviar_email_modificar_email(usuario,nuevo_email):
     mail.send(msg)
 
 
-def enviar_email_confirmacion_eliminacion(usuario):
-    token = generar_token_eliminacion(usuario.id_usuario)
+def enviar_email_confirmacion_eliminacion(usuario, user_agent, ip_solicitud, jti, jti_refresh):
+    token = generar_token_eliminacion(usuario.id_usuario, user_agent, ip_solicitud, jti, jti_refresh)
     enlace = f"{current_app.config['USER_DELETION_CONFIRM_URL']}?token={token}"
 
     saludo = f"""

@@ -181,10 +181,14 @@ def verificar_token_modificar_email(token: str):
     except (ExpiredSignatureError, InvalidTokenError) as e:
         return None
 
-def generar_token_eliminacion(id_usuario: int) -> str:
+def generar_token_eliminacion(id_usuario: int, user_agent:str, ip_solicitud:str, jti:str, jti_refresh: str) -> str:
     payload = {
         "sub": str(id_usuario),
         "type": "eliminar_usuario",
+        "jti": jti,
+        "jti_refresh": jti_refresh,
+        "user_agent": user_agent,
+        "ip": ip_solicitud,
         "exp": datetime.now(timezone.utc) + timedelta(minutes=30),
     }
     return encode(payload, getenv("JWT_SECRET_KEY"), algorithm="HS256")

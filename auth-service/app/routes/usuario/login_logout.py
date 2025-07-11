@@ -10,7 +10,7 @@ from common.decorators.api_access import api_access
 from common.models.cache_settings import CacheSettings
 from common.utils.response import make_response, ResponseStatus
 from app.utils.jwt import verificar_token_modificar_email,verificar_token_eliminacion
-
+from app.extensions import get_redis
 bp = Blueprint(
     "usuario_login_logout", __name__, cli_group="usuario"
 )
@@ -309,6 +309,10 @@ def eliminar_usuario():
     session = SessionLocal()
     try:
         usuario_id = ComponentRequest.get_user_id()
+        user_agent = ComponentRequest.get_user_agent()
+        ip_solicitud = ComponentRequest.get_ip()
+        jti = ComponentRequest.get_jti()
+        jti_refresh = ComponentRequest.get_refresh_jti()
         datos = request.get_json()
         schema = UsuarioEliminarSchema()
         campos = schema.load(datos)
@@ -317,8 +321,10 @@ def eliminar_usuario():
         email_data = campos.get("email_usuario")
 
         status, mensaje, data, code = usuario_service.solicitar_eliminacion(
-            session, usuario_id, email_data, password
+            session, usuario_id, email_data, password, user_agent, ip_solicitud, jti, jti_refresh
         )
+
+
         return make_response(status, mensaje, data), code
 
     except Exception as e:
@@ -361,6 +367,20 @@ def confirmar_eliminacion_usuario():
             raise ValueError("Token inválido o expirado")
 
         usuario_id = int(datos.get("sub"))
+        jti = datos.get("jti")
+        jti_refresh = datos.get("jti_refresh")
+
+        redis = get_redis()
+
+        # Validar si los jti existen antes de revocar
+        if jti and redis.exists(jti):
+            redis.delete(jti)
+        if jti_refresh and redis.exists(f"refresh:{jti_refresh}"):
+            redis.delete(f"refresh:{jti_refresh}")
+
+        # Eliminar flag de eliminación pendiente (por limpieza)
+        redis.delete(f"eliminacion_pendiente:{usuario_id}")
+
         status, mensaje, _, _ = usuario_service.eliminar_usuario(session, usuario_id)
         if status != ResponseStatus.SUCCESS:
             raise ValueError(mensaje)

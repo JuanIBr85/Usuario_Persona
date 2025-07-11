@@ -267,6 +267,12 @@ class UsuarioService(ServicioBase):
                 None,
                 400,
             )
+        if get_redis().get(f"eliminacion_pendiente:{usuario.id_usuario}"):
+            return ResponseStatus.FAIL, (
+                "Tu cuenta tiene una solicitud de eliminación pendiente. "
+                "Si no realizaste esta acción, esperá 30 minutos y luego podés iniciar sesión nuevamente."
+                "Si no has sido tu puedes dar aviso a los administradores."
+            ), None, 403
 
         # comprobar si quedo deprecada porque ya no se crea usuario hasta que no se tenga la verificaicon
         # if not usuario.email_verificado:
@@ -491,7 +497,7 @@ class UsuarioService(ServicioBase):
 
     # -----------------------------------------------------------------------------------------------------------------------------
  
-    def solicitar_eliminacion(self, session: Session,usuario_id: int,email_data:str,password:str) -> dict:
+    def solicitar_eliminacion(self, session: Session,usuario_id: int,email_data:str,password:str,user_agent:str, ip_solicitud:str, jti:str, jti_refresh:str) -> dict:
             try:
                 usuario = session.query(Usuario).filter_by(id_usuario=usuario_id,eliminado=False).first()
                 if not usuario:
@@ -514,7 +520,19 @@ class UsuarioService(ServicioBase):
                         400,
                     )
 
-                enviar_email_confirmacion_eliminacion(usuario)
+                enviar_email_confirmacion_eliminacion(usuario, user_agent, ip_solicitud, jti, jti_refresh)
+
+                # bandera para bloquear el login por 30 min
+                get_redis().setex(f"eliminacion_pendiente:{usuario_id}", 60 * 30, "1")
+
+                #Se crea un log de la solicitud solo por si no fue el mismo usuario el que la pidio para tener un registro.
+                usuario_log = UsuarioLog(
+                    usuario_id=usuario.id_usuario,
+                    accion="solicitar_eliminacion",
+                    detalles=f"IP: {ip_solicitud}, User-Agent: {user_agent}"
+                )
+                session.add(usuario_log)
+                session.commit()
                 return ResponseStatus.SUCCESS, "Se envió un email al correo para verificar su eliminación de cuenta.", None, 200
 
             except Exception as e:
