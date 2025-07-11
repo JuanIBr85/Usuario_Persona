@@ -42,7 +42,7 @@ const ProfileForm = () => {
       setLastUpdate(lastUpdate);
       setDias(dias);
     };
-    const interval = setInterval(updateDate, 1000);
+    const interval = setInterval(updateDate, 5000);
     updateDate();
     return () => clearInterval(interval);
   }, [personaData.updated_at]);
