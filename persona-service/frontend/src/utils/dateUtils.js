@@ -11,7 +11,6 @@ export function tiempoTranscurrido(fechaStr) {
   const ahora = new Date();
   const fecha = new Date(`${fechaStr}Z`);
   const segundos = Math.floor((ahora - fecha) / 1000);
-  console.log(segundos)
   const dias = Math.floor(segundos / 86400);
   const intervalos = {
     año: 31536000,
