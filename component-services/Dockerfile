@@ -1,8 +1,8 @@
 #El que mejor funcion
 FROM python:3.13.3
 
-ENV WORKERS=4
-ENV THREADS=2
+ENV WORKERS=1
+ENV THREADS=1
 
 WORKDIR /app
 
