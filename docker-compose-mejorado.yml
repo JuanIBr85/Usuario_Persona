@@ -1,0 +1,173 @@
+
+  services:
+
+    #============================================================================#
+    # Primera etapa de inicio (bases de datos y redis)
+    #============================================================================#
+    auth-db:
+      image: postgres:13
+      #volumes:
+        #- postgres_data:/var/lib/postgresql/data
+      restart: unless-stopped
+      shm_size: 128mb
+      ports:
+        - 5432:5432
+      environment:
+        - POSTGRES_USER=usuario
+        - POSTGRES_PASSWORD=pass
+        - POSTGRES_DB=auth_db
+      healthcheck:
+        #se hace un chequeo para que la db inicie antes que el servicio auth
+        # test es un comando de docker, se indica usar cmd con pg_isready(herramienta de postgres)
+        #le indica -U para que utilice el usuario para comprobar conexion
+        #-h indica el nombre del host
+        #-p indica el puerto que estas usando
+        test: ["CMD", "pg_isready", "-U", "usuario", "-h", "auth-db", "-p", "5432"]
+        interval: 5s
+        timeout: 5s
+        retries: 5
+
+    #DB de componentes
+    component-db:
+      image: postgres:13
+      #volumes:
+        #- component_db_data:/var/lib/postgresql/data
+      restart: unless-stopped
+      shm_size: 128mb
+      ports:
+        - 5433:5432
+      environment:
+        - POSTGRES_USER=component_user
+        - POSTGRES_PASSWORD=component_pass
+        - POSTGRES_DB=component_db
+
+    adminer:
+      image: adminer
+      restart: unless-stopped
+      ports:
+        - 8080:8080
+
+    #alternativa a mailtrap en local!!!
+    mailpit:
+      image: axllent/mailpit:latest
+      ports:
+        - "1025:1025"  # SMTP
+        - "8025:8025"  # Web UI
+
+
+    redis:
+      image: redis:latest
+      container_name: redis-dev
+      ports:
+        - "6379:6379"
+    persona-db:
+      image: postgres:13
+      container_name: postgres-persona
+      restart: unless-stopped
+      environment:
+        POSTGRES_USER: persona_user
+        POSTGRES_PASSWORD: persona_pass
+        POSTGRES_DB: persona_db
+      ports:
+        - "5434:5432"
+      volumes:
+        - persona_db_data:/var/lib/postgresql/data
+
+    #============================================================================#
+    # Segunda etapa de inicio (servicios CORE)
+    #============================================================================#
+
+    auth-service:
+      build: ./auth-service
+      ports:
+        - "5000:5000"
+      env_file:
+        - ./auth-service/.env
+      environment:
+        - COMPONENT_SERVICE_HOST=component-service
+        - REDIS_HOST=redis
+        - POSTGRES_HOST=auth-db
+        - MAIL_SERVER=mailpit
+      volumes:
+        - ./auth-service:/app
+        - ./auth-service/auth_data:/app/auth_data
+      depends_on:
+        - auth-db
+        - persona-db
+        - redis
+        - mailpit
+
+    persona-backend:
+      build: ./persona-service/backend
+      ports:
+        - "5001:5001"
+      env_file:
+        - ./persona-service/backend/.env
+      environment:
+        - COMPONENT_SERVICE_HOST=component-service
+        - POSTGRES_HOST=persona-db
+        - POSTGRES_PORT=5432
+        - MAIL_SERVER=mailpit
+      volumes:
+        - ./persona-service/backend:/app
+        - ./persona-service/backend/persona.db:/app/persona.db
+      depends_on:
+        - auth-db
+        - persona-db
+        - redis
+        - mailpit
+
+    #============================================================================#
+    # Tercera etapa de inicio (servicios adicionales)
+    #============================================================================#
+
+    #example-service:
+    #  build: ./example-service
+    #  ports:
+    #    - "5003:5003"
+    #  volumes:
+    #    - ./example-service:/app
+    #  environment:
+    #    - COMPONENT_SERVICE_HOST=component-service
+
+    #============================================================================#
+    # Cuarta etapa de inicio (Component Service)
+    #============================================================================#
+    component-service:
+      build: ./component-services
+      ports:
+        - "5002:5002"
+      env_file:
+        - ./component-services/.env
+      volumes:
+        - ./component-services:/app
+      environment:
+        - SERVICES_CONFIG_FILE=services-docker.json
+        - REDIS_HOST=redis
+        - DB_HOST=component-db
+        - DB_PORT=5432
+        #Estas variables de entorno son requeridas por common 
+        #para encontrar los servicios para poder usar su api
+        - AUTH_SERVICE_HOST=auth-service
+        - PERSONA_SERVICE_HOST=persona-backend
+      depends_on:
+        - auth-service
+        - persona-backend
+        - component-db
+        
+
+
+    #============================================================================#
+    # Quinta etapa de inicio (Frontend)
+    #============================================================================#
+    persona-frontend:
+      build: ./persona-service/frontend
+      ports:
+        - "5173:5173"
+      env_file:
+        - ./persona-service/frontend/.env
+
+  volumes:
+    persona_db_data:
+    #postgres_data:
+    #component_db_data
