@@ -711,10 +711,14 @@ class UsuarioService(ServicioBase):
         except Exception as e:
             return (f"[!] Error al registrar access token en Redis: {e}")
         
-        return {
-                "access_token": nuevo_access_token,
-                "access_jti": access_jti
-            }
+        usuario_data = self.schema_out.dump(usuario)
+
+        usuario_data["access_token"] = nuevo_access_token  # es el access token
+        usuario_data["access_token_expires_in"] = ttl  # en segundos
+        usuario_data["rol"] = rol_nombre
+        usuario_data["permisos"] = permisos
+
+        return usuario_data
         
 
 
@@ -736,10 +740,9 @@ class UsuarioService(ServicioBase):
                 "Usuario no encontrado",
                 None,
                 404
-        )
-
+        )           
         tokens["refresh_token"] = nuevo_refresh_token
-        tokens["refresh_jti"] = jti_nuevo
+        tokens["refresh_expires"] = refresh_expires.isoformat()  # si ya lo tenés generado
 
         return (
             ResponseStatus.SUCCESS,
