@@ -54,6 +54,11 @@ def actualizar_roles():
                 rol = roles_existentes.get(nombre_rol)
                 if not rol:
                     continue
+
+                # Si el rol esta borrado se restaura
+                rol.deleted_at = None
+                db.flush()
+
                 # Obtener permisos actuales del rol a través de la relación
                 permisos_actuales = {
                     rp.permiso.nombre_permiso: rp 
