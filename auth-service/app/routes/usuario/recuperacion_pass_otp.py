@@ -14,6 +14,8 @@ from common.decorators.api_access import api_access
 from common.utils.response import make_response, ResponseStatus
 from app.utils.jwt import decodificar_token_verificacion,generar_token_dispositivo
 from app.utils.logs_utils import log_usuario_accion
+from app.extensions import get_redis
+from app.utils.otp_manager import revocar_refresh_token
 bp = Blueprint(
     "usuario_recuperacion_pass_otp", __name__, cli_group="usuario"
 )
@@ -317,9 +319,11 @@ def refresh_token():
                 status=400,
                 mimetype="application/json",
             )
+        
+        jti_access_anterior = ComponentRequest.get_jti()
+        jti_refresh_anterior = ComponentRequest.get_refresh_jti()
 
         # Validar y decodificar manualmente el refresh token
-        
         payload, error = verificar_refresh_token_valido(token)
         if error:
             return Response(
@@ -327,9 +331,14 @@ def refresh_token():
                     status=401,
                     mimetype="application/json",
                 )
-
-        status,mensaje,resultado,code = usuario_service.rotar_refresh_token(session, payload)
         
+        status,mensaje,resultado,code = usuario_service.rotar_refresh_token(session, payload)
+
+        if code == 200:
+            if jti_access_anterior:
+                get_redis().delete(jti_access_anterior)
+            if jti_refresh_anterior:
+                revocar_refresh_token(jti_refresh_anterior)
         
         return make_response(status, mensaje, resultado), code
 

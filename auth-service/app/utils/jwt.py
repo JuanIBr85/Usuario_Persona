@@ -78,7 +78,7 @@ def crear_token_refresh(usuario_id):
 def verificar_refresh_token_valido(token: str) -> Tuple[Optional[dict], Optional[str]]:
     """
     Verifica que el refresh token sea válido, con scope correcto y jti registrado en Redis.
-    Devuelve (payload, None) si es válido, o (None, error_str) si es inválido.
+    Devuelve una tupla (payload, None) si es válido, o (None, error_str) si es inválido.
     """
     try:
         payload = decode(token, getenv("JWT_SECRET_KEY"), algorithms=["HS256"])
@@ -110,6 +110,7 @@ def generar_token_restauracion(email: str) -> str:
         "exp": datetime.now(timezone.utc) + timedelta(minutes=720),
     }
     return encode(payload, getenv("JWT_SECRET_KEY"), algorithm="HS256")
+
 
 def generar_token_confirmacion_usuario(email: str) -> str:
     payload = {
