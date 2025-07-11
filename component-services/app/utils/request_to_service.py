@@ -58,7 +58,7 @@ def request_to_service(url:str):
             "json": request.get_json() if request.is_json else None,
             "data": request.form if not request.is_json else None,
         },
-        timeout=30  # para prevenir que el request se quede indefinidamente esperando
+        timeout=60  # para prevenir que el request se quede indefinidamente esperando
     )
 
     # Filtrar headers que Flask no debe reenviar

@@ -54,7 +54,7 @@ export class FetchError extends Error {
 export const fetchService = {
     
     // Método simplificado que usa automáticamente nuestra URL base
-    useDefaultUrl: ({ url, method, headers = {}, body, useToken, returnJson = true, showError = true, timeout = 1000 * 5 }) => {
+    useDefaultUrl: ({ url, method, headers = {}, body, useToken, returnJson = true, showError = true, timeout = 1000 * 30 }) => {
         // Simplemente llama al método fetch() pero agregando la URL base automáticamente
         return fetchService.fetch({
             url: `${ServiceURL.persona}/${url}`, // Combina la URL base con la ruta específica
