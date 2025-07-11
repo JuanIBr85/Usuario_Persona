@@ -1,35 +1,17 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Email Actualizado</title>
-    <style>
-        body {
-            background-color: #f9f9fb;
-            font-family: "Segoe UI", sans-serif;
-            text-align: center;
-            padding: 60px;
-            color: #333;
-        }
-        .container {
-            background-color: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            display: inline-block;
-        }
-        .check {
-            font-size: 60px;
-            color: #4caf50;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="check">✔️</div>
-        <h2>¡Email actualizado con éxito!</h2>
-        <p>Tu nuevo correo es: <strong>{{ email }}</strong></p>
-        <p>Gracias por mantener tus datos actualizados. 📨</p>
-    </div>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Email Actualizado{% endblock %}
+{% block body_class %}ok{% endblock %}
+
+{% block content %}
+<div class="message ok">
+  <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="44" height="44" viewBox="0 0 48 48">
+    <path fill="#4caf50" d="M44,24c0,11.045-8.955,20-20,20S4,35.045,4,24S12.955,4,24,4S44,12.955,44,24z"></path>
+    <path fill="#ccff90" d="M34.602,14.602L21,28.199l-5.602-5.598l-2.797,2.797L21,33.801l16.398-16.402L34.602,14.602z">
+    </path>
+  </svg>
+  <h1>¡Email actualizado con éxito!</h1>
+  <p>Tu nuevo correo es: <strong>{{ email }}</strong></p>
+  <p>Gracias por mantener tus datos actualizados. 📨</p>
+</div>
+{% endblock %}

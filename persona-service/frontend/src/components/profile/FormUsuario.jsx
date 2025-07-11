@@ -44,6 +44,8 @@ export default function FormUsuario() {
   const [usernameResultOpen, setUsernameResultOpen] = useState(false);
   const [usernameMessage, setUsernameMessage] = useState("");
 
+  const [deleteOk, setDeleteOk] = useState(false);
+
 
 
   const submitDeleteRequest = async (event) => {
@@ -61,11 +63,13 @@ export default function FormUsuario() {
         setDeleteMessage(
           "Se envió un correo de confirmación para eliminar la cuenta."
         );
+        setDeleteOk(true);
         setDeleteResultOpen(true);
         setOpenDeleteDialog(false);
 
       })
       .catch((error) => {
+        setDeleteOk(false);
         setDeleteMessage(
           error?.data?.message || error?.message || "Error al solicitar eliminación"
         );
@@ -344,8 +348,14 @@ export default function FormUsuario() {
         action="Aceptar"
         actionHandle={() => {
           setDeleteResultOpen(false);
-          AuthService.logout();
-          navigate("/auth/login");
+
+          if (deleteOk) {
+
+            AuthService.logout();
+            navigate("/auth/login");
+
+          }
+
         }}
       />
 
