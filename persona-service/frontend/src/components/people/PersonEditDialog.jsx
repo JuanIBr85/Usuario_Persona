@@ -48,13 +48,15 @@ function PersonEditDialog({
   // Adaptar para que null, undefined o "none" sean equivalentes a "ningún usuario"
   const usuarioValue =
     editingUser.usuario_id === null ||
-      editingUser.usuario_id === undefined ||
-      editingUser.usuario_id === "" // por compatibilidad con valor previo
+    editingUser.usuario_id === undefined ||
+    editingUser.usuario_id === "" // por compatibilidad con valor previo
       ? "none"
       : String(editingUser.usuario_id);
 
-  // es la fecha actual para limitar la fecha de nacimiento
-  const today = new Date().toISOString().slice(0, 10);
+  // Limita la fecha para mayores de 18 años
+  const eighteenYearsAgo = new Date();
+  eighteenYearsAgo.setFullYear(eighteenYearsAgo.getFullYear() - 18);
+  const maxDate = eighteenYearsAgo.toISOString().slice(0, 10);
 
   return (
     <Dialog open={!!editingUser} onOpenChange={(open) => !open && setEditingUser(null)}>
@@ -124,7 +126,7 @@ function PersonEditDialog({
                 labelText="Fecha de Nacimiento"
                 value={editingUser.fecha_nacimiento || ""}
                 onChange={(e) => setEditingUser({ ...editingUser, fecha_nacimiento: e.target.value })}
-                max={today}
+                max={maxDate}
               />
 
               <SimpleSelect
