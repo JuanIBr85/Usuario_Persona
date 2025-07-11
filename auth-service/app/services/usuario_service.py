@@ -13,7 +13,6 @@ from app.utils.jwt import (
     generar_token_reset,
     crear_token_refresh,
     create_access_token,
-    verificar_token_eliminacion,
 )
 from app.schemas.usuarios_schema import (
     LoginSchema,
@@ -45,6 +44,7 @@ from app.utils.otp_manager import (
     revocar_refresh_token,
     generar_codigo_otp,
 )
+from app.utils.logs_utils import log_usuario_accion
 from flask_jwt_extended import decode_token
 from app.extensions import get_redis
 from common.services.send_message_service import send_message
@@ -71,7 +71,7 @@ class UsuarioService(ServicioBase):
 
         usuario_existente = session.query(Usuario).filter(
             (func.lower(Usuario.email_usuario) == data_validada["email_usuario"].lower()) |
-            (func.lower(Usuario.nombre_usuario) == data_validada["nombre_usuario"].lower())
+            ((Usuario.nombre_usuario) == data_validada["nombre_usuario"].strip().lower())
         ).first()
 
         if usuario_existente:
@@ -108,6 +108,7 @@ class UsuarioService(ServicioBase):
     def confirmar_registro(
         self, session: Session, email: str, otp: str, user_agent: str
     ) -> dict:
+        email = email.strip().lower()
         if not verificar_otp_redis(email, otp):
             return ResponseStatus.FAIL, "OTP incorrecto o expirado", None, 400
         
@@ -137,13 +138,7 @@ class UsuarioService(ServicioBase):
                     updated_at=datetime.now(timezone.utc),
                 )
             )
-            session.add(
-                UsuarioLog(
-                    usuario_id=nuevo_usuario.id_usuario,
-                    accion="registro",
-                    detalles="Registro con OTP",
-                )
-            )
+
             session.add(
                 DispositivoConfiable(
                     usuario_id=nuevo_usuario.id_usuario,
@@ -153,16 +148,9 @@ class UsuarioService(ServicioBase):
             )
 
             session.commit()
-
             key = f"registro_temp:{email}"
             get_redis().delete(key)
 
-            '''return (
-                ResponseStatus.SUCCESS,
-                "Usuario registrado exitosamente",
-                self.schema_out.dump(nuevo_usuario),
-                200,
-            )'''
         except Exception as e:
             session.rollback()
             traceback_str = traceback.format_exc()
@@ -185,7 +173,8 @@ class UsuarioService(ServicioBase):
             )
         except Exception as e:
             print("[WARNING] Error al enviar mensaje a persona-service:", e, flush=True)
-
+        
+        log_usuario_accion(session, nuevo_usuario.id_usuario, "Registro exitoso")
         # Respuesta final
         return (
             ResponseStatus.SUCCESS,
@@ -199,6 +188,7 @@ class UsuarioService(ServicioBase):
 
     def reenviar_otp_registro(self, session: Session, email: str) -> tuple:
     # Verificar si ya está registrado (por si acaso)
+        email = email.strip().lower()
         if session.query(Usuario).filter(Usuario.email_usuario == email).first():
             return (
             ResponseStatus.FAIL,
@@ -212,7 +202,7 @@ class UsuarioService(ServicioBase):
         if not datos_temporales:
             return (
                 ResponseStatus.FAIL,
-                f"No hay registro pendiente para {email}. Probablemente ya expiró.",
+                f"No hay registro pendiente para {email}.",
                 None,
                 404,
             )   
@@ -334,16 +324,6 @@ class UsuarioService(ServicioBase):
         except Exception as e:
             traceback.print_exc() 
 
-        # Registrar log de login
-        session.add(
-            UsuarioLog(
-                usuario_id=usuario.id_usuario,
-                accion="login",
-                detalles="El usuario se logueó correctamente",
-            )
-        )
-        session.commit()
-
         usuario_data = self.schema_out.dump(usuario)
         try:
             # tomo el identificador unico del token y lo guardo en redis con sus permisos
@@ -360,7 +340,7 @@ class UsuarioService(ServicioBase):
         usuario_data["refresh_expires"] = refresh_expires.isoformat()
         usuario_data["rol"] = roles_nombres
 
-
+        log_usuario_accion(session, usuario.id_usuario, "Login exitoso", f"Email: {usuario.email_usuario}")
         return ResponseStatus.SUCCESS, "Login exitoso.", usuario_data, 200
 
     # -----------------------------------------------------------------------------------------------------------------------------
@@ -484,6 +464,7 @@ class UsuarioService(ServicioBase):
 
             usuario.email_usuario = nuevo_email
             session.commit()
+            log_usuario_accion(session, usuario_id, "confirmar_modificar_email", f"Nuevo email: {usuario.email_usuario}")
 
             return ResponseStatus.SUCCESS, "Email de Usuario modificado con éxito", {
                     "id_usuario": usuario.id_usuario,
@@ -526,13 +507,8 @@ class UsuarioService(ServicioBase):
                 get_redis().setex(f"eliminacion_pendiente:{usuario_id}", 60 * 30, "1")
 
                 #Se crea un log de la solicitud solo por si no fue el mismo usuario el que la pidio para tener un registro.
-                usuario_log = UsuarioLog(
-                    usuario_id=usuario.id_usuario,
-                    accion="solicitar_eliminacion",
-                    detalles=f"IP: {ip_solicitud}, User-Agent: {user_agent}"
-                )
-                session.add(usuario_log)
-                session.commit()
+                log_usuario_accion(session, usuario_id, "solicitar_eliminacion")
+
                 return ResponseStatus.SUCCESS, "Se envió un email al correo para verificar su eliminación de cuenta.", None, 200
 
             except Exception as e:
@@ -563,7 +539,7 @@ class UsuarioService(ServicioBase):
         except Exception as e:
             session.rollback()
             raise e
-        
+        log_usuario_accion(session, usuario_id, "confirmar_eliminacion")
         return ResponseStatus.SUCCESS, "Usuario eliminado correctamente", None, 200
     # -----------------------------------------------------------------------------------------------------------------------------
     
@@ -573,19 +549,12 @@ class UsuarioService(ServicioBase):
         if not usuario:
             return ResponseStatus.NOT_FOUND, "Usuario no encontrado", None, 404
 
-        # Agregar log de logout
-        log = UsuarioLog(
-            usuario_id=usuario.id_usuario,
-            accion="logout",
-            detalles="El usuario cerró sesión correctamente.",
-        )
-        session.add(log)
-        session.commit()
+
 
         # Limpiar redis
         get_redis().delete(jwt_jti)
         revocar_refresh_token(refresh_jti)
-
+        log_usuario_accion(session, usuario_id, "Logout exitoso", f"Email: {usuario.email_usuario}")
         return ResponseStatus.SUCCESS, "Logout exitoso.", None, 200
 
     # -----------------------------------------------------------------------------------------------------------------------------
@@ -604,10 +573,8 @@ class UsuarioService(ServicioBase):
             enviar_codigo_reset_por_email(usuario, otp)
 
             return ResponseStatus.SUCCESS, "Código OTP enviado al correo", None, 200
+        
         except Exception as e:
-            import traceback
-
-            traceback.print_exc()
             return ResponseStatus.ERROR, "Error interno al solicitar código", None, 500
 
     def verificar_otp(self, session: Session, email: str, otp: str) -> dict:
@@ -621,10 +588,7 @@ class UsuarioService(ServicioBase):
 
             return ResponseStatus.SUCCESS, "OTP válido", {"reset_token": token}, 200
         except Exception as e:
-            import traceback
-
-            traceback.print_exc()
-            return ResponseStatus.ERROR, "Error interno al solicitar código", None, 500
+            return ResponseStatus.ERROR, "Error interno al solicitar código", str(e), 500
 
     """def verificar_otp(self, session: Session, email: str, otp: str) -> dict:
         try:
@@ -699,7 +663,7 @@ class UsuarioService(ServicioBase):
         # Aquí actualizas y registras contraseña
         usuario.password = generate_password_hash(nueva_pass)  # tu función de hash
         session.commit()
-
+        log_usuario_accion(session, usuario.id_usuario, "Modificacion_password_exitosa")
         return ResponseStatus.SUCCESS, "Contraseña actualizada correctamente", None, 200
 
 
@@ -745,8 +709,8 @@ class UsuarioService(ServicioBase):
             get_redis().rpush(access_jti, *permisos)
             get_redis().expire(access_jti, ttl)
         except Exception as e:
-            print(f"[!] Error al registrar access token en Redis: {e}")
-
+            return (f"[!] Error al registrar access token en Redis: {e}")
+        
         return {
                 "access_token": nuevo_access_token,
                 "access_jti": access_jti

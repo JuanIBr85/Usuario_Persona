@@ -242,3 +242,29 @@ class SuperAdminService:
 
   # =========================
   # =========================
+from app.models import UsuarioLog
+from app.schemas import usuario_log_schema
+from common.utils.response import ResponseStatus
+
+def obtener_logs_usuario(session: Session, usuario_id: int, limite: int = 50) -> tuple:
+    """
+    Devuelve los últimos logs de actividad del usuario.
+    """
+    try:
+        logs = (
+            session.query(UsuarioLog)
+            .filter_by(usuario_id=usuario_id)
+            .order_by(UsuarioLog.logged_at.desc())
+            .limit(limite)
+            .all()
+        )
+
+        if not logs:
+            return ResponseStatus.FAIL, "No se encontraron logs para este usuario", None, 404
+
+        data = UsuarioLog(many=True).dump(logs)
+        return ResponseStatus.SUCCESS, "Logs obtenidos con éxito", data, 200
+
+    except Exception as e:
+        session.rollback()
+        raise e

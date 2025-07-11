@@ -13,7 +13,7 @@ from datetime import datetime, timezone, timedelta
 from common.decorators.api_access import api_access
 from common.utils.response import make_response, ResponseStatus
 from app.utils.jwt import decodificar_token_verificacion,generar_token_dispositivo
-
+from app.utils.logs_utils import log_usuario_accion
 bp = Blueprint(
     "usuario_recuperacion_pass_otp", __name__, cli_group="usuario"
 )
@@ -371,7 +371,7 @@ def confirmar_restauracion():
         usuario.eliminado = False
         usuario.deleted_at = None
         session.commit()
-
+        log_usuario_accion(session, usuario.id_usuario, "Restauración de cuenta exitosa.")
         return render_template("cuenta_restaurada.html")
 
     except ExpiredSignatureError:

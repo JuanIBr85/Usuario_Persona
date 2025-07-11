@@ -513,3 +513,15 @@ def restaurar_usuario_desde_token():
         session.close()
 
 
+@superadmin_bp.route("/logs/<int:usuario_id>", methods=["GET"])
+@api_access(
+    is_public=False,
+    access_permissions=["auth.admin.ver_logs_usuario"]
+)
+def ver_logs_usuario(usuario_id):
+    session = SessionLocal()
+    try:
+        status, mensaje, data, code = superadmin_service.obtener_logs_usuario(session, usuario_id)
+        return make_response(status, mensaje, data), code
+    finally:
+        session.close()

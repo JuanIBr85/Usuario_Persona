@@ -31,6 +31,7 @@ roles:
     - auth.admin.obtener_usuarios
     - auth.admin.obtener_usuarios_eliminados
     - auth.admin.restaurar_usuario
+    - auth.admin.ver_logs_usuario
 
   admin-roles:
     - auth.admin.obtener_roles

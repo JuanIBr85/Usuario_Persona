@@ -78,7 +78,7 @@ def verificar_otp_redis(email: str, codigo: str) -> bool:
 # =====================
 
 def guardar_datos_registro_temporal(email: str, datos: dict):
-    key = f"registro_temp:{email}"
+    key = f"registro_temp:{email.lower()}"
     redis_client = get_redis()
     redis_client.setex(key, DATOS_REGISTRO_EXPIRATION_SECONDS, json.dumps(datos))
 
