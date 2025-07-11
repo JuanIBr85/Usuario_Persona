@@ -16,6 +16,21 @@ import { VerificarOTP } from "@/components/connectProfile/steps/VerificarOTP";
 import { VerificarIdentidad } from "@/components/connectProfile/steps/VerificarIdentidad";
 import { useAuthContext } from "@/context/AuthContext";
 
+/**
+ * PerfilConnect.jsx
+ * 
+ * Vista responsable del proceso de vinculación de un perfil existente en el sistema
+ * con una cuenta de usuario autenticada.
+ * 
+ * Flujo general:
+ * 1. El usuario ingresa su documento para buscar su perfil.
+ * 2. Verifica su correo electrónico.
+ * 3. Ingresa el código OTP enviado por email.
+ * 4. En caso de email incorrecto o no coincidencia, se solicita verificación manual de identidad.
+ * 
+ * Este proceso sirve para asegurar que el usuario actual tiene acceso legítimo a un perfil en el sistema.
+ */
+
 const steps = [
   'Documento',
   'Email',
@@ -24,22 +39,32 @@ const steps = [
 ];
 
 function PerfilConnect() {
+  // Estado actual del paso del flujo (0 a 3)
   const [currentStep, setCurrentStep] = useState(0);
+  // Estado para mostrar spinner de carga
   const [loading, setLoading] = useState(false);
+  // Estado para mostrar diálogos de confirmación o error
   const [dialog, setDialog] = useState(null);
+  // Email recuperado tras verificar documento
   const [email, setEmail] = useState(null);
+  // Tipos de documentos disponibles
   const [tipoDocumento, setTipoDocumento] = useState({});
+  // Datos temporales del proceso (documento, email, etc.)
   const [tempData, setTempData] = useState({});
+
+  // Referencia al formulario en cada paso
   const formRef = useRef(null);
   const navigate = useNavigate();
   const { authData } = useAuthContext();
 
+  // Si el usuario ya tiene un perfil vinculado, redirigir a /profile
   useEffect(()=>{
     if(authData?.user?.id_persona && authData?.user?.id_persona !== 0){
       navigate('/profile');
     }
   }, [authData])
 
+  // Obtener los tipos de documentos válidos desde el backend
   useEffect(() => {
     PersonaService.get_tipos_documentos()
       .then(response => {
@@ -55,6 +80,10 @@ function PerfilConnect() {
       });
   }, [])
 
+  /**
+   * Paso 1: Verifica el documento ingresado y recupera el email asociado.
+   * Si no existe, ofrece opción de crear perfil nuevo.
+   */
   const handleDNIVerificacion = async (event) => {
     event.preventDefault();
     const formData = await formSubmitJson(event);
@@ -87,6 +116,10 @@ function PerfilConnect() {
     }
   }
 
+  /**
+   * Paso 2: Verificación del email recuperado.
+   * El backend envía un código OTP al correo.
+   */
   const handleEmailVerification = async (event) => {
     event.preventDefault();
     const formData = await formSubmitJson(event);
@@ -116,6 +149,10 @@ function PerfilConnect() {
     }
   }
 
+  /**
+   * Paso 3: Validación del código OTP enviado al email.
+   * Si es correcto, se vincula el perfil.
+   */
   const handleOTPVerification = async (event) => {
     event.preventDefault();
     const formData = await formSubmitJson(event);
@@ -144,6 +181,10 @@ function PerfilConnect() {
     }
   }
 
+  /**
+   * Paso 4: Verificación manual de identidad si no fue posible validar email u OTP.
+   * Se envía una solicitud al administrador.
+   */
   const handleIdentidadVerification = async (event) => {
     event.preventDefault();
     const formData = await formSubmitJson(event);
@@ -151,7 +192,7 @@ function PerfilConnect() {
 
     try {
       const response = await PersonaService.verificar_identidad({
-        ...formData, 
+        ...formData,
         ...tempData,
         usuario_email:authData.user.email_usuario
       });
@@ -167,12 +208,12 @@ function PerfilConnect() {
           navigate('/searchprofile')
         },
         description: <>
-          Tus petición fue aceptada, enviaremos una petición de verificación al administrador, te contactaremos pronto
-          <br />
-          En caso de no ser contactado, puedes contactarnos al correo <a className="text-blue-500" href="mailto:soporte@persona.com">soporte@persona.com</a>
-          <br />
-          o llamar al número <a className="text-blue-500" href="tel:+56912345678">+56912345678</a>
-        </>
+            Tus petición fue aceptada, enviaremos una petición de verificación al administrador, te contactaremos pronto
+            <br />
+            En caso de no ser contactado, puedes contactarnos al correo <a className="text-blue-500" href="mailto:soporte@persona.com">soporte@persona.com</a>
+            <br />
+            o llamar al número <a className="text-blue-500" href="tel:+56912345678">+56912345678</a>
+          </>
       })
     } catch (error) {
       setDialog({
@@ -186,15 +227,20 @@ function PerfilConnect() {
   }
 
 
+  // Avanza al siguiente paso del flujo (máximo hasta el 3)
   const nextStep = () => {
     setCurrentStep(prev => Math.min(prev + 1, 3));
   };
 
-
+  
+  // Si el usuario indica que su email es incorrecto, pasa a validación manual
   const handleEmailIncorrecto = () => {
     setCurrentStep(3); // Ir directamente al paso de verificación de identidad
   };
 
+  /**
+   * Renderiza dinámicamente el componente correspondiente al paso actual.
+   */
   const renderStep = () => {
     switch (currentStep) {
       case 0:
@@ -239,6 +285,7 @@ function PerfilConnect() {
 
   return (
     <>
+      {/* Modal de errores o acciones */}
       <SimpleDialog
         title={dialog?.title}
         description={dialog?.description}
@@ -250,14 +297,18 @@ function PerfilConnect() {
         setIsOpen={() => setDialog(null)}
         className="sm:max-w-3xl"
       />
+
+      {/* Spinner de carga */}
       {loading && <Loading isFixed={true} />}
+
+      {/* Contenido principal con animación */}
       <Fade duration={300} triggerOnce>
         <div className="w-full flex items-center justify-center sm:p-4">
           <Card className="w-full max-w-2xl shadow-lg rounded-xl overflow-hidden">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl">
                 Vinculación de perfil
-              </CardTitle>
+              </CardTitle>              
               <CardDescription>
                 <p>Conecta tu perfil con tu cuenta de usuario</p>
                 <p>Verificaremos si estás en el sistema</p>
@@ -266,6 +317,7 @@ function PerfilConnect() {
 
             <CardContent className="flex flex-col flex-1 min-h-70">
               <div className="space-y-8 flex-1">
+                {/* Barra de progreso del flujo */}
                 <ProgressBar currentStep={currentStep} steps={steps} size={10}/>
                 <div className="mb-6">
                   {renderStep()}
