@@ -314,11 +314,11 @@ def refresh_token():
         token = data.get("refresh_token")
 
         if not token:
-            return Response(
-                json.dumps({"error": "Token de refresh requerido"}),
-                status=400,
-                mimetype="application/json",
-            )
+            return make_response(
+                ResponseStatus.FAIL,
+                "Token de refresh requerido",
+                error_code="NO_INPUT",
+            ), 400
         
         jti_access_anterior = ComponentRequest.get_jti()
         jti_refresh_anterior = ComponentRequest.get_refresh_jti()
@@ -326,11 +326,11 @@ def refresh_token():
         # Validar y decodificar manualmente el refresh token
         payload, error = verificar_refresh_token_valido(token)
         if error:
-            return Response(
-                    json.dumps({"error": error}),
-                    status=401,
-                    mimetype="application/json",
-                )
+            return make_response(
+                    ResponseStatus.FAIL,
+                    error,
+                    error_code="TOKEN_INVALID",
+                ), 401
         
         status,mensaje,resultado,code = usuario_service.rotar_refresh_token(session, payload)
 

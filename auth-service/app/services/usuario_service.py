@@ -688,28 +688,31 @@ class UsuarioService(ServicioBase):
         if not usuario:
             return None
 
-        rol = (
+        rol_usuario = (
             session.query(Rol)
-            .join(RolUsuario, Rol.id_rol == RolUsuario.id_rol)
+            .join(RolUsuario)
             .filter(RolUsuario.id_usuario == usuario.id_usuario)
-            .first()
-        )
-        rol_nombre = rol.nombre_rol if rol else "sin_rol"
-
-        permisos_query = (
-            session.query(Permiso.nombre_permiso)
-            .join(RolPermiso, Permiso.id_permiso == RolPermiso.permiso_id)
-            .filter(RolPermiso.id_rol == rol.id_rol)
             .all()
         )
-        permisos = [p.nombre_permiso for p in permisos_query]
+        roles_nombres = [rol.nombre_rol for rol in rol_usuario]
+
+        # Obtener los permisos
+        permisos = (
+            session.query(Permiso.nombre_permiso)
+            .join(RolPermiso, Permiso.id_permiso == RolPermiso.permiso_id)
+            .join(RolUsuario, RolPermiso.id_rol == RolUsuario.id_rol)
+            .filter(RolUsuario.id_usuario == usuario.id_usuario)
+            .distinct()  # Para evitar duplicados
+            .all()
+        )
+        permisos = [p.nombre_permiso for p in permisos]
 
         nuevo_access_token = create_access_token(
             identity=str(usuario_id),
             additional_claims={
                 "sub": str(usuario.id_usuario),
                 "email": usuario.email_usuario,
-                "rol": rol_nombre,
+                "rol": roles_nombres,
                 "permisos": permisos,
             },
         )
@@ -729,10 +732,9 @@ class UsuarioService(ServicioBase):
         
         usuario_data = self.schema_out.dump(usuario)
 
-        usuario_data["access_token"] = nuevo_access_token  # es el access token
-        usuario_data["access_token_expires_in"] = ttl  # en segundos
-        usuario_data["rol"] = rol_nombre
-        usuario_data["permisos"] = permisos
+        usuario_data["token"] = nuevo_access_token  # es el access token
+        usuario_data["expires_in"] = ttl  # en segundos
+        usuario_data["rol"] = roles_nombres
 
         return usuario_data
         
