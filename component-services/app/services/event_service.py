@@ -3,8 +3,15 @@ from app.services.services_search_service import ServicesSearchService
 import uuid
 import logging
 from app.utils.get_health import get_health
+from app.utils.lock_events import make_lock_event, acquire_lock
+
 
 message_service = MessageService()
+
+#Locks para los eventos
+gateway_research_event = make_lock_event("gateway-research")
+component_stop_service_event = make_lock_event("component-stop-service")
+component_start_service_event = make_lock_event("component-start-service")
 
 
 class EventService:
@@ -47,10 +54,10 @@ class EventService:
                 )
 
     def gateway_research(self, isEnd=False):
-        self._send_event_all("gateway-research", {"isEnd": isEnd})
+        acquire_lock(gateway_research_event, lambda: self._send_event_all("gateway-research", {"isEnd": isEnd}), "gateway-research")
 
     def component_stop_service(self):
-        self._send_event_all("component-stop-service", {})
+        acquire_lock(component_stop_service_event, lambda: self._send_event_all("component-stop-service", {}), "component-stop-service")
 
     def component_start_service(self):
-        self._send_event_all("component-start-service", {})
+        acquire_lock(component_start_service_event, lambda: self._send_event_all("component-start-service", {}), "component-start-service")
