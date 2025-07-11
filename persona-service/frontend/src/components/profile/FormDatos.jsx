@@ -9,6 +9,7 @@ import Loading from "@/components/loading/Loading";
 import { Ban } from "lucide-react";
 import ResponsiveColumnForm from "@/components/ResponsiveColumnForm";
 import { SimpleDialog } from "@/components/SimpleDialog";
+import { Label } from "recharts";
 
 export default function FormDatos({
   persona_id,
@@ -115,6 +116,10 @@ export default function FormDatos({
               readOnly
             />
           </ResponsiveColumnForm>
+          <div className="flex flex-col gap-1 items-center">
+            <span className="text-xs text-gray-500">Los datos personales solo pueden editarse una vez cada 30 dias.</span>
+            <span className="text-xs text-gray-500">Los campos bloqueados solo pueden ser editados por el administrador.</span>
+          </div>
         </div>
         <div className="flex flex-col gap-3 pt-4">
           <Button type="submit" className="w-full">
