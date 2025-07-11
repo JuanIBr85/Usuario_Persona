@@ -51,10 +51,9 @@ const ProfileForm = () => {
     );
   }
 
-  const errorDialog = () => {
+  const errorDialog = (description) => {
     const title=<div className="flex flex-row items-center gap-2"><Ban /> Ocurrió un error</div>;
-    const description="No se pudieron guardar los datos. Intenta nuevamente.";
-    showDialog(title, description, "Cerrar");
+    showDialog(title, description || "No se pudieron guardar los datos. Intenta nuevamente.", "Cerrar");
   }
 
   if (isLoading) {

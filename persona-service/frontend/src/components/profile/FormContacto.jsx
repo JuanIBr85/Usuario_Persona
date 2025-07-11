@@ -85,7 +85,6 @@ export default function FormContacto({
               label="Red social"
               placeholder="Selecciona una red social"
               value={contacto?.red_social_nombre}
-              required
               id="red_social_nombre"
               onChange={(e) => console.log(e.target.value)}
             >

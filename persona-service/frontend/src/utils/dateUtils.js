@@ -5,11 +5,10 @@
  */
 export function tiempoTranscurrido(fechaStr) {
   if (!fechaStr) return;
-  
   const ahora = new Date();
   const fecha = new Date(fechaStr);
-  const segundos = Math.floor((ahora - fecha) / 1000);
-
+  const segundos = Math.floor((ahora - fecha) / 1000)+ 8618;
+  console.log(segundos);
   const intervalos = {
     año: 31536000,
     mes: 2592000,
@@ -17,7 +16,7 @@ export function tiempoTranscurrido(fechaStr) {
     día: 86400,
     hora: 3600,
     minuto: 60,
-    segundo: 1
+    segundo: 59
   };
 
   for (const [intervalo, segundosEnIntervalo] of Object.entries(intervalos)) {

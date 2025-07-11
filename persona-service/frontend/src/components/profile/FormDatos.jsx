@@ -41,14 +41,9 @@ export default function FormDatos({
       })
       .catch((error) => {
         console.error("Error updating domicilio:", error.data);
-        const title=<div className="flex flex-row items-center gap-2"><Ban /> Ocurrió un error</div>;
-        const description=<>
-        No se pudieron guardar los datos.<br/>
-        Los datos personales solo pueden editarse una vez cada 30 dias.
-        </>;
-        showDialog({
-          title, description, action:"Cerrar"
-        });
+        errorDialog(<>
+          No se pudieron guardar los datos.<br/>Los datos personales solo pueden editarse una vez cada 30 dias.
+        </>)
       })
       .finally(() => setLoading(false));
   };
@@ -116,7 +111,7 @@ export default function FormDatos({
               readOnly
             />
           </ResponsiveColumnForm>
-          <div className="flex flex-col gap-1 items-center">
+          <div className="flex flex-col gap-1 items-center select-none">
             <span className="text-xs text-gray-500">Los datos personales solo pueden editarse una vez cada 30 dias.</span>
             <span className="text-xs text-gray-500">Los campos bloqueados solo pueden ser editados por el administrador.</span>
           </div>
