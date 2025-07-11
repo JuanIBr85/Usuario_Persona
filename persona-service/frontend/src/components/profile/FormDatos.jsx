@@ -9,6 +9,7 @@ import Loading from "@/components/loading/Loading";
 import { Ban } from "lucide-react";
 import ResponsiveColumnForm from "@/components/ResponsiveColumnForm";
 import { SimpleDialog } from "@/components/SimpleDialog";
+import { Label } from "recharts";
 
 export default function FormDatos({
   persona_id,
@@ -23,10 +24,11 @@ export default function FormDatos({
   const [loading, setLoading] = useState(false);
   const [tipoDoc, setTipoDoc] = useState(personaData.tipo_documento || Object.keys(tipoDocumento)[0] || "");
 
-  // Calcular fecha máxima para mayores de 18 años
-  const eighteenYearsAgo = new Date();
-  eighteenYearsAgo.setFullYear(eighteenYearsAgo.getFullYear() - 18);
-  const maxDate = eighteenYearsAgo.toISOString().slice(0, 10);
+  // Calcular fecha máxima para mayores de 17 años
+  const seventeenYearsAgo = new Date();
+  seventeenYearsAgo.setFullYear(seventeenYearsAgo.getFullYear() - 17);
+  const maxDate = seventeenYearsAgo.toISOString().slice(0, 10);
+
 
   const handleSubmit = async (event) => {
     const { email, ...formData } = await formSubmitJson(event);
@@ -39,7 +41,14 @@ export default function FormDatos({
       })
       .catch((error) => {
         console.error("Error updating domicilio:", error.data);
-        errorDialog();
+        const title=<div className="flex flex-row items-center gap-2"><Ban /> Ocurrió un error</div>;
+        const description=<>
+        No se pudieron guardar los datos.<br/>
+        Los datos personales solo pueden editarse una vez cada 30 dias.
+        </>;
+        showDialog({
+          title, description, action:"Cerrar"
+        });
       })
       .finally(() => setLoading(false));
   };
@@ -86,7 +95,6 @@ export default function FormDatos({
 
           <ResponsiveColumnForm>
             <InputValidate
-              id="fecha_nacimiento_persona"
               type="date"
               placeholder="Ingresa tu fecha de nacimiento"
               labelText="Fecha de nacimiento"
@@ -95,7 +103,8 @@ export default function FormDatos({
                 handleChange("fecha_nacimiento_persona", e.target.value)
               }
               validationMessage="La fecha de nacimiento es requerida"
-              required
+              className="bg-gray-100 cursor-not-allowed w-full"
+              readOnly
               max={maxDate}
             />
             <InputValidate
@@ -107,6 +116,10 @@ export default function FormDatos({
               readOnly
             />
           </ResponsiveColumnForm>
+          <div className="flex flex-col gap-1 items-center">
+            <span className="text-xs text-gray-500">Los datos personales solo pueden editarse una vez cada 30 dias.</span>
+            <span className="text-xs text-gray-500">Los campos bloqueados solo pueden ser editados por el administrador.</span>
+          </div>
         </div>
         <div className="flex flex-col gap-3 pt-4">
           <Button type="submit" className="w-full">

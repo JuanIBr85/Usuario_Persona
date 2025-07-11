@@ -88,7 +88,7 @@ const ProfileForm = () => {
         actionHandle={() => {
           setTimeout(() => {
             setDialog(null);
-            dialog?.action();
+            dialog?.action && dialog?.action();
           }, 500);
         }}
       />
@@ -176,7 +176,9 @@ const ProfileForm = () => {
             </CardContent>
 
             <CardFooter className="flex justify-between text-sm text-gray-500 border-t">
-              <span>Última actualización: hace {lastUpdate}</span>
+              {
+                lastUpdate && <span>Última actualización: {lastUpdate}</span>
+              }
             </CardFooter>
           </Card>
         </div>
