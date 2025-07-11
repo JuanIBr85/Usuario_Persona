@@ -37,11 +37,13 @@ const ProfileForm = () => {
   const [dias, setDias] = useState(undefined);
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    const updateDate = () => {
       const {lastUpdate, dias} = tiempoTranscurrido(personaData.updated_at);
       setLastUpdate(lastUpdate);
       setDias(dias);
-    }, 1000);
+    };
+    const interval = setInterval(updateDate, 1000);
+    updateDate();
     return () => clearInterval(interval);
   }, [personaData.updated_at]);
 
