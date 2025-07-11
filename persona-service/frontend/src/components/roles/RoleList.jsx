@@ -8,7 +8,7 @@ export default function RoleList({ roles, onEdit, onDelete, formatPermissionName
             <Card>
                 <CardHeader className="flex items-center gap-2">
                     <BadgeCheck className="w-5 h-5 text-muted-foreground" />
-                    <CardTitle>Lista de roles creados</CardTitle>
+                    <CardTitle>Lista de roles creados <span className="text-xs text-muted-foreground">(Los roles creados por los servicios no pueden ser editado o eliminados permanentemente)</span></CardTitle>
                 </CardHeader>
                 <CardContent className="flex flex-col gap-4">
                     {roles.map((role) => {
