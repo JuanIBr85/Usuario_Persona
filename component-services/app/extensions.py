@@ -8,6 +8,7 @@ from config import SQLALCHEMY_DATABASE_URI, SERVICES_CONFIG_FILE, REDIS_HOST, RE
 import logging
 import redis
 import os
+from limits.storage import RedisStorage
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URI, echo=False, echo_pool=False, future=True
@@ -28,6 +29,8 @@ services_config = []  # json.load(open(SERVICES_CONFIG_FILE))
 limiter = Limiter(
     key_func=get_remote_address, 
     default_limits=["100/minute"],
+    # REDIS DB 2 CACHE
+    storage_uri=f"redis://{REDIS_HOST}:{REDIS_PORT}/2",
     enabled=True#Para desactivar durante los berchmarks
 )
 
@@ -61,6 +64,7 @@ try:
         decode_responses=True,
     )
     redis_client_core.ping()  # test de conexión
+    
     print("[✓] Redis core conectado correctamente.")
 
     redis_client_cache = redis.StrictRedis(
@@ -74,6 +78,9 @@ try:
 except Exception as e:
     print("[x] Error al conectar con Redis:", e)
     raise e
+
+
+
 
 # IDENTIFICADOR UNICO DEL WORKER GUNICORN
 WORKER_ID = f"COMPONENT-SERVICE-ID-{os.getpid()}"
