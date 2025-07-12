@@ -7,33 +7,25 @@ PESOS_CUIT = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2]
 
 
 def validar_cuit(cuit: str) -> bool:
-    """Valida un CUIT/CUIL utilizando el algoritmo de módulo 11.
-    XX - YYYYYYYY - Z
-    |    |          |
-    |    |          --> Dígito verificador
-    |    --> Número de documento (8 dígitos)
-    --> Prefijo (20, 23, 24, 27, 30, 33, 34)
+    #https://wiki.python.org.ar/recetario/validarcuit/
 
-    """
-    if cuit is None:
-        return False
+    base = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2]
 
-    cuit = str(cuit).replace("-", "")
-    if len(cuit) != 11 or not cuit.isdigit():
-        return False
+    cuit = cuit.replace("-", "") # remuevo las barras
 
-    digitos = [int(d) for d in cuit]
-    total = sum(d * w for d, w in zip(digitos[:10], PESOS_CUIT))
-    modulo = 11 - (total % 11)
+    # calculo el digito verificador:
+    aux = 0
+    for i in range(10):
+        aux += int(cuit[i]) * base[i]
 
-    if modulo == 11:
-        verifica_digito = 0
-    elif modulo == 10:
-        verifica_digito = 9
-    else:
-        verifica_digito = modulo
+    aux = 11 - (aux - (int(aux / 11) * 11))
 
-    return digitos[-1] == verifica_digito
+    if aux == 11:
+        aux = 0
+    if aux == 10:
+        aux = 9
+
+    return aux == int(cuit[10])
 
 
 def validar_documento_por_regex(documento: str, regex: str) -> bool:
