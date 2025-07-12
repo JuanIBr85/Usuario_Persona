@@ -162,10 +162,8 @@ def generar_token_dispositivo(email, user_agent, ip):
 
 def decodificar_token_verificacion(token: str,tipo: str = "verificar_dispositivo") -> dict:
     try:
-        payload = decode(token, getenv("JWT_SECRET_KEY"), algorithms=["HS256"])
-        if payload.get("type") != tipo:
-            logger.error("[decodificar_token_verificacion] Type inválido", exc_info=None)
-            return None
+        return decode(token, getenv("JWT_SECRET_KEY"), algorithms=["HS256"])
+        
     except ExpiredSignatureError as e:
         logger.error("[decodificar_token_verificacion] Token expirado", exc_info=e)
         raise ValueError("Token expirado.")
