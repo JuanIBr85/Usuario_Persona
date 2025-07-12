@@ -38,3 +38,11 @@ Traceback (most recent call last):
     raise NotFound() from None
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 
+2025-07-12 19:43:51,838 - root - ERROR - Enviando mensaje a persona-service en el canal default: {'from_service': 'auth-service', 'to_service': 'persona-service', 'channel': 'default', 'event_type': 'auth_user_register', 'message': {'id_usuario': 2, 'email': 'fabrizio@gmail.com'}, 'message_id': '4d3b9e42d0954749a76ce527ae86d241'}
+2025-07-12 19:43:56,395 - app.routes.usuario.login_logout - INFO - → [ROUTE] Solicitud de login recibida
+2025-07-12 19:43:56,409 - app.services.usuario_service - INFO - → Iniciando login de usuario
+2025-07-12 19:43:56,619 - app.services.usuario_service - INFO - → Usuario 2 autenticado, generando tokens...
+2025-07-12 19:43:56,637 - app.services.usuario_service - INFO - → Tokens generados correctamente
+2025-07-12 19:43:56,642 - app.services.usuario_service - INFO - → Permisos almacenados en Redis
+2025-07-12 19:43:56,645 - app.services.usuario_service - INFO - → Login finalizado para usuario 2
+2025-07-12 19:43:56,658 - app.routes.usuario.login_logout - INFO - → [ROUTE] Login procesado, status: ResponseStatus.SUCCESS, code: 200

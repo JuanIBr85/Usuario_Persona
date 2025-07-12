@@ -58,8 +58,7 @@ def verificar_token_reset(token: str):
 
 def crear_token_refresh(usuario_id):
     jti = str(uuid4())
-    expires_in = datetime.now(timezone.utc) + timedelta(days=int(getenv("JWT_REFRESH_TOKEN_EXPIRES"))
-    )
+    expires_in = datetime.now(timezone.utc) + timedelta(seconds=int(getenv("JWT_REFRESH_TOKEN_EXPIRES")))
     payload = {
             "sub": str(usuario_id), 
             "type": "refresh_token",
@@ -160,7 +159,7 @@ def generar_token_dispositivo(email, user_agent, ip):
     return encode(payload, getenv("JWT_SECRET_KEY"), algorithm='HS256')
 
 
-def decodificar_token_verificacion(token: str,tipo: str = "verificar_dispositivo") -> dict:
+def decodificar_token_verificacion(token: str) -> dict:
     try:
         return decode(token, getenv("JWT_SECRET_KEY"), algorithms=["HS256"])
         
