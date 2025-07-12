@@ -248,7 +248,7 @@ function AuthContextProvider({ children }) {
 
         return () => {
             clearInterval(interval);
-            clearTimeout(timeout);
+            //clearTimeout(timeout);
         };
     }, [authData.user?.expires_in]);
 
