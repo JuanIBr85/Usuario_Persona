@@ -35,11 +35,11 @@ def validar_documento_por_regex(documento: str, regex: str) -> bool:
         resultado = bool(re.match(regex, documento))
         return resultado
     except re.error:
-        logging.error(f"Error al validar documento {documento} con regex {regex}")
+        #logging.error(f"Error al validar documento {documento} con regex {regex}")
         return False
 
 
-def validar_documento_por_tipo(tipo_documento: str, numero: str) -> bool:
+def validar_documento_por_tipo(tipo_documento: str, numero: str) -> bool | int:
     """Valida el número de documento según el tipo especificado."""
 
     if (
@@ -57,5 +57,5 @@ def validar_documento_por_tipo(tipo_documento: str, numero: str) -> bool:
         return False
 
     if tipo_documento in {"CUIT", "CUIL"}:
-        return validar_cuit(numero)
+        return True if validar_cuit(numero) else 0
     return True

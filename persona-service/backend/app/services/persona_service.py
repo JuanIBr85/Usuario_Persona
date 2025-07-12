@@ -86,7 +86,12 @@ class PersonaService(IPersonaInterface):
             tipo_doc = data_validada["tipo_documento"]
             num_doc = data_validada["num_doc_persona"]
 
-            if not validar_documento_por_tipo(tipo_doc, num_doc):
+            validacion = validar_documento_por_tipo(tipo_doc, num_doc)
+
+            if validacion==0:
+                raise Exception ("Numero de CUIL/CUIT invalido.")
+
+            if not validacion:
                 raise Exception ("Numero de documento invalido para el tipo selecionado. Verifique y vuelva a intentar.")    
 
             existe_persona = (
@@ -167,8 +172,15 @@ class PersonaService(IPersonaInterface):
 
             tipo_doc = data_validada.get("tipo_documento", persona.tipo_documento)
             num_doc = data_validada.get("num_doc_persona", persona.num_doc_persona)
-            if not validar_documento_por_tipo(tipo_doc, num_doc):
-                raise Exception("Numero de documento invalido para el tipo selecionado")
+            
+            validacion = validar_documento_por_tipo(tipo_doc, num_doc)
+
+            if validacion==0:
+                raise Exception ("Numero de CUIL/CUIT invalido.")
+
+            if not validacion:
+                raise Exception ("Numero de documento invalido para el tipo selecionado. Verifique y vuelva a intentar.")    
+
 
             hubo_cambios = False
             hubo_cambios_persona = False
