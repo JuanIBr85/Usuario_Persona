@@ -5,6 +5,23 @@ import redis
 import os
 from dotenv import load_dotenv
 
+"""
+Módulo de inicialización de extensiones globales.
+
+Este archivo define e inicializa las extensiones utilizadas en la aplicación,
+como el sistema de rate limiting (`Flask-Limiter`), envío de correos (`Flask-Mail`),
+y la conexión perezosa a Redis.
+
+Incluye:
+- `limiter`: Middleware de rate limit por dirección IP.
+- `mail`: Cliente de correo Flask.
+- `get_redis()`: Inicializador perezoso de conexión a Redis.
+
+Notas:
+- La conexión a Redis se realiza solo la primera vez que se llama `get_redis()`.
+- Las variables de entorno `REDIS_HOST` y `REDIS_PORT` son utilizadas para la configuración.
+"""
+
 limiter = Limiter(key_func=get_remote_address)
 mail = Mail()
 

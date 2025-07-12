@@ -9,9 +9,9 @@ service:
 #Aca se definen los roles y permisos del servicio
 roles:
   admin-componentes:
-    - component.admin.crear_componente
-    - component.admin.ver_componente
-    - component.admin.modificar_componente
-    - component.admin.eliminar_componente
+    - component.control.investigacion
+    - component.control.servicios
+    - component.control.servicios_parada
+    - component.control.redireccion
     
     

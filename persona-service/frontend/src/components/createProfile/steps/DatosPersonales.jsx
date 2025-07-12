@@ -21,12 +21,14 @@ const DatosPersonales = ({ hidden, staticData, documento }) => {
       <ResponsiveColumnForm>
         <InputValidate
           id="nombre_persona"
+          maxLength={50}
           type="text"
           labelText="Nombre"
           required
         />
         <InputValidate
           id="apellido_persona"
+          maxLength={50}
           type="text"
           labelText="Apellido"
           required
