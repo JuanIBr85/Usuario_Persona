@@ -54,18 +54,12 @@ export function useProfile() {
         estados_civiles: estados_civilesResponse?.data || [],
         ocupaciones: ocupacionesResponse?.data || [],
         estudios_alcanzados: estudios_alcanzadosResponse?.data || [],
-        tipos_documento: tiposDocumentoResponse?.data || [],
+        tipos_documento: tiposDocumentoResponse?.data || {},
         redes_sociales: redes_socialesResponse?.data || []
       });
       const profileResponse = await PersonaService.persona_by_usuario();
       //console.log(profileResponse);
       if (profileResponse?.data) {
-
-        //Si se esta esperando una redireccion, redirigira directamente hacia redirect,
-        //Para que este se encargue de redirigir al usuario a la pagina correcta
-        if(sessionStorage.getItem('_redirect')){
-          navigate("/auth/redirect");
-        }
 
         setPersonaData({
           ...initialPersonaState,
@@ -80,7 +74,7 @@ export function useProfile() {
         setDialog({
           title: "No hay un perfil",
           description: "Complete los datos de perfil para continuar",
-          action: () => navigate('/perfilConnect')
+          action: () => navigate('/searchprofile')
         });
 
       } else {
@@ -98,7 +92,11 @@ export function useProfile() {
   };
 
   useEffect(() => {
-    fetchData();
+    if(authData?.user?.id_persona===undefined || authData?.user?.id_persona === 0){
+      navigate('/searchprofile');
+    }else{
+      fetchData();
+    }
   }, [authData]);
 
   return {

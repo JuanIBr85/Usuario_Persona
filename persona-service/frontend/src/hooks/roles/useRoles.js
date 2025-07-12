@@ -18,6 +18,7 @@ export function useRoles(showError = (msg) => console.error(msg)) {
         const fetchRoles = async () => {
             try {
                 const data = await roleService.get_all();
+                console.log("Roles obtenidos:", data);  
                 const transformedRoles = data.roles.map((role) => ({
                     id: role.id_rol,
                     name: role.nombre_rol,
@@ -36,6 +37,7 @@ export function useRoles(showError = (msg) => console.error(msg)) {
             try {
                 const userData = await userService.getAllUsers();
                 setUsuarios(Array.isArray(userData) ? userData : []);
+                console.log("Usuarios obtenidos:", userData);
             } catch (error) {
                 console.error(error);
             }

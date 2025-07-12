@@ -1,0 +1,14 @@
+#El tercero mejor
+FROM python:3.13.3
+
+ENV WORKERS=4
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install hypercorn
+
+COPY . .
+
+CMD hypercorn --bind 0.0.0.0:5002 --workers ${WORKERS} --worker-class asyncio run:app

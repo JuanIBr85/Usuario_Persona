@@ -33,19 +33,18 @@ services:
         - REDIS_HOST=redis
         - REDIS_PORT=6379
 
-    mysql:
-      image: mysql:5.7
-      container_name: mysql-persona
+    persona-db:
+      image: postgres:13
+      container_name: postgres-persona
       restart: unless-stopped
       environment:
-        MYSQL_ROOT_PASSWORD: rootpass
-        MYSQL_DATABASE: persona_db
-        MYSQL_USER: persona_user
-        MYSQL_PASSWORD: persona_pass
+        POSTGRES_USER: persona_user
+        POSTGRES_PASSWORD: persona_pass
+        POSTGRES_DB: persona_db
       ports:
-        - "3306:3306"  # El 3307 es el puerto en tu máquina host (no pisa XAMPP en 3306)
+        - "5434:5432"
       volumes:
-        - mysql_data:/var/lib/mysql
+        - persona_db_data:/var/lib/postgresql/data
 
     persona-backend:
       build: ./persona-service/backend
@@ -56,7 +55,7 @@ services:
       volumes:
         - ./persona-service/backend:/app
       depends_on:
-        - mysql
+        - persona-db
 
     persona-frontend:
       build: ./persona-service/frontend
@@ -84,4 +83,4 @@ networks:
         driver: bridge
 
 volumes:
-      mysql_data:
+      persona_db_data:

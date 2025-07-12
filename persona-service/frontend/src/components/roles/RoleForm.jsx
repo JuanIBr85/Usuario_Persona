@@ -25,8 +25,8 @@ export default function RoleForm({
             placeholder="Nombre del rol"
             value={newRoleName}
             onChange={(e) => setNewRoleName(e.target.value)}
+            
           />
-
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {availablePermissions.map((permission) => (
               <label key={permission.id} className="flex items-center gap-2">

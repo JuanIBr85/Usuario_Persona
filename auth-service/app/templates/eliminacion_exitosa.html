@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Cuenta eliminada{% endblock %}
+{% block body_class %}ok{% endblock %}
+
+{% block content %}
+<div class="message ok long-fade ">
+  <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="44" height="44" viewBox="0 0 48 48" class="icon">
+    <path fill="#c9302c" d="M44,24c0,11.045-8.955,20-20,20S4,35.045,4,24S12.955,4,24,4S44,12.955,44,24z"></path>
+    <path fill="#ffccbc"
+      d="M34.6,17.4l-2.8-2.8L24,22.4l-7.8-7.8l-2.8,2.8L21.6,25.2l-7.8,7.8l2.8,2.8L24,27.6l7.8,7.8l2.8-2.8l-7.8-7.8L34.6,17.4z">
+    </path>
+  </svg>
+  <h1>Cuenta eliminada con éxito</h1>
+  <p>Gracias por haber formado parte del sistema. Tu cuenta ha sido marcada como eliminada correctamente.</p>
+  <p class="fade">Por razones éticas, legales y técnicas, tu cuenta ha sido eliminada, pero algunos de tus datos se
+    conservarán temporalmente. Esta medida nos permite garantizar la seguridad, trazabilidad y estabilidad del sistema
+    para toda la comunidad.</p>
+  <p class="fade">Además, conservamos esta información por si en el futuro decidís regresar al sistema y querés
+    restaurar tu cuenta sin perder tu historial.</p>
+  <p class="fade">Te aseguramos que tu información no será utilizada para fines comerciales ni compartida con terceros.
+    Solo se mantendrá bajo resguardo en caso de auditorías internas o requerimientos legales.</p>
+  <p class="fade">Si necesitás ayuda o querés acelerar la desvinculación completa, no dudes en <a
+      href="mailto:superadmin@admin.com">contactar al equipo de administración</a>.</p>
+  <p class="footer fade">Esperamos verte nuevamente en el futuro. ¡Te deseamos lo mejor!</p>
+</div>
+{% endblock %}

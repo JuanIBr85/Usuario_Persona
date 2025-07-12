@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="component-services",
-    version="0.2.53",
+    version="0.2.76",
     description="Servicio de componentes",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -17,5 +17,6 @@ setup(
         "PyYAML>=6.0.0",
         "marshmallow==4.0.0",
         "requests==2.32.3",
+        "cachetools==6.1.0"
     ],
 )

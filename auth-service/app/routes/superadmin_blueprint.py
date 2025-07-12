@@ -1,4 +1,4 @@
-from flask import Blueprint, Response, request, current_app
+from flask import Blueprint, Response, request, current_app,render_template
 import json
 from app.database.session import SessionLocal
 from app.services.superadmin_service import SuperAdminService
@@ -14,6 +14,21 @@ superadmin_bp = Blueprint("admin", __name__)
 
 superadmin_service = SuperAdminService()
 
+"""
+Blueprint: admin
+
+Este módulo contiene los endpoints de administración avanzada del sistema.
+Está destinado a ser utilizado por usuarios con permisos de superadministrador.
+
+Permite realizar operaciones como:
+- Crear y modificar usuarios con rol
+- Crear, modificar, borrar y obtener roles
+- Crear y obtener permisos
+- Asignar permisos a roles
+- Obtener usuarios (activos o eliminados)
+- Restaurar usuarios eliminados (por token)
+"""
+
 
 # ======================
 # crear usuario con rol
@@ -25,6 +40,17 @@ superadmin_service = SuperAdminService()
     access_permissions=["auth.admin.crear_usuario_con_rol"],
 )
 def crear_usuario_con_rol():
+    """
+    Crea un nuevo usuario con un rol asignado.
+
+    Args:
+        JSON con nombre_usuario, email_usuario, password y rol.
+
+    Returns:
+        - 201 si se crea correctamente.
+        - 400 si faltan datos o rol inválido.
+        - 500 si ocurre un error inesperado.
+    """
     session = SessionLocal()
     try:
         data = request.get_json()
@@ -73,6 +99,17 @@ def crear_usuario_con_rol():
     access_permissions=["auth.admin.crear_rol"],
 )
 def crear_rol():
+    """
+    Crea un nuevo rol en el sistema.
+
+    Args:
+        JSON con nombre_rol.
+
+    Returns:
+        - 201 si se crea correctamente.
+        - 400 si faltan datos.
+        - 500 si ocurre un error inesperado.
+    """
     session = SessionLocal()
     try:
         data = request.get_json()
@@ -109,6 +146,18 @@ def crear_rol():
     access_permissions=["auth.admin.asignar_permisos_rol"],
 )
 def asignar_permisos_rol(id):
+    """
+    Asigna una lista de permisos a un rol específico (reemplaza los anteriores).
+
+    Args:
+        id (int): ID del rol a modificar.
+        JSON con lista de permisos.
+
+    Returns:
+        - 200 si se asignan correctamente.
+        - 400 si faltan datos o formato inválido.
+        - 500 si ocurre un error inesperado.
+    """
     session = SessionLocal()
     try:
         data = request.get_json()
@@ -150,6 +199,19 @@ def asignar_permisos_rol(id):
     access_permissions=["auth.admin.modificar_usuario_con_rol"],
 )
 def modificar_usuario_con_rol(id):
+    """
+    Modifica los datos de un usuario y su rol asignado.
+
+    Args:
+        id (int): ID del usuario a modificar.
+        JSON con datos actualizados.
+
+    Returns:
+        - 200 si se modifica correctamente.
+        - 400 si faltan datos.
+        - 404 si el usuario no existe.
+        - 500 si ocurre un error inesperado.
+    """
     session = SessionLocal()
     try:
         data = request.get_json()
@@ -190,6 +252,17 @@ def modificar_usuario_con_rol(id):
     access_permissions=["auth.admin.modificar_rol"],
 )
 def modificar_rol(rol_id):
+    """
+    Modifica el nombre u atributos de un rol existente.
+
+    Args:
+        rol_id (int): ID del rol a modificar.
+
+    Returns:
+        - 200 si se modifica correctamente.
+        - 400 si los datos son inválidos.
+        - 500 si ocurre un error inesperado.
+    """
     return Response(
         json.dumps({"mensaje": f"Rol {rol_id} modificado "}),
         status=200,
@@ -207,6 +280,16 @@ def modificar_rol(rol_id):
     access_permissions=["auth.admin.crear_permiso"],
 )
 def crear_permiso():
+    """
+    Crea un nuevo permiso en el sistema.
+
+    Args:
+        JSON con nombre del permiso.
+
+    Returns:
+        - 201 si se crea correctamente.
+        - 400 si faltan datos.
+    """
     return Response(
         json.dumps({"mensaje": "Permiso creado "}),
         status=201,
@@ -225,6 +308,13 @@ def crear_permiso():
     cache=CacheSettings(expiration=5),
 )
 def obtener_roles():
+    """
+    Obtiene la lista de roles disponibles en el sistema.
+
+    Returns:
+        - 200 con la lista de roles.
+        - 500 si ocurre un error inesperado.
+    """
     session = SessionLocal()
     try:
         roles = superadmin_service.obtener_roles(session)
@@ -250,6 +340,17 @@ def obtener_roles():
     access_permissions=["auth.admin.borrar_rol"],
 )
 def borrar_rol(rol_id):
+    """
+    Elimina lógicamente un rol del sistema.
+
+    Args:
+        rol_id (int): ID del rol a eliminar.
+
+    Returns:
+        - 200 si se elimina correctamente.
+        - 404 si no se encuentra.
+        - 500 si ocurre un error inesperado.
+    """
     session = SessionLocal()
     try:
         resultado = superadmin_service.borrar_rol(session, rol_id)
@@ -281,6 +382,13 @@ def borrar_rol(rol_id):
     cache=CacheSettings(expiration=10),
 )
 def obtener_permisos():
+    """
+    Obtiene todos los permisos registrados en el sistema.
+
+    Returns:
+        - 200 con la lista de permisos.
+        - 500 si ocurre un error inesperado.
+    """
     session = SessionLocal()
     try:
         resultado = superadmin_service.obtener_permisos(session)
@@ -301,11 +409,18 @@ def obtener_permisos():
 @superadmin_bp.route("/usuarios", methods=["GET"])
 @api_access(
     is_public=False,
-    limiter=["5 per minute"],
+    limiter=["25 per minute"],
     access_permissions=["auth.admin.obtener_usuarios"],
     cache=CacheSettings(expiration=10),
 )
 def obtener_usuarios():
+    """
+    Obtiene la lista de usuarios activos (no eliminados).
+
+    Returns:
+        - 200 con la lista de usuarios.
+        - 500 si ocurre un error inesperado.
+    """
     session = SessionLocal()
     try:
         usuarios = superadmin_service.obtener_usuarios(session, solo_eliminados=False)
@@ -331,6 +446,13 @@ def obtener_usuarios():
     cache=CacheSettings(expiration=10),
 )
 def ver_usuarios_eliminados():
+    """
+    Obtiene la lista de usuarios que han sido eliminados lógicamente.
+
+    Returns:
+        - 200 con la lista de usuarios eliminados.
+        - 500 si ocurre un error inesperado.
+    """
     session = SessionLocal()
     try:
         usuarios = superadmin_service.obtener_usuarios(session, solo_eliminados=True)
@@ -351,25 +473,28 @@ def ver_usuarios_eliminados():
     cache=CacheSettings(expiration=600, params=["token"]),
     )
 def restaurar_usuario_desde_token():
+    """
+    Restaura un usuario eliminado utilizando un token enviado por email.
+
+    Query Params:
+        - token: token JWT de restauración
+
+    Returns:
+        - 200 si se envía el correo de confirmación al usuario.
+        - 400 si el token es inválido o ha expirado.
+        - 404 si el usuario no existe.
+    """
     session = SessionLocal()
     token = request.args.get("token")
     try:
         email = verificar_token_restauracion(token, tipo="restauracion_admin")
         if not email:
-            return make_response(ResponseStatus.FAIL, "Token inválido o expirado", None, 400)
+            return render_template("token_invalido.html"), 400
 
         usuario = session.query(Usuario).filter_by(email_usuario=email, eliminado=True).first()
 
         if not usuario:
-            return """
-            <!DOCTYPE html>
-            <html>
-            <body style="font-family:sans-serif;text-align:center;padding:2rem;">
-            <h1>⚠️ Usuario no encontrado</h1>
-            <p>Es posible que el usuario ya haya sido restaurado o no exista.</p>
-            </body>
-            </html>
-            """, 404
+            return render_template("usuario_no_encontrado.html"), 404
 
         # 1) Generar nuevo token para que el usuario confirme
         token_usuario = generar_token_confirmacion_usuario(email)
@@ -378,15 +503,7 @@ def restaurar_usuario_desde_token():
         # 2) Enviar mail de confirmación al usuario
         enviar_mail_confirmacion_usuario(usuario, enlace_usuario)
 
-        return f"""
-        <!DOCTYPE html>
-        <html>
-        <body style="font-family:sans-serif;text-align:center;padding:2rem;">
-        <h1>📧 Correo enviado</h1>
-        <p>Se envió un correo a <strong>{email}</strong> con un enlace para que confirme la restauración de su cuenta.</p>
-        </body>
-        </html>
-        """, 200
+        return render_template("correo_enviado_confirmacion.html", email=email), 200
 
     except ExpiredSignatureError:
         return "El enlace ha expirado.", 400
@@ -396,3 +513,15 @@ def restaurar_usuario_desde_token():
         session.close()
 
 
+@superadmin_bp.route("/logs/<int:usuario_id>", methods=["GET"])
+@api_access(
+    is_public=False,
+    access_permissions=["auth.admin.ver_logs_usuario"]
+)
+def ver_logs_usuario(usuario_id):
+    session = SessionLocal()
+    try:
+        status, mensaje, data, code = superadmin_service.obtener_logs_usuario(session, usuario_id)
+        return make_response(status, mensaje, data), code
+    finally:
+        session.close()

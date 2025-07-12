@@ -1,13 +1,15 @@
+import logging
 import traceback
 from flask import request
-import requests
 from werkzeug.routing import Map, Rule
 from app.services.services_search_service import ServicesSearchService
 from common.models.endpoint_route_model import EndpointRouteModel
 from app.models.service_model import ServiceModel
 import time
-from app.extensions import logger
 from app.services.event_service import EventService
+from app.utils.service_endpoint_log import ServiceEndpointLog
+from common.services.service_request import ServiceRequest
+from app.utils.get_health import get_health
 
 event_service: EventService = EventService()
 
@@ -48,23 +50,22 @@ class EndpointsSearchService:
     ) -> dict[str, dict[str, str]] | None:
         # Contador de errores consecutivos
         error_cnt = 0
-
+        service_endpoint_log:ServiceEndpointLog = self._search_log[service.service_name]
         # Bucle de reintentos hasta conexión exitosa o señal de parada
         while not self._stop_search:
             try:
                 # Construye y realiza la petición al servicio
                 service_url = service.service_url
                 service_prefix = service.service_prefix
-                response = requests.get(
-                    f"{service_url}/component_service/endpoints"
+                response = ServiceRequest.get(
+                    f"{service_url}/component_service/endpoints",
+                    timeout=0.2,
                 ).json()
 
                 # Resetea contador de errores en éxito
                 error_cnt = 0
 
-                self._search_log[service.service_name]["endpoints_count"] = len(
-                    response
-                )
+                service_endpoint_log.set_success(len(response))
 
                 # Retorna diccionario de endpoints con URLs completas
                 return {
@@ -82,80 +83,93 @@ class EndpointsSearchService:
                 error_cnt += 1
                 # Logea error cada minuto (60 intentos)
                 if error_cnt % (5 * 1) == 0:
-                    logger.error(f"Error conectando con {service.service_name}")
-                self._search_log[service.service_name]["success"] = "error"
-                self._search_log[service.service_name]["error"] = str(e)
+                    logging.error(f"Error conectando con {service.service_name}")
+                service_endpoint_log.set_error(str(e))
 
-                if not service.service_wait and error_cnt > 10:
-                    self._search_log[service.service_name]["success"] = "timeout"
+                if not service.service_wait:
+                    service_endpoint_log.set_timeout()
                     return None
-
                 # Espera 1 segundo entre reintentos
                 time.sleep(1)
 
     def _load_endpoints(self):
         # Inicialización de variables y registro de inicio
-        logger.warning("Iniciando carga de servicios")
+        logging.info("Iniciando carga de servicios")
         self._endpoints = {}
         self._search_in_progress = True
         self._search_log = {}
 
         self._stop_search = False
         services = ServicesSearchService().get_services()
+
+        # Ordena los servicios, para cargar primero los servicios del core
+        services = tuple(sorted(services, key=lambda x: (not x.service_core, x.service_name)))
+        
+        # Una bandera para saber cuando terminan de cargar los servicios del core
+        is_core_services = True
+
         # Itera sobre cada servicio en la configuración
         for service in services:
-            self._search_log[service.service_name] = {
-                "in_progress": True,
-                "success": "in_progress",
-                "start_time": time.time(),
-                "error": None,
-                "endpoints_count": 0,
-            }
 
+            # Si se pasa de los servicios del core, actualiza el mapa
+            # Para tener el acceso minimo
+            if is_core_services and not service.service_core:
+                is_core_services = False
+                self._update_map()
+                logging.info("Cargando servicios del core")
+
+            # Inicializa el log
+            service_endpoint_log = ServiceEndpointLog(service.service_name)
+            self._search_log[service.service_name] = service_endpoint_log
+
+            # Si no es un servicio del core, verifica que el servicio este activo
+            if not is_core_services:
+                # Si el servicio no esta activo, continua con el siguiente
+                if not get_health(service.service_url):
+                    service_endpoint_log.set_not_available()
+                    logging.info(f"El servicio {service.service_name} no esta activo")
+                    continue
+
+            #Si el servicio no esta disponible, continua con el siguiene
             if service.service_available is False:
-                self._search_log[service.service_name]["success"] = "not_available"
-                self._search_log[service.service_name]["in_progress"] = False
+                service_endpoint_log.set_not_available()
                 continue
 
             if self._stop_search:  # Verifica señal de parada
-                self._search_log[service.service_name]["in_progress"] = False
-                self._search_log[service.service_name]["success"] = "stop"
-                logger.warning(f"Parada de búsqueda de endpoints")
+                service_endpoint_log.set_stop()
+                logging.info(f"Parada de búsqueda de endpoints")
                 break
 
-            logger.warning(f"Conectando con {service.service_name}...")
+            logging.info(f"Conectando con {service.service_name}...")
             try:
                 # Obtiene endpoints del servicio actual
                 service_endpoints = self._wait_for_service(service)
                 if service_endpoints is None:
-                    self._search_log[service.service_name][
-                        "error"
-                    ] = "No se pudo obtener endpoints"
+                    service_endpoint_log.set_error("No se pudo obtener endpoints")
                     continue
 
                 # Actualiza el diccionario de endpoints
                 self._endpoints.update(service_endpoints)
-                self._search_log[service.service_name]["error"] = ""
-                logger.warning(
+                service_endpoint_log.set_success(len(service_endpoints))
+                logging.info(
                     f"{service.service_name} - {len(service_endpoints)} endpoints cargados"
                 )
-
-                self._search_log[service.service_name]["success"] = "success"
             except Exception as e:
-                logger.error(f"Error cargando {service.service_name}: {str(e)}")
-                self._search_log[service.service_name]["error"] = str(e)
-                self._search_log[service.service_name]["success"] = "error"
-            finally:
-                self._search_log[service.service_name]["in_progress"] = False
+                logging.error(f"Error cargando {service.service_name}: {str(e)}")
+                service_endpoint_log.set_error(str(e))
+        
         # Finalización de la carga
         self._search_in_progress = False
-        logger.warning(f"Carga completada. Total de endpoints: {len(self._endpoints)}")
+        logging.info(f"Carga completada. Total de endpoints: {len(self._endpoints)}")
+        self._update_map()
+
+    def _update_map(self):
         # Crea modelos de ruta para cada endpoint
         self._services_route = {
             k: EndpointRouteModel(**v) for k, v in self._endpoints.items()
         }
         # Actualiza el mapa de URLs
-        self._update_url_map()
+        self._update_url_map()        
 
     def _update_url_map(self):
         """
@@ -232,5 +246,6 @@ class EndpointsSearchService:
         args_dict = {k: str(v) for k, v in args.items()}
         return endpoint_route, args_dict, str(matched_endpoint)
 
-    def get_search_log(self) -> dict[str, dict[str, str]]:
-        return self._search_log or {}
+    def get_search_log(self) -> dict[str, dict[str, str]]:  
+        #Convierto los logs en diccionarios
+        return {k: v.to_dict() for k, v in self._search_log.items()} or {}

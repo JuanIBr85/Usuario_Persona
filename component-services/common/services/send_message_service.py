@@ -1,18 +1,11 @@
 from common.utils.get_component_info import get_component_info
 import uuid
-import requests
+from common.services.component_service_api import ComponentServiceApi
 import traceback
 from common.schemas.message_schema import MessageSchema
-import os
 import logging
 
 message_schema = MessageSchema()
-logger = logging.getLogger(__name__)
-COMPONENT_SERVICE_HOST = os.environ.get(
-    "COMPONENT_SERVICE_HOST", "localhost"
-)  # Default to auth-service if not set
-logger.error(COMPONENT_SERVICE_HOST)
-
 
 def send_message(
     to_service: str,
@@ -38,16 +31,13 @@ def send_message(
         if error:
             return None, 400, error
 
-        logger.error(
+        logging.error(
             f"Enviando mensaje a {to_service} en el canal {channel}: {message}"
         )
 
         # Enviamos el mensaje
-        response = requests.post(
-            f"http://{COMPONENT_SERVICE_HOST}:5002/internal/message/send",
-            json=message,
-            timeout=2,
-        )
+        response = ComponentServiceApi.internal_message_send(message)
+
         if response.status_code != 200:
             return (
                 None,

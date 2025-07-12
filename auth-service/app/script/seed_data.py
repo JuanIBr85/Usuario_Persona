@@ -8,6 +8,23 @@ from werkzeug.security import generate_password_hash
 from datetime import datetime, timezone
 from app.constantes.permisos_const import PERMISOS, PERMISOS_POR_ROL
 
+"""
+Script: scripts.seed
+
+Este módulo inicializa la base de datos con datos predeterminados esenciales
+para el funcionamiento del sistema.
+
+Funcionalidades:
+- Crea todos los permisos definidos en `PERMISOS`.
+- Crea los roles definidos en `PERMISOS_POR_ROL` y les asigna los permisos correspondientes.
+- Crea un usuario SuperAdmin con email `superadmin@admin.com` y contraseña `Admin123!` (ya hasheada).
+- Asocia al SuperAdmin el rol "superadmin".
+
+Este script está destinado a entornos de desarrollo o testing. No debe ejecutarse en producción
+sin modificaciones o medidas de seguridad adicionales.
+
+"""
+
 def seed():
     db = SessionLocal()
 

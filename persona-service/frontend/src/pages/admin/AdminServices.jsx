@@ -55,7 +55,7 @@ function AdminServices() {
       path: "/adminservices/components",
     },
     {
-      title: "Monitoreo de Endpoints",
+      title: "Monitoreo de Servicios",
       description: "Iniciar y controlar el análisis de servicios registrados.",
       path: "/adminservices/endpoints-research",
     },

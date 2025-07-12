@@ -1,111 +1,378 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom"; import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button";
 import InputValidate from "@/components/inputValidate/InputValidate";
 import { SimpleDialog } from "@/components/SimpleDialog";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+
+} from "@/components/ui/alert-dialog";
 import Loading from "@/components/loading/Loading";
 import { AuthService } from "@/services/authService";
 import { formSubmitJson } from "@/utils/formUtils";
 import { useAuthContext } from "@/context/AuthContext";
-import { useState } from "react";
+
+
+
 
 export default function FormUsuario() {
-  const { authData, updateData, removeAuthData } = useAuthContext();
+
+  const { authData, updateData } = useAuthContext();
+  const navigate = useNavigate();
+
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
-  const handleSubmit = async (event) => {
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);//modal de eliminar cuenta
+  const [deleteResultOpen, setDeleteResultOpen] = useState(false);//respuesta de eliminar cuenta
+  const [deleteMessage, setDeleteMessage] = useState("");//mensaje de eliminar cuenta
+
+  const [otpDialogOpen, setOtpDialogOpen] = useState(false);
+  const [otpMessage, setOtpMessage] = useState("");
+  const [redirectToOtp, setRedirectToOtp] = useState(false);
+
+  const [openEmailDialog, setOpenEmailDialog] = useState(false);
+  const [emailResultOpen, setEmailResultOpen] = useState(false);
+  const [emailMessage, setEmailMessage] = useState("");
+
+  const [openUsernameDialog, setOpenUsernameDialog] = useState(false);
+  const [usernameResultOpen, setUsernameResultOpen] = useState(false);
+  const [usernameMessage, setUsernameMessage] = useState("");
+
+  const [deleteOk, setDeleteOk] = useState(false);
+  const [emailOk, setEmailOk] = useState(false);
+
+
+
+  const submitDeleteRequest = async (event) => {
+
     const formData = await formSubmitJson(event);
-    document.activeElement.blur();
     setLoading(true);
-    AuthService.updateUser(formData)
-      .then((response) => {
-        updateData({ user: { ...authData.user, ...response.data } });
-      })
-      .catch((error) => {
-        console.error("Error updating user:", error);
-        setError(true);
-        setOpenDialog(true);
-      })
-      .finally(() => setLoading(false));
-  };
 
-  const confirmDelete = () => {
-    setLoading(true);
-    AuthService.deleteUser()
+    AuthService.requestDelete({
+      email: formData.email,
+      password: formData.password,
+    })
       .then(() => {
-        removeAuthData();
-        window.location.href = "/auth/login";
+
+
+        setDeleteMessage(
+          "Se envió un correo de confirmación para eliminar la cuenta."
+        );
+        setDeleteOk(true);
+        setDeleteResultOpen(true);
+        setOpenDeleteDialog(false);
+
       })
       .catch((error) => {
-        console.error("Error deleting user:", error);
-        setError(true);
-        setOpenDialog(true);
+        setDeleteOk(false);
+        setDeleteMessage(
+          error?.data?.message || error?.message || "Error al solicitar eliminación"
+        );
+        setDeleteResultOpen(true);
+        setOpenDeleteDialog(true);
       })
       .finally(() => {
         setLoading(false);
-        setOpenDeleteDialog(false);
+
       });
   };
 
+  const requestOtp = () => {
+    setLoading(true);
+    AuthService.requestOtp({ email: authData.user.email_usuario })
+      .then(() => {
+        sessionStorage.setItem("email_para_reset", authData.user.email_usuario);
+        setOtpMessage(
+          "Se ha enviado un código de verificación a tu mail para cambiar la contraseña."
+        );
+        setRedirectToOtp(true);
+      })
+      .catch((error) => {
+        setOtpMessage(
+          error?.data?.message || error?.message || "Error al solicitar código"
+        );
+        setRedirectToOtp(false);
+      })
+      .finally(() => {
+        setLoading(false);
+        setOtpDialogOpen(true);
+      });
+  };
+
+  const submitChangeEmail = async (event) => {
+    const formData = await formSubmitJson(event);
+    setLoading(true);
+
+    AuthService.changeEmail({
+      nuevo_email: formData.nuevo_email,
+      password: formData.password,
+    })
+      .then(() => {
+
+        setEmailOk(true);
+        setEmailMessage(
+          "Se ha enviado un correo de verificación al nuevo email. Despues de confirmar inicia sesión con el nuevo correo para continuar."
+        );
+        setEmailResultOpen(true);
+        setOpenEmailDialog(false);
+
+      })
+      .catch((error) => {
+        setEmailOk(false);
+        setEmailMessage(
+          error?.data?.message || error?.message || "Error al cambiar correo"
+        )
+        setOpenEmailDialog(true);
+        setEmailResultOpen(true);
+      })
+      .finally(() => {
+        setLoading(false);
+
+      });
+  };
+
+  const submitChangeUsername = async (event) => {
+    const formData = await formSubmitJson(event);
+    setLoading(true);
+    AuthService.changeUsername({ nombre_usuario: formData.nombre_usuario })
+      .then((response) => {
+        updateData({ user: { ...authData.user, ...response.data } });
+        setUsernameMessage("Nombre de usuario actualizado correctamente.");
+        setUsernameResultOpen(true);
+        setOpenUsernameDialog(false);
+      })
+      .catch((error) => {
+        setUsernameMessage(
+          error?.data?.message || error?.message || "Error al cambiar nombre"
+        );
+        setOpenUsernameDialog(true);
+        setUsernameResultOpen(true);
+      })
+      .finally(() => {
+        setLoading(false);
+
+      });
+  };
+
+
+
   return (
     <>
-      {loading && <Loading isFixed={true} />}
+      {loading && <Loading isFixed />}
 
       <div className="w-full max-w-md mx-auto space-y-4 px-4">
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-3 pt-4">
           <InputValidate
-            id="nombre_usuario"
+            id="info_nombre_usuario"
             type="text"
             labelText="Nombre de usuario"
-            placeholder="Ingresa tu nombre de usuario"
             value={authData.user.nombre_usuario || ""}
-            required
+            className="bg-gray-100 cursor-not-allowed w-full"
+            readOnly
           />
           <InputValidate
-            id="email_usuario"
+            id="info_email_usuario"
             type="email"
-            labelText="Email"
-            placeholder="Ingresa tu email"
+            labelText="Correo"
             value={authData.user.email_usuario || ""}
-            required
+            className="bg-gray-100 cursor-not-allowed w-full"
+            readOnly
           />
+        </div>
+        <div className="flex flex-col gap-3 pt-4">
+          <Button onClick={requestOtp}>Cambiar Contraseña</Button>
 
-          <div className="flex flex-col gap-3 pt-4">
-            <Button type="submit" className="w-full sm:w-auto">
-              Guardar Cambios
-            </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              className="w-full sm:w-auto"
-              onClick={() => setOpenDeleteDialog(true)}
-            >
-              Eliminar Cuenta
-            </Button>
-          </div>
-        </form>
+          <Button onClick={() => setOpenUsernameDialog(true)}>
+            Cambiar Nombre de Usuario
+          </Button>
+
+          <Button onClick={() => setOpenEmailDialog(true)}>
+            Cambiar Correo
+          </Button>
+
+          <Button
+            variant="destructive"
+            onClick={() => setOpenDeleteDialog(true)}
+          >
+            Eliminar Cuenta
+          </Button>
+        </div>
       </div>
 
-      {error && (
-        <SimpleDialog
-          title="Ocurrió un error"
-          description="No se pudieron guardar los datos. Intenta nuevamente."
-          isOpen={openDialog}
-          actionHandle={() => setOpenDialog(false)}
-          action="Cerrar"
-        />
-      )}
+      {/* ─────────── Diálogos ─────────── */}
+
+      {/* eliminar cuenta */}
+      <AlertDialog
+        open={openDeleteDialog}
+        onOpenChange={setOpenDeleteDialog}   // 👈 más simple
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Eliminar cuenta</AlertDialogTitle>
+            <AlertDialogDescription>
+              Ingresá tu correo y contraseña para confirmar la eliminación
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <form onSubmit={submitDeleteRequest} className="space-y-4">
+            <InputValidate
+              id="email"
+              type="email"
+              labelText="Correo"
+              placeholder="Ingresa tu correo"
+              defaultValue={authData.user.email_usuario || ""}
+              validationMessage="Email inválido"
+              required
+            />
+            <InputValidate
+              id="password"
+              type="password"
+              labelText="Contraseña"
+              placeholder="Ingresa tu contraseña"
+              required
+            />
+
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              {/* Botón que envía, pero NO cierra automáticamente */}
+              <Button type="submit">Eliminar</Button>
+            </AlertDialogFooter>
+          </form>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* OTP / cambio de contraseña */}
+      <SimpleDialog
+        title="Recuperar contraseña"
+        description={otpMessage}
+        isOpen={otpDialogOpen}
+        setIsOpen={(value) => {
+          setOtpDialogOpen(value);
+          if (!value && redirectToOtp) navigate("/auth/otpvalidation");
+        }}
+      />
+
+      {/* dialogo nombre de usuario */}
+      <AlertDialog
+        open={openUsernameDialog}
+        onOpenChange={setOpenUsernameDialog}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cambiar nombre de usuario</AlertDialogTitle>
+            <AlertDialogDescription>
+              Ingresa el nuevo nombre de usuario
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <form onSubmit={submitChangeUsername} className="space-y-4">
+            <InputValidate
+              id="nombre_usuario"
+              type="text"
+              labelText="Nuevo nombre"
+              placeholder="Ingresa el nuevo nombre"
+              validatePattern=".{4,}"
+              validationMessage="El nombre debe tener al menos 4 caracteres"
+              required
+            />
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              {/* Botón que envía, pero NO cierra automáticamente */}
+              <Button type="submit">Guardar</Button>
+            </AlertDialogFooter>
+          </form>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* dialogo cambiar correo */}
+      <AlertDialog
+        open={openEmailDialog}
+        onOpenChange={setOpenEmailDialog}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cambiar correo</AlertDialogTitle>
+            <AlertDialogDescription>
+              Ingresa tu nuevo correo y tu contraseña actual para confirmar el cambio.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <form onSubmit={submitChangeEmail} className="space-y-4">
+            <InputValidate
+              id="nuevo_email"
+              type="email"
+              labelText="Nuevo correo"
+              placeholder="Ingresa tu nuevo correo"
+
+              validationMessage="Email inválido"
+              required
+            />
+            <InputValidate
+              id="password"
+              type="password"
+              labelText="Contraseña"
+              placeholder="Ingresa tu contraseña"
+              required
+            />
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              {/* Botón que envía, pero NO cierra automáticamente */}
+              <Button type="submit">Guardar</Button>
+            </AlertDialogFooter>
+          </form>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* resultados */}
+      <SimpleDialog
+        title="Cambio de nombre de usuario"
+        description={usernameMessage}
+        isOpen={usernameResultOpen}
+        actionHandle={() => setUsernameResultOpen(false)}
+      />
 
       <SimpleDialog
-        title="¿Eliminar cuenta?"
-        description="Esta acción no se puede deshacer. ¿Deseas eliminar tu cuenta?"
-        isOpen={openDeleteDialog}
-        cancel="Cancelar"
-        action="Eliminar"
-        cancelHandle={() => setOpenDeleteDialog(false)}
-        actionHandle={confirmDelete}
+        title="Cambio de correo"
+        description={emailMessage}
+        isOpen={emailResultOpen}
+        actionHandle={() => {
+          setEmailResultOpen(false)
+
+          if (emailOk) {
+
+            AuthService.logout();
+            navigate("/auth/login");
+          }
+
+        }}
+
+
+
       />
+      <SimpleDialog
+        title="Eliminar cuenta"
+        description={deleteMessage}
+        isOpen={deleteResultOpen}
+        action="Aceptar"
+        actionHandle={() => {
+          setDeleteResultOpen(false);
+
+          if (deleteOk) {
+
+            AuthService.logout();
+            navigate("/auth/login");
+
+          }
+
+        }}
+      />
+
     </>
   );
 }

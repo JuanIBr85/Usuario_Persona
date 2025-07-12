@@ -71,6 +71,17 @@ export const AuthService = {
     });
   },
 
+
+  resendOtp: async (body) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/resend-otp`,
+      method: HttpMethod.POST,
+      body: body,
+      
+      showError: AuthService.showError
+    });
+  },
+
   /**
    * Valida un código OTP proporcionado por el usuario.
    * @async
@@ -133,10 +144,50 @@ logout: async () => {
     });
   },
 
+  changeEmail: async (body) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/cambiar-email`,
+      method: HttpMethod.POST,
+      body: body,
+      useToken: true,
+      showError: AuthService.showError,
+    });
+  },
+
+  changeUsername: async (body) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/modificar`,
+      method: HttpMethod.POST,
+      body: body,
+      useToken: true,
+      showError: AuthService.showError,
+    });
+  },
+
+  requestDelete: async (body) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/solicitar-eliminacion`,
+      method: HttpMethod.POST,
+      body: body,
+      useToken: true,
+      showError: AuthService.showError,
+    });
+  },
+
   deleteUser: async () => {
     return fetchService.fetch({
       url: `${ServiceURL.auth}/eliminar`,
       method: HttpMethod.DELETE,
+      useToken: true,
+      showError: AuthService.showError,
+    });
+  },
+
+  renewToken: async (token) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/refresh`,
+      method: HttpMethod.POST,
+      body: {refresh_token: token},
       useToken: true,
       showError: AuthService.showError,
     });

@@ -13,7 +13,6 @@ env/
 .env
 
 # Archivos de logs y bases temporales
-*.log
 *.sqlite3
 
 # IDEs

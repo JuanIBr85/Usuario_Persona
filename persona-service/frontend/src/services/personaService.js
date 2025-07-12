@@ -207,6 +207,17 @@ export const PersonaService = {
       useToken: true,
       showError: PersonaService.showError
     });
-  }
+  },
+
+    //Obtiene la persona vinculada al usuario autenticado actual.
+    verificar_identidad: async (body) => {
+      return fetchService.fetch({
+        url: `${ServiceURL.persona}/personas/verificar-identidad`,
+        method: HttpMethod.POST,
+        body: body,
+        useToken: true,
+        showError: PersonaService.showError
+      });
+    }
 
 };

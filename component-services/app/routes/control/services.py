@@ -8,7 +8,6 @@ from app.models.service_model import ServiceModel
 from app.schemas.service_schema import ServiceSchema
 from app.utils.get_health import get_health
 from app.utils.get_component_info import get_component_info
-from app.extensions import logger
 from datetime import datetime, timezone, timedelta
 from flask import current_app
 import time
@@ -22,15 +21,8 @@ services_service: ServicioBase = ServicioBase(ServiceModel, ServiceSchema())
 event_service: EventService = EventService()
 
 
-@bp.route("/echo", methods=["GET"])
-@cp_api_access(is_public=True)
-def echo():
-    send_event("test", {"message": "Bienvenido a la API de Componentes"})
-    return jsonify({"message": "Bienvenido a la API de Componentes"}), 200
-
-
 @bp.route("/all", methods=["GET"])
-@cp_api_access(is_public=True, limiter=["15 per minute"])
+@cp_api_access(is_public=False, limiter=["15 per minute"], access_permissions=["component.control.servicios"])
 def get_services():
     try:
         services = services_service.get_all()
@@ -47,7 +39,7 @@ def get_services():
 
 
 @bp.route("/get_service/<int:id>", methods=["GET"])
-@cp_api_access(is_public=True, limiter=["15 per minute"])
+@cp_api_access(is_public=False, limiter=["15 per minute"], access_permissions=["component.control.servicios"])
 def get_service(id: int):
     try:
         service = services_service.get_by_id(id)
@@ -66,7 +58,7 @@ def get_service(id: int):
 
 
 @bp.route("/refresh_service/<int:id>", methods=["PUT"])
-@cp_api_access(is_public=True, limiter=["5 per minute"])
+@cp_api_access(is_public=False, limiter=["5 per minute"], access_permissions=["component.control.servicios"])
 def refresh_service(id: int):
     try:
         service: ServiceModel = services_service.get_by_id(id)
@@ -97,7 +89,7 @@ def refresh_service(id: int):
 
 
 @bp.route("/install_service", methods=["POST"])
-@cp_api_access(is_public=True, limiter=["5 per minute"])
+@cp_api_access(is_public=False, limiter=["5 per minute"], access_permissions=["component.control.servicios"])
 def install_service():
     try:
         url = request.get_json().get("url")
@@ -137,7 +129,7 @@ def install_service():
 
 
 @bp.route("/remove_service/<int:id>", methods=["DELETE"])
-@cp_api_access(is_public=True, limiter=["5 per minute"])
+@cp_api_access(is_public=False, limiter=["5 per minute"], access_permissions=["component.control.servicios"])
 def remove_service(id: int):
     try:
 
@@ -165,7 +157,7 @@ def remove_service(id: int):
 
 
 @bp.route("/set_service_available/<int:id>/<int:state>", methods=["PUT"])
-@cp_api_access(is_public=True, limiter=["5 per minute"])
+@cp_api_access(is_public=False, limiter=["5 per minute"], access_permissions=["component.control.servicios"])
 def set_service_available(id: int, state: int):
     try:
         service: ServiceModel = services_service.get_by_id(id)
@@ -197,7 +189,7 @@ def set_service_available(id: int, state: int):
 
 
 @bp.route("/stop_system", methods=["POST"])
-@cp_api_access(is_public=True, limiter=["1 per minute"])
+@cp_api_access(is_public=False, limiter=["1 per minute"], access_permissions=["component.control.servicios_parada"])
 def stop_system():
     try:
 

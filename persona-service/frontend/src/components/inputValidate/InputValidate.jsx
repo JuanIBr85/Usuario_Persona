@@ -15,13 +15,13 @@ import { useEffect } from 'react'
  * @param {Object} props - Props adicionales que serán pasadas al componente <Input>.
  * @param {string} containerClassName - Clases adicionales para el contenedor del input.
  */
-export default function InputValidate({ id, type, placeholder, labelText, validatePattern, validationMessage, value, containerClassName, onChange, required, ...props }) {
+export default function InputValidate({ id, type, placeholder, labelText, validatePattern, validationMessage, value="", containerClassName, onChange, required, ...props }) {
     //Este estado sirve para indicar si hubo un error en la validacion del input
     const [error, setError] = React.useState(false)
     //Este estado sirve para indicar si debe o no ocultar la contraseña
     const [showPassword, setShowPassword] = React.useState(false)
 
-    const [internalValue, setInternalValue] = React.useState(value)
+    const [internalValue, setInternalValue] = React.useState(value || '')
 
     useEffect(() => {
         setInternalValue(value)

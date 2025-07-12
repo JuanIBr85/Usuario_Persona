@@ -1,14 +1,30 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Separator } from "@/components/ui/separator";
 import { Link } from "react-router-dom";
+import { isAdmin, hasToken } from "@/context/AuthContext";
+
+// Variables de entorno
+const {
+  VITE_PAGINA_WEB: paginaWeb = 'coronelsuarez.gob.ar',
+  VITE_TELEFONOS: telefonos = '2926429200;2926429371',
+  VITE_EMAILS: emails = 'coronelsuarez@gob.ar',
+  VITE_DIRECCION: direccion = 'Av. Alsina 150 (7540) Coronel Suárez Buenos Aires - Argentina',
+  VITE_DIRECCION_URL: direccionUrl = 'https://www.openstreetmap.org/#map=20/-37.4445931/-61.9241133&layers=H',
+  VITE_FACEBOOK: facebook = 'https://www.facebook.com/suarezmunicipio/?locale=es_LA',
+  VITE_INSTAGRAM: instagram = 'https://www.instagram.com/suarezmunicipio/?hl=es'
+} = import.meta.env;
 
 const Footer = () => {
+  const [_isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    setIsAdmin(isAdmin());
+  }, []);
   return (
     <footer className="bg-white shadow-[-4px_-4px_10px_rgba(0,0,0,0.01)] dark:bg-card px-4 pt-16 w-full mx-auto max-w-full px-lg:px-24  lg:px-8">
-      <div className="grid gap-10 row-gap-6 mb-8 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="sm:col-span-2">
+      <div className="grid gap-10 row-gap-6 mb-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="sm:col-span-1">
           <Link
-            to="/"
+            to={hasToken()?(_isAdmin ? "/" : "/profile"):"/auth/login"}
             aria-label="Ir a inicio"
             title="PRISMA"
             className="inline-flex items-center"
@@ -23,7 +39,7 @@ const Footer = () => {
               Plataforma de Registro de Identidades, Servicios y Módulos Asociados
             </p>
             <p className="mt-4 text-sm text-gray-800">
-              <a href="https://www.coronelsuarez.gob.ar">coronelsuarez.gob.ar</a>
+              <a href={`https://${paginaWeb}`}>{paginaWeb}</a>
             </p>
           </div>
         </div>
@@ -33,53 +49,40 @@ const Footer = () => {
           </p>
           <div className="flex">
             <p className="mr-1 text-gray-800 ">Teléfono:</p>
-            <a
-              href="tel:2926429200"
-              aria-label="Nuestro teléfono"
-              title="Nuestro teléfono"
-              className="transition-colors duration-300 text-deep-purple-accent-400 hover:text-deep-purple-800 mr-1"
-            >
-              +54 (2926) 429200
-            </a>
-            <a
-              href="tel:2926429371"
-              aria-label="Nuestro teléfono"
-              title="Nuestro teléfono"
-              className="transition-colors duration-300 text-deep-purple-accent-400 hover:text-deep-purple-800 mr-1"
-            >
-              +54 (2926) 429371
-            </a>
-            <a
-              href="tel:2926429372"
-              aria-label="Nuestro teléfono"
-              title="Nuestro teléfono"
-              className="transition-colors duration-300 text-deep-purple-accent-400 hover:text-deep-purple-800"
-            >
-              +54 (2926) 429372
-            </a>
+            {telefonos.split(';').map((telefono, index) => (
+              <a
+                key={index}
+                href={`tel:${telefono.replace(/[^\d+]/g, '')}`}
+                aria-label="Nuestro teléfono"
+                title="Nuestro teléfono"
+                className="transition-colors duration-300 text-deep-purple-accent-400 hover:text-deep-purple-800 mr-1"
+              >
+                {telefono}
+              </a>
+            ))}
           </div>
           <div className="flex">
             <p className="mr-1 text-gray-800">Correo electrónico:</p>
             <a
-              href="mailto:comunicaciones@coronelsuarez.gob.ar"
+              href={`mailto:${emails}`}
               aria-label="Nuestro correo"
               title="Nuestro correo"
               className="transition-colors duration-300 text-deep-purple-accent-400 hover:text-deep-purple-800"
             >
-              comunicaciones@coronelsuarez.gob.ar
+              {emails}
             </a>
           </div>
           <div className="flex">
             <p className="mr-1 text-gray-800">Dirección:</p>
             <a
-              href="https://www.openstreetmap.org/#map=20/-37.4445931/-61.9241133&layers=H"
+              href={direccionUrl}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Nuestra dirección"
               title="Nuestra dirección"
               className="transition-colors duration-300 text-deep-purple-accent-400 hover:text-deep-purple-800"
             >
-              Av. Alsina 150 (7540) Coronel Suárez Buenos Aires - Argentina
+              {direccion}
             </a>
           </div>
         </div>
@@ -89,7 +92,7 @@ const Footer = () => {
           </span>
           <div className="flex items-center mt-1 space-x-3">
             <a
-              href="https://www.instagram.com/suarezmunicipio/?hl=es"
+              href={instagram}
               className="text-gray-500 transition-colors duration-300 hover:text-deep-purple-accent-400"
             >
               <svg viewBox="0 0 30 30" fill="currentColor" className="h-6">
@@ -98,7 +101,7 @@ const Footer = () => {
               </svg>
             </a>
             <a
-              href="https://www.facebook.com/suarezmunicipio/?locale=es_LA"
+              href={facebook}
               className="text-gray-500 transition-colors duration-300 hover:text-deep-purple-accent-400"
             >
               <svg viewBox="0 0 24 24" fill="currentColor" className="h-5">
@@ -108,7 +111,7 @@ const Footer = () => {
           </div>
           <Separator className="my-4" />
           <p className="mt-4 text-sm text-gray-500">
-            Los contenidos de coronelsuarez.gob.ar están licenciados bajo  Creative Commons Reconocimiento 2.5 Argentina License      
+            Los contenidos de coronelsuarez.gob.ar están licenciados bajo  Creative Commons Reconocimiento 2.5 Argentina License
           </p>
         </div>
       </div>
@@ -116,7 +119,7 @@ const Footer = () => {
         <ul className="flex flex-col mb-3 space-y-2 lg:mb-0 sm:space-y-0 sm:space-x-5 sm:flex-row">
           <li>
             <Link
-              to="/faq"
+              to="/faq/faq"
               className="text-sm text-gray-600 transition-colors duration-300 hover:text-deep-purple-accent-400"
             >
               Preguntas frecuentes
@@ -124,7 +127,7 @@ const Footer = () => {
           </li>
           <li>
             <Link
-              to="/privacypolicy"
+              to="/faq/privacypolicy"
               className="text-sm text-gray-600 transition-colors duration-300 hover:text-deep-purple-accent-400"
             >
               Política de privacidad
@@ -132,7 +135,7 @@ const Footer = () => {
           </li>
           <li>
             <Link
-              to="/termsofservice"
+              to="/faq/termsofservice"
               className="text-sm text-gray-600 transition-colors duration-300 hover:text-deep-purple-accent-400"
             >
               Términos y condiciones

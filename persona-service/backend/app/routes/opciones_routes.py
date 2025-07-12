@@ -1,5 +1,7 @@
 from flask import Blueprint, jsonify, request
 from common.utils.response import make_response, ResponseStatus
+import logging
+from sqlalchemy.exc import SQLAlchemyError
 from config import (
     TIPOS_DOCUMENTO_VALIDOS,
     REDES_SOCIALES_VALIDAS,
@@ -19,21 +21,23 @@ opciones_bp = Blueprint("opciones_bp", __name__)
 service = PersonaService()
 validar_documento_schema = ValidarDocumentoSchema()
 
-
-@api_access(cache=CacheSettings(expiration=60 * 60))
+#Lista de tipos válidos de documento
+@api_access(cache=CacheSettings(expiration=1))
 @opciones_bp.route("/tipos_documento", methods=["GET"])
 def obtener_tipos_documento():
-
     return (
         make_response(
             status=ResponseStatus.SUCCESS,
             message="Tipos de documento obtenidos correctamente",
+            # Devuelve solo los tipos de documento
+            # Lo ideal seria enviar los regex para permitir al front una validacion fiable
+            # data=list(TIPOS_DOCUMENTO_VALIDOS.keys()),
             data=TIPOS_DOCUMENTO_VALIDOS,
         ),
         200,
     )
 
-
+#Lista de redes sociales válidas
 @api_access(cache=CacheSettings(expiration=60 * 60))
 @opciones_bp.route("/redes_sociales", methods=["GET"])
 def obtener_red_social():
@@ -47,7 +51,7 @@ def obtener_red_social():
         200,
     )
 
-
+#Estados civiles posibles
 @api_access(cache=CacheSettings(expiration=60 * 60))
 @opciones_bp.route("/estados_civiles", methods=["GET"])
 def obtener_estado_civile():
@@ -61,7 +65,7 @@ def obtener_estado_civile():
         200,
     )
 
-
+#Ocupaciones disponibles
 @api_access(cache=CacheSettings(expiration=60 * 60))
 @opciones_bp.route("/ocupaciones", methods=["GET"])
 def obtener_ocupacion():
@@ -75,7 +79,7 @@ def obtener_ocupacion():
         200,
     )
 
-
+#Niveles educativos posibles
 @api_access(cache=CacheSettings(expiration=60 * 60))
 @opciones_bp.route("/estudios_alcanzados", methods=["GET"])
 def obtener_estudios_alcanzados():
@@ -89,7 +93,7 @@ def obtener_estudios_alcanzados():
         200,
     )
 
-
+#Localidades según el código postal
 @api_access(cache=CacheSettings(expiration=60, params=["codigo_postal"]))
 @opciones_bp.route("/domicilios_postales/localidades", methods=["GET"])
 def buscar_localidades_por_codigo_postal():
@@ -126,6 +130,10 @@ def buscar_localidades_por_codigo_postal():
             ),
             200,
         )
+    
+    except SQLAlchemyError as e:
+        logging.error(f"Database error: {type(e).__name__}")
+        return make_response(ResponseStatus.ERROR, str(type(e).__name__), None, "DB ERROR"), 500
 
     except Exception as e:
         return (
@@ -137,7 +145,7 @@ def buscar_localidades_por_codigo_postal():
             500,
         )
 
-
+#Busca un domicilio postal por código y localidad
 @api_access(cache=CacheSettings(expiration=60, params=["codigo_postal", "localidad"]))
 @opciones_bp.route("/domicilios_postales/buscar", methods=["GET"])
 def buscar_domicilio_postal():
@@ -180,6 +188,10 @@ def buscar_domicilio_postal():
             ),
             200,
         )
+    
+    except SQLAlchemyError as e:
+        logging.error(f"Database error: {type(e).__name__}")
+        return make_response(ResponseStatus.ERROR, str(type(e).__name__), None, "DB ERROR"), 500
 
     except Exception as e:
         return (
@@ -196,6 +208,7 @@ def buscar_domicilio_postal():
 @api_access(
     # limiter=["3 per minute"],
 )
+#Comprueba si un documento ya está registrado
 @opciones_bp.route("/opciones/verificar-documento", methods=["POST"])
 def verificar_documento():
     try:
@@ -204,7 +217,11 @@ def verificar_documento():
         error = validar_documento_schema.validate(data)
         if error:
             return (
-                make_response(ResponseStatus.FAIL, error),
+                make_response(
+                    status=ResponseStatus.FAIL,
+                    message="Datos inválidos",
+                    data=error,
+                ),
                 400,
             )
 
@@ -238,6 +255,10 @@ def verificar_documento():
             ),
             200,
         )
+    except SQLAlchemyError as e:
+        logging.error(f"Database error: {type(e).__name__}")
+        return make_response(ResponseStatus.ERROR, str(type(e).__name__), None, "DB ERROR"), 500
+
     except Exception as e:
         return (
             make_response(

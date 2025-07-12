@@ -28,7 +28,7 @@ const Redirect = () => {
             setLoadingText("Perfil encontrado");
         } catch (error) {
             setLoadingText("No se a completado los datos del perfil");
-            setTimeout(() => navigate('/profile'), 1000);
+            setTimeout(() => navigate('/searchprofile'), 1000);
             return;
         }
 
@@ -41,7 +41,7 @@ const Redirect = () => {
             //Si no se pudo convertir la informacion de auth en base64
             if (!b64Data) {
                 setLoadingText("Hubo un problema al empaquetar la informacion");
-                removeAuthData();
+                removeAuthData("Redirect");
                 setTimeout(() => navigate('/auth/login'), 1000);
                 return;
             }

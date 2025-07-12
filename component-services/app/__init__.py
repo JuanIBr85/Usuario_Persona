@@ -1,7 +1,7 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 import os
-from app.extensions import engine, Base, logger
+from app.extensions import engine, Base
 from app.routes import register_blueprints
 from app.decorators.cp_api_access import cp_api_access
 from flask_jwt_extended import JWTManager
@@ -11,11 +11,17 @@ from app.services.services_search_service import ServicesSearchService
 import threading
 from app.utils.redis_message import redis_stream_start, register_redis_receiver
 from app.services.event_service import EventService
+<<<<<<< HEAD
 from werkzeug.middleware.proxy_fix import ProxyFix
 
+=======
+from config import CORS_CONFIG
+import logging
+>>>>>>> master
 endpoints_search_service = EndpointsSearchService()
 # Defino los modelos
 import app.models
+
 
 
 @cp_api_access(is_public=True)
@@ -33,14 +39,7 @@ def create_app() -> Flask:
 
     CORS(
         app,
-        resources={r"/*": {"origins": "*"}},
-        supports_credentials=True,
-        allow_headers=[
-            "Content-Type",
-            "Authentication",
-            "Authorization",
-            "authorization",
-        ],
+        **CORS_CONFIG
     )
 
     limiter.init_app(app)
@@ -57,19 +56,15 @@ def create_app() -> Flask:
     app.route("/sys_detenido", methods=["NONE"])(sys_detenido)
 
     # Inicializa el servicio de busqueda de endpoints
-    # Iniciar el refresco en segundo plano
-    thread = threading.Thread(target=endpoints_search_service.refresh_endpoints)
-    thread.daemon = True  # El hilo se cerrará cuando el programa principal termine
-    thread.start()
+    endpoints_search_service.refresh_endpoints()
 
     # Cargo el listado de redirecciones
-    thread = threading.Thread(target=ServicesSearchService().update_redirect)
-    thread.daemon = True  # El hilo se cerrará cuando el programa principal termine
-    thread.start()
+    ServicesSearchService().update_redirect()
 
     # Inicializa el servicio de mensajeria
     redis_stream_start(app)
 
+    #Se desactivo este evento por alguna razon provoca un retrazo
     # Aviso a los servicios que inicio el servicio de componentes
     EventService().component_start_service()
 
@@ -79,7 +74,7 @@ def create_app() -> Flask:
 # Recarga la api gateway
 @register_redis_receiver("research")
 def research(app: Flask, message_data: dict):
-    logger.warning("Recargando endpoints")
+    logging.info("Recargando endpoints")
     endpoints_search_service.refresh_endpoints()
     ServicesSearchService().update_redirect()
 
@@ -87,7 +82,7 @@ def research(app: Flask, message_data: dict):
 # Detiene todo el sistema
 @register_redis_receiver("stop_services")
 def stop_services(app: Flask, message_data: dict):
-    logger.warning("Deteniendo servicios")
+    logging.warning("Deteniendo servicios")
     for endpoint in app.view_functions.keys():
         # Solo permite la comunicacion entre servicios
         if endpoint == "message.send_message":

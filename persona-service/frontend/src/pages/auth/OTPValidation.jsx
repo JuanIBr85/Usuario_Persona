@@ -15,28 +15,58 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 
+/**
+ * OTPValidation.jsx
+ *
+ * Vista encargada de validar un código OTP enviado por email,
+ * como parte del flujo de recuperación de contraseña.
+ *
+ * Funcionalidades:
+ * - Recupera el email del usuario desde `sessionStorage`.
+ * - Permite ingresar un código OTP de 6 dígitos.
+ * - Realiza una verificación contra el backend.
+ * - En caso exitoso, almacena el `reset_token` para el siguiente paso (resetear la contraseña).
+ * - Permite reenviar el código OTP al correo.
+ * - Muestra un diálogo de éxito o error según el resultado.
+ * - Redirige al formulario de restablecer contraseña si la validación fue exitosa.
+ *
+ * Si no hay email guardado en sessionStorage (`email_para_reset`), redirige automáticamente al login.
+ */
+
 function OTPValidation() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Ruta a redirigir luego de la validación exitosa
   const toRedirect = location.state?.from || "/auth/resetpassword";
+
+  // Email obtenido desde sessionStorage
   const email = sessionStorage.getItem("email_para_reset");
 
+  // Estados locales para manejar el flujo
   const [shouldRedirect, setShouldRedirect] = React.useState(false);
   const [isOpen, setIsOpen] = React.useState(false);
   const [dialogMessage, setMessage] = React.useState("");
   const [isOK, setIsOK] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
 
+  /**
+   * useEffect que redirige al login si no hay email en sessionStorage.
+   */
   useEffect(() => {
     if (!email) {
       navigate("/auth/login");
     }
   }, [email, navigate]);
 
+  /**
+   * Maneja el reenvío del código OTP al correo almacenado.
+   */
   const handleResendOtp = async () => {
 
     console.log("Reenviando OTP a:", email);
     if (!email) return;
+
     setIsLoading(true);
 
     AuthService
@@ -58,7 +88,10 @@ function OTPValidation() {
       });
   };
 
-
+  /**
+   * Maneja el envío del formulario de validación OTP.
+   * Si es exitoso, guarda el `reset_token` y redirige al formulario de cambio de contraseña.
+   */
   const handleSubmit = async (event) => {
     const formData = await formSubmitJson(event);
     document.activeElement.blur();
@@ -80,7 +113,6 @@ function OTPValidation() {
         } else {
           setMessage("No se recibió el token de verificación.");
           setIsOK(false);
-
         }
       }).catch((error) => {
         console.log(error.data);
@@ -102,8 +134,10 @@ function OTPValidation() {
 
   return (
     <>
+      {/* Spinner de carga */}
       {isLoading && <Loading isFixed={true} />}
 
+      {/* Diálogo con mensaje de éxito o error */}
       <SimpleDialog
         title={isOK ? "Verificación exitosa" : "Error de verificación"}
         description={dialogMessage}
@@ -116,6 +150,7 @@ function OTPValidation() {
         }}
       />
 
+      {/* Layout con formulario de validación */}
       <AuthLayout
         title="Verificación de dos factores"
         visualContent={<ShieldCheck className="text-white w-42 h-42" />}
@@ -140,10 +175,12 @@ function OTPValidation() {
             </div>
           </div>
 
+          {/* Enlace para reenviar OTP */}
           <Button type="button" variant="link" className="p-0 mt-4" onClick={handleResendOtp}>
             ¿No te llegó el código? Reenviar
           </Button>
 
+          {/* Botón de envío */}
           <Button type="submit" className="mt-4">Validar</Button>
         </form>
       </AuthLayout>

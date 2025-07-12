@@ -1,14 +1,10 @@
-import threading
 import traceback
 from flask import Blueprint
-from flask import request
-from app.decorators.cp_api_access import cp_api_access
 from app.services.servicio_base import ServicioBase
 from common.utils.response import make_response, ResponseStatus
 from app.models.service_model import ServiceModel
 from app.schemas.service_schema import ServiceSchema
 from app.services.services_search_service import ServicesSearchService
-from app.extensions import logger
 
 
 bp = Blueprint(
@@ -20,10 +16,13 @@ services_service: ServicioBase = ServicioBase(ServiceModel, ServiceSchema())
 @bp.route("/recolect_perms", methods=["GET"])
 def recolect_perms():
     try:
-        perms = ServicesSearchService().get_permissions()
+        perms, roles = ServicesSearchService().get_permissions()
         return (
             make_response(
-                ResponseStatus.SUCCESS, "Permisos recolectados correctamente", perms
+                ResponseStatus.SUCCESS, "Permisos recolectados correctamente", {
+                    "permissions": perms,
+                    "roles": roles,
+                }
             ),
             200,
         )

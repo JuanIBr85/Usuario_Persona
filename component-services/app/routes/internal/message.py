@@ -8,7 +8,6 @@ import logging
 from app.services.message_service import MessageService
 from common.schemas.message_schema import MessageSchema
 
-logger = logging.getLogger(__name__)
 message_schema = MessageSchema()
 
 bp = Blueprint("message", __name__, cli_group="internal", url_prefix="/message")
@@ -40,5 +39,5 @@ def send_message():
         )
     except Exception as e:
         traceback.print_exc()
-        logger.error(f"Error al enviar mensaje: {str(e)}")
+        logging.error(f"Error al enviar mensaje: {str(e)}")
         return make_response(ResponseStatus.ERROR, str(e)), 500

@@ -6,7 +6,7 @@ import {
     CarouselPrevious,
 } from "@/components/ui/carousel"
 import React from "react";
-const SimpleCarousel = ({ children, setApi, showCarouselControls=false, className }) => {
+const SimpleCarousel = ({ children, setApi, showCarouselControls = false, className }) => {
     return (
         <Carousel setApi={setApi} className={className}>
             <CarouselContent>

@@ -21,7 +21,7 @@ const Logout = () => {
   const { removeAuthData } = useAuthContext();     // Función del contexto para eliminar los datos de auth
 
   useEffect(() => {
-    removeAuthData();           // Limpia los datos del contexto de autenticación
+    removeAuthData("Logout");           // Limpia los datos del contexto de autenticación
     sessionStorage.clear();     // Borra cualquier dato guardado en sessionStorage
     navigate('/auth/login');   // Redirige a la pantalla de login
   }, [navigate]);

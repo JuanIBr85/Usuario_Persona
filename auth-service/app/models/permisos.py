@@ -4,6 +4,17 @@ from app.models.base_model import Base
 from datetime import datetime, timezone
 
 class Permiso(Base):
+    """
+    Modelo que representa un permiso específico dentro del sistema.
+
+    Atributos:
+        id_permiso (int): Identificador único del permiso.
+        nombre_permiso (str): Nombre o código del permiso (ej: 'crear_usuario', 'ver_logs').
+        created_at, updated_at, deleted_at: Campos heredados para control de tiempo y eliminación lógica.
+
+    Relaciones:
+        roles (List[RolPermiso]): Relación con roles que tienen este permiso.
+    """
     __tablename__ = 'permiso'
 
     id_permiso = Column(Integer, primary_key=True)
@@ -17,6 +28,19 @@ class Permiso(Base):
 
 
 class RolPermiso(Base):
+    """
+    Modelo intermedio que representa la relación muchos a muchos entre roles y permisos.
+
+    Atributos:
+        id_rol_permiso (int): Identificador único de la relación.
+        id_rol (int): ID del rol asociado.
+        permiso_id (int): ID del permiso asociado.
+        created_at, updated_at, deleted_at: Campos para auditoría y eliminación lógica.
+
+    Relaciones:
+        rol (Rol): Rol relacionado.
+        permiso (Permiso): Permiso relacionado.
+    """
     __tablename__ = 'rol_permiso'
 
     id_rol_permiso = Column(Integer, primary_key=True)

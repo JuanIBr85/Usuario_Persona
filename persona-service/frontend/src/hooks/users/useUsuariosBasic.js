@@ -21,6 +21,7 @@ export function useUsuariosBasic() {
                     }))
                     : [];
                 setUsuarios(basicUsers);
+                console.log("Usuarios obtenidos:", basicUsers);
             } catch (e) {
                 setUsuarios([]);
                 const rawMsg = e?.data?.message || e?.message || "Error desconocido.";

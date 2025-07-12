@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, X } from "lucide-react";
 
-
 import PersonFilter from "@/components/people/PersonFilter";
 import Loading from "@/components/loading/Loading";
 
@@ -15,8 +14,9 @@ import PersonEditDialog from "@/components/people/PersonEditDialog";
 import PersonBreadcrumb from "@/components/people/PersonBreadcrumb";
 import { formSubmitJson } from "@/utils/formUtils";
 import { usePersonas } from "@/hooks/people/usePersonas";
-import PersonDialog from "@/components/people/PersonDialog";
+import { useUsuariosBasic } from "@/hooks/users/useUsuariosBasic";
 
+import PersonCreateDialog from "@/components/people/PersonCreateDialog";
 
 /**
  * Componente AdminUsers
@@ -27,7 +27,7 @@ import PersonDialog from "@/components/people/PersonDialog";
  *
  * Estado:
  * - editingUser: usuario que se está editando (null si no hay ninguno).
- * - users: lista completa de usuarios obtenida desde el servicio.
+ * - personas: lista completa de personas obtenida desde el servicio.
  * - mostrarFiltroAvanzado: controla si se muestra o no el filtro avanzado.
  * - filtro: texto para filtrar usuarios por nombre o email.
  *
@@ -55,9 +55,11 @@ function AdminPersons() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // Usar el hook usePersonas para manejar la lógica de personas
+  // personas y setPersonas hacen referencias a personas, el nombre debe cambiarse a personas
+  // para evitar confusiones con el concepto de usuario (User) en el sistema.
   const {
-    users,
-    setUsers,
+    personas,
+    setPersonas,
     tiposDocumentos,
     redesSociales,
     localidades,
@@ -69,6 +71,15 @@ function AdminPersons() {
     setLocalidades,
   } = usePersonas();
 
+  console.log("Personas obtenidas:", personas);
+  const {
+    usuarios,
+    loading,
+    error,
+  } = useUsuariosBasic();
+
+  console.log("Usuarios obtenidos:", usuarios);
+
   // Efecto para cargar localidades cuando cambia el código postal
   useEffect(() => {
     if (newUser.codigo_postal?.length >= 4) {
@@ -78,8 +89,8 @@ function AdminPersons() {
     }
   }, [newUser.codigo_postal]);
 
-  // Filtra usuarios según texto en nombre, apellido o documento (insensible a mayúsculas)
-  const usuariosFiltrados = users.filter((user) => {
+  // Filtra personas según texto en nombre, apellido o documento (insensible a mayúsculas)
+  const personasFiltradas = personas.filter((user) => {
     const textoMatch =
       `${user.nombre} ${user.apellido}`
         .toLowerCase()
@@ -101,7 +112,18 @@ function AdminPersons() {
    * @param {Event} e - Evento submit del formulario
    */
   const handleEditSubmit = async (e) => {
-    const result = await handleEditSubmitHook(e, editingUser);
+    e.preventDefault();
+
+    // Crea una copia del usuario y transforma usuario_id a number si corresponde
+    const userForSubmit = {
+      ...editingUser,
+      usuario_id:
+        editingUser.usuario_id && editingUser.usuario_id !== "none"
+          ? Number(editingUser.usuario_id)
+          : null,
+    };
+
+    const result = await handleEditSubmitHook(e, userForSubmit);
     if (result?.success) {
       setEditingUser(null);
     }
@@ -118,7 +140,7 @@ function AdminPersons() {
         fecha_nacimiento_persona: formData.fecha_nacimiento || "",
         tipo_documento: formData.tipo_documento || "DNI",
         num_doc_persona: formData.nro_documento || "",
-        usuario_id: formData.usuario_id || null,
+        usuario_id: formData?.usuario_id,
         domicilio: {
           domicilio_calle: formData.domicilio_calle || "",
           domicilio_numero: formData.domicilio_numero || "",
@@ -140,28 +162,31 @@ function AdminPersons() {
         },
       };
 
-      await PersonaService.crear(body);
+      await PersonaService.crear(body).then((res) => {
+        const newUserForTable = {
+          id: res?.data?.id,
+          nombre: formData.nombre || "",
+          apellido: formData.apellido || "",
+          tipo_documento: formData.tipo_documento || "DNI",
+          nro_documento: formData.nro_documento || "",
+          fecha_nacimiento: formData.fecha_nacimiento || "",
+          usuario_id: formData.usuario_id || "",
+        };
 
-      const newUserForTable = { 
-        id: null,
-        nombre: formData.nombre || "",
-        apellido: formData.apellido || "",
-        tipo_documento: formData.tipo_documento || "DNI",
-        nro_documento: formData.nro_documento || "",
-        fecha_nacimiento: formData.fecha_nacimiento || "",
-        usuario_id: formData.usuario_id || null,
-      };
+        setPersonas((prevPersonas) => [...prevPersonas, newUserForTable]);
+        setNewUser({});
+        setIsDialogOpen(false);
+      });
 
-      setUsers((prevUsers) => [...prevUsers, newUserForTable]);
-      setNewUser({});
-      setIsDialogOpen(false);
+
     } catch (error) {
       console.error("Error al crear persona:", error);
-      const rawMsg = error?.response?.data?.message || error.message || "Error desconocido";
+      const rawMsg = error?.data?.error?.server || error?.data?.message || error.message || "Error desconocido";
       console.log("Error al crear persona:", rawMsg);
       setAlert({
-        title: rawMsg,
-        description: "",
+        title: "Error al crear persona",
+        description: rawMsg,
+        variant: "destructive"
       });
       setIsDialogOpen(false);
     }
@@ -183,8 +208,8 @@ function AdminPersons() {
     }
   };
 
-  // Muestra loader si aún no hay usuarios cargados
-  if (!users) return <Loading />;
+  // Muestra loader si aún no hay personas cargadas
+  if (!personas) return <Loading />;
 
   return (
     <div className="p-6 space-y-6 py-15 px-3 md:py-10 md:px-15">
@@ -207,10 +232,11 @@ function AdminPersons() {
               />
             </div>
 
-            {/* Tabla con usuarios filtrados */}
+            {/* Tabla con personas filtradas */}
             <div className="overflow-auto border p-3 rounded-md shadow-sm">
               <PersonTable
-                users={usuariosFiltrados}
+                persons={personasFiltradas}
+                users={usuarios}
                 onEdit={(user) => {
                   setEditingUser(user);
                   setAlert(null); // Limpiar alertas previas
@@ -219,8 +245,8 @@ function AdminPersons() {
                 onSeeDetails={handleSeeDetails}
               />
             </div>
-            
-            <PersonDialog
+
+            <PersonCreateDialog
               isDialogOpen={isDialogOpen}
               setIsDialogOpen={setIsDialogOpen}
               newUser={newUser}
@@ -230,19 +256,22 @@ function AdminPersons() {
               localidades={localidades}
               handleChangePostal={handleChangePostal}
               redesSociales={redesSociales}
+              usuarios={usuarios}
+              error={error}
+              loading={loading}
             />
 
             {alert && (
               <div className="fixed bottom-16 right-4 z-50 w-96">
-                <Alert 
+                <Alert
                   variant={alert.variant || "default"}
-                  className="animate-in slide-in-from-right-8 duration-300 bg-white border-black"
+                  className="animate-in slide-in-from-right-8 duration-300 bg-card border-black"
                 >
                   <AlertTitle>{alert.title}</AlertTitle>
                   {alert.description && (
                     <AlertDescription>{alert.description}</AlertDescription>
                   )}
-                  <button 
+                  <button
                     onClick={() => setAlert(null)}
                     className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
                   >
@@ -265,6 +294,9 @@ function AdminPersons() {
           setEditingUser={setEditingUser}
           onSubmit={handleEditSubmit}
           tiposDocumentos={tiposDocumentos}
+          usuarios={usuarios}
+          error={error}
+          loading={loading}
         />
       )}
     </div>

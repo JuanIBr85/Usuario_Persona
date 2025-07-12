@@ -24,7 +24,8 @@ function Login() {
   const [isLogin, setIsLogin] = React.useState(false); // Indica si el login fue exitoso
   const [isLoading, setIsLoading] = React.useState(false); // Estado de carga (spinner)
   const { updateData } = useAuthContext(); // Función del contexto global para guardar datos del usuario
-
+  //Compruebo si tiene un otp
+  const [hasResetEmail, setHasResetEmail] = React.useState(sessionStorage.getItem("email_verificar") !== null);
   /**
    * Maneja el envío del formulario de login.
    * Realiza la autenticación contra el backend usando AuthService.
@@ -67,7 +68,7 @@ function Login() {
         setIsOpen={setIsOpen}
         actionHandle={
           isLogin
-            ? () => setTimeout(() => navigate("/profile"), 500)
+            ? () => setTimeout(() => navigate("/searchprofile"), 500)
             : undefined
         }
         // Si el login fue exitoso, redirige al perfil después de cerrar el diálogo
@@ -105,6 +106,13 @@ function Login() {
           <Button variant="link" asChild className="p-0">
             <Link to="/auth/forgotPassword">¿Olvidaste la contraseña?</Link>
           </Button>
+
+          {/* Enlace para registrarse si no tiene cuenta */}
+
+          {hasResetEmail &&
+            <Button variant="link" asChild className="p-0">
+              <Link to="/auth/otpregister">¿Posee un codigo OTP?</Link>
+            </Button>}
 
           {/* Enlace para registrarse si no tiene cuenta */}
           <Button variant="link" asChild className="p-0">

@@ -7,11 +7,6 @@ service:
   service_core: false #Indica si es un servicio del core, y no puede ser desactivado por ser un servicio crucial
   service_wait: false #Indica si la api gateway debe de esperar al servicio para iniciar
 
-#Define los permisos del servicio para que el servicio de autenticacion los pueda listar
-permissions:
-  - example.admin.admin_dice
-  - example.user.modificar
-
 #Esta seccion es opcional, sirve como un metadato para el frontend, para saber hacia donde redirigir
 redirect:
   to_login: #esto es solo por motivos organizativos, para dejar en claro para que es la redireccion, no tiene efectos reales en el codigo ni funcionamiento
@@ -24,4 +19,12 @@ redirect:
   to_logout:
     code: aleatorio_de_16_caracteres_2
     url: "https://google.com"
+
+#Aca se definen los roles y permisos del servicio
+roles:
+  admin-example:
+    - example.admin.admin_dice
+    - example.user.modificar
+  user-example:
+    - example.user.modificar
     

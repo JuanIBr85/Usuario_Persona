@@ -25,6 +25,9 @@ import ComponentServicesDetails from "@/pages/component/ComponentServicesDetails
 import Redirect from "@/pages/auth/Redirect";
 import EndpointsResearch from "@/pages/endpoints/EndpointsResearch";
 import CreatePerfil from "@/pages/user/CreatePerfil";
+import OTPRegisterRecovery from "@/pages/auth/OTPRegisterRecovery";
+import SearchProfile from "@/pages/user/SearchProfile";
+import WaitingView from "@/pages/auth/WaitingView";
 /**
  * Componente que define todas las rutas de la aplicación utilizando react-router-dom.
  * Cada ruta se asocia con un componente de página específico para renderizar.
@@ -38,7 +41,8 @@ function AppRoutes() {
       <Route path="/" element={<AdminPanel />} />
       <Route path="profile" element={<Profile />} />
       <Route path="createperfil" element={<CreatePerfil />} />
-      <Route path="perfilconnect" element={<PerfilConnect />} />
+      <Route path="profileconnect" element={<PerfilConnect />} />
+      <Route path="searchprofile" element={<SearchProfile />} />
       <Route path="adminpanel" element={<AdminPanel />} />
       <Route path="logs" element={<Logs />} />
       <Route path="adminpersons" element={<AdminPersons />} />
@@ -46,13 +50,14 @@ function AppRoutes() {
       <Route path="adminroles" element={<AdminRoles />} />
       <Route path="adminservices/components" element={<ComponentServices />} />
       <Route path="adminservices/components/:id" element={<ComponentServicesDetails />} />
+      
 
       <Route path="adminservices/endpoints-research/" element={<EndpointsResearch />} />
 
       <Route path="persondetails/:id" element={<PersonDetails />} />
-      <Route path="privacypolicy" element={<AboutPrivacyPolicy />} />
-      <Route path="termsofservice" element={<TermsOfService />} />
-      <Route path="faq" element={<Faq />} />
+      <Route path="faq/privacypolicy" element={<AboutPrivacyPolicy />} />
+      <Route path="faq/termsofservice" element={<TermsOfService />} />
+      <Route path="faq/faq" element={<Faq />} />
       <Route path="*" element={<NotFound />} />
 
       <Route path="auth/forgotpassword" element={<ForgotPassword />} />
@@ -63,6 +68,8 @@ function AppRoutes() {
       <Route path="auth/otpvalidation" element={<OTPValidation />} />
       <Route path="auth/redirect" element={<Redirect />} />
       <Route path="auth/otpregister" element={<OTPRegister />} />
+      <Route path="auth/otpregisterrecovery" element={<OTPRegisterRecovery />} />
+      <Route path="auth/waiting" element={<WaitingView />} />
     </Routes>
   );
 }

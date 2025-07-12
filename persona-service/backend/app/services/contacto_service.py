@@ -47,17 +47,31 @@ class ContactoService(IContactoInterface):
         if not contacto:
             raise ValueError("Contacto no encontrado")
 
-        campos_editables = ['telefono_fijo', 'telefono_movil', 'red_social_contacto', 'red_social_nombre',
-                            'email_contacto', 'observacion_contacto']
+        campos_editables = [
+                "telefono_fijo", 
+                "telefono_movil",
+                "red_social_contacto",
+                "red_social_nombre",
+                "email_contacto",
+                "observacion_contacto",
+                ]
+        
+        cambios = False
 
         for campo in campos_editables:
             if campo in data:
-                setattr(contacto, campo, data[campo])
+                nuevo_valor = data[campo]
+                valor_actual = getattr(contacto, campo) 
 
-        contacto.updated_at = datetime.now(timezone.utc)
-        session.flush() 
+                if valor_actual != nuevo_valor:
+                    setattr(contacto, campo, nuevo_valor)
+                    cambios = True
 
-        return contacto
+        if cambios:    
+            contacto.updated_at = datetime.now(timezone.utc)
+            session.flush() 
+
+        return cambios
     
 
     def borrar_contacto(self, id_contacto, session=None):
