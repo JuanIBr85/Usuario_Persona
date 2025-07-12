@@ -233,7 +233,7 @@ function AuthContextProvider({ children }) {
         
         //Por si se renova el token
         //creo un timeout para que cuando falten 5 minutos o menos lance una advertencia
-        /*const timeout = setTimeout(() => {
+        const timeout = -1;/*setTimeout(() => {
             setDialog({
                 title: "Renovar sesión",
                 description: "Su sesión expira en 5 minutos. Desea renovarla?",
