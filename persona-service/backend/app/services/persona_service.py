@@ -179,8 +179,23 @@ class PersonaService(IPersonaInterface):
                 raise Exception ("Numero de CUIL/CUIT invalido.")
 
             if not validacion:
-                raise Exception ("Numero de documento invalido para el tipo selecionado. Verifique y vuelva a intentar.")    
+                raise Exception ("Numero de documento invalido para el tipo selecionado. Verifique y vuelva a intentar.") 
 
+            existe_persona = (
+                session.query(Persona)
+                .filter(
+                    Persona.tipo_documento == tipo_doc,
+                    Persona.num_doc_persona == num_doc,
+                    Persona.deleted_at.is_(None),
+                    Persona.id_persona != id,
+                )
+                .first()
+            )
+
+            if existe_persona:
+                raise Exception(
+                    "Hay una persona que se encuentra registrada con ese tipo y numero de documento. Por favor, intente nuevamente o comuniquese con un administrador"
+                )               
 
             hubo_cambios = False
             hubo_cambios_persona = False
