@@ -105,6 +105,7 @@ function PersonCreateDialog({
                 type="text"
                 labelText="Nombre"
                 value={newUser.nombre || ""}
+                maxLength={50}
                 required
               />
 
@@ -114,6 +115,7 @@ function PersonCreateDialog({
                 type="text"
                 labelText="Apellido"
                 value={newUser.apellido || ""}
+                maxLength={50}
                 required
               />
             </ResponsiveColumnForm>
@@ -210,6 +212,7 @@ function PersonCreateDialog({
               <InputValidate
                 id="domicilio_calle"
                 name="domicilio_calle"
+                maxLength={50}
                 type="text"
                 labelText="Calle"
                 value={newUser.domicilio_calle || ""}
@@ -218,6 +221,7 @@ function PersonCreateDialog({
               <InputValidate
                 id="domicilio_numero"
                 name="domicilio_numero"
+                maxLength={10}
                 type="text"
                 labelText="Número"
                 value={newUser.domicilio_numero || ""}
@@ -228,6 +232,7 @@ function PersonCreateDialog({
               <InputValidate
                 id="domicilio_piso"
                 name="domicilio_piso"
+                maxLength={10}
                 type="text"
                 labelText="Piso"
                 value={newUser.domicilio_piso || ""}
@@ -237,6 +242,7 @@ function PersonCreateDialog({
               <InputValidate
                 id="domicilio_dpto"
                 name="domicilio_dpto"
+                maxLength={10}
                 type="text"
                 labelText="Departamento"
                 value={newUser.domicilio_dpto || ""}
@@ -245,6 +251,7 @@ function PersonCreateDialog({
               <InputValidate
                 id="codigo_postal"
                 name="codigo_postal"
+                maxLength={10}
                 type="text"
                 labelText="Código Postal"
                 value={newUser.codigo_postal || ""}
@@ -280,6 +287,7 @@ function PersonCreateDialog({
               <InputValidate
                 id="telefono_fijo"
                 name="telefono_fijo"
+                maxLength={20}
                 type="tel"
                 labelText="Teléfono fijo"
                 value={newUser.telefono_fijo || ""}
@@ -288,6 +296,7 @@ function PersonCreateDialog({
               <InputValidate
                 id="telefono_movil"
                 name="telefono_movil"
+                maxLength={20}
                 type="tel"
                 labelText="Teléfono móvil"
                 value={newUser.telefono_movil || ""}
@@ -313,6 +322,7 @@ function PersonCreateDialog({
               <InputValidate
                 id="red_social_contacto"
                 name="red_social_contacto"
+                maxLength={50}
                 type="text"
                 labelText={`Usuario de ${newUser.red_social_nombre || 'red social'}`}
                 value={newUser.red_social_contacto || ""}
@@ -325,6 +335,7 @@ function PersonCreateDialog({
                 id="email_contacto"
                 name="email_contacto"
                 type="email"
+                maxLength={100}
                 labelText="Email de contacto"
                 value={newUser.email_contacto || ""}
                 required
@@ -337,6 +348,7 @@ function PersonCreateDialog({
                 id="observacion_contacto"
                 name="observacion_contacto"
                 type="text"
+                maxLength={255}
                 labelText="Observaciones de contacto"
                 value={newUser.observacion_contacto || ""}
                 className="w-full"

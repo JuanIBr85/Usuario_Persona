@@ -75,6 +75,7 @@ function PersonEditDialog({
                 id="nombre"
                 name="nombre"
                 type="text"
+                maxLength={50}
                 labelText="Nombre"
                 value={editingUser.nombre || ""}
                 onChange={(e) => setEditingUser({ ...editingUser, nombre: e.target.value })}
@@ -84,6 +85,7 @@ function PersonEditDialog({
               <InputValidate
                 id="apellido"
                 name="apellido"
+                maxLength={50}
                 type="text"
                 labelText="Apellido"
                 value={editingUser.apellido || ""}
@@ -114,6 +116,7 @@ function PersonEditDialog({
                 name="nro_documento"
                 type="text"
                 labelText="Número de Documento"
+                maxLength={20}
                 value={editingUser.nro_documento || ""}
                 validatePattern={tiposDocumentos[tipoDoc]}
                 validationMessage="Número de documento inválido"
