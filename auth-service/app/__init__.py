@@ -21,6 +21,9 @@ from app.extensions import mail
 import smtplib
 from app.utils.actualizar_roles_permisos import actualizar_roles
 
+from app.core.logging_config import configurar_logger_global
+from app.core.error_handler import registrar_manejador_errores
+
 def create_app():
     #monkey patch para no lanzar el log de mails.
     smtplib.SMTP.set_debuglevel = lambda self, level: None
@@ -37,14 +40,11 @@ def create_app():
     app_flask.register_blueprint(superadmin_bp, url_prefix="/super-admin")
     app_flask.register_blueprint(admin_micro_bp, url_prefix="/admin-micro")
     app_flask.register_blueprint(usuario_bp)
-    from app.messaging import receivers
 
-    import logging
+    #logger general para excepciones no manejadas
+    configurar_logger_global()
+    registrar_manejador_errores(app_flask)
 
-    logging.basicConfig(
-        level=logging.INFO,  # También podés usar DEBUG para más detalle
-        format="%(asctime)s %(levelname)s: %(message)s",
-    )
 
     if os.environ.get("WERKZEUG_RUN_MAIN") != "true":
         init_app()

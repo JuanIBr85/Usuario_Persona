@@ -49,7 +49,8 @@ from flask_jwt_extended import decode_token
 from app.extensions import get_redis
 from common.services.send_message_service import send_message
 from common.utils.response import ResponseStatus
-
+import logging
+logger = logging.getLogger(__name__)
 """
 Servicio: UsuarioService
 
@@ -243,9 +244,11 @@ class UsuarioService(ServicioBase):
     def login_usuario(
         self, session: Session, data: dict, user_agent: str, ip: str
     ) -> dict:
+        logger.info("→ Iniciando login de usuario")
         try:
             data_validada = self.schema_login.load(data)
         except ValidationError as error:
+            logger.warning(f"→ Error de validación: {error.messages}")
             return (
                 ResponseStatus.FAIL,
                 "Error de validacion de datos.",
@@ -259,6 +262,7 @@ class UsuarioService(ServicioBase):
             .first()
         )
         if not usuario:
+            logger.warning("→ Usuario no encontrado o eliminado")
             return (
                 ResponseStatus.UNAUTHORIZED,
                 "Email o contraseña incorrecta",
@@ -267,6 +271,7 @@ class UsuarioService(ServicioBase):
             )
 
         if not check_password_hash(usuario.password, data_validada["password"]):
+            logger.warning("→ Contraseña incorrecta")
             return (
                 ResponseStatus.UNAUTHORIZED,
                 "Email o contraseña incorrecta",
@@ -274,12 +279,13 @@ class UsuarioService(ServicioBase):
                 400,
             )
         if get_redis().get(f"eliminacion_pendiente:{usuario.id_usuario}"):
+            logger.info("→ Usuario con eliminación pendiente")
             return ResponseStatus.FAIL, (
                 "Tu cuenta tiene una solicitud de eliminación pendiente. "
                 "Si no realizaste esta acción, esperá 30 minutos y luego podés iniciar sesión nuevamente."
                 "Si no has sido tu puedes dar aviso a los administradores."
             ), None, 403
-
+        logger.info(f"→ Usuario {usuario.id_usuario} autenticado, generando tokens...")
         # comprobar si quedo deprecada porque ya no se crea usuario hasta que no se tenga la verificaicon
         # if not usuario.email_verificado:
         #   return ResponseStatus.UNAUTHORIZED, "Debe verificar el email antes de loguearse.", None, 400
@@ -317,11 +323,12 @@ class UsuarioService(ServicioBase):
             ) < datetime.now(timezone.utc):
                 # Dispositivo nuevo o expirado → enviar email de validación
                 enviar_email_validacion_dispositivo(usuario, user_agent, ip)
+                logger.info("→ Dispositivo no confiable, se envió mail de validación")
                 return (
                     ResponseStatus.PENDING,
                     "Verificación de dispositivo enviada al email. Por favor confírmelo.",
                     None,
-                    400,
+                    403,
                 )
 
             else:
@@ -331,14 +338,16 @@ class UsuarioService(ServicioBase):
                 token, expires_in, expires_seconds = crear_token_acceso(
                     usuario.id_usuario, usuario.email_usuario, jti_refresh
                 )
+                logger.info("→ Tokens generados correctamente")
         except Exception as error:
+            logger.error("Error al generar tokens", exc_info=error)
             return ResponseStatus.FAIL, "error de dispositivo ", str(error), 400
 
         
         try:
             registrar_refresh_token(jti_refresh, refresh_expires)
         except Exception as e:
-            traceback.print_exc() 
+            logger.error("Error al registrar refresh token en Redis", exc_info=e)
 
         usuario_data = self.schema_out.dump(usuario)
         try:
@@ -346,8 +355,9 @@ class UsuarioService(ServicioBase):
             decoded = decode_token(token)
             get_redis().rpush(decoded["jti"], *permisos_lista)
             get_redis().expire(decoded["jti"], expires_seconds)
+            logger.info("→ Permisos almacenados en Redis")
         except Exception as e:
-            traceback.print_exc()
+            logger.error("Error al guardar permisos en Redis", exc_info=e)
         
 
         usuario_data["token"] = token
@@ -356,6 +366,7 @@ class UsuarioService(ServicioBase):
         usuario_data["refresh_expires"] = refresh_expires.isoformat()
         usuario_data["rol"] = roles_nombres
 
+        logger.info(f"→ Login finalizado para usuario {usuario.id_usuario}")
         log_usuario_accion(session, usuario.id_usuario, "Login exitoso", f"Email: {usuario.email_usuario}")
         return ResponseStatus.SUCCESS, "Login exitoso.", usuario_data, 200
 
@@ -725,11 +736,10 @@ class UsuarioService(ServicioBase):
         usuario_data = self.schema_out.dump(usuario)
 
         usuario_data["token"] = nuevo_access_token  # es el access token
-        usuario_data["expires_in"] = ttl  # en segundos
+        usuario_data["expires_in"] = access_exp 
         usuario_data["rol"] = roles_nombres
 
         return usuario_data
-        
 
 
     def rotar_refresh_token(self, session: Session, payload: str) -> dict:

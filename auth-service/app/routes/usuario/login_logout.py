@@ -11,12 +11,14 @@ from common.models.cache_settings import CacheSettings
 from common.utils.response import make_response, ResponseStatus
 from app.utils.jwt import verificar_token_modificar_email,verificar_token_eliminacion
 from app.extensions import get_redis
+import logging
+
 bp = Blueprint(
     "usuario_login_logout", __name__, cli_group="usuario"
 )
 
 usuario_service = UsuarioService()
-
+logger = logging.getLogger(__name__)
 """
 Módulo de autenticación de usuario.
 
@@ -59,8 +61,10 @@ def login1():
     """
     session = SessionLocal()
     try:
+        logger.info("→ [ROUTE] Solicitud de login recibida")
         data = request.get_json()
         if not data:
+            logger.warning("→ [ROUTE] No se recibieron datos de entrada")
             return make_response(
                 ResponseStatus.FAIL,
                 "Datos de entrada requeridos",
@@ -69,13 +73,15 @@ def login1():
 
         user_agent = ComponentRequest.get_user_agent()
         ip = ComponentRequest.get_ip()
+        logger.debug(f"→ [ROUTE] IP: {ip} | User-Agent: {user_agent}")
         status, mensaje, data, code = usuario_service.login_usuario(
             session, data, user_agent, ip
         )
+        logger.info(f"→ [ROUTE] Login procesado, status: {status}, code: {code}")
         return make_response(status, mensaje, data), code
 
     except Exception as e:
-        traceback.print_exc()
+        logger.error("→ [ROUTE] Excepción en login", exc_info=e)
         return (
             make_response(
                 ResponseStatus.ERROR, "Error en login", str(e), error_code="LOGIN_ERROR"

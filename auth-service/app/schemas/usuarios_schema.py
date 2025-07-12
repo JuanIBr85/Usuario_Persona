@@ -34,7 +34,7 @@ class UsuarioInputSchema(Schema):
         load_only=True, 
         required=False, 
         validate=[
-            validate.Length(min=6, error="La contraseña debe tener al menos 6 caracteres."),
+            validate.Length(min=6, max=72, error="La contraseña debe tener al menos 6 caracteres y maximo 72 caracteres"),
             validate.Regexp(
                     regex=r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$",
                         error="La contraseña debe contener al menos una letra minúscula, " \
