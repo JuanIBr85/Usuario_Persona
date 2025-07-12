@@ -11,13 +11,8 @@ from app.services.services_search_service import ServicesSearchService
 import threading
 from app.utils.redis_message import redis_stream_start, register_redis_receiver
 from app.services.event_service import EventService
-<<<<<<< HEAD
-from werkzeug.middleware.proxy_fix import ProxyFix
-
-=======
 from config import CORS_CONFIG
 import logging
->>>>>>> master
 endpoints_search_service = EndpointsSearchService()
 # Defino los modelos
 import app.models

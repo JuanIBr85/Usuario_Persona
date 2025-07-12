@@ -1,30 +1,9 @@
 
   services:
 
-<<<<<<< HEAD
-    auth-service:
-      build: ./auth-service
-      ports:
-        - "5000:5000"
-      env_file:
-        - ./auth-service/.env
-      environment:
-        - COMPONENT_SERVICE_HOST=component-service
-        - REDIS_HOST=redis
-        - POSTGRES_HOST=auth-db
-        - MAIL_SERVER=mailpit
-      volumes:
-        - ./auth-service:/app
-        - ./auth-service/auth_data:/app/auth_data
-      depends_on:
-        - redis
-        - auth-db
-
-=======
     #============================================================================#
     # Primera etapa de inicio (bases de datos y redis)
     #============================================================================#
->>>>>>> master
     auth-db:
       image: postgres:13
       #volumes:
@@ -131,20 +110,9 @@
         - ./persona-service/backend:/app
         - ./persona-service/backend/persona.db:/app/persona.db
 
-<<<<<<< HEAD
-    persona-frontend:
-      build: ./persona-service/frontend
-      ports:
-        - "5173:5173"
-    web_creus:
-      build: ./web_creus
-      ports:
-        - "5174:5174"
-=======
     #============================================================================#
     # Tercera etapa de inicio (servicios adicionales)
     #============================================================================#
->>>>>>> master
 
     #example-service:
     #  build: ./example-service
@@ -182,67 +150,9 @@
     persona-frontend:
       build: ./persona-service/frontend
       ports:
-<<<<<<< HEAD
-        - "6379:6379"
-
-
-    mysql:
-      image: mysql:5.7
-      container_name: mysql-persona
-      restart: unless-stopped
-      environment:
-        MYSQL_ROOT_PASSWORD: rootpass
-        MYSQL_DATABASE: persona_db
-        MYSQL_USER: persona_user
-        MYSQL_PASSWORD: persona_pass
-      ports:
-        - "3306:3306"  # El 3307 es el puerto en tu máquina host (no pisa XAMPP en 3306)
-      volumes:
-        - mysql_data:/var/lib/mysql
-
-    nginx:
-      container_name: nginx
-      build: ./nginx
-      ports:
-        - "80:80"
-        - "433:433"
-      volumes:
-        - ./nginx/conf.d:/etc/nginx/conf.d
-        - ./nginx/cert:/etc/nginx/cert
-        - ./nginx/logs:/var/log/nginx
-
-    #phpmyadmin:
-    #  image: phpmyadmin/phpmyadmin
-    #  container_name: phpmyadmin
-    #  restart: unless-stopped
-    #  ports:
-    #  - "8080:80"
-    #  environment:
-    #    PMA_HOST: mysql
-    #    PMA_PORT: 3306
-    #  depends_on:
-    #  - mysql    
-
-    #servicio-adicional:
-    #  build: ./servicio-adicional-ejemplo
-    #  ports:
-    #    - "5003:5003"
-    #  volumes:
-    #    - ./servicio-adicional-ejemplo:/app
-    #  environment:
-    #    - COMPONENT_SERVICE_HOST=component-service
-
-    #alternativa a mailtrap en local!!!
-    mailpit:
-      image: axllent/mailpit:latest
-      ports:
-        - "1025:1025"  # SMTP
-        - "8025:8025"  # Web UI
-=======
         - "5173:5173"
       env_file:
         - ./persona-service/frontend/.env
->>>>>>> master
 
     api-creus:
       build: ./api_creus
@@ -254,7 +164,21 @@
         - FLASK_ENV=development
         - COMPONENT_SERVICE_HOST=component-service
 
+    #============================================================================#
+    # Sexta etapa de inicio (nginx)
+    #============================================================================#
+    nginx:
+      container_name: nginx
+      build: ./nginx
+      ports:
+        - "8486:80"
+        - "433:433"
+      volumes:
+        - ./nginx/conf.d:/etc/nginx/conf.d
+        - ./nginx/cert:/etc/nginx/cert
+        - ./nginx/logs:/var/log/nginx
+
   volumes:
     persona_db_data:
-    #postgres_data:
-    #component_db_data
+    postgres_data:
+    component_db_data:

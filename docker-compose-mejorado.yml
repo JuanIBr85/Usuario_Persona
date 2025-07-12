@@ -6,8 +6,8 @@
     #============================================================================#
     auth-db:
       image: postgres:13
-      #volumes:
-        #- postgres_data:/var/lib/postgresql/data
+      volumes:
+        - postgres_data:/var/lib/postgresql/data
       restart: unless-stopped
       shm_size: 128mb
       ports:
@@ -30,8 +30,8 @@
     #DB de componentes
     component-db:
       image: postgres:13
-      #volumes:
-        #- component_db_data:/var/lib/postgresql/data
+      volumes:
+        - component_db_data:/var/lib/postgresql/data
       restart: unless-stopped
       shm_size: 128mb
       ports:
@@ -141,6 +141,7 @@
         - ./component-services/.env
       volumes:
         - ./component-services:/app
+        - component_db_data:/var/lib/postgresql/data
       environment:
         - SERVICES_CONFIG_FILE=services-docker.json
         - REDIS_HOST=redis
@@ -167,8 +168,26 @@
         - "5173:5173"
       env_file:
         - ./persona-service/frontend/.env
+      depends_on:
+        - component-service
 
+    #============================================================================#
+    # Sexta etapa de inicio (nginx)
+    #============================================================================#
+    nginx:
+      container_name: nginx
+      build: ./nginx
+      ports:
+        - "8486:80"
+        - "433:433"
+      volumes:
+        - ./nginx/conf.d:/etc/nginx/conf.d
+        - ./nginx/cert:/etc/nginx/cert
+        - ./nginx/logs:/var/log/nginx
+      depends_on:
+        - persona-frontend
+        
   volumes:
     persona_db_data:
-    #postgres_data:
-    #component_db_data
+    postgres_data:
+    component_db_data:
