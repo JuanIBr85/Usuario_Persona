@@ -7,6 +7,7 @@ from app.extensions import jwt, redis_client_auth
 from app.utils.is_local_connection import is_local_connection
 from common.utils.ttl_cache_util import TTLCacheUtil
 from common.utils.response import make_response, ResponseStatus
+from config import LOCALHOST_AUTH_DISABLE
 
 endpoints_search_service = EndpointsSearchService()
 
@@ -120,6 +121,10 @@ def authenticate_config(app):
         if identity:
             payload = get_jwt()
             g.jwt = payload
+
+        # Si es una peticion local, no se verifica la autenticacion
+        if LOCALHOST_AUTH_DISABLE and is_local_connection():
+            return
 
         # Si no tiene el token y no es publico, aborto con 401
         if not service_route.is_public:
