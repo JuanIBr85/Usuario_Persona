@@ -5,7 +5,25 @@ from sqlalchemy.orm import Session
 from common.services.component_service_api import ComponentServiceApi
 
 def actualizar_roles():
-    # Obtengo el listado de permisos del servicio de componentes
+    """
+    Sincroniza los roles y permisos desde el servicio de componentes.
+
+    Esta función realiza las siguientes acciones:
+    - Consulta el servicio `component-service` para obtener la estructura actual de roles y permisos.
+    - Crea nuevos permisos si no existen.
+    - Crea nuevos roles si no existen.
+    - Restaura roles previamente eliminados.
+    - Elimina todos los permisos actuales de cada rol (excepto `superadmin`).
+    - Asigna los nuevos permisos a cada rol según la configuración recibida.
+    - Se asegura de mantener actualizado el rol `superadmin` con todos los permisos (esto se gestiona en `actualizar_permisos`).
+
+    Notas:
+        - El rol `superadmin` no se modifica aquí, ya que posee automáticamente todos los permisos.
+        - Se utiliza SQLAlchemy ORM y operaciones en bloque para eficiencia.
+
+    Raise:
+        Exception: Si ocurre un error inesperado durante la sincronización.
+    """
     response = ComponentServiceApi.internal_services_recolect_perms()
     db = SessionLocal()
     try:
@@ -97,6 +115,21 @@ def actualizar_roles():
         db.close()
 
 def actualizar_permisos(db: Session, permisos: list[str]):
+    """
+    Agrega nuevos permisos a la base de datos si no existen y los asigna al rol `superadmin`.
+
+    Esta función:
+    - Compara la lista de permisos actuales en base de datos con la lista recibida.
+    - Inserta los permisos faltantes.
+    - Asigna automáticamente los permisos nuevos al rol `superadmin`, sin duplicar relaciones.
+
+    Args:
+        db (Session): Objeto de sesión activa de SQLAlchemy.
+        permisos (list[str]): Lista de nombres de permisos a asegurar en base de datos.
+
+    Raise:
+        Exception: En caso de error durante la inserción o asignación de permisos.
+    """
     try:
         # Obtener todos los permisos existentes de una s|ola vez
         permisos_existentes = {
