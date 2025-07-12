@@ -248,7 +248,7 @@ class UsuarioService(ServicioBase):
         except ValidationError as error:
             return (
                 ResponseStatus.FAIL,
-                "Error de schema / Bad Request",
+                "Error de validacion de datos.",
                 error.messages,
                 400,
             )
@@ -683,7 +683,7 @@ class UsuarioService(ServicioBase):
         return ResponseStatus.SUCCESS, "Contraseña actualizada correctamente", None, 200
 
 
-    def refresh_token(self, session: Session, usuario_id: int) -> dict:
+    def refresh_token(self, session: Session, usuario_id: int,jti_refresh: str) -> dict:
         usuario = session.query(Usuario).filter_by(id_usuario=usuario_id,eliminado=False).first()
         if not usuario:
             return None
@@ -707,15 +707,7 @@ class UsuarioService(ServicioBase):
         )
         permisos = [p.nombre_permiso for p in permisos]
 
-        nuevo_access_token = create_access_token(
-            identity=str(usuario_id),
-            additional_claims={
-                "sub": str(usuario.id_usuario),
-                "email": usuario.email_usuario,
-                "rol": roles_nombres,
-                "permisos": permisos,
-            },
-        )
+        nuevo_access_token = crear_token_acceso(usuario_id, usuario.email_usuario,jti_refresh)
 
         # Decodificar el token para obtener jti y expiración
         access_decoded = decode_token(nuevo_access_token)
@@ -751,7 +743,7 @@ class UsuarioService(ServicioBase):
         nuevo_refresh_token, refresh_expires, jti_nuevo = crear_token_refresh(usuario_id)
         registrar_refresh_token(jti_nuevo, refresh_expires)
 
-        tokens = self.refresh_token(session, usuario_id)
+        tokens = self.refresh_token(session, usuario_id,jti_nuevo)
         if tokens is None:
             return (
                 ResponseStatus.FAIL,
