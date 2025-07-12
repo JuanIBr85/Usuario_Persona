@@ -945,7 +945,7 @@ class UsuarioService(ServicioBase):
         return ResponseStatus.SUCCESS, "Contraseña actualizada correctamente", None, 200
 
 
-    def refresh_token(self, session: Session, usuario_id: int) -> dict:
+    def refresh_token(self, session: Session, usuario_id: int,jti_refresh:str) -> dict:
         """
         Genera un nuevo access token para el usuario a partir de su ID, utilizando sus roles y permisos actuales.
 
@@ -965,49 +965,45 @@ class UsuarioService(ServicioBase):
         if not usuario:
             return None
 
-        rol = (
+        rol_usuario = (
             session.query(Rol)
-            .join(RolUsuario, Rol.id_rol == RolUsuario.id_rol)
+            .join(RolUsuario)
             .filter(RolUsuario.id_usuario == usuario.id_usuario)
-            .first()
-        )
-        rol_nombre = rol.nombre_rol if rol else "sin_rol"
-
-        permisos_query = (
-            session.query(Permiso.nombre_permiso)
-            .join(RolPermiso, Permiso.id_permiso == RolPermiso.permiso_id)
-            .filter(RolPermiso.id_rol == rol.id_rol)
             .all()
         )
-        permisos = [p.nombre_permiso for p in permisos_query]
+        roles_nombres = [rol.nombre_rol for rol in rol_usuario]
 
-        nuevo_access_token = create_access_token(
-            identity=str(usuario_id),
-            additional_claims={
-                "sub": str(usuario.id_usuario),
-                "email": usuario.email_usuario,
-                "rol": rol_nombre,
-                "permisos": permisos,
-            },
+        # Obtener los permisos
+        permisos = (
+            session.query(Permiso.nombre_permiso)
+            .join(RolPermiso, Permiso.id_permiso == RolPermiso.permiso_id)
+            .join(RolUsuario, RolPermiso.id_rol == RolUsuario.id_rol)
+            .filter(RolUsuario.id_usuario == usuario.id_usuario)
+            .distinct()  # Para evitar duplicados
+            .all()
         )
 
+        permisos_lista = (p.nombre_permiso for p in permisos)
+
+        token, expires_in, expires_seconds = crear_token_acceso(
+                    usuario.id_usuario, usuario.email_usuario, jti_refresh
+                )
+
         # Decodificar el token para obtener jti y expiración
-        access_decoded = decode_token(nuevo_access_token)
+        access_decoded = decode_token(token)
         access_jti = access_decoded["jti"]
-        access_exp = datetime.fromtimestamp(access_decoded["exp"], tz=timezone.utc)
-        ttl = int((access_exp - datetime.now(timezone.utc)).total_seconds())
 
         # Guardar en Redis
         try:
-            get_redis().rpush(access_jti, *permisos)
-            get_redis().expire(access_jti, ttl)
+            get_redis().rpush(access_jti, *permisos_lista)
+            get_redis().expire(access_jti, expires_seconds)
         except Exception as e:
             return (f"[!] Error al registrar access token en Redis: {e}")
         
         usuario_data = self.schema_out.dump(usuario)
 
-        usuario_data["token"] = nuevo_access_token  # es el access token
-        usuario_data["expires_in"] = access_exp 
+        usuario_data["token"] = token  # es el access token
+        usuario_data["expires_in"] = expires_in 
         usuario_data["rol"] = roles_nombres
 
         return usuario_data
@@ -1038,7 +1034,7 @@ class UsuarioService(ServicioBase):
         nuevo_refresh_token, refresh_expires, jti_nuevo = crear_token_refresh(usuario_id)
         registrar_refresh_token(jti_nuevo, refresh_expires)
 
-        tokens = self.refresh_token(session, usuario_id)
+        tokens = self.refresh_token(session, usuario_id,jti_nuevo)
         if tokens is None:
             return (
                 ResponseStatus.FAIL,
@@ -1048,7 +1044,7 @@ class UsuarioService(ServicioBase):
         )
 
         tokens["refresh_token"] = nuevo_refresh_token
-        tokens["refresh_jti"] = jti_nuevo
+        tokens["refresh_expires"] = refresh_expires.isoformat()
 
         return (
             ResponseStatus.SUCCESS,
