@@ -183,4 +183,14 @@ logout: async () => {
     });
   },
 
+  renewToken: async (token) => {
+    return fetchService.fetch({
+      url: `${ServiceURL.auth}/refresh`,
+      method: HttpMethod.POST,
+      body: {refresh_token: token},
+      useToken: true,
+      showError: AuthService.showError,
+    });
+  },
+
 };
