@@ -150,6 +150,7 @@
         #para encontrar los servicios para poder usar su api
         - AUTH_SERVICE_HOST=auth-service
         - PERSONA_SERVICE_HOST=persona-backend
+        - LOCALHOST_AUTH_DISABLE=True
       depends_on:
         - auth-service
         - persona-backend

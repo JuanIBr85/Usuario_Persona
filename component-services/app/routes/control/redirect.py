@@ -7,7 +7,7 @@ bp = Blueprint("component", __name__, cli_group="control", url_prefix="/redirect
 
 
 @bp.route("/all", methods=["GET"])
-@cp_api_access(is_public=True, limiter=["3 per minute"])
+@cp_api_access(is_public=False, limiter=["3 per minute"], access_permissions=["component.control.redireccion"])
 def all():
     try:
         return (
@@ -28,7 +28,7 @@ def all():
 
 
 @bp.route("/update", methods=["GET"])
-@cp_api_access(is_public=True, limiter=["10 per minute"])
+@cp_api_access(is_public=False, limiter=["10 per minute"], access_permissions=["component.control.redireccion"])
 def update():
     try:
         ServicesSearchService().update_redirect()
@@ -50,7 +50,7 @@ def update():
 
 
 @bp.route(rule="/get/<string:code>", methods=["GET"])
-@cp_api_access(is_public=True, limiter=["10 per minute"])
+@cp_api_access(is_public=True, limiter=["2 per minute"])
 def get(code: str):
     try:
         redirect = ServicesSearchService().get_redirect(code)
