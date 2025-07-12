@@ -87,6 +87,8 @@ function AuthContextProvider({ children }) {
             localStorage.setItem("authData", JSON.stringify(newData));
             localStorage.setItem("token", newData.token);
             Object.assign(tempAuthData, newData);
+            console.log(newData, "<<<<");
+
             //console.log("Datos de autenticación actualizados", newData);
             //console.log("Datos de usuario actualizados", newData.user);
             return newData;
@@ -174,6 +176,17 @@ function AuthContextProvider({ children }) {
         return true;
     }
 
+    const tokenRenew = () => {
+        AuthService.renewToken(authData.user.refresh_token)
+            .then((response) => {
+                updateData(response.data);
+                showDialog(makeDialog("Renovacion exitosa", "El token ha sido renovado exitosamente"));
+            })
+            .catch((error) => {
+                console.error("Error al renovar el token", error);
+                showDialog(makeDialog("Error al renovar el token", "No se pudo renovar el token"));
+            });
+    }
     //Verifica si el usuario esta autenticado al cambiar la ruta
     useEffect(() => {
         //Si el usuario esta esperando a que un admin lo vincule, lo redirijo a la pantalla de espera
@@ -197,6 +210,7 @@ function AuthContextProvider({ children }) {
         }
         
     }, [location]);
+    
 
     //Verifica si el usuario esta autenticado al cambiar la ruta
     useEffect(() => {
@@ -214,7 +228,28 @@ function AuthContextProvider({ children }) {
                 }, 10000)
             });
         }, 1000);
-        return () => clearInterval(interval);
+
+        //console.warn(timeLeftToExpire(), Math.max(timeLeftToExpire()-(60*25), 0), (60*25))
+        
+        //Por si se renova el token
+        //creo un timeout para que cuando falten 5 minutos o menos lance una advertencia
+        /*const timeout = setTimeout(() => {
+            setDialog({
+                title: "Renovar sesión",
+                description: "Su sesión expira en 5 minutos. Desea renovarla?",
+                action: () =>tokenRenew(),
+                cancel: "Cancelar",
+                cancelHandle: () => {
+                    setDialog(null);
+                }
+            });
+        }, Math.max(timeLeftToExpire()-(60*29), 0)*1000);*/
+
+
+        return () => {
+            clearInterval(interval);
+            clearTimeout(timeout);
+        };
     }, [authData.user?.expires_in]);
 
 
@@ -326,6 +361,8 @@ function AuthContextProvider({ children }) {
                 description={dialog.description}
                 isOpen={dialog}
                 actionHandle={handleDialogAction}
+                cancel={dialog?.cancel}
+                cancelHandle={dialog?.cancelHandle}
             />}
             {!isUnauthorizedRoute && children}
         </AuthContext.Provider>
