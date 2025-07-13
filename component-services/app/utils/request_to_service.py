@@ -47,6 +47,15 @@ def request_to_service(url:str):
 
     headers["X-CLIENT-IP"] = request.remote_addr
     headers["X-CLIENT-USER-AGENT"] = request.user_agent.string
+
+    # Preparar datos según el tipo de contenido
+    if request.is_json:
+        request_data = {"json": request.get_json()}
+    elif request.content_type and request.content_type != 'application/x-www-form-urlencoded':
+        request_data = {"data": request.get_data()}
+    else:
+        request_data = {"data": request.form}
+
     # Armo la request para enviar al microservicio con todos los datos recibidos
     # Envio la request al microservicio
     response = ServiceRequest.request(
@@ -55,8 +64,8 @@ def request_to_service(url:str):
             "url": url,
             "headers": headers,
             "params": request.args,
-            "json": request.get_json() if request.is_json else None,
-            "data": request.form if not request.is_json else None,
+            "allow_redirects": False,#Previene que el request siga redirigiendose
+            **request_data
         },
         timeout=60  # para prevenir que el request se quede indefinidamente esperando
     )
