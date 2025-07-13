@@ -16,6 +16,7 @@ import logging
 endpoints_search_service = EndpointsSearchService()
 # Defino los modelos
 import app.models
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 
 
@@ -36,6 +37,16 @@ def create_app() -> Flask:
     )
 
     limiter.init_app(app)
+
+    # Configura ProxyFix para que confíe en 1 proxy
+    app.wsgi_app = ProxyFix(
+        app.wsgi_app,
+        x_for=1,      # X-Forwarded-For
+        x_proto=1,    # X-Forwarded-Proto
+        x_host=1,     # X-Forwarded-Host
+        x_prefix=1    # X-Forwarded-Prefix
+)
+
 
     # Inicializa de las exteniciones
     jwt.init_app(app)
