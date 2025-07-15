@@ -168,6 +168,25 @@
       env_file:
         - ./persona-service/frontend/.env
 
+    #============================================================================#
+    # Sexta etapa de inicio (Nginx)
+    #============================================================================#
+    # nginx:
+    #   container_name: nginx
+    #   build: ./nginx
+    #   ports:
+    #     - "8486:80"
+    #     - "433:433"
+    #   volumes:
+    #     - ./nginx/conf.d:/etc/nginx/conf.d
+    #     - ./nginx/cert:/etc/nginx/cert
+    #     - ./nginx/logs:/var/log/nginx
+    #   depends_on:
+    #     - persona-frontend
+    #     - persona-backend
+    #     - component-service
+
+
   volumes:
     persona_db_data:
     #postgres_data:
