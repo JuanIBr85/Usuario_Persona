@@ -86,7 +86,7 @@ def _obtener_persona_x_id(id):
     )
 
 #Devuelve la persona vinculada al usuario autenticado
-@api_access(cache=CacheSettings(expiration=10))
+@api_access()
 @persona_bp.route("/persona_by_id", methods=["GET"])
 def persona_by_id():
     try:
