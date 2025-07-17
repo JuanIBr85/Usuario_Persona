@@ -60,6 +60,8 @@ export function usePersonas() {
         // Cargar redes sociales
         PersonaService.get_redes_sociales()
             .then((res) => {
+                console.log("Redes sociales obtenidas:", res);
+
                 setRedesSociales(res?.data || []);
             })
             .catch(() => setRedesSociales([]));

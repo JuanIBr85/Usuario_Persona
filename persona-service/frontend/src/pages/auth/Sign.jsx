@@ -123,6 +123,7 @@ function Sign() {
           <InputValidate
             id="password"
             type="password"
+            isCleanValue={false}
             placeholder="Contraseña"
             labelText="Contraseña"
             validatePattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$"
@@ -136,6 +137,7 @@ function Sign() {
             id="password_repeat"
             name="password_repeat" 
             type="password"
+            isCleanValue={false}
             placeholder="Repetir contraseña"
             labelText="Repetir contraseña"
             validationMessage="Las contraseñas no coinciden."
