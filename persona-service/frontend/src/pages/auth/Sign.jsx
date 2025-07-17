@@ -24,24 +24,48 @@ function Sign() {
   const [isOK, setIsOK] = React.useState(false); // Indica si el registro fue exitoso
   const navigate = useNavigate(); // Utilizado para la redirección
 
+  const [password, setPassword] = React.useState("");
+  const [passwordRepeat, setPasswordRepeat] = React.useState("");
+  const [passwordError, setPasswordError] = React.useState("");
+  
+  React.useEffect(() => {
+    if (passwordRepeat && password !== passwordRepeat) {
+      setPasswordError("Las contraseñas no coinciden.");
+    } else {
+      setPasswordError("");
+    }
+  }, [passwordRepeat, password]);
+
   // Maneja el envío del formulario
   const handleSubmit = async (event) => {
+    event.preventDefault(); // Prevenir comportamiento por defecto
+    
+    // Verificar si las contraseñas coinciden antes de enviar
+    if (passwordError) {
+      setMessage(passwordError);
+      setIsOpen(true);
+      return;
+    }
+    
     const formData = await formSubmitJson(event); // Convierte los datos del formulario a JSON
+    
+    // Eliminar el campo password_repeat que el backend no reconoce
+    delete formData.password_repeat;
+    
     document.activeElement.blur();
     setIsLoading(true);
 
     AuthService.register(formData) // Llama al servicio para registrar al usuario
       .then(() => {
-
         // Si fue exitoso, muestra mensaje de éxito y activa bandera isOK
         sessionStorage.setItem("email_verificar", formData.email_usuario);
         setMessage(
-          `La cuenta ha sido creada correctamente. Por favor, ingrese el codigo que fue enviado a su mail para activar su cuenta.`
+          `La cuenta ha sido creada correctamente. Por favor, ingrese el código que fue enviado a su mail para activar su cuenta.`
         );
         setIsOK(true);
       })
       .catch((error) => {
-        setMessage(error.data?.message ?? "Ocurrió un error inesperado")
+        setMessage(error.data?.message ?? "Ocurrió un error inesperado");
         setIsOK(false);
       })
       .finally(() => {
@@ -73,7 +97,7 @@ function Sign() {
         title="Creación de cuenta"
         visualContent={<UserPlus className="text-white w-42 h-42" />}
       >
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 h-full">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3 h-full overflow-y-auto">
           {/* Input de email */}
           <InputValidate
             id="email_usuario"
@@ -103,8 +127,28 @@ function Sign() {
             labelText="Contraseña"
             validatePattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$"
             validationMessage="La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula, un número y un carácter especial."
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
           />
+
+          <InputValidate
+            id="password_repeat"
+            name="password_repeat" 
+            type="password"
+            placeholder="Repetir contraseña"
+            labelText="Repetir contraseña"
+            validationMessage="Las contraseñas no coinciden."
+            value={passwordRepeat}
+            onChange={(e) => setPasswordRepeat(e.target.value)}
+            required
+            isInvalid={!!passwordError}
+          />
+          
+          {/* Mostrar mensaje de error si las contraseñas no coinciden */}
+          {passwordError && (
+            <div className="text-red-500 text-sm mt-[-12px]">{passwordError}</div>
+          )}
 
           {/* Link para ir al login si ya tiene cuenta */}
           <Button variant="link" asChild className="p-0">
@@ -112,11 +156,13 @@ function Sign() {
           </Button>
 
           <Button variant="link" asChild className="p-0">
-            <Link to="/auth/otpregisterrecovery">¿Tenés un código de registro?</Link>
+            <Link to="/auth/otpregisterrecovery">
+              ¿Tenés un código de registro?
+            </Link>
           </Button>
 
           {/* Botón de envío del formulario */}
-          <Button type="submit" className="mt-4">
+          <Button type="submit" className="mt-0 " disabled={!!passwordError}>
             Registrarse
           </Button>
         </form>

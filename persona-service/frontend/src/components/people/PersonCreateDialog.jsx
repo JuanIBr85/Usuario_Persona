@@ -56,7 +56,6 @@ function PersonCreateDialog({
   loading = false,
   error = null,
 }) {
-
   const [userSearch, setUserSearch] = useState("");
   const [tipoDoc, setTipoDoc] = useState(Object.keys(tiposDocumentos)[0] || "");
 
@@ -64,7 +63,6 @@ function PersonCreateDialog({
   const seventeenYearsAgo = new Date();
   seventeenYearsAgo.setFullYear(seventeenYearsAgo.getFullYear() - 17);
   const maxDate = seventeenYearsAgo.toISOString().slice(0, 10);
-
 
   const filteredUsuarios = useMemo(() => {
     if (!userSearch) return usuarios;
@@ -76,7 +74,6 @@ function PersonCreateDialog({
           u.email_usuario.toLowerCase().includes(userSearch.toLowerCase()))
     );
   }, [userSearch, usuarios]);
-
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -103,20 +100,24 @@ function PersonCreateDialog({
                 id="nombre"
                 name="nombre"
                 type="text"
-                labelText="Nombre"
+                labelText="Nombre(s)"
                 value={newUser.nombre || ""}
-                maxLength={50}
+                maxLength={30}
                 required
+                validatePattern="^[A-Za-zÁÉÍÓÚÜáéíóúüÑñ'’ ]+$"
+                validationMessage="El nombre solo puede contener letras."
               />
 
               <InputValidate
                 id="apellido"
                 name="apellido"
                 type="text"
-                labelText="Apellido"
+                labelText="Apellido(s)"
                 value={newUser.apellido || ""}
-                maxLength={50}
+                maxLength={30}
                 required
+                validatePattern="^[A-Za-zÁÉÍÓÚÜáéíóúüÑñ'’ ]+$"
+                validationMessage="El nombre solo puede contener letras."
               />
             </ResponsiveColumnForm>
 
@@ -128,12 +129,12 @@ function PersonCreateDialog({
                 placeholder="Selecciona un tipo de documento"
                 onValueChange={(value) => {
                   setTipoDoc(value);
-                  handleChange({ target: { name: 'tipo_documento', value } });
+                  handleChange({ target: { name: "tipo_documento", value } });
                 }}
                 required
               >
                 {Object.keys(tiposDocumentos).map((doc, i) => (
-                  <SelectItem key={i} value={doc} >
+                  <SelectItem key={i} value={doc}>
                     {doc}
                   </SelectItem>
                 ))}
@@ -160,6 +161,7 @@ function PersonCreateDialog({
                 value={newUser.fecha_nacimiento || ""}
                 required
                 max={maxDate}
+                min="1905-01-01"
               />
 
               {/* Select de usuario */}
@@ -181,19 +183,11 @@ function PersonCreateDialog({
                 </div>
                 <SelectItem value="-1">Ningún usuario</SelectItem>
                 {loading && (
-                  <SelectItem disabled>
-                    Cargando usuarios...
-                  </SelectItem>
+                  <SelectItem disabled>Cargando usuarios...</SelectItem>
                 )}
-                {error && (
-                  <SelectItem disabled>
-                    {error}
-                  </SelectItem>
-                )}
+                {error && <SelectItem disabled>{error}</SelectItem>}
                 {filteredUsuarios.length === 0 && !loading && !error && (
-                  <SelectItem disabled>
-                    No se encontraron usuarios
-                  </SelectItem>
+                  <SelectItem disabled>No se encontraron usuarios</SelectItem>
                 )}
                 {filteredUsuarios.map((u) => (
                   <SelectItem key={u.id} value={`${u.id}`}>
@@ -212,19 +206,23 @@ function PersonCreateDialog({
               <InputValidate
                 id="domicilio_calle"
                 name="domicilio_calle"
-                maxLength={50}
+                maxLength={30}
                 type="text"
                 labelText="Calle"
                 value={newUser.domicilio_calle || ""}
+                validatePattern="^(?!\s*$).+"
+                validationMessage="El nombre de la calle no puede estar vacío ni tener solo espacios"
               />
 
               <InputValidate
                 id="domicilio_numero"
                 name="domicilio_numero"
-                maxLength={10}
+                maxLength={5}
                 type="text"
                 labelText="Número"
                 value={newUser.domicilio_numero || ""}
+                validatePattern="^\d{1,5}$"
+                validationMessage="Solo se permiten números (máximo 5 dígitos)"
               />
             </ResponsiveColumnForm>
 
@@ -232,7 +230,7 @@ function PersonCreateDialog({
               <InputValidate
                 id="domicilio_piso"
                 name="domicilio_piso"
-                maxLength={10}
+                maxLength={3}
                 type="text"
                 labelText="Piso"
                 value={newUser.domicilio_piso || ""}
@@ -251,11 +249,14 @@ function PersonCreateDialog({
               <InputValidate
                 id="codigo_postal"
                 name="codigo_postal"
-                maxLength={10}
                 type="text"
+                placeholder="Ej: 7540"
                 labelText="Código Postal"
                 value={newUser.codigo_postal || ""}
                 onChange={handleChangePostal}
+                validatePattern="^[0-9]{4}$"
+                validationMessage="Código postal inválido, debe tener 4 dígitos numéricos"
+                maxLength={4}
                 required
               />
             </ResponsiveColumnForm>
@@ -266,7 +267,9 @@ function PersonCreateDialog({
                 label="Localidad"
                 value={newUser.localidad || ""}
                 placeholder="Selecciona una localidad"
-                onValueChange={(value) => handleChange({ target: { name: 'localidad', value } })}
+                onValueChange={(value) =>
+                  handleChange({ target: { name: "localidad", value } })
+                }
                 required
               >
                 {localidades.map((loc, index) => (
@@ -275,7 +278,8 @@ function PersonCreateDialog({
                   </SelectItem>
                 ))}
               </SimpleSelect>
-              <div /> {/* Espacio vacío para mantener el diseño de dos columnas */}
+              <div />{" "}
+              {/* Espacio vacío para mantener el diseño de dos columnas */}
             </ResponsiveColumnForm>
           </div>
 
@@ -288,19 +292,25 @@ function PersonCreateDialog({
                 id="telefono_fijo"
                 name="telefono_fijo"
                 maxLength={20}
+                minLength={7}
                 type="tel"
                 labelText="Teléfono fijo"
                 value={newUser.telefono_fijo || ""}
+                validatePattern="^\d+$"
+                validationMessage="Solo se permiten números, mínimo 7 dígitos."
               />
 
               <InputValidate
                 id="telefono_movil"
                 name="telefono_movil"
                 maxLength={20}
+                minLength={7}
                 type="tel"
                 labelText="Teléfono móvil"
                 value={newUser.telefono_movil || ""}
                 required
+                validatePattern="^\d+$"
+                validationMessage="Solo se permiten números, mínimo 7 dígitos."
               />
             </ResponsiveColumnForm>
 
@@ -310,8 +320,13 @@ function PersonCreateDialog({
                 label="Red social"
                 value={newUser.red_social_nombre || ""}
                 placeholder="Selecciona una red social"
-                onValueChange={(value) => handleChange({ target: { name: 'red_social_nombre', value } })}
+                onValueChange={(value) =>
+                  handleChange({ target: { name: "red_social_nombre", value } })
+                }
               >
+                <SelectItem key="ninguna" value="ninguna">
+                  Ninguna
+                </SelectItem>
                 {redesSociales.map((rs) => (
                   <SelectItem key={rs} value={rs}>
                     {rs}
@@ -319,15 +334,18 @@ function PersonCreateDialog({
                 ))}
               </SimpleSelect>
 
-              <InputValidate
-                id="red_social_contacto"
-                name="red_social_contacto"
-                maxLength={50}
-                type="text"
-                labelText={`Usuario de ${newUser.red_social_nombre || 'red social'}`}
-                value={newUser.red_social_contacto || ""}
-                disabled={!newUser.red_social_nombre}
-              />
+              {newUser.red_social_nombre &&
+                newUser.red_social_nombre !== "ninguna" && (
+                  <InputValidate
+                    id="red_social_contacto"
+                    name="red_social_contacto"
+                    maxLength={50}
+                    type="text"
+                    labelText={`Usuario de ${newUser.red_social_nombre}`}
+                    value={newUser.red_social_contacto || "ninguna"}
+                    disabled={!newUser.red_social_nombre}
+                  />
+                )}
             </ResponsiveColumnForm>
 
             <ResponsiveColumnForm>
@@ -340,7 +358,8 @@ function PersonCreateDialog({
                 value={newUser.email_contacto || ""}
                 required
               />
-              <div /> {/* Espacio vacío para mantener el diseño de dos columnas */}
+              <div />{" "}
+              {/* Espacio vacío para mantener el diseño de dos columnas */}
             </ResponsiveColumnForm>
 
             <div className="w-full">
@@ -362,9 +381,7 @@ function PersonCreateDialog({
                 Cancelar
               </Button>
             </DialogClose>
-            <Button type="submit">
-              Guardar
-            </Button>
+            <Button type="submit">Guardar</Button>
           </DialogFooter>
         </form>
       </DialogContent>
