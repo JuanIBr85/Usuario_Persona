@@ -10,7 +10,7 @@ def render_email_template(saludo_html: str,
         background-color: #1C1464;
         padding: 30px;
         border-radius: 10px;
-        color: white;">
+        color: #FFFFFF;">
         
         {saludo_html}
 
