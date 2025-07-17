@@ -72,11 +72,7 @@ function AdminPersons() {
   } = usePersonas();
 
   console.log("Personas obtenidas:", personas);
-  const {
-    usuarios,
-    loading,
-    error,
-  } = useUsuariosBasic();
+  const { usuarios, loading, error } = useUsuariosBasic();
 
   console.log("Usuarios obtenidos:", usuarios);
 
@@ -95,7 +91,8 @@ function AdminPersons() {
       `${user.nombre} ${user.apellido}`
         .toLowerCase()
         .includes(filtro.toLowerCase()) ||
-      (user.nro_documento && user.nro_documento.toLowerCase().includes(filtro.toLowerCase()));
+      (user.nro_documento &&
+        user.nro_documento.toLowerCase().includes(filtro.toLowerCase()));
     return textoMatch;
   });
 
@@ -177,16 +174,33 @@ function AdminPersons() {
         setNewUser({});
         setIsDialogOpen(false);
       });
-
-
     } catch (error) {
       console.error("Error al crear persona:", error);
-      const rawMsg = error?.data?.error?.server || error?.data?.message || error.message || "Error desconocido";
-      console.log("Error al crear persona:", rawMsg);
+
+      // Intenta extraer mensaje de error HTML (por ejemplo, de un <p>)
+      let rawMsg = error?.data || "Error desconocido";
+
+      // Si el mensaje contiene HTML, extrae solo el texto del primer <p>
+      if (typeof rawMsg === "string" && rawMsg.includes("<p")) {
+        const match = rawMsg.match(/<p[^>]*>(.*?)<\/p>/i);
+        if (match && match[1]) {
+          rawMsg = match[1];
+        }
+      }
+      // Si error.data es HTML, intenta extraer <p> de ahí también (por si rawMsg no lo trae)
+      else if (typeof error?.data === "string" && error.data.includes("<p")) {
+        const match = error.data.match(/<p[^>]*>(.*?)<\/p>/i);
+        if (match && match[1]) {
+          rawMsg = match[1];
+        }
+      }
+
+      console.error("Mensaje de error procesado:", rawMsg);
+
       setAlert({
         title: "Error al crear persona",
         description: rawMsg,
-        variant: "destructive"
+        variant: "destructive",
       });
       setIsDialogOpen(false);
     }

@@ -86,7 +86,7 @@ def _obtener_persona_x_id(id):
     )
 
 #Devuelve la persona vinculada al usuario autenticado
-@api_access(cache=CacheSettings(expiration=10))
+@api_access()
 @persona_bp.route("/persona_by_id", methods=["GET"])
 def persona_by_id():
     try:
@@ -459,7 +459,7 @@ def restaurar_persona(id):
         )
 
 #Obtiene la persona asociada a un usuario específico
-@api_access(access_permissions=[])
+@api_access(access_permissions=["persona.admin.obtener_persona_usuario"])
 @persona_bp.route("/personas_by_usuario/<int:id>", methods=["GET"])
 def obtener_persona_usuario(id):
     try:
@@ -501,7 +501,7 @@ def obtener_persona_usuario(id):
         )
 
 #Devuelve la cantidad total de personas
-@api_access(access_permissions=[])
+@api_access(access_permissions=["persona.admin.contar_personas"])
 @persona_bp.route("/personas/count", methods=["GET"])
 def contar_personas():
     try:

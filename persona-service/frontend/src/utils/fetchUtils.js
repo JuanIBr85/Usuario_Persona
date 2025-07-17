@@ -1,9 +1,11 @@
-import { href } from "react-router";
+//URL PARA EL HOST
+//const BASE_URL = "http://186.19.137.9:8486/api";
+const BASE_URL = "http://localhost:5002/api";
 
 export const ServiceURL = Object.freeze({
-    auth: "http://localhost:5002/api/auth",
-    persona: "http://localhost:5002/api/persona",
-    control: "http://localhost:5002/api/control",
+    auth: `${BASE_URL}/auth`,
+    persona: `${BASE_URL}/persona`,
+    control: `${BASE_URL}/control`,
     //api gateway
     // "http://localhost:5002/api"
 });

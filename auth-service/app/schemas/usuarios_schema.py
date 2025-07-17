@@ -21,18 +21,24 @@ class UsuarioInputSchema(Schema):
     )
     nombre_usuario = fields.Str(
         required=True, 
-        validate=validate.Length(min=4, error="El nombre de usuario debe tener al menos 4 caracteres."),
-        error_messages={"Requerimiento": "El nombre de usuario es obligatorio."}
+        validate=[
+            validate.Length(min=4,max=20, error="El nombre de usuario debe tener entre 4 y 20 caracteres."),
+            validate.Regexp(r'^[a-zA-Z0-9_-]+$', error="El nombre de usuario no puede tener espacios ni caracteres especiales.")
+        ],
+        error_messages={"required": "El nombre de usuario es obligatorio."}
     )
     email_usuario = fields.Email(
         required=True,
+            validate=[validate.Regexp( r"^[^+\s]+@[^\s@]+\.[^\s@]+$",
+            error="El email no puede contener espacios ni alias con '+'."),
+            validate.Length(max=60, error="El Email debe tener menos de 60 caracteres.")],
         error_messages={
             "required": "El email es obligatorio.",
             "invalid": "Debe ser un email válido."}
     )
     password = fields.Str(
         load_only=True, 
-        required=False, 
+        required=True, 
         validate=[
             validate.Length(min=6, max=72, error="La contraseña debe tener al menos 6 caracteres y maximo 72 caracteres"),
             validate.Regexp(
@@ -41,7 +47,7 @@ class UsuarioInputSchema(Schema):
                         "una letra mayúscula, un número y un símbolo."
             )
         ],
-        error_messages={"Requerido": "La contraseña es obligatoria."}
+        error_messages={"required": "La contraseña es obligatoria."}
     )
     
     # Solo para devolver si querés mostrar timestamps
@@ -90,14 +96,17 @@ class LoginSchema(Schema):
 
     email_usuario = fields.Email(
         required=True,
+         validate=[validate.Regexp( r"^[^+\s]+@[^\s@]+\.[^\s@]+$",
+         error="El email no puede contener espacios ni alias con '+'."),
+         validate.Length(max=60, error="El Email debe tener menos de 60 caracteres.")],
         error_messages={
             "required": "El email es obligatorio.",
             "invalid": "Debe ser un email válido."}
     )
     password = fields.Str(
         required=True, 
-        validate=validate.Length(min=6, error="La contraseña debe tener al menos 6 caracteres."),
-        error_messages={"Requerido": "La contraseña es obligatoria."}
+        validate=validate.Length(min=6, max=72, error="La contraseña debe tener entre 6 y 72 caracteres."),
+        error_messages={"Required": "La contraseña es obligatoria."}
     )
     
     @pre_load
@@ -135,16 +144,16 @@ class ResetPasswordSchema(Schema):
 
     password = fields.Str(
         load_only=True, 
-        required=False, 
+        required=True, 
         validate=[
-            validate.Length(min=6, error="La contraseña debe tener al menos 6 caracteres."),
+            validate.Length(min=6,max=72,error="La contraseña debe tener entre 6 y 72 caracteres."),
             validate.Regexp(
                     regex=r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$",
                     error="La contraseña debe contener al menos una letra minúscula, una letra mayúscula, " \
                     "un número y un símbolo."
             )
         ],
-        error_messages={"Requerido": "La contraseña es obligatoria."}
+        error_messages={"required": "La contraseña es obligatoria."}
     )
     confirm_password = fields.Str(
         load_only=True,
@@ -169,7 +178,10 @@ Campos:
 class UsuarioModificarSchema(Schema):
     nombre_usuario = fields.Str(
         required=False,
-        validate=validate.Length(min=4, error="El nombre de usuario debe tener al menos 4 caracteres.")
+        validate=[
+            validate.Length(min=4, max=20,error="El nombre de usuario debe tener entre 4 y 20 caracteres."),
+            validate.Regexp(r'^[a-zA-Z0-9_-]+$', error="El nombre de usuario no puede tener espacios ni caracteres especiales.")
+        ],
     )
 
 
@@ -188,6 +200,9 @@ Validaciones:
 class UsuarioModificarEmailSchema(Schema):
         nuevo_email = fields.Email(
         required=False,
+         validate=[validate.Regexp( r"^[^+\s]+@[^\s@]+\.[^\s@]+$",
+         error="El email no puede contener espacios ni alias con '+'."),
+         validate.Length(max=60, error="El Email debe tener menos de 60 caracteres.")],
         error_messages={
             "invalido": "Debe ser un email válido."
         }
@@ -196,14 +211,14 @@ class UsuarioModificarEmailSchema(Schema):
             load_only=True, 
             required=False, 
             validate=[
-                validate.Length(min=6, error="La contraseña debe tener al menos 6 caracteres."),
+                validate.Length(min=6,max=72, error="La contraseña debe tener emtre 6 y 72 caracteres."),
                 validate.Regexp(
                         regex=r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$",
                         error="La contraseña debe contener al menos una letra minúscula, una letra mayúscula, " \
                         "un número y un símbolo."
                 )
             ],
-            error_messages={"Requerido": "La contraseña es obligatoria."}
+            error_messages={"required": "La contraseña es obligatoria."}
         )
         
         @pre_load
@@ -228,6 +243,9 @@ Validaciones:
 class UsuarioEliminarSchema(Schema):
         email_usuario = fields.Email(
         required=False,
+         validate=[validate.Regexp( r"^[^+\s]+@[^\s@]+\.[^\s@]+$",
+         error="El email no puede contener espacios ni alias con '+'."),
+         validate.Length(max=60, error="El Email debe tener menos de 60 caracteres.")],
         error_messages={
             "invalido": "Debe ser un email válido."
         }
@@ -236,14 +254,14 @@ class UsuarioEliminarSchema(Schema):
             load_only=True, 
             required=False, 
             validate=[
-                validate.Length(min=6, error="La contraseña debe tener al menos 6 caracteres."),
+                validate.Length(min=6,max=72, error="La contraseña debe tener entre 6 y 72 caracteres."),
                 validate.Regexp(
                         regex=r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$",
                         error="La contraseña debe contener al menos una letra minúscula, una letra mayúscula, " \
                         "un número y un símbolo."
                 )
             ],
-            error_messages={"Requerido": "La contraseña es obligatoria."}
+            error_messages={"required": "La contraseña es obligatoria."}
         )
         
         @pre_load
