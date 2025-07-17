@@ -451,7 +451,7 @@ class UsuarioService(ServicioBase):
 
         perfil = {
             "id_usuario": usuario.id_usuario,
-            "email": usuario.email,
+            "email": usuario.email_usuario,
             "fecha_creacion": (
                 usuario.fecha_creacion.isoformat() if usuario.fecha_creacion else None
             ),
