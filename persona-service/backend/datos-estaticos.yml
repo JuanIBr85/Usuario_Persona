@@ -21,6 +21,7 @@ documentos:
   CUIL: "^(20|23|24|27|30|33|34)-?\\d{8}-?\\d$"
 
 redes_sociales:
+  - No uso redes sociales
   - Facebook
   - Instagram
   - X
@@ -30,6 +31,7 @@ redes_sociales:
   - YouTube
 
 estado_civil:
+  - Prefiero no responder
   - Casado/a
   - Soltero/a
   - Viudo/a
@@ -38,6 +40,7 @@ estado_civil:
   - Otros estados civiles
 
 ocupacion:
+  - Prefiero no responder
   - Trabajo informal
   - Trabajo en relacion de dependencia
   - Trabajo independiente
@@ -45,6 +48,7 @@ ocupacion:
   - Empleado público
 
 estudios_alcanzados:
+  - Prefiero no responder
   - Educación primaria
   - Educación secundaria
   - Educación superior
