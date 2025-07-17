@@ -34,10 +34,17 @@ def enviar_codigo_por_email_persona(persona, codigo_otp: str):
             {codigo_otp}
         </p>
     """
+    advertencia = """
+        <p style="font-size:13px; margin-top:20px;">
+            Este código es personal y confidencial. No lo compartas con nadie.
+            Si no fuiste vos quien lo solicitó, ignorá este mensaje.
+        </p>
+    """
 
     html = render_email_template(
         saludo_html=saludo,
         cuerpo_html=cuerpo,
+        extra_html=advertencia,
         aviso_expiracion="Este código expirará en 15 minutos."
     )
 
