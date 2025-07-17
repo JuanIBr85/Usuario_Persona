@@ -456,7 +456,7 @@ def ver_usuarios_eliminados():
     session = SessionLocal()
     try:
         usuarios = superadmin_service.obtener_usuarios(session, solo_eliminados=True)
-        return make_response(ResponseStatus.SUCCESS, data=usuarios)
+        return make_response(ResponseStatus.SUCCESS,"lista de eliminados obtenida con exito", data=usuarios)
     except Exception as e:
         return make_response(ResponseStatus.ERROR,"Error al cargar los usuarios eliminados",str(e),500)
     finally:
