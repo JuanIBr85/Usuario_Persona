@@ -47,7 +47,7 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
     useEffect(() => {
         if(!validatePattern)return;
         setInternalPattern(validatePattern);
-        inputRef.current.pattern = validatePattern;
+        if(inputRef.current)inputRef.current.pattern = validatePattern;
         if(isInit)handleBlur({target: inputRef.current});
     }, [validatePattern]);
 
@@ -87,7 +87,9 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
         const oldCheck = HTMLInputElement.prototype.checkValidity.bind(input);
 
         inputRef.current.checkValidity = () => {
-            
+            if(internalPattern){
+                input.pattern = internalPattern;
+            }
             //Si el patron del input es diferente al del validatePattern
             if ( (type && (input.type !== type && !(type === "password" && input.type === "text")))
                 //Si el required difiere de la que se le dio al input al principio
@@ -101,16 +103,14 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
                 //Si el max difiere de la que se le dio al input al principio
                 || (max && (input.max !== internalMax))
             ) {
-                console.warn(``)
                 //Forzamos el patron de nuevo, en caso de que no se pueda recargar la pagina
-                //input.pattern = internalPattern;
-                //input.type = type;
-                //setInternalValue("");
-                //input.value = "";
-                //removeAuthData("Alteracion de formularios");
-                //alert(`No, eso no funcionara, Atras espiritu del mal`);
+                input.type = type;
+                setInternalValue("");
+                input.value = "";
+                removeAuthData("Alteracion de formularios");
+                alert(`No, eso no funcionara, Atras espiritu del mal`);
                 //Recargamos la pagina para que se aplique el nuevo patron
-                //window.location.href = "/auth/login";
+                window.location.href = "/auth/login";
             }
             return oldCheck();
         }

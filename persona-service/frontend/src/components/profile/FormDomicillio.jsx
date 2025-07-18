@@ -9,6 +9,7 @@ import Loading from "@/components/loading/Loading"
 import { SimpleDialog } from "@/components/SimpleDialog"
 import { Ban } from "lucide-react"
 import { useState } from "react"
+import ResponsiveColumnForm from "@/components/ResponsiveColumnForm"
 
 export default function FormDomicillio({ domicilio, setPersonaData, persona_id, showDialog, okDialog, errorDialog }) {
 
@@ -19,7 +20,7 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id, 
             {loading && <Loading isFixed={true} />}
             <form onSubmit={handleSubmit}>
                 <div className="min-h-69 space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-4 items-end">
+                    <ResponsiveColumnForm className={"md:grid-cols-6"}>
                         {/* Campo Calle */}
                         <InputValidate
                             id="domicilio_calle"
@@ -31,6 +32,7 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id, 
                             validatePattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s,.]{2,50}$"
                             validationMessage="Ingresa un nombre de calle válido (2-50 caracteres, solo letras, espacios, puntos y comas)"
                             containerClassName="sm:col-span-3"
+                            required
                         />
 
                         {/* Campo Número */}
@@ -43,6 +45,7 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id, 
                             value={domicilio?.domicilio_numero || ''}
                             validatePattern="^[0-9]{1,9}[a-zA-Z]?$"
                             validationMessage="Ingresa un número válido (ej: 1234, 123A)"
+                            required
                         />
 
                         {/* Campo Piso (opcional) */}
@@ -68,9 +71,9 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id, 
                             validatePattern="^[a-zA-Z0-9]{1,2}$|^$"
                             validationMessage="Ingresa un departamento válido (máximo 2 caracteres)"
                         />
-                    </div>
+                    </ResponsiveColumnForm>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
+                    <ResponsiveColumnForm>
                         {/* Campo Código Postal */}
                         <InputValidate
                             id="codigo_postal"
@@ -98,7 +101,7 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id, 
                                 </SelectItem>
                             ))}
                         </SimpleSelect>
-                    </div>
+                    </ResponsiveColumnForm>
                     {/* Campo Referencia */}
                     <InputValidate
                         id="domicilio_referencia"
