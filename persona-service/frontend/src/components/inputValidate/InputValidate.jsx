@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useEffect } from 'react'
 import { EyeOff, Eye, EyeClosed } from 'lucide-react'
+import { useAuthContext } from '@/context/AuthContext';
 /**
  * Componente de input con validación personalizada y funcionalidad para mostrar/ocultar contraseñas.
  *
@@ -20,13 +21,17 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
     const [error, setError] = React.useState(false)
     //Este estado sirve para indicar si debe o no ocultar la contraseña
     const [showPassword, setShowPassword] = React.useState(false);
+    const inputRef = React.useRef(null)
 
     const [internalValue, setInternalValue] = React.useState(value || '')
 
     const [isInit, setIsInit] = React.useState(false);
 
-    const handleBlur = (event) => {
-        const input = event.target
+    const { removeAuthData } = useAuthContext();
+
+    const handleBlur = () => {
+        const input = inputRef.current;
+        if(!input)return;
 
         let value = input.value?.trim();
 
@@ -48,10 +53,41 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
         }
         input.value = value;
         setInternalValue(value);
+
         if (input.checkValidity()) {
             setError(false)
         }
     }
+
+    useEffect(() => {
+        if(!inputRef.current)return;
+        const input = inputRef.current;
+        const oldCheck = inputRef.current.checkValidity.bind(inputRef.current);
+
+        inputRef.current.checkValidity = () => {
+            //Si el patron del input es diferente al del validatePattern
+            if (validatePattern && (input.pattern !== validatePattern) 
+                //Si el type difiere de la que se le dio al input al principio exceptuando  si es en el caso q se cambie password a text
+                || (input.type !== type && !(type === "password" && input.type === "text"))
+                //Si el required difiere de la que se le dio al input al principio
+                || (required && (input.required !== required))
+                //Si el id o name difiere de la que se le dio al input al principio
+                || (input.id !== id || input.name !== id)
+            ) {
+                //Forzamos el patron de nuevo, en caso de que no se pueda recargar la pagina
+                input.pattern = validatePattern;
+                input.type = type;
+                setInternalValue("");
+                input.value = "";
+                removeAuthData("Alteracion de formularios");
+                alert(`No, eso no funcionara, Atras espiritu del mal`);
+                //Recargamos la pagina para que se aplique el nuevo patron
+                window.location.href = "/auth/login";
+            }
+            return oldCheck();
+        }
+
+    }, [inputRef]);
 
     useEffect(() => {
         setInternalValue(value)
@@ -68,27 +104,6 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
         if (!isInit) return;
         const input = event.target
         setInternalValue(input.value)
-
-        //Si el patron del input es diferente al del validatePattern
-        //Tambien si el type difiere de la que se le dio al input al principio exceptuando  si es en el caso q se cambie password a text
-        if (validatePattern && (input.pattern !== validatePattern) 
-            || (input.type !== type && !(type === "password" && input.type === "text"))
-            || (required && (input.required !== required))
-        ) {
-            //Forzamos el patron de nuevo, en caso de que no se pueda recargar la pagina
-            input.pattern = validatePattern;
-            input.type = type;
-            setInternalValue("");
-            input.value = "";
-            alert(`No, eso no funcionara, Atras espiritu del mal`)
-            //Recargamos la pagina para que se aplique el nuevo patron
-            window.location.reload();
-        }
-
-        //Esto solo quita el error si el input es invalido
-        if (input.checkValidity()) {
-            setError(false)
-        }
 
         if (onChange) {
             onChange(event)
@@ -110,7 +125,7 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
                     data-validation-message={validationMessage}
                     value={internalValue}
                     onBlur={handleBlur}
-
+                    ref={inputRef}
                     required={required}
                     {...props} />
                 {//Si el input es de tipo contraseña mostrara un boton para ver/ocultar la contraseña

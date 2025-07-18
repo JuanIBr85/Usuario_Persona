@@ -102,7 +102,7 @@ function AuthContextProvider({ children }) {
     };
 
     //Funcion para eliminar los datos de autenticación
-    const removeAuthData = (rason) => {
+    const removeAuthData = (rason, callToLogout=true) => {
         if (!hasToken()) return;
 
         if (!rason) {
@@ -110,11 +110,12 @@ function AuthContextProvider({ children }) {
         }
 
         console.warn(`Se eliminaron los datos de autenticación por: ${rason} a las ${new Date().toLocaleString()}`);
-
-        AuthService.logout()
-            .finally(() => {
-                localStorage.removeItem('token');
-            });
+        if(callToLogout){
+            AuthService.logout()
+                .finally(() => {
+                    localStorage.removeItem('token');
+                });
+        }
 
         setAuthData(defaultData);
         localStorage.removeItem('authData');
