@@ -29,7 +29,6 @@ const Domicilio = ({ hidden, staticData }) => {
             validatePattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s,.]{2,50}$"
             validationMessage="Ingresa un nombre de calle válido (2-50 caracteres, solo letras, números, espacios, puntos y comas)"
             containerClassName="sm:col-span-3"
-            required
           />
 
           {/* Campo Número */}
@@ -41,7 +40,6 @@ const Domicilio = ({ hidden, staticData }) => {
             labelText="Número"
             validatePattern="^[0-9]{1,9}[a-zA-Z]?$"
             validationMessage="Ingresa un número válido (ej: 1234, 123A)"
-            required
           />
 
           {/* Campo Piso (opcional) */}

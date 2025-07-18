@@ -31,7 +31,6 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id, 
                             validatePattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s,.]{2,50}$"
                             validationMessage="Ingresa un nombre de calle válido (2-50 caracteres, solo letras, espacios, puntos y comas)"
                             containerClassName="sm:col-span-3"
-                            required
                         />
 
                         {/* Campo Número */}
@@ -44,7 +43,6 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id, 
                             value={domicilio?.domicilio_numero || ''}
                             validatePattern="^[0-9]{1,9}[a-zA-Z]?$"
                             validationMessage="Ingresa un número válido (ej: 1234, 123A)"
-                            required
                         />
 
                         {/* Campo Piso (opcional) */}
