@@ -39,6 +39,16 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
 
     const { removeAuthData } = useAuthContext();
 
+    useEffect(() => {
+        setInternalMin(min || (type === "date" ? minDate : undefined));
+        setInternalMax(max || (type === "date" ? maxDate : undefined));
+        if (!inputRef.current) return;
+        const input = inputRef.current;
+        input.min = min;
+        input.max = max;
+    }, [min, max]);
+    
+
     const handleBlur = () => {
         const input = inputRef.current;
         if(!input)return;
@@ -75,6 +85,23 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
         const oldCheck = inputRef.current.checkValidity.bind(inputRef.current);
 
         inputRef.current.checkValidity = () => {
+            console.warn(`
+                validatePattern: ${validatePattern}
+                input.pattern: ${input.pattern}
+                type: ${type}
+                input.type: ${input.type}
+                required: ${required}
+                input.required: ${input.required}
+                id: ${id}
+                input.id: ${input.id}
+                input.name: ${input.name}
+                maxLength: ${maxLength}
+                input.maxLength: ${input.maxLength}
+                min: ${min}
+                input.min: ${input.min}
+                max: ${max}
+                input.max: ${input.max}
+                `);
             //Si el patron del input es diferente al del validatePattern
             if (validatePattern && (input.pattern !== validatePattern) 
                 //Si el type difiere de la que se le dio al input al principio exceptuando  si es en el caso q se cambie password a text
@@ -94,10 +121,10 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
                 //Forzamos el patron de nuevo, en caso de que no se pueda recargar la pagina
                 input.pattern = validatePattern;
                 input.type = type;
-                setInternalValue("");
-                input.value = "";
-                removeAuthData("Alteracion de formularios");
-                alert(`No, eso no funcionara, Atras espiritu del mal`);
+                //setInternalValue("");
+                //input.value = "";
+                //removeAuthData("Alteracion de formularios");
+                //alert(`No, eso no funcionara, Atras espiritu del mal`);
                 //Recargamos la pagina para que se aplique el nuevo patron
                 window.location.href = "/auth/login";
             }
