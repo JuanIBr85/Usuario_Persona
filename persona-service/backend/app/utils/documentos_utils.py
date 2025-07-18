@@ -57,5 +57,5 @@ def validar_documento_por_tipo(tipo_documento: str, numero: str) -> bool | int:
         return False
 
     if tipo_documento in {"CUIT", "CUIL"}:
-        return True if validar_cuit(numero) else 0
+        return True if validar_cuit(numero) else -4
     return True
