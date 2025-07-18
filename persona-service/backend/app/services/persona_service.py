@@ -1,4 +1,5 @@
 from datetime import date, datetime, timezone, timedelta
+import logging
 from flask import jsonify
 from flask_jwt_extended import create_access_token
 from marshmallow import ValidationError
@@ -583,13 +584,19 @@ class PersonaService(IPersonaInterface):
                 .filter(
                     Persona.tipo_documento == tipo_documento,
                     Persona.num_doc_persona == num_doc_persona,
-                    Persona.deleted_at.is_(None),
+                    #Persona.deleted_at.is_(None),
                     Persona.usuario_id.is_(None),
                 )
                 .first()
             )
             if not persona:
                 return False, None, None
+            
+            if persona.deleted_at is not None:
+                persona.deleted_at = None
+                session.commit()
+                logging.info(f"Restauracion de la persona con documento {num_doc_persona}")
+                
             return True, persona.contacto.email_contacto, persona.id_persona
         finally:
             session.close()
