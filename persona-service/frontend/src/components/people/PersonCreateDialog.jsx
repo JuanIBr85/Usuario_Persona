@@ -318,15 +318,12 @@ function PersonCreateDialog({
               <SimpleSelect
                 name="red_social_nombre"
                 label="Red social"
-                value={newUser.red_social_nombre || ""}
+                value={newUser.red_social_nombre || redesSociales[0] || ""}
                 placeholder="Selecciona una red social"
                 onValueChange={(value) =>
                   handleChange({ target: { name: "red_social_nombre", value } })
                 }
               >
-                <SelectItem key="ninguna" value="ninguna">
-                  Ninguna
-                </SelectItem>
                 {redesSociales.map((rs) => (
                   <SelectItem key={rs} value={rs}>
                     {rs}
@@ -335,15 +332,19 @@ function PersonCreateDialog({
               </SimpleSelect>
 
               {newUser.red_social_nombre &&
-                newUser.red_social_nombre !== "ninguna" && (
+                newUser.red_social_nombre !== redesSociales[0] && (
                   <InputValidate
                     id="red_social_contacto"
                     name="red_social_contacto"
                     maxLength={50}
                     type="text"
                     labelText={`Usuario de ${newUser.red_social_nombre}`}
-                    value={newUser.red_social_contacto || "ninguna"}
-                    disabled={!newUser.red_social_nombre}
+                    value={newUser.red_social_contacto || ""}
+                    onChange={handleChange}
+                    disabled={
+                      !newUser.red_social_nombre ||
+                      newUser.red_social_nombre === redesSociales[0]
+                    }
                   />
                 )}
             </ResponsiveColumnForm>
