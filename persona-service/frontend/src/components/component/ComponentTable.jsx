@@ -156,7 +156,7 @@ function ComponentTable({ data, setData }) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>ID</TableHead>
+            {/*<TableHead>ID</TableHead>*/}
             <TableHead>Nombre del Servicio</TableHead>
             <TableHead>Descripción</TableHead>
             <TableHead>URL</TableHead>
@@ -170,9 +170,9 @@ function ComponentTable({ data, setData }) {
           {data && data.length > 0 ? (
             data.map((service) => (
               <TableRow key={service.id_service}>
-                <TableCell className="font-medium">
+                {/*<TableCell className="font-medium">
                   {service.id_service}
-                </TableCell>
+                </TableCell>*/}
                 <TableCell>{service.service_name}</TableCell>
                 <TableCell>{service.service_description}</TableCell>
                 <TableCell>{service.service_url}</TableCell>

@@ -10,7 +10,7 @@ function ServiceCard({ service, onToggleAvailable, onRemove }) {
         <CardTitle>{service.service_name}</CardTitle>
       </CardHeader>
       <CardContent>
-        <p><strong>ID:</strong> {service.id_service}</p>
+        {/* <p><strong>ID:</strong> {service.id_service}</p> */}
         <p><strong>Descripción:</strong> {service.service_description}</p>
         <p><strong>URL:</strong> {service.service_url}</p>
         <p>
