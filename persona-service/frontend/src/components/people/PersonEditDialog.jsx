@@ -53,11 +53,9 @@ function PersonEditDialog({
       ? "none"
       : String(editingUser.usuario_id);
 
-  // Calcular fecha máxima para mayores de 17 años
   const seventeenYearsAgo = new Date();
   seventeenYearsAgo.setFullYear(seventeenYearsAgo.getFullYear() - 17);
   const maxDate = seventeenYearsAgo.toISOString().slice(0, 10);
-
 
   return (
     <Dialog open={!!editingUser} onOpenChange={(open) => !open && setEditingUser(null)}>

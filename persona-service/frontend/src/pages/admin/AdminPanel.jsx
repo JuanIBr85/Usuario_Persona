@@ -13,6 +13,7 @@ import { Fade } from "react-awesome-reveal";
 import { isAdmin } from "@/context/AuthContext";
 import { useAuthContext } from "@/context/AuthContext";
 import { hasAccess } from "@/routes/AuthRouteConfig";
+import ResponsiveColumnForm from "@/components/ResponsiveColumnForm";
 /**
  * Lista de opciones disponibles en el panel de administración.
  * Cada opción incluye un título, una descripción, un ícono y la ruta correspondiente.

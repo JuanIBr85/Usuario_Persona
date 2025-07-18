@@ -9,11 +9,9 @@ import ResponsiveColumnForm from '@/components/ResponsiveColumnForm';
 const DatosPersonales = ({ hidden, staticData, documento }) => {
   const [tipoDoc, setTipoDoc] = useState(Object.keys(staticData.tipos_documento)[0] || '');
 
-  // Calcular fecha máxima para mayores de 17 años
   const seventeenYearsAgo = new Date();
   seventeenYearsAgo.setFullYear(seventeenYearsAgo.getFullYear() - 17);
   const maxDate = seventeenYearsAgo.toISOString().slice(0, 10);
-
 
   return (
     <div className="space-y-4" hidden={hidden}>

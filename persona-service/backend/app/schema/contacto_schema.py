@@ -23,10 +23,25 @@ class ContactoSchema(BaseSchema):
     red_social_nombre=fields.Str(allow_none=True, required=False, validate=permitir_vacios(REDES_SOCIALES_VALIDAS))
     email_contacto=fields.Str(required=True, 
             validate = [
+<<<<<<< HEAD
                 validate.Length(min=1, error="El email no puede estar vacío"),
                 Email(error="Formato de email inválido")
             ])
     observacion_contacto=fields.Str(validate = validar_referencias)
+=======
+                validate.Regexp(
+                    r"^[^+\s]+@[^\s@]+\.[^\s@]+$",
+                    error="El email no puede contener espacios ni alias"  
+                ),
+                validate.Length(min=1, error="El email no puede estar vacío.")   
+            ],
+            error_messages={
+                "required": "El email es obligatorio.",
+                "invalid": "Debe ser un email válido."
+            }
+    )
+    observacion_contacto=fields.Str(validate=Length(max=1000))
+>>>>>>> e4e1932116adcfb966fe7dc68ce1d9bfea0bb4e3
 
     created_at=fields.DateTime(dump_only=True)
     updated_at=fields.DateTime(dump_only=True)

@@ -1,5 +1,6 @@
 from marshmallow import Schema, fields, validate,ValidationError,validates_schema,pre_load
-
+import logging
+logger = logging.getLogger(__name__)
 """
 Schema: UsuarioInputSchema
 
@@ -49,7 +50,28 @@ class UsuarioInputSchema(Schema):
         ],
         error_messages={"required": "La contraseña es obligatoria."}
     )
+    password_repeat = fields.Str(
+            load_only=True, 
+            required=False, 
+            validate=[
+                validate.Length(min=6,max=72, error="La contraseña debe tener entre 6 y 72 caracteres."),
+                validate.Regexp(
+                        regex=r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$",
+                        error="La contraseña debe contener al menos una letra minúscula, una letra mayúscula, " \
+                        "un número y un símbolo."
+                )
+            ],
+            error_messages={"required": "La contraseña es obligatoria."}
+        )
     
+    @validates_schema
+    def validate_passwords_match(self, data, **kwargs):
+        password = data.get("password")
+        password_repeat = data.get("password_repeat")
+        logger.warning(f"→ Validando contraseñas: password={repr(password)}, password_repeat={repr(password_repeat)}")
+        if data.get("password") != data.get("password_repeat"):
+            raise ValidationError("Las contraseñas no coinciden.", field_name="password_repeat")
+        
     # Solo para devolver si querés mostrar timestamps
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
@@ -263,7 +285,7 @@ class UsuarioEliminarSchema(Schema):
             ],
             error_messages={"required": "La contraseña es obligatoria."}
         )
-        
+
         @pre_load
         def lower_case_fields(self, data, **kwargs):
             if "email_usuario" in data and isinstance(data["email_usuario"], str):

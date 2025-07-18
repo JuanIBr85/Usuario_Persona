@@ -4,6 +4,13 @@ import { Label } from '@/components/ui/label'
 import { useEffect } from 'react'
 import { EyeOff, Eye, EyeClosed } from 'lucide-react'
 import { useAuthContext } from '@/context/AuthContext';
+
+// Calcular fecha máxima para mayores de 17 años
+const seventeenYearsAgo = new Date();
+seventeenYearsAgo.setFullYear(seventeenYearsAgo.getFullYear() - 17);
+const maxDate = seventeenYearsAgo.toISOString().slice(0, 10);
+const minDate = "1905-01-01"
+
 /**
  * Componente de input con validación personalizada y funcionalidad para mostrar/ocultar contraseñas.
  *
@@ -16,21 +23,36 @@ import { useAuthContext } from '@/context/AuthContext';
  * @param {Object} props - Props adicionales que serán pasadas al componente <Input>.
  * @param {string} containerClassName - Clases adicionales para el contenedor del input.
  */
-export default function InputValidate({ id, type, placeholder, labelText, validatePattern, validationMessage, value = "", containerClassName, onChange, required, iconInput, cleanRegex = /[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ0-9\s\-_.,'()]/g, cleanEmailRegex = /[^a-zA-Z0-9@._-]/g, cleanTelRegex = /[^0-9\s\-\(\)\+]/g, cleanUrlRegex = /[^a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]/g, isCleanValue = true, maxLength=50, ...props }) {
+export default function InputValidate({ id, type, placeholder, labelText, validatePattern, validationMessage, value = "", containerClassName, onChange, required=false, iconInput, cleanRegex = /[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ0-9\s\-_.,'()]/g, cleanEmailRegex = /[^a-zA-Z0-9@._-]/g, cleanTelRegex = /[^0-9\s\-\(\)\+]/g, cleanUrlRegex = /[^a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]/g, isCleanValue = true, maxLength=50, min, max, ...props }) {
     //Este estado sirve para indicar si hubo un error en la validacion del input
     const [error, setError] = React.useState(false)
     //Este estado sirve para indicar si debe o no ocultar la contraseña
     const [showPassword, setShowPassword] = React.useState(false);
     const inputRef = React.useRef(null)
 
-    const [internalValue, setInternalValue] = React.useState(value || '')
+    const [internalMin, setInternalMin] = React.useState(min || (type === "date" ? minDate : undefined));
+    const [internalMax, setInternalMax] = React.useState(max || (type === "date" ? maxDate : undefined));
+    const [internalPattern, setInternalPattern] = React.useState(validatePattern);
+    const [internalValue, setInternalValue] = React.useState(value || '');
 
     const [isInit, setIsInit] = React.useState(false);
 
     const { removeAuthData } = useAuthContext();
 
-    const handleBlur = () => {
-        const input = inputRef.current;
+    useEffect(() => {
+        setInternalMin(min || (type === "date" ? minDate : undefined));
+        setInternalMax(max || (type === "date" ? maxDate : undefined));
+    }, [min, max]);
+
+    useEffect(() => {
+        if(!validatePattern)return;
+        setInternalPattern(validatePattern);
+        if(inputRef.current)inputRef.current.pattern = validatePattern;
+        if(isInit)handleBlur({target: inputRef.current});
+    }, [validatePattern]);
+
+    const handleBlur = (event) => {
+        const input = event.target;
         if(!input)return;
 
         let value = input.value?.trim();
@@ -62,23 +84,26 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
     useEffect(() => {
         if(!inputRef.current)return;
         const input = inputRef.current;
-        const oldCheck = inputRef.current.checkValidity.bind(inputRef.current);
+        const oldCheck = HTMLInputElement.prototype.checkValidity.bind(input);
 
         inputRef.current.checkValidity = () => {
+            if(internalPattern){
+                input.pattern = internalPattern;
+            }
             //Si el patron del input es diferente al del validatePattern
-            if (validatePattern && (input.pattern !== validatePattern) 
-                //Si el type difiere de la que se le dio al input al principio exceptuando  si es en el caso q se cambie password a text
-                || (input.type !== type && !(type === "password" && input.type === "text"))
+            if ( (type && (input.type !== type && !(type === "password" && input.type === "text")))
                 //Si el required difiere de la que se le dio al input al principio
                 || (required && (input.required !== required))
                 //Si el id o name difiere de la que se le dio al input al principio
-                || (input.id !== id || input.name !== id)
+                || (id && (input.id !== id || input.name !== id))
                 //Si el maxlength difiere de la que se le dio al input al principio
-                || (input.maxLength !== maxLength)
+                || (maxLength && (input.maxLength !== maxLength))
+                //Si el min difiere de la que se le dio al input al principio
+                || (min && (input.min !== internalMin))
+                //Si el max difiere de la que se le dio al input al principio
+                || (max && (input.max !== internalMax))
             ) {
-                
                 //Forzamos el patron de nuevo, en caso de que no se pueda recargar la pagina
-                input.pattern = validatePattern;
                 input.type = type;
                 setInternalValue("");
                 input.value = "";
@@ -90,7 +115,7 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
             return oldCheck();
         }
 
-    }, [inputRef]);
+    }, [inputRef, internalPattern]);
 
     useEffect(() => {
         setInternalValue(value)
@@ -124,12 +149,14 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
                     id={id}
                     name={id}
                     placeholder={placeholder}
-                    pattern={validatePattern}
+                    pattern={internalPattern}
                     data-validation-message={validationMessage}
                     value={internalValue}
                     onBlur={handleBlur}
                     ref={inputRef}
                     maxLength={maxLength}
+                    min={internalMin}
+                    max={internalMax}
                     required={required}
                     {...props} />
                 {//Si el input es de tipo contraseña mostrara un boton para ver/ocultar la contraseña

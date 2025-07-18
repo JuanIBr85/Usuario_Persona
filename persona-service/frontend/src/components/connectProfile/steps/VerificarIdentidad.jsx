@@ -1,14 +1,14 @@
 import InputValidate from "@/components/inputValidate/InputValidate";
 import { Button } from "@/components/ui/button";
+import ResponsiveColumnForm from "@/components/ResponsiveColumnForm";
 
 export function VerificarIdentidad({ formRef, setDialog, onSubmit }) {
   const today = new Date().toISOString().slice(0, 10);
   
-  console.log(today)
   return (
     <form onSubmit={onSubmit} ref={formRef}>
       <div className="flex flex-col gap-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <ResponsiveColumnForm>
           <InputValidate
             id="nombre_persona"
             name="nombre_persona"
@@ -27,8 +27,8 @@ export function VerificarIdentidad({ formRef, setDialog, onSubmit }) {
             cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
             required
           />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        </ResponsiveColumnForm>
+        <ResponsiveColumnForm>
           <InputValidate
             id="fecha_nacimiento_persona"
             name="fecha_nacimiento_persona"
@@ -50,7 +50,7 @@ export function VerificarIdentidad({ formRef, setDialog, onSubmit }) {
             validationMessage="Ingresa un número de teléfono válido"
             required
           />
-        </div>
+        </ResponsiveColumnForm>
         <Button
           type="submit"
           className="w-full"

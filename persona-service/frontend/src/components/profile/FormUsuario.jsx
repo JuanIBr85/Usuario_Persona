@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; import { Switch } from "@/components/ui/switch"
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import InputValidate from "@/components/inputValidate/InputValidate";
 import { SimpleDialog } from "@/components/SimpleDialog";
@@ -17,6 +17,7 @@ import Loading from "@/components/loading/Loading";
 import { AuthService } from "@/services/authService";
 import { formSubmitJson } from "@/utils/formUtils";
 import { useAuthContext } from "@/context/AuthContext";
+import ResponsiveColumnForm from "@/components/ResponsiveColumnForm";
 
 
 
@@ -166,8 +167,8 @@ export default function FormUsuario() {
     <>
       {loading && <Loading isFixed />}
 
-      <div className="w-full max-w-md mx-auto space-y-4 px-4">
-        <div className="space-y-3 pt-4">
+      <div className="min-h-69 space-y-4">
+        <ResponsiveColumnForm>
           <InputValidate
             id="info_nombre_usuario"
             type="text"
@@ -184,7 +185,7 @@ export default function FormUsuario() {
             className="bg-gray-100 cursor-not-allowed w-full"
             readOnly
           />
-        </div>
+        </ResponsiveColumnForm>
         <div className="flex flex-col gap-3 pt-4">
           <Button onClick={requestOtp}>Cambiar Contraseña</Button>
 
@@ -203,7 +204,7 @@ export default function FormUsuario() {
             Eliminar Cuenta
           </Button>
         </div>
-      </div>
+      </div >
 
       {/* ─────────── Diálogos ─────────── */}
 

@@ -50,7 +50,7 @@ function Sign() {
     const formData = await formSubmitJson(event); // Convierte los datos del formulario a JSON
     
     // Eliminar el campo password_repeat que el backend no reconoce
-    delete formData.password_repeat;
+    //delete formData.password_repeat;
     
     document.activeElement.blur();
     setIsLoading(true);
