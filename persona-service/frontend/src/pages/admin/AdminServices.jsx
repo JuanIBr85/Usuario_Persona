@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { Home, ShieldUser } from "lucide-react";
+import { Home, ShieldUser, MonitorCog, MonitorCheck } from "lucide-react";
 import { Fade } from "react-awesome-reveal";
 
 import {
@@ -50,11 +50,13 @@ function AdminServices() {
 
   const options = [
     {
+      icon : <MonitorCheck className="w-6 h-6" />,
       title: "Servicios Disponibles",
       description: "Controlar el servicio de componentes",
       path: "/adminservices/components",
     },
     {
+      icon : <MonitorCog className="w-6 h-6" />,
       title: "Monitoreo de Servicios",
       description: "Iniciar y controlar el análisis de servicios registrados.",
       path: "/adminservices/endpoints-research",
@@ -76,7 +78,7 @@ function AdminServices() {
                 onClick={() => navigate(opt.path)}
               >
                 <CardHeader>
-                  <CardTitle>{opt.title}</CardTitle>
+                  <CardTitle className="flex items-center gap-2">{opt.icon} {opt.title}</CardTitle>
                   <CardDescription>{opt.description}</CardDescription>
                 </CardHeader>
                 <CardFooter>
