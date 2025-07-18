@@ -9,6 +9,10 @@ import ResponsiveColumnForm from '@/components/ResponsiveColumnForm';
 const DatosPersonales = ({ hidden, staticData, documento }) => {
   const [tipoDoc, setTipoDoc] = useState(Object.keys(staticData.tipos_documento)[0] || '');
 
+  const seventeenYearsAgo = new Date();
+  seventeenYearsAgo.setFullYear(seventeenYearsAgo.getFullYear() - 17);
+  const maxDate = seventeenYearsAgo.toISOString().slice(0, 10);
+
   return (
     <div className="space-y-4" hidden={hidden}>
       <h3 className="text-lg font-medium">Datos Personales</h3>
@@ -57,6 +61,7 @@ const DatosPersonales = ({ hidden, staticData, documento }) => {
           labelText="Fecha de nacimiento"
           validationMessage="La fecha de nacimiento es requerida"
           required
+          max={maxDate}
         />
       </ResponsiveColumnForm>
     </div>

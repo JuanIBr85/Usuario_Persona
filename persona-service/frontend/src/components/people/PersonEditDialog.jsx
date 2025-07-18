@@ -53,6 +53,10 @@ function PersonEditDialog({
       ? "none"
       : String(editingUser.usuario_id);
 
+  const seventeenYearsAgo = new Date();
+  seventeenYearsAgo.setFullYear(seventeenYearsAgo.getFullYear() - 17);
+  const maxDate = seventeenYearsAgo.toISOString().slice(0, 10);
+
   return (
     <Dialog open={!!editingUser} onOpenChange={(open) => !open && setEditingUser(null)}>
       <DialogContent className="sm:max-w-[425px]">
@@ -126,6 +130,7 @@ function PersonEditDialog({
                 labelText="Fecha de Nacimiento"
                 value={editingUser.fecha_nacimiento || ""}
                 onChange={(e) => setEditingUser({ ...editingUser, fecha_nacimiento: e.target.value })}
+                max={maxDate}
               />
 
               <SimpleSelect
