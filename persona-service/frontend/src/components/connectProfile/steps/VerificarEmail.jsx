@@ -20,6 +20,7 @@ export function VerificarEmail({ formRef, email, onSubmit, onEmailIncorrecto, lo
         containerClassName="sm:col-span-3"
         validatePattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         validationMessage="Por favor, ingresa un correo electrónico válido."
+        maxLength={50}
         required
       />
       <Button type="submit" className="w-full" disabled={loading}>

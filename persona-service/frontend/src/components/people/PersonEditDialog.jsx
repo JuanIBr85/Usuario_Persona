@@ -118,7 +118,7 @@ function PersonEditDialog({
                 name="nro_documento"
                 type="text"
                 labelText="Número de Documento"
-                maxLength={20}
+                maxLength={13}
                 value={editingUser.nro_documento || ""}
                 validatePattern={tiposDocumentos[tipoDoc]}
                 validationMessage="Número de documento inválido"

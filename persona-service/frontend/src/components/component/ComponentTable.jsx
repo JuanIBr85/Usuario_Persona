@@ -324,6 +324,7 @@ function ComponentTable({ data, setData }) {
                   <InputValidate
                     id="newService_url"
                     type="url"
+                    maxLength={100}
                     placeholder="https://example:port"
                     labelText="URL del servicio"
                     validatePattern="^https?:\/\/(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(?:\/[^\s]*)?$"

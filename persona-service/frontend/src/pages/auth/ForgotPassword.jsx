@@ -96,6 +96,7 @@ function ForgotPassword() {
             id="email"
             type="email"
             placeholder="Email"
+            maxLength={50}
             labelText="Email"
             validationMessage="Email inválido"
             required

@@ -26,6 +26,7 @@ export function Documento({ formRef, tipoDocumento, onSubmit, loading }) {
         name="num_doc_persona"
         type="text"
         value=""
+        maxLength={13}
         labelText="Ingresa el número de documento"
         placeholder="Nº de documento"
         validatePattern={tipoDocumento[tipoDoc]}

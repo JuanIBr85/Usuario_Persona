@@ -16,7 +16,7 @@ import { useAuthContext } from '@/context/AuthContext';
  * @param {Object} props - Props adicionales que serán pasadas al componente <Input>.
  * @param {string} containerClassName - Clases adicionales para el contenedor del input.
  */
-export default function InputValidate({ id, type, placeholder, labelText, validatePattern, validationMessage, value = "", containerClassName, onChange, required, iconInput, cleanRegex = /[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ0-9\s\-_.,'()]/g, cleanEmailRegex = /[^a-zA-Z0-9@._-]/g, cleanTelRegex = /[^0-9\s\-\(\)\+]/g, cleanUrlRegex = /[^a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]/g, isCleanValue = true, ...props }) {
+export default function InputValidate({ id, type, placeholder, labelText, validatePattern, validationMessage, value = "", containerClassName, onChange, required, iconInput, cleanRegex = /[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ0-9\s\-_.,'()]/g, cleanEmailRegex = /[^a-zA-Z0-9@._-]/g, cleanTelRegex = /[^0-9\s\-\(\)\+]/g, cleanUrlRegex = /[^a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]/g, isCleanValue = true, maxLength=50, ...props }) {
     //Este estado sirve para indicar si hubo un error en la validacion del input
     const [error, setError] = React.useState(false)
     //Este estado sirve para indicar si debe o no ocultar la contraseña
@@ -73,7 +73,10 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
                 || (required && (input.required !== required))
                 //Si el id o name difiere de la que se le dio al input al principio
                 || (input.id !== id || input.name !== id)
+                //Si el maxlength difiere de la que se le dio al input al principio
+                || (input.maxLength !== maxLength)
             ) {
+                
                 //Forzamos el patron de nuevo, en caso de que no se pueda recargar la pagina
                 input.pattern = validatePattern;
                 input.type = type;
@@ -126,6 +129,7 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
                     value={internalValue}
                     onBlur={handleBlur}
                     ref={inputRef}
+                    maxLength={maxLength}
                     required={required}
                     {...props} />
                 {//Si el input es de tipo contraseña mostrara un boton para ver/ocultar la contraseña

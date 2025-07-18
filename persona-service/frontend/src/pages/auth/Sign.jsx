@@ -103,6 +103,7 @@ function Sign() {
             id="email_usuario"
             type="email"
             placeholder="Email"
+            maxLength={50}
             labelText="Email"
             validationMessage="Email inválido"
             required
@@ -112,6 +113,7 @@ function Sign() {
           <InputValidate
             id="nombre_usuario"
             type="text"
+            maxLength={20}
             cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
             placeholder="Nombre de usuario"
             labelText="Nombre"
@@ -124,6 +126,7 @@ function Sign() {
           <InputValidate
             id="password"
             type="password"
+            maxLength={70}
             isCleanValue={false}
             placeholder="Contraseña"
             labelText="Contraseña"
@@ -138,6 +141,7 @@ function Sign() {
             id="password_repeat"
             name="password_repeat" 
             type="password"
+            maxLength={70}
             isCleanValue={false}
             placeholder="Repetir contraseña"
             labelText="Repetir contraseña"

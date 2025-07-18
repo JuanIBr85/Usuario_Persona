@@ -224,6 +224,7 @@ export default function FormUsuario() {
             <InputValidate
               id="email"
               type="email"
+              maxLength={50}
               labelText="Correo"
               placeholder="Ingresa tu correo"
               defaultValue={authData.user.email_usuario || ""}
@@ -233,6 +234,7 @@ export default function FormUsuario() {
             <InputValidate
               id="password"
               type="password"
+              maxLength={70}
               isCleanValue={false}
               labelText="Contraseña"
               placeholder="Ingresa tu contraseña"
@@ -276,6 +278,7 @@ export default function FormUsuario() {
             <InputValidate
               id="nombre_usuario"
               type="text"
+              maxLength={20}
               labelText="Nuevo nombre"
               cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
               placeholder="Ingresa el nuevo nombre"
@@ -311,7 +314,7 @@ export default function FormUsuario() {
               type="email"
               labelText="Nuevo correo"
               placeholder="Ingresa tu nuevo correo"
-
+              maxLength={50}
               validationMessage="Email inválido"
               required
             />
@@ -321,6 +324,7 @@ export default function FormUsuario() {
               isCleanValue={false}
               labelText="Contraseña"
               placeholder="Ingresa tu contraseña"
+              maxLength={70}
               required
             />
             <AlertDialogFooter>

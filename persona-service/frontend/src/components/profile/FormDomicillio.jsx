@@ -23,6 +23,7 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id, 
                         {/* Campo Calle */}
                         <InputValidate
                             id="domicilio_calle"
+                            maxLength={50}
                             type="text"
                             placeholder="Ingresa el nombre de la calle"
                             labelText="Calle"
@@ -36,6 +37,7 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id, 
                         {/* Campo Número */}
                         <InputValidate
                             id="domicilio_numero"
+                            maxLength={10}
                             type="text"
                             placeholder="Número de domicilio"
                             labelText="Número"
@@ -48,6 +50,7 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id, 
                         {/* Campo Piso (opcional) */}
                         <InputValidate
                             id="domicilio_piso"
+                            maxLength={3}
                             type="text"
                             placeholder="Piso (opcional)"
                             labelText="Piso"
@@ -59,6 +62,7 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id, 
                         {/* Campo Departamento (opcional) */}
                         <InputValidate
                             id="domicilio_dpto"
+                            maxLength={2}
                             type="text"
                             placeholder="Departamento (opcional)"
                             labelText="Departamento"
@@ -72,6 +76,7 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id, 
                         {/* Campo Código Postal */}
                         <InputValidate
                             id="codigo_postal"
+                            maxLength={8}
                             type="text"
                             placeholder="Código postal"
                             labelText={<>Código Postal<a href="https://www.correoargentino.com.ar/formularios/cpa" target="_blank" className="text-indigo-600 hover:underline cursor-pointer">¿no sabés el código?</a></>}
@@ -100,6 +105,7 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id, 
                     <InputValidate
                         id="domicilio_referencia"
                         type="text"
+                        maxLength={200}
                         placeholder="Referencia (ej: Entre Calles X e Y)"
                         labelText="Referencia"
                         value={domicilio?.domicilio_referencia || ''}

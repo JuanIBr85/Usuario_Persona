@@ -53,6 +53,7 @@ export default function FormContacto({
               id="telefono_fijo"
               name="telefono_fijo"
               type="tel"
+              maxLength={20}
               placeholder="Ingresa tu teléfono fijo"
               labelText="Teléfono Fijo"
               value={contacto?.telefono_fijo || ""}
@@ -63,6 +64,7 @@ export default function FormContacto({
               id="telefono_movil"
               name="telefono_movil"
               type="tel"
+              maxLength={20}
               placeholder="Ingresa tu teléfono móvil"
               labelText="Teléfono móvil"
               value={contacto?.telefono_movil || ""}
@@ -76,6 +78,7 @@ export default function FormContacto({
               id="red_social_contacto"
               name="red_social_contacto"
               type="text"
+              maxLength={50}
               cleanRegex={/[^a-zA-Z0-9@._-]/g}
               placeholder="Nombre del Usuario"
               labelText="Red social de contacto"
@@ -100,6 +103,7 @@ export default function FormContacto({
           <InputValidate
             id="email_contacto"
             type="email"
+            maxLength={50}
             labelText="Email de contacto"
             placeholder="Ingresa el email de contacto"
             validationMessage="Email inválido"
@@ -112,6 +116,7 @@ export default function FormContacto({
             labelText="Observación del contacto"
             placeholder="Ingresa una observación"
             value={contacto?.observacion_contacto || ""}
+            maxLength={300}
           />
         </div>
         <div className="flex flex-col gap-3 pt-4">
