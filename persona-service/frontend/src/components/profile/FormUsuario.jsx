@@ -210,7 +210,7 @@ export default function FormUsuario() {
       {/* eliminar cuenta */}
       <AlertDialog
         open={openDeleteDialog}
-        onOpenChange={setOpenDeleteDialog}   // 👈 más simple
+        onOpenChange={setOpenDeleteDialog}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
