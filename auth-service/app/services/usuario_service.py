@@ -1017,7 +1017,7 @@ class UsuarioService(ServicioBase):
 
         return usuario_data
 
-    def rotar_refresh_token(self, session: Session, jti_viejo: str, user_agent: str, ip: str) -> dict:
+    def rotar_refresh_token(self, session: Session, jti_viejo: str, id_usuario: int, user_agent: str, ip: str) -> dict:
         """
         Rota el refresh token del usuario, generando uno nuevo y revocando el anterior.
 
@@ -1034,16 +1034,18 @@ class UsuarioService(ServicioBase):
          dict: Tupla con estado (`ResponseStatus`), mensaje, diccionario con los nuevos tokens y código HTTP.
                En caso de error (usuario no encontrado), se retorna un mensaje de error y código 404.
         """
-        # Revocar el refresh token anterior
-        revocar_refresh_token(jti_viejo)
 
         usuario = (
             session.query(Usuario)
-            .filter_by(id_usuario=payload["sub"],eliminado=False)
+            .filter_by(id_usuario=id_usuario,eliminado=False)
             .first()
         )
 
         if not usuario:
             return ResponseStatus.FAIL, "Usuario no encontrado", None, 404
+        
+
+        # Revocar el refresh token anterior
+        revocar_refresh_token(jti_viejo)
 
         return self._get_token(usuario, session, user_agent, ip)
