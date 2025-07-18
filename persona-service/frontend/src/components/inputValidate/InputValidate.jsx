@@ -23,7 +23,7 @@ const minDate = "1905-01-01"
  * @param {Object} props - Props adicionales que serán pasadas al componente <Input>.
  * @param {string} containerClassName - Clases adicionales para el contenedor del input.
  */
-export default function InputValidate({ id, type, placeholder, labelText, validatePattern, validationMessage, value = "", containerClassName, onChange, required, iconInput, cleanRegex = /[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ0-9\s\-_.,'()]/g, cleanEmailRegex = /[^a-zA-Z0-9@._-]/g, cleanTelRegex = /[^0-9\s\-\(\)\+]/g, cleanUrlRegex = /[^a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]/g, isCleanValue = true, maxLength=50, min, max, ...props }) {
+export default function InputValidate({ id, type, placeholder, labelText, validatePattern, validationMessage, value = "", containerClassName, onChange, required=false, iconInput, cleanRegex = /[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ0-9\s\-_.,'()]/g, cleanEmailRegex = /[^a-zA-Z0-9@._-]/g, cleanTelRegex = /[^0-9\s\-\(\)\+]/g, cleanUrlRegex = /[^a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]/g, isCleanValue = true, maxLength=50, min, max, ...props }) {
     //Este estado sirve para indicar si hubo un error en la validacion del input
     const [error, setError] = React.useState(false)
     //Este estado sirve para indicar si debe o no ocultar la contraseña
@@ -32,7 +32,7 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
 
     const [internalMin, setInternalMin] = React.useState(min || (type === "date" ? minDate : undefined));
     const [internalMax, setInternalMax] = React.useState(max || (type === "date" ? maxDate : undefined));
-
+    const [internalPattern, setInternalPattern] = React.useState(validatePattern);
     const [internalValue, setInternalValue] = React.useState(value || '');
 
     const [isInit, setIsInit] = React.useState(false);
@@ -42,15 +42,17 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
     useEffect(() => {
         setInternalMin(min || (type === "date" ? minDate : undefined));
         setInternalMax(max || (type === "date" ? maxDate : undefined));
-        if (!inputRef.current) return;
-        const input = inputRef.current;
-        input.min = min;
-        input.max = max;
     }, [min, max]);
-    
 
-    const handleBlur = () => {
-        const input = inputRef.current;
+    useEffect(() => {
+        if(!validatePattern)return;
+        setInternalPattern(validatePattern);
+        inputRef.current.pattern = validatePattern;
+        if(isInit)handleBlur({target: inputRef.current});
+    }, [validatePattern]);
+
+    const handleBlur = (event) => {
+        const input = event.target;
         if(!input)return;
 
         let value = input.value?.trim();
@@ -82,30 +84,12 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
     useEffect(() => {
         if(!inputRef.current)return;
         const input = inputRef.current;
-        const oldCheck = inputRef.current.checkValidity.bind(inputRef.current);
+        const oldCheck = HTMLInputElement.prototype.checkValidity.bind(input);
 
         inputRef.current.checkValidity = () => {
-            console.warn(`
-                validatePattern: ${validatePattern}
-                input.pattern: ${input.pattern}
-                type: ${type}
-                input.type: ${input.type}
-                required: ${required}
-                input.required: ${input.required}
-                id: ${id}
-                input.id: ${input.id}
-                input.name: ${input.name}
-                maxLength: ${maxLength}
-                input.maxLength: ${input.maxLength}
-                min: ${min}
-                input.min: ${input.min}
-                max: ${max}
-                input.max: ${input.max}
-                `);
+            
             //Si el patron del input es diferente al del validatePattern
-            if (validatePattern && (input.pattern !== validatePattern) 
-                //Si el type difiere de la que se le dio al input al principio exceptuando  si es en el caso q se cambie password a text
-                || (type && (input.type !== type && !(type === "password" && input.type === "text")))
+            if ( (type && (input.type !== type && !(type === "password" && input.type === "text")))
                 //Si el required difiere de la que se le dio al input al principio
                 || (required && (input.required !== required))
                 //Si el id o name difiere de la que se le dio al input al principio
@@ -117,21 +101,21 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
                 //Si el max difiere de la que se le dio al input al principio
                 || (max && (input.max !== internalMax))
             ) {
-                
+                console.warn(``)
                 //Forzamos el patron de nuevo, en caso de que no se pueda recargar la pagina
-                input.pattern = validatePattern;
-                input.type = type;
+                //input.pattern = internalPattern;
+                //input.type = type;
                 //setInternalValue("");
                 //input.value = "";
                 //removeAuthData("Alteracion de formularios");
                 //alert(`No, eso no funcionara, Atras espiritu del mal`);
                 //Recargamos la pagina para que se aplique el nuevo patron
-                window.location.href = "/auth/login";
+                //window.location.href = "/auth/login";
             }
             return oldCheck();
         }
 
-    }, [inputRef]);
+    }, [inputRef, internalPattern]);
 
     useEffect(() => {
         setInternalValue(value)
@@ -165,7 +149,7 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
                     id={id}
                     name={id}
                     placeholder={placeholder}
-                    pattern={validatePattern}
+                    pattern={internalPattern}
                     data-validation-message={validationMessage}
                     value={internalValue}
                     onBlur={handleBlur}
