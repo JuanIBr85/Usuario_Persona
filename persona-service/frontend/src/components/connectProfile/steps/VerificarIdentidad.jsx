@@ -14,12 +14,14 @@ export function VerificarIdentidad({ formRef, setDialog, onSubmit }) {
             name="nombre_persona"
             type="text"
             labelText="Nombre"
+            maxLength={50}
             cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
             required
           />
           <InputValidate
             id="apellido_persona"
             name="apellido_persona"
+            maxLength={50}
             type="text"
             labelText="Apellido"
             cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
@@ -40,6 +42,7 @@ export function VerificarIdentidad({ formRef, setDialog, onSubmit }) {
           <InputValidate
             id="telefono_movil"
             name="telefono_movil"
+            maxLength={20}
             type="tel"
             placeholder="Ingresa tu teléfono móvil"
             labelText="Teléfono móvil"

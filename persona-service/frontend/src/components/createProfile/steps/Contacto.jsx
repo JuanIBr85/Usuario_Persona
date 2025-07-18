@@ -12,6 +12,7 @@ const Contacto = ({hidden, staticData}) => (
         id="telefono_fijo"
         name="telefono_fijo"
         type="tel"
+        maxLength={20}
         placeholder="Ingresa tu teléfono fijo"
         labelText="Teléfono Fijo"
         validatePattern="^[\+]?[0-9\-\s\(\)]{10,}$"
@@ -21,6 +22,7 @@ const Contacto = ({hidden, staticData}) => (
         id="telefono_movil"
         name="telefono_movil"
         type="tel"
+        maxLength={20}
         placeholder="Ingresa tu teléfono móvil"
         labelText="Teléfono móvil"
         validatePattern="^[\+]?[0-9\-\s\(\)]{10,}$"
@@ -33,6 +35,7 @@ const Contacto = ({hidden, staticData}) => (
         id="red_social_contacto"
         name="red_social_contacto"
         type="text"
+        maxLength={50}
         placeholder="Nombre del Usuario"
         labelText="Red social de contacto"
         cleanRegex={/[^a-zA-Z0-9@._-]/g}
@@ -56,6 +59,7 @@ const Contacto = ({hidden, staticData}) => (
     <InputValidate
       id="email_contacto"
       type="email"
+      maxLength={50}
       labelText="Email de contacto"
       placeholder="Ingresa el email de contacto"
       validationMessage="Email inválido"
@@ -64,6 +68,7 @@ const Contacto = ({hidden, staticData}) => (
     <InputValidate
       id="observacion_contacto"
       type="text"
+      maxLength={300}
       labelText="Observación del contacto"
       placeholder="Ingresa una observación"
     />

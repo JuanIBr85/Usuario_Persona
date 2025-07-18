@@ -63,9 +63,9 @@ function ComponentDetails() {
             <CardDescription>{details.service_description}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
+            {/*<div>
               <span className="font-semibold">ID:</span> {details.id_service}
-            </div>
+            </div>*/}
             <div>
               <span className="font-semibold">URL:</span>{" "}
               <a

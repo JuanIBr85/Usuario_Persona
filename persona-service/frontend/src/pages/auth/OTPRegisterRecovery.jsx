@@ -169,6 +169,7 @@ function OTPRegisterRecovery() {
             id="email_usuario"
             type="email"
             placeholder="Email"
+            maxLength={50}
             labelText="Email"
             validationMessage="Email inválido"
             required

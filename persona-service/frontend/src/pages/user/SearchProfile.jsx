@@ -33,58 +33,58 @@ import { PersonaService } from '@/services/personaService';
  */
 
 const SearchProfile = () => {
-    const navigate = useNavigate();
-    const { updateUserData } = useAuthContext(); //para actualizar el contexto de usuario
-    const [loadingText, setLoadingText] = useState('Buscando perfil...');
+  const navigate = useNavigate();
+  const { updateUserData } = useAuthContext(); //para actualizar el contexto de usuario
+  const [loadingText, setLoadingText] = useState('Buscando perfil...');
 
-    useEffect(()=>{
-        PersonaService.persona_by_usuario().then((response)=>{
-            setLoadingText("Perfil encontrado");
-            updateUserData({
-                id_persona: response.data.id_persona,
-            });
+  useEffect(() => {
+    PersonaService.persona_by_usuario().then((response) => {
+      setLoadingText("Perfil encontrado");
+      updateUserData({
+        id_persona: response.data.id_persona,
+      });
 
-            // Limpieza de flags relacionados al proceso de espera
-            localStorage.removeItem("persona-esperando-admin");
-            localStorage.removeItem("persona-esperando-persona");
-            localStorage.removeItem("persona-esperando-admin-count");
+      // Limpieza de flags relacionados al proceso de espera
+      localStorage.removeItem("persona-esperando-admin");
+      localStorage.removeItem("persona-esperando-persona");
+      localStorage.removeItem("persona-esperando-admin-count");
 
-            //Si se esta esperando una redireccion, redirigira directamente hacia redirect,
-            //Para que este se encargue de redirigir al usuario a la pagina correcta
-            if(sessionStorage.getItem('_redirect')){
-                setLoadingText("Se encontro un codigo de redireccion");
-                setTimeout(() => navigate("/auth/redirect"), 500);
-            }else{
-                setTimeout(() => navigate('/profile'), 500);
-            }
-        })
-        .catch((error)=>{
-            setLoadingText("No se a completado los datos del perfil");
-            updateUserData({
-                id_persona: 0,
-            });
-            
-            //Si esta esperando a que un admin lo vincule lo mando a esperar
-            if(localStorage.getItem("persona-esperando-persona")){
-                const expirationTime = new Date();
-                expirationTime.setMinutes(expirationTime.getMinutes() + 1);
-                //expirationTime.setHours(expirationTime.getHours() + 1);
-                localStorage.setItem("persona-esperando-admin", expirationTime.toISOString());
-
-                navigate("/auth/waiting"); // Redirige a pantalla de espera
-                return;
-            }
-            // Si no está esperando, lo redirige a vinculación desde cero
-            setTimeout(() => navigate('/profileconnect'), 500);
+      //Si se esta esperando una redireccion, redirigira directamente hacia redirect,
+      //Para que este se encargue de redirigir al usuario a la pagina correcta
+      if (sessionStorage.getItem('_redirect')) {
+        setLoadingText("Se encontró un código de redirección");
+        setTimeout(() => navigate("/auth/redirect"), 500);
+      } else {
+        setTimeout(() => navigate('/profile'), 500);
+      }
+    })
+      .catch((error) => {
+        setLoadingText("No se han completado los datos del perfil");
+        updateUserData({
+          id_persona: 0,
         });
-    }, []);
 
-    return (
-        <div>
-            {/* Componente de carga centralizado */}
-            <Loading text={loadingText} isFixed></Loading>
-        </div>
-    );
+        //Si esta esperando a que un admin lo vincule lo mando a esperar
+        if (localStorage.getItem("persona-esperando-persona")) {
+          const expirationTime = new Date();
+          expirationTime.setMinutes(expirationTime.getMinutes() + 1);
+          //expirationTime.setHours(expirationTime.getHours() + 1);
+          localStorage.setItem("persona-esperando-admin", expirationTime.toISOString());
+
+          navigate("/auth/waiting"); // Redirige a pantalla de espera
+          return;
+        }
+        // Si no está esperando, lo redirige a vinculación desde cero
+        setTimeout(() => navigate('/profileconnect'), 500);
+      });
+  }, []);
+
+  return (
+    <div>
+      {/* Componente de carga centralizado */}
+      <Loading text={loadingText} isFixed></Loading>
+    </div>
+  );
 }
 
 export default SearchProfile;

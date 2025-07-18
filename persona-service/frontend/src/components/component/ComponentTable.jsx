@@ -156,7 +156,7 @@ function ComponentTable({ data, setData }) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>ID</TableHead>
+            {/*<TableHead>ID</TableHead>*/}
             <TableHead>Nombre del Servicio</TableHead>
             <TableHead>Descripción</TableHead>
             <TableHead>URL</TableHead>
@@ -170,9 +170,9 @@ function ComponentTable({ data, setData }) {
           {data && data.length > 0 ? (
             data.map((service) => (
               <TableRow key={service.id_service}>
-                <TableCell className="font-medium">
+                {/*<TableCell className="font-medium">
                   {service.id_service}
-                </TableCell>
+                </TableCell>*/}
                 <TableCell>{service.service_name}</TableCell>
                 <TableCell>{service.service_description}</TableCell>
                 <TableCell>{service.service_url}</TableCell>
@@ -324,6 +324,7 @@ function ComponentTable({ data, setData }) {
                   <InputValidate
                     id="newService_url"
                     type="url"
+                    maxLength={100}
                     placeholder="https://example:port"
                     labelText="URL del servicio"
                     validatePattern="^https?:\/\/(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(?:\/[^\s]*)?$"
@@ -357,7 +358,7 @@ function ComponentTable({ data, setData }) {
             {/* Botones de agregar y de detener el sistema */}
             <Button
               variant=""
-              className={"mt-5"}
+              className={"mt-5 cursor-pointer"}
               onClick={() => setInstallDialogOpen(true)}
             >
               {" "}
@@ -366,7 +367,7 @@ function ComponentTable({ data, setData }) {
             <Button
               disabled={isStopping}
               variant="destructive"
-              className={"mt-5"}
+              className={"mt-5 cursor-pointer"}
               onClick={() => {
                 setCountdown(3);
                 setCanStop(false);

@@ -107,6 +107,7 @@ function PersonEditDialog({
                 id="nombre_persona"
                 type="text"
                 labelText="Nombre"
+                maxLength={50}
                 cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
                 value={editingPerson.nombre_persona || ""}
                 required
@@ -116,6 +117,7 @@ function PersonEditDialog({
                 id="apellido_persona"
                 type="text"
                 labelText="Apellido"
+                maxLength={50}
                 cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
                 value={editingPerson.apellido_persona || ""}
                 required
@@ -146,6 +148,7 @@ function PersonEditDialog({
                 name="num_doc_persona"
                 type="text"
                 labelText="Nro. documento"
+                maxLength={13}
                 value={editingPerson.num_doc_persona || ""}
                 validatePattern={tiposDocumentos[tipoDoc]}
                 validationMessage="Número de documento inválido"
@@ -194,6 +197,7 @@ function PersonEditDialog({
                 id="email_contacto"
                 type="email"
                 labelText="Email"
+                maxLength={50}
                 value={editingPerson.contacto?.email_contacto || ""}
                 required
               />
@@ -203,6 +207,7 @@ function PersonEditDialog({
                 type="tel"
                 labelText="Teléfono móvil"
                 value={editingPerson.contacto?.telefono_movil || ""}
+                maxLength={20}
                 required
               />
             </ResponsiveColumnForm>
@@ -212,6 +217,7 @@ function PersonEditDialog({
                 id="telefono_fijo"
                 type="tel"
                 labelText="Teléfono fijo"
+                maxLength={20}
                 value={editingPerson.contacto?.telefono_fijo || ""}
               />
             </ResponsiveColumnForm>
@@ -226,6 +232,7 @@ function PersonEditDialog({
                 id="domicilio_calle"
                 type="text"
                 labelText="Calle"
+                maxLength={50}
                 value={editingPerson.domicilio?.domicilio_calle || ""}
               />
 
@@ -233,6 +240,7 @@ function PersonEditDialog({
                 id="domicilio_numero"
                 type="text"
                 labelText="Número"
+                maxLength={10}
                 value={editingPerson.domicilio?.domicilio_numero || ""}
               />
             </ResponsiveColumnForm>
@@ -242,6 +250,7 @@ function PersonEditDialog({
                 id="domicilio_piso"
                 type="text"
                 labelText="Piso"
+                maxLength={3}
                 value={editingPerson.domicilio?.domicilio_piso || ""}
               />
 
@@ -249,6 +258,7 @@ function PersonEditDialog({
                 id="domicilio_dpto"
                 type="text"
                 labelText="Departamento"
+                maxLength={2}
                 value={editingPerson.domicilio?.domicilio_dpto || ""}
               />
             </ResponsiveColumnForm>
@@ -258,7 +268,8 @@ function PersonEditDialog({
                 id="domicilio_referencia"
                 type="text"
                 labelText="Referencia"
-                value={editingPerson.domicilio?.domicilio_referencia || ""}
+                maxLength={200}
+                value={editingPerson.domicilio?.domicilio_referencia || ""} 
               />
             </ResponsiveColumnForm>
 
@@ -267,6 +278,7 @@ function PersonEditDialog({
                 id="codigo_postal"
                 type="text"
                 labelText="Código Postal"
+                maxLength={8}
                 value={editingPerson.domicilio?.domicilio_postal?.codigo_postal || ""}
                 onChange={handleChangePostal}
               />
@@ -317,6 +329,7 @@ function PersonEditDialog({
                 cleanRegex={/[^a-zA-Z0-9@._-]/g}
                 type="text"
                 labelText="Usuario de la red social"
+                maxLength={50}
                 value={editingPerson.contacto?.red_social_contacto || ""}
                 onChange={handleChange}
               />
@@ -328,6 +341,7 @@ function PersonEditDialog({
               type="button"
               variant="outline"
               onClick={() => setIsDialogOpen(false)}
+              className={"cursor-pointer"}
             >
               Cancelar
             </Button>

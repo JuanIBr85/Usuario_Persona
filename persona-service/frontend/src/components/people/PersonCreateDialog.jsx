@@ -59,11 +59,6 @@ function PersonCreateDialog({
   const [userSearch, setUserSearch] = useState("");
   const [tipoDoc, setTipoDoc] = useState(Object.keys(tiposDocumentos)[0] || "");
 
-  // Calcular fecha máxima para mayores de 17 años
-  const seventeenYearsAgo = new Date();
-  seventeenYearsAgo.setFullYear(seventeenYearsAgo.getFullYear() - 17);
-  const maxDate = seventeenYearsAgo.toISOString().slice(0, 10);
-
   const filteredUsuarios = useMemo(() => {
     if (!userSearch) return usuarios;
     return usuarios.filter(
@@ -103,7 +98,7 @@ function PersonCreateDialog({
                 labelText="Nombre(s)"
                 value={newUser.nombre || ""}
                 cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
-                maxLength={30}
+                maxLength={50}
                 required
                 validatePattern="^[A-Za-zÁÉÍÓÚÜáéíóúüÑñ'’ ]+$"
                 validationMessage="El nombre solo puede contener letras."
@@ -116,7 +111,7 @@ function PersonCreateDialog({
                 type="text"
                 labelText="Apellido(s)"
                 value={newUser.apellido || ""}
-                maxLength={30}
+                maxLength={50}
                 required
                 validatePattern="^[A-Za-zÁÉÍÓÚÜáéíóúüÑñ'’ ]+$"
                 validationMessage="El nombre solo puede contener letras."
@@ -147,6 +142,7 @@ function PersonCreateDialog({
                 name="nro_documento"
                 type="text"
                 labelText="Nro. documento"
+                maxLength={13}
                 value={newUser.nro_documento || ""}
                 validatePattern={tiposDocumentos[tipoDoc]}
                 validationMessage="Número de documento inválido"
@@ -162,8 +158,6 @@ function PersonCreateDialog({
                 labelText="Fecha de nacimiento"
                 value={newUser.fecha_nacimiento || ""}
                 required
-                max={maxDate}
-                min="1905-01-01"
               />
 
               {/* Select de usuario */}
@@ -208,7 +202,7 @@ function PersonCreateDialog({
               <InputValidate
                 id="domicilio_calle"
                 name="domicilio_calle"
-                maxLength={30}
+                maxLength={50}
                 type="text"
                 labelText="Calle"
                 value={newUser.domicilio_calle || ""}
@@ -219,7 +213,7 @@ function PersonCreateDialog({
               <InputValidate
                 id="domicilio_numero"
                 name="domicilio_numero"
-                maxLength={5}
+                maxLength={10}
                 type="text"
                 labelText="Número"
                 value={newUser.domicilio_numero || ""}
@@ -242,7 +236,7 @@ function PersonCreateDialog({
               <InputValidate
                 id="domicilio_dpto"
                 name="domicilio_dpto"
-                maxLength={10}
+                maxLength={2}
                 type="text"
                 labelText="Departamento"
                 value={newUser.domicilio_dpto || ""}
@@ -258,7 +252,7 @@ function PersonCreateDialog({
                 onChange={handleChangePostal}
                 validatePattern="^[0-9]{4}$"
                 validationMessage="Código postal inválido, debe tener 4 dígitos numéricos"
-                maxLength={4}
+                maxLength={8}
                 required
               />
             </ResponsiveColumnForm>
@@ -357,7 +351,7 @@ function PersonCreateDialog({
                 id="email_contacto"
                 name="email_contacto"
                 type="email"
-                maxLength={100}
+                maxLength={50}
                 labelText="Email de contacto"
                 value={newUser.email_contacto || ""}
                 required
@@ -371,7 +365,7 @@ function PersonCreateDialog({
                 id="observacion_contacto"
                 name="observacion_contacto"
                 type="text"
-                maxLength={255}
+                maxLength={300}
                 labelText="Observaciones de contacto"
                 value={newUser.observacion_contacto || ""}
                 className="w-full"
@@ -381,11 +375,11 @@ function PersonCreateDialog({
 
           <DialogFooter className="pt-4">
             <DialogClose asChild>
-              <Button type="button" variant="outline">
+              <Button type="button" variant="outline" className={"cursor-pointer"}>
                 Cancelar
               </Button>
             </DialogClose>
-            <Button type="submit">Guardar</Button>
+            <Button type="submit" className={"cursor-pointer"}>Guardar</Button>
           </DialogFooter>
         </form>
       </DialogContent>

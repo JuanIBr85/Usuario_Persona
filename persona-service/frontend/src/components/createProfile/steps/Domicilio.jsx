@@ -23,29 +23,30 @@ const Domicilio = ({ hidden, staticData }) => {
           <InputValidate
             id="domicilio_calle"
             type="text"
+            maxLength={50}
             placeholder="Ingresa el nombre de la calle"
             labelText="Calle"
             validatePattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s,.]{2,50}$"
             validationMessage="Ingresa un nombre de calle válido (2-50 caracteres, solo letras, números, espacios, puntos y comas)"
             containerClassName="sm:col-span-3"
-            required
           />
 
           {/* Campo Número */}
           <InputValidate
             id="domicilio_numero"
             type="text"
+            maxLength={10}
             placeholder="Número de domicilio"
             labelText="Número"
             validatePattern="^[0-9]{1,9}[a-zA-Z]?$"
             validationMessage="Ingresa un número válido (ej: 1234, 123A)"
-            required
           />
 
           {/* Campo Piso (opcional) */}
           <InputValidate
             id="domicilio_piso"
             type="text"
+            maxLength={3}
             placeholder="Piso (opcional)"
             labelText="Piso"
             validatePattern="^[0-9]{1,3}$|^$"
@@ -56,6 +57,7 @@ const Domicilio = ({ hidden, staticData }) => {
           <InputValidate
             id="domicilio_dpto"
             type="text"
+            maxLength={2}
             placeholder="Departamento (opcional)"
             labelText="Departamento"
             validatePattern="^[a-zA-Z0-9]{1,2}$|^$"
@@ -72,6 +74,7 @@ const Domicilio = ({ hidden, staticData }) => {
             labelText={<>Código Postal<a href="https://www.correoargentino.com.ar/formularios/cpa" target="_blank" className="text-indigo-600 hover:underline cursor-pointer">¿no sabes el codigo?</a></>}
             value={codigoPostal}
             ref={inputCPRef}
+            maxLength={8}
             onChange={(e) => setCodigoPostal(e.target.value)}
             validatePattern="^(?:[A-Za-z]\d{4}[A-Za-z]{3}|\d{4})$"
             validationMessage="Ingrese CP (4 dígitos) o CPA (1 letra + 4 dígitos + 3 letras, todo en mayúsculas)"
@@ -95,6 +98,7 @@ const Domicilio = ({ hidden, staticData }) => {
         <InputValidate
           id="domicilio_referencia"
           type="text"
+          maxLength={200}
           placeholder="Referencia (ej: Entre Calles X e Y)"
           labelText="Referencia"
           validatePattern=".{0,200}"

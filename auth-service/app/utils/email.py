@@ -25,7 +25,12 @@ def enviar_codigo_reset_por_email(usuario, codigo_otp):
         </p>
     """.format(codigo=codigo_otp)
 
-    html = render_email_template(saludo, cuerpo)
+    advertencia = """<p style="font-size:13px; margin-top:20px; color: #cccccc;">
+            Este código es personal y confidencial. No lo compartas con nadie.
+            Si no fuiste vos quien lo solicitó, ignorá este mensaje.
+        </p>"""
+
+    html = render_email_template(saludo, cuerpo, advertencia)
 
     msg = Message(
         subject="Código para recuperación de contraseña",
@@ -55,7 +60,12 @@ def enviar_codigo_por_email_registro(email: str, codigo_otp: str):
     extra = """<p style="font-size: 13px; margin-top: 20px; color: #cccccc;">
             Pasadas las 6 horas debera registrarse de nuevo.
         </p>"""
-    html = render_email_template(saludo, cuerpo, extra)
+    
+    advertencia = """<p style="font-size:13px; margin-top:20px; color: #cccccc;">
+            Este código es personal y confidencial. No lo compartas con nadie.
+            Si no fuiste vos quien lo solicitó, ignorá este mensaje.
+        </p>"""
+    html = render_email_template(saludo, cuerpo, extra + advertencia)
 
     msg = Message(
         subject="Código para validar e-mail",
@@ -91,8 +101,8 @@ def enviar_email_validacion_dispositivo(usuario, user_agent, ip):
     extra = f"""
         <p style="margin-top:20px;text-align:center;">
             <a href="{enlace}" style="
-                background-color:white;
-                color:black;
+                background-color:#FFFFFF;
+                color:#000000;
                 padding:12px 24px;
                 text-decoration:none;
                 border-radius:5px;
@@ -146,7 +156,7 @@ def enviar_solicitud_restauracion_admin(usuario):
     """
     extra = f"""
         <p style="margin-top:20px;text-align:center;">
-            <a href="{enlace}" style="background-color:white; color:black; padding:12px 24px;
+            <a href="{enlace}" style="background-color:#FFFFFF; color:#000000; padding:12px 24px;
             text-decoration:none; border-radius:5px; font-weight:bold;">Restaurar cuenta</a>
         </p>
     """
@@ -169,7 +179,7 @@ def enviar_mail_confirmacion_usuario(usuario, enlace):
     """
     extra = f"""
         <p style="margin-top:20px;text-align:center;">
-            <a href="{enlace}" style="background-color:white;color:black;padding:12px 24px;
+            <a href="{enlace}" style="background-color:#FFFFFF;color:#000000;padding:12px 24px;
             text-decoration:none; border-radius:5px;font-weight:bold;">Confirmar restauración</a>
         </p>
     """
@@ -210,8 +220,8 @@ def enviar_email_modificar_email(usuario,nuevo_email):
     extra = f"""
         <p style="margin-top:20px;text-align:center;">
             <a href="{enlace}" style="
-                background-color:white;
-                color:black;
+                background-color:#FFFFFF;
+                color:#000000;
                 padding:12px 24px;
                 text-decoration:none;
                 border-radius:5px;
@@ -234,6 +244,8 @@ def enviar_email_modificar_email(usuario,nuevo_email):
             <a href="{enlace}" style="color:#80bfff;text-decoration:underline;">{enlace}</a>
         </p>
     """
+
+    
 
     # ───────── 2) Render final ─────────
     html = render_email_template(

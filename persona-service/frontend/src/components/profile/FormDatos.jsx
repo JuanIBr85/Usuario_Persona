@@ -60,6 +60,7 @@ export default function FormDatos({
               id="nombre_persona"
               type="text"
               labelText="Nombre"
+              maxLength={50}
               value={personaData.nombre_persona || ""}
               cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
               readOnly={(dias < 30 && dias !== undefined)}
@@ -71,6 +72,7 @@ export default function FormDatos({
               id="apellido_persona"
               type="text"
               labelText="Apellido"
+              maxLength={50}
               value={personaData.apellido_persona || ""}
               cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
               readOnly={(dias < 30 && dias !== undefined)}
@@ -96,6 +98,7 @@ export default function FormDatos({
               validationMessage="Número de documento inválido"
               className="bg-gray-100 cursor-not-allowed w-full"
               readOnly
+              maxLength={13}
             />
           </ResponsiveColumnForm>
 

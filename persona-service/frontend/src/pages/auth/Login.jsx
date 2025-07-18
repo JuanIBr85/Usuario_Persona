@@ -86,6 +86,7 @@ function Login() {
             id="email_usuario"
             type="email"
             placeholder="Email"
+            maxLength={50}
             labelText="Email"
             validationMessage="Email inválido"
             required
@@ -97,6 +98,7 @@ function Login() {
             type="password"
             isCleanValue={false}
             placeholder="Contraseña"
+            maxLength={70}
             labelText="Contraseña"
             validatePattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$"
             validationMessage="La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula, un número y un carácter especial."

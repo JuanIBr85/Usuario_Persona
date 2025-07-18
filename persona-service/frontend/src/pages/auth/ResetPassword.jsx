@@ -118,6 +118,7 @@ const ResetPassword = () => {
             id="password"
             name="password"
             type="password"
+            maxLength={70}
             isCleanValue={false}
             placeholder="Nueva contraseña"
             labelText="Nueva contraseña"
@@ -131,6 +132,7 @@ const ResetPassword = () => {
             id="confirm_password"
             name="confirm_password"
             type="password"
+            maxLength={70}
             isCleanValue={false}
             placeholder="Confirmar contraseña"
             labelText="Confirmar contraseña"
