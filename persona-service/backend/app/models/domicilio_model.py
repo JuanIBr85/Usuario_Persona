@@ -9,10 +9,10 @@ class Domicilio(Base):
 
     id_domicilio=Column(Integer, primary_key=True)
     domicilio_calle=Column(String(50), nullable=False)
-    domicilio_numero=Column(String (10), nullable=False)
-    domicilio_piso=Column(String(3), nullable=True)
-    domicilio_dpto=Column(String(2), nullable=True)
-    domicilio_referencia=Column(String(200), nullable=True)
+    domicilio_numero=Column(String (5), nullable=False)
+    domicilio_piso=Column(String(4), nullable=True)
+    domicilio_dpto=Column(String(4), nullable=True)
+    domicilio_referencia=Column(String(150), nullable=True)
 
     codigo_postal_id=Column(Integer, ForeignKey('domicilios_postales.id_domicilio_postal'))
     

@@ -5,6 +5,7 @@ from app.schema.domicilio_schema import DomicilioSchema
 from app.schema.persona_extendida_schema import PersonaExtendidaSchema
 from app.schema.base_schema import BaseSchema
 from app.utils.validar_string import validar_nombre_apellido
+from app.utils.validar_fechas import validar_fecha_nacimiento
 
 
 class FormatoDocumentoSchema(BaseSchema):
@@ -24,7 +25,7 @@ class PersonaSchema(FormatoDocumentoSchema):
     id_persona = fields.Int(dump_only=True)
     nombre_persona = fields.Str(required=True,validate=validar_nombre_apellido)
     apellido_persona = fields.Str(required=True,validate=validar_nombre_apellido)
-    fecha_nacimiento_persona = fields.Date(required=True)
+    fecha_nacimiento_persona = fields.Date(required=True,validate = validar_fecha_nacimiento)
     tipo_documento = fields.Str(
         required=True, validate=validate.OneOf(list(TIPOS_DOCUMENTO_VALIDOS.keys()))
     )
@@ -51,9 +52,9 @@ class PersonaSchema(FormatoDocumentoSchema):
 
 class PersonaResumidaSchema(FormatoDocumentoSchema):
     id_persona = fields.Int(dump_only=True)
-    nombre_persona = fields.Str(required=True)
-    apellido_persona = fields.Str(required=True)
-    fecha_nacimiento_persona = fields.Date(required=True)
+    nombre_persona = fields.Str(required=True,validate=validar_nombre_apellido)
+    apellido_persona = fields.Str(required=True,validate=validar_nombre_apellido)
+    fecha_nacimiento_persona = fields.Date(required=True,validate = validar_fecha_nacimiento)
     tipo_documento = fields.Str(
         required=True, validate=validate.OneOf(list(TIPOS_DOCUMENTO_VALIDOS.keys()))
     )
