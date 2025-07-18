@@ -15,16 +15,44 @@ import { EyeOff, Eye, EyeClosed } from 'lucide-react'
  * @param {Object} props - Props adicionales que serán pasadas al componente <Input>.
  * @param {string} containerClassName - Clases adicionales para el contenedor del input.
  */
-export default function InputValidate({ id, type, placeholder, labelText, validatePattern, validationMessage, value="", containerClassName, onChange, required, iconInput, ...props }) {
+export default function InputValidate({ id, type, placeholder, labelText, validatePattern, validationMessage, value = "", containerClassName, onChange, required, iconInput, cleanRegex = /[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ0-9\s\-_.,'()]/g, cleanEmailRegex = /[^a-zA-Z0-9@._-]/g, cleanTelRegex = /[^0-9\s\-\(\)\+]/g, isCleanValue = false, ...props }) {
     //Este estado sirve para indicar si hubo un error en la validacion del input
     const [error, setError] = React.useState(false)
     //Este estado sirve para indicar si debe o no ocultar la contraseña
-    const [showPassword, setShowPassword] = React.useState(false)
+    const [showPassword, setShowPassword] = React.useState(false);
 
     const [internalValue, setInternalValue] = React.useState(value || '')
 
+    const [isInit, setIsInit] = React.useState(false);
+
+    const handleBlur = (event) => {
+        const input = event.target
+
+        let value = input.value?.trim();
+
+        if (isCleanValue) {
+            switch (type) {
+                case "email":
+                    value = value?.replace(cleanEmailRegex, '');
+                    break;
+                case "tel":
+                    value = value?.replace(cleanTelRegex, '');
+                    break;
+                default:
+                    value = value?.replace(cleanRegex, '');
+                    break;
+            }
+        }
+        input.value = value;
+        setInternalValue(value);
+        if (input.checkValidity()) {
+            setError(false)
+        }
+    }
+
     useEffect(() => {
         setInternalValue(value)
+        setIsInit(value !== undefined);
     }, [value]);
 
     //Este evento se llama cuando el input es invalido
@@ -34,15 +62,28 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
     }
 
     const handleOnChange = (event) => {
+        if (!isInit) return;
         const input = event.target
         setInternalValue(input.value)
+
+        //Si el patron del input es diferente al del validatePattern
+        if (validatePattern && (input.pattern !== validatePattern) || input.type !== type) {
+            //Forzamos el patron de nuevo, en caso de que no se pueda recargar la pagina
+            input.pattern = validatePattern;
+            input.type = type;
+            setInternalValue("");
+            input.value = "";
+            alert(`No, eso no funcionara ${input.pattern !== validatePattern} ${input.type !== type}, ${input.pattern}, ${validatePattern}`)
+            //Recargamos la pagina para que se aplique el nuevo patron
+            window.location.reload();
+        }
 
         //Esto solo quita el error si el input es invalido
         if (input.checkValidity()) {
             setError(false)
         }
 
-        if(onChange){
+        if (onChange) {
             onChange(event)
         }
     }
@@ -61,13 +102,15 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
                     pattern={validatePattern}
                     data-validation-message={validationMessage}
                     value={internalValue}
+                    onBlur={handleBlur}
+
                     required={required}
                     {...props} />
                 {//Si el input es de tipo contraseña mostrara un boton para ver/ocultar la contraseña
-                    type === "password" ? <a className="absolute right-2 top-1.5 text-gray-500 hover:text-gray-700 cursor-pointer select-none" onClick={() => setShowPassword(v => !v)}>{showPassword ? <Eye/> : <EyeClosed/>}</a> : iconInput && <div className='absolute right-2 top-1.5'>{iconInput}</div>
+                    type === "password" ? <a className="absolute right-2 top-1.5 text-gray-500 hover:text-gray-700 cursor-pointer select-none" onClick={() => setShowPassword(v => !v)}>{showPassword ? <Eye /> : <EyeClosed />}</a> : iconInput && <div className='absolute right-2 top-1.5'>{iconInput}</div>
                 }
             </div>
-            
+
             {//Si ocurre un error en la validacion del input mostrara el error debajo del input
                 error ? <p className="text-destructive text-xs ml-2">{validationMessage}</p> : undefined
             }

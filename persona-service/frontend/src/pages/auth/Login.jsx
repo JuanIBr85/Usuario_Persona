@@ -95,6 +95,7 @@ function Login() {
           <InputValidate
             id="password"
             type="password"
+            isCleanValue={false}
             placeholder="Contraseña"
             labelText="Contraseña"
             validatePattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$"

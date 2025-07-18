@@ -233,6 +233,7 @@ export default function FormUsuario() {
             <InputValidate
               id="password"
               type="password"
+              isCleanValue={false}
               labelText="Contraseña"
               placeholder="Ingresa tu contraseña"
               required
@@ -316,6 +317,7 @@ export default function FormUsuario() {
             <InputValidate
               id="password"
               type="password"
+              isCleanValue={false}
               labelText="Contraseña"
               placeholder="Ingresa tu contraseña"
               required

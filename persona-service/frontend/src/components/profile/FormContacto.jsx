@@ -10,7 +10,7 @@ import { useState } from "react";
 import { formSubmitJson } from "@/utils/formUtils";
 import Loading from "@/components/loading/Loading";
 import { SimpleDialog } from "@/components/SimpleDialog";
-
+import ResponsiveColumnForm from "@/components/ResponsiveColumnForm";
 
 export default function FormContacto({
   persona_id,
@@ -47,7 +47,7 @@ export default function FormContacto({
       {loading && <Loading isFixed={true} />}
       <form onSubmit={handleSubmit} >
         <div className="min-h-69 space-y-4">
-          <div className="grid grid-cols-2 gap-4 items-end">
+          <ResponsiveColumnForm>
             {/* Datos editables con InputValidate */}
             <InputValidate
               id="telefono_fijo"
@@ -70,8 +70,8 @@ export default function FormContacto({
               validationMessage="Ingresa un número de teléfono válido"
               required
             />
-          </div>
-          <div className="grid grid-cols-2 gap-4 items-end">
+          </ResponsiveColumnForm>
+          <ResponsiveColumnForm>
             <InputValidate
               id="red_social_contacto"
               name="red_social_contacto"
@@ -94,7 +94,7 @@ export default function FormContacto({
                 </SelectItem>
               ))}
             </SimpleSelect>
-          </div>
+          </ResponsiveColumnForm>
 
           <InputValidate
             id="email_contacto"

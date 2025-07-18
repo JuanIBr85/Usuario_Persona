@@ -63,6 +63,8 @@ export default function FormDatos({
               value={personaData.nombre_persona || ""}
               readOnly={(dias < 30 && dias !== undefined)}
               className={dias < 30 && dias !== undefined ? "cursor-not-allowed" : ""}
+              validatePattern={"^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$"}
+              validationMessage="El nombre debe contener solo letras"
             />
             <InputValidate
               id="apellido_persona"
@@ -71,6 +73,8 @@ export default function FormDatos({
               value={personaData.apellido_persona || ""}
               readOnly={(dias < 30 && dias !== undefined)}
               className={dias < 30 && dias !== undefined ? "cursor-not-allowed" : ""}
+              validatePattern={"^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$"}
+              validationMessage="El apellido debe contener solo letras"
             />
           </ResponsiveColumnForm>
 
