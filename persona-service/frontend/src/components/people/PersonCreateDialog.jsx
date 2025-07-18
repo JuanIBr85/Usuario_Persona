@@ -381,11 +381,11 @@ function PersonCreateDialog({
 
           <DialogFooter className="pt-4">
             <DialogClose asChild>
-              <Button type="button" variant="outline">
+              <Button type="button" variant="outline" className={"cursor-pointer"}>
                 Cancelar
               </Button>
             </DialogClose>
-            <Button type="submit">Guardar</Button>
+            <Button type="submit" className={"cursor-pointer"}>Guardar</Button>
           </DialogFooter>
         </form>
       </DialogContent>

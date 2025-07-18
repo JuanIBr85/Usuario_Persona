@@ -357,7 +357,7 @@ function ComponentTable({ data, setData }) {
             {/* Botones de agregar y de detener el sistema */}
             <Button
               variant=""
-              className={"mt-5"}
+              className={"mt-5 cursor-pointer"}
               onClick={() => setInstallDialogOpen(true)}
             >
               {" "}
@@ -366,7 +366,7 @@ function ComponentTable({ data, setData }) {
             <Button
               disabled={isStopping}
               variant="destructive"
-              className={"mt-5"}
+              className={"mt-5 cursor-pointer"}
               onClick={() => {
                 setCountdown(3);
                 setCanStop(false);

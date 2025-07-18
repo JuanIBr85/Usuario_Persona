@@ -328,6 +328,7 @@ function PersonEditDialog({
               type="button"
               variant="outline"
               onClick={() => setIsDialogOpen(false)}
+              className={"cursor-pointer"}
             >
               Cancelar
             </Button>

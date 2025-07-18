@@ -42,11 +42,11 @@ export default function RoleForm({
             ))}
           </div>
 
-          <div className="flex gap-2">
-            <Button onClick={onSubmit}>
+          <div className="flex gap-2 ">
+            <Button onClick={onSubmit} className={"cursor-pointer"}>
               {isEditing ? "Guardar Cambios" : "Agregar Rol"}
             </Button>
-            <Button variant="outline" onClick={onCancel}>
+            <Button variant="outline" onClick={onCancel} className={"cursor-pointer"}>
               Cancelar
             </Button>
           </div>

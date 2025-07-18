@@ -7,7 +7,7 @@ function PersonaDeleteDialog({ user, onDelete }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">
+        <Button variant="outline cursor-pointer">
           <Trash2 className="mr-1" /> Borrar
         </Button>
       </DialogTrigger>
@@ -20,9 +20,9 @@ function PersonaDeleteDialog({ user, onDelete }) {
         </DialogHeader>
         <DialogFooter className="mt-4">
           <DialogClose asChild>
-            <Button variant="outline">Cancelar</Button>
+            <Button variant="outline" className={"cursor-pointer"}>Cancelar</Button>
           </DialogClose>
-          <Button variant="destructive" onClick={() => onDelete(user.id)}>
+          <Button variant="destructive" onClick={() => onDelete(user.id)} className="cursor-pointer">
             Confirmar eliminación
           </Button>
         </DialogFooter>

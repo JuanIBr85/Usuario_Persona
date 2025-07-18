@@ -283,7 +283,7 @@ export default function AdminRoles() {
         >
           {!showNewRoleForm && (
             <div>
-              <Button onClick={openNewRoleForm} className="mb-4">
+              <Button onClick={openNewRoleForm} className="mb-4 cursor-pointer">
                 <BadgePlus /> Agregar Rol
               </Button>
             </div>

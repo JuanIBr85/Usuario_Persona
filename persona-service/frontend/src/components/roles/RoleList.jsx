@@ -39,6 +39,7 @@ export default function RoleList({ roles, onEdit, onDelete, formatPermissionName
                                             variant="outline"
                                             onClick={() => onEdit(role)}
                                             disabled={isSuperadminRole}
+                                            className={"cursor-pointer"}
                                             title={isSuperadminRole ? "El rol superadmin no puede editarse" : "Editar"}
                                         >
                                             <Pencil className="w-4 h-4" />
@@ -48,6 +49,7 @@ export default function RoleList({ roles, onEdit, onDelete, formatPermissionName
                                             variant="outline"
                                             onClick={() => onDelete(role)}
                                             disabled={isSuperadminRole}
+                                            className={"cursor-pointer"}
                                             title={isSuperadminRole ? "El rol superadmin no puede borrarse" : "Borrar"}
                                         >
                                             <Trash2 className="w-4 h-4" />

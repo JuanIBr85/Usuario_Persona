@@ -33,13 +33,13 @@ function ServiceCard({ service, onToggleAvailable, onRemove }) {
           onClick={() => onToggleAvailable(service.id_service, service.service_available)}
         >
           {service.service_available ? (
-            <>
+            <div className="cursor-pointer">
               <ShieldMinus className="inline w-4 h-4 mr-1" /> Desactivar
-            </>
+            </div>
           ) : (
-            <>
-              <ShieldCheck className="inline w-4 h-4 mr-1" /> Activar
-            </>
+            <div className="cursor-pointer">
+              <ShieldCheck className="inline w-4 h-4 mr-1 cursor-pointer" /> Activar
+            </div>
           )}
         </Button>
         {!service.service_core && (

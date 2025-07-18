@@ -30,10 +30,10 @@ function RolesDeleteDialog({openDeleteDialog,setOpenDeleteDialog,roleToDelete, c
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter className="flex justify-end gap-2">
-                    <Button variant="outline" onClick={() => setOpenDeleteDialog(false)}>
+                    <Button variant="outline" onClick={() => setOpenDeleteDialog(false)} className={"cursor-pointer"}>
                         Cancelar
                     </Button>
-                    <Button variant="destructive" onClick={confirmDeleteRole}>
+                    <Button variant="destructive" onClick={confirmDeleteRole} className={"cursor-pointer"}>
                         Eliminar
                     </Button>
                 </DialogFooter>

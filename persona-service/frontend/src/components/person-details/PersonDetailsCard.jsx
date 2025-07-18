@@ -122,7 +122,7 @@ function PersonDetailsCard({ person, onEdit }) {
         </CardContent>
         <CardFooter className="justify-start">
           <Button variant="outline" onClick={onEdit}>
-            <Pencil className="mr-2" /> Editar
+            <Pencil className="mr-2 cursor-pointer"/> Editar
           </Button>
         </CardFooter>
       </Card>

@@ -65,7 +65,7 @@ export default function RoleAssignmentWithSearch({
         </div>
       </CardContent>
       <CardFooter>
-        <Button onClick={onAsignar} className="">
+        <Button onClick={onAsignar} className="cursor-pointer">
           <ShieldCheck className="inline-block mr-2 h-4 w-4" />
           Asignar Roles
         </Button>
