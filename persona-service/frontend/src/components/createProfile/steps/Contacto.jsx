@@ -35,6 +35,7 @@ const Contacto = ({hidden, staticData}) => (
         type="text"
         placeholder="Nombre del Usuario"
         labelText="Red social de contacto"
+        cleanRegex={/[^a-zA-Z0-9@._-]/g}
         value=""
       />
       <SimpleSelect

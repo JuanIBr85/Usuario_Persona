@@ -76,6 +76,7 @@ export default function FormContacto({
               id="red_social_contacto"
               name="red_social_contacto"
               type="text"
+              cleanRegex={/[^a-zA-Z0-9@._-]/g}
               placeholder="Nombre del Usuario"
               labelText="Red social de contacto"
               value={contacto?.red_social_contacto || ""}

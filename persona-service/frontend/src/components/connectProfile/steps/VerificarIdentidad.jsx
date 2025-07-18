@@ -14,6 +14,7 @@ export function VerificarIdentidad({ formRef, setDialog, onSubmit }) {
             name="nombre_persona"
             type="text"
             labelText="Nombre"
+            cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
             required
           />
           <InputValidate
@@ -21,6 +22,7 @@ export function VerificarIdentidad({ formRef, setDialog, onSubmit }) {
             name="apellido_persona"
             type="text"
             labelText="Apellido"
+            cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
             required
           />
         </div>

@@ -112,6 +112,7 @@ function Sign() {
           <InputValidate
             id="nombre_usuario"
             type="text"
+            cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
             placeholder="Nombre de usuario"
             labelText="Nombre"
             validatePattern=".{4,}"

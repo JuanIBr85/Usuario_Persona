@@ -24,6 +24,7 @@ const DatosPersonales = ({ hidden, staticData, documento }) => {
           maxLength={50}
           type="text"
           labelText="Nombre"
+          cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
           required
         />
         <InputValidate
@@ -31,6 +32,7 @@ const DatosPersonales = ({ hidden, staticData, documento }) => {
           maxLength={50}
           type="text"
           labelText="Apellido"
+          cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
           required
         />
       </ResponsiveColumnForm>

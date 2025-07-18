@@ -74,6 +74,7 @@ function PersonEditDialog({
               <InputValidate
                 id="nombre"
                 name="nombre"
+                cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
                 type="text"
                 maxLength={50}
                 labelText="Nombre"
@@ -85,6 +86,7 @@ function PersonEditDialog({
               <InputValidate
                 id="apellido"
                 name="apellido"
+                cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
                 maxLength={50}
                 type="text"
                 labelText="Apellido"

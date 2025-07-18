@@ -15,7 +15,7 @@ import { EyeOff, Eye, EyeClosed } from 'lucide-react'
  * @param {Object} props - Props adicionales que serán pasadas al componente <Input>.
  * @param {string} containerClassName - Clases adicionales para el contenedor del input.
  */
-export default function InputValidate({ id, type, placeholder, labelText, validatePattern, validationMessage, value = "", containerClassName, onChange, required, iconInput, cleanRegex = /[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ0-9\s\-_.,'()]/g, cleanEmailRegex = /[^a-zA-Z0-9@._-]/g, cleanTelRegex = /[^0-9\s\-\(\)\+]/g, isCleanValue = false, ...props }) {
+export default function InputValidate({ id, type, placeholder, labelText, validatePattern, validationMessage, value = "", containerClassName, onChange, required, iconInput, cleanRegex = /[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ0-9\s\-_.,'()]/g, cleanEmailRegex = /[^a-zA-Z0-9@._-]/g, cleanTelRegex = /[^0-9\s\-\(\)\+]/g, cleanUrlRegex = /[^a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]/g, isCleanValue = true, ...props }) {
     //Este estado sirve para indicar si hubo un error en la validacion del input
     const [error, setError] = React.useState(false)
     //Este estado sirve para indicar si debe o no ocultar la contraseña
@@ -37,6 +37,9 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
                     break;
                 case "tel":
                     value = value?.replace(cleanTelRegex, '');
+                    break;
+                case "url":
+                    value = value?.replace(cleanUrlRegex, '');
                     break;
                 default:
                     value = value?.replace(cleanRegex, '');
@@ -67,13 +70,17 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
         setInternalValue(input.value)
 
         //Si el patron del input es diferente al del validatePattern
-        if (validatePattern && (input.pattern !== validatePattern) || input.type !== type) {
+        //Tambien si el type difiere de la que se le dio al input al principio exceptuando  si es en el caso q se cambie password a text
+        if (validatePattern && (input.pattern !== validatePattern) 
+            || (input.type !== type && !(type === "password" && input.type === "text"))
+            || (required && (input.required !== required))
+        ) {
             //Forzamos el patron de nuevo, en caso de que no se pueda recargar la pagina
             input.pattern = validatePattern;
             input.type = type;
             setInternalValue("");
             input.value = "";
-            alert(`No, eso no funcionara ${input.pattern !== validatePattern} ${input.type !== type}, ${input.pattern}, ${validatePattern}`)
+            alert(`No, eso no funcionara, Atras espiritu del mal`)
             //Recargamos la pagina para que se aplique el nuevo patron
             window.location.reload();
         }

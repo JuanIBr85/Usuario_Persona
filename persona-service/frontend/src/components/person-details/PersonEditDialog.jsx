@@ -107,6 +107,7 @@ function PersonEditDialog({
                 id="nombre_persona"
                 type="text"
                 labelText="Nombre"
+                cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
                 value={editingPerson.nombre_persona || ""}
                 required
               />
@@ -115,6 +116,7 @@ function PersonEditDialog({
                 id="apellido_persona"
                 type="text"
                 labelText="Apellido"
+                cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
                 value={editingPerson.apellido_persona || ""}
                 required
               />
@@ -312,6 +314,7 @@ function PersonEditDialog({
               <InputValidate
                 id="red_social_contacto"
                 name="red_social_contacto"
+                cleanRegex={/[^a-zA-Z0-9@._-]/g}
                 type="text"
                 labelText="Usuario de la red social"
                 value={editingPerson.contacto?.red_social_contacto || ""}

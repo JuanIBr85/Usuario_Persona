@@ -102,6 +102,7 @@ function PersonCreateDialog({
                 type="text"
                 labelText="Nombre(s)"
                 value={newUser.nombre || ""}
+                cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
                 maxLength={30}
                 required
                 validatePattern="^[A-Za-zÁÉÍÓÚÜáéíóúüÑñ'’ ]+$"
@@ -111,6 +112,7 @@ function PersonCreateDialog({
               <InputValidate
                 id="apellido"
                 name="apellido"
+                cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
                 type="text"
                 labelText="Apellido(s)"
                 value={newUser.apellido || ""}
@@ -336,6 +338,7 @@ function PersonCreateDialog({
                   <InputValidate
                     id="red_social_contacto"
                     name="red_social_contacto"
+                    cleanRegex={/[^a-zA-Z0-9@._-]/g}
                     maxLength={50}
                     type="text"
                     labelText={`Usuario de ${newUser.red_social_nombre}`}

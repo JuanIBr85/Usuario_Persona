@@ -277,6 +277,7 @@ export default function FormUsuario() {
               id="nombre_usuario"
               type="text"
               labelText="Nuevo nombre"
+              cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
               placeholder="Ingresa el nuevo nombre"
               validatePattern=".{4,}"
               validationMessage="El nombre debe tener al menos 4 caracteres"

@@ -61,6 +61,7 @@ export default function FormDatos({
               type="text"
               labelText="Nombre"
               value={personaData.nombre_persona || ""}
+              cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
               readOnly={(dias < 30 && dias !== undefined)}
               className={dias < 30 && dias !== undefined ? "cursor-not-allowed" : ""}
               validatePattern={"^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$"}
@@ -71,6 +72,7 @@ export default function FormDatos({
               type="text"
               labelText="Apellido"
               value={personaData.apellido_persona || ""}
+              cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
               readOnly={(dias < 30 && dias !== undefined)}
               className={dias < 30 && dias !== undefined ? "cursor-not-allowed" : ""}
               validatePattern={"^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$"}

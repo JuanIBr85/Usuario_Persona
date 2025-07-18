@@ -323,7 +323,7 @@ function ComponentTable({ data, setData }) {
                 <div className="grid gap-3">
                   <InputValidate
                     id="newService_url"
-                    type="text"
+                    type="url"
                     placeholder="https://example:port"
                     labelText="URL del servicio"
                     validatePattern="^https?:\/\/(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(?:\/[^\s]*)?$"
