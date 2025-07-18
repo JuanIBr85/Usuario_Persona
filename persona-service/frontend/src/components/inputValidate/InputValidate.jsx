@@ -44,12 +44,12 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
         setInternalMax(max || (type === "date" ? maxDate : undefined));
     }, [min, max]);
 
-    useEffect(() => {
+    /*useEffect(() => {
         if(!validatePattern)return;
         setInternalPattern(validatePattern);
         if(inputRef.current)inputRef.current.pattern = validatePattern;
         if(isInit)handleBlur({target: inputRef.current});
-    }, [validatePattern]);
+    }, [validatePattern]);*/
 
     const handleBlur = (event) => {
         const input = event.target;
@@ -88,7 +88,7 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
 
         inputRef.current.checkValidity = () => {
             if(internalPattern){
-                input.pattern = internalPattern;
+                //input.pattern = internalPattern;
             }
             //Si el patron del input es diferente al del validatePattern
             if ( (type && (input.type !== type && !(type === "password" && input.type === "text")))
@@ -104,13 +104,13 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
                 || (max && (input.max !== internalMax))
             ) {
                 //Forzamos el patron de nuevo, en caso de que no se pueda recargar la pagina
-                input.type = type;
+                /*input.type = type;
                 setInternalValue("");
                 input.value = "";
                 removeAuthData("Alteracion de formularios");
                 alert(`No, eso no funcionara, Atras espiritu del mal`);
                 //Recargamos la pagina para que se aplique el nuevo patron
-                window.location.href = "/auth/login";
+                window.location.href = "/auth/login";*/
             }
             return oldCheck();
         }
