@@ -51,7 +51,7 @@ def validar_domicilio_calle(valor: str) -> str:
 def validar_domicilio_numero(valor: str) -> str:
 
     """Valida que el número del domicilio sea numérico (opcionalmente con una letra) o 's/n'."""
-
+    
     if valor is None:
         raise ValidationError("Número requerido")
 
@@ -74,7 +74,7 @@ def validar_domicilio_piso(valor: str) -> str:
 
     """Valida que el piso sea alfanumérico simple o abreviaturas como 'PB'."""
 
-    if valor is None:
+    if valor is None or len(valor) == 0:
         return ""  # no es requerido
 
     valor = valor.strip()
@@ -87,12 +87,12 @@ def validar_domicilio_piso(valor: str) -> str:
 
 def validar_domicilio_dpto(valor: str) -> str:
     """Valida que el departamento sea una cadena alfanumérica corta (1-5 caracteres)."""
-    if valor is None:
+    if valor is None or len(valor) == 0:
         return ""  # No requerido
 
     valor = valor.strip()
 
-    if not valor:
+    if not valor: 
         return ""  # Permitido vacío
 
     patron = r'^[A-Za-z0-9]{1,5}$'
@@ -105,7 +105,7 @@ def validar_referencias(valor: str) -> str:
 
     """Valida que la referencia del domicilio tenga hasta 150 caracteres y contenido limpio."""
 
-    if valor is None:
+    if valor is None or len(valor) == 0:
         return ""
     
     valor = valor.strip()
@@ -128,7 +128,7 @@ def validar_telefono(valor: str) -> str:
 
     """Valida que el teléfono contenga sólo números y guiones."""
 
-    if valor is None:
+    if valor is None or len(valor) == 0:
         return ""
     
     valor = valor.strip()
@@ -143,7 +143,7 @@ def validar_red_social_contacto(valor: str) -> str:
 
     """Valida que el nombre de usuario en la red social tenga caracteres válidos."""
 
-    if valor is None:
+    if valor is None or len(valor) == 0:
         return ""
 
     valor = valor.strip()
