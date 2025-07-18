@@ -166,6 +166,7 @@ class UsuarioService(ServicioBase):
         datos_registro = obtener_datos_registro_temporal(email)
         if not datos_registro:
             return ResponseStatus.FAIL, "Registro expirado o no iniciado", None, 400
+        datos_registro.pop("password_repeat", None) 
         try:
             password_hash = generate_password_hash(datos_registro["password"])
             datos_registro["password"] = password_hash

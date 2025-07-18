@@ -46,3 +46,55 @@ werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on 
 2025-07-12 19:43:56,642 - app.services.usuario_service - INFO - → Permisos almacenados en Redis
 2025-07-12 19:43:56,645 - app.services.usuario_service - INFO - → Login finalizado para usuario 2
 2025-07-12 19:43:56,658 - app.routes.usuario.login_logout - INFO - → [ROUTE] Login procesado, status: ResponseStatus.SUCCESS, code: 200
+2025-07-18 20:42:43,506 - app.routes.usuario.login_logout - INFO - → [ROUTE] Solicitud de login recibida
+2025-07-18 20:42:43,510 - app.services.usuario_service - INFO - → Iniciando login de usuario
+2025-07-18 20:42:43,836 - app.services.usuario_service - INFO - → Usuario 1 autenticado, generando tokens...
+2025-07-18 20:42:43,886 - app.services.usuario_service - INFO - → Dispositivo no confiable, se envió mail de validación
+2025-07-18 20:42:43,897 - app.routes.usuario.login_logout - INFO - → [ROUTE] Login procesado, status: ResponseStatus.PENDING, code: 403
+2025-07-18 20:42:48,703 - root - ERROR - Excepción no manejada:
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/usr/local/lib/python3.10/site-packages/flask/app.py", line 891, in dispatch_request
+    self.raise_routing_exception(req)
+  File "/usr/local/lib/python3.10/site-packages/flask/app.py", line 500, in raise_routing_exception
+    raise request.routing_exception  # type: ignore[misc]
+  File "/usr/local/lib/python3.10/site-packages/flask/ctx.py", line 362, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+  File "/usr/local/lib/python3.10/site-packages/werkzeug/routing/map.py", line 629, in match
+    raise NotFound() from None
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+
+2025-07-18 20:42:53,246 - app.routes.usuario.login_logout - INFO - → [ROUTE] Solicitud de login recibida
+2025-07-18 20:42:53,255 - app.services.usuario_service - INFO - → Iniciando login de usuario
+2025-07-18 20:42:53,514 - app.services.usuario_service - INFO - → Usuario 1 autenticado, generando tokens...
+2025-07-18 20:42:53,524 - app.services.usuario_service - INFO - → Tokens generados correctamente
+2025-07-18 20:42:53,530 - app.services.usuario_service - INFO - → Permisos almacenados en Redis
+2025-07-18 20:42:53,532 - app.services.usuario_service - INFO - → Login finalizado para usuario 1
+2025-07-18 20:42:53,561 - app.routes.usuario.login_logout - INFO - → [ROUTE] Login procesado, status: ResponseStatus.SUCCESS, code: 200
+2025-07-18 20:44:57,238 - app.routes.usuario.login_logout - INFO - → [ROUTE] Solicitud de login recibida
+2025-07-18 20:44:57,244 - app.services.usuario_service - INFO - → Iniciando login de usuario
+2025-07-18 20:44:57,501 - app.services.usuario_service - INFO - → Usuario 1 autenticado, generando tokens...
+2025-07-18 20:44:57,547 - app.services.usuario_service - INFO - → Dispositivo no confiable, se envió mail de validación
+2025-07-18 20:44:57,550 - app.routes.usuario.login_logout - INFO - → [ROUTE] Login procesado, status: ResponseStatus.PENDING, code: 403
+2025-07-18 20:45:03,890 - root - ERROR - Excepción no manejada:
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/usr/local/lib/python3.10/site-packages/flask/app.py", line 891, in dispatch_request
+    self.raise_routing_exception(req)
+  File "/usr/local/lib/python3.10/site-packages/flask/app.py", line 500, in raise_routing_exception
+    raise request.routing_exception  # type: ignore[misc]
+  File "/usr/local/lib/python3.10/site-packages/flask/ctx.py", line 362, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+  File "/usr/local/lib/python3.10/site-packages/werkzeug/routing/map.py", line 629, in match
+    raise NotFound() from None
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+
+2025-07-18 20:45:05,752 - app.routes.usuario.login_logout - INFO - → [ROUTE] Solicitud de login recibida
+2025-07-18 20:45:05,754 - app.services.usuario_service - INFO - → Iniciando login de usuario
+2025-07-18 20:45:06,120 - app.services.usuario_service - INFO - → Usuario 1 autenticado, generando tokens...
+2025-07-18 20:45:06,135 - app.services.usuario_service - INFO - → Tokens generados correctamente
+2025-07-18 20:45:06,141 - app.services.usuario_service - INFO - → Permisos almacenados en Redis
+2025-07-18 20:45:06,144 - app.services.usuario_service - INFO - → Login finalizado para usuario 1
+2025-07-18 20:45:06,153 - app.routes.usuario.login_logout - INFO - → [ROUTE] Login procesado, status: ResponseStatus.SUCCESS, code: 200
