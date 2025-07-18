@@ -59,11 +59,6 @@ function PersonCreateDialog({
   const [userSearch, setUserSearch] = useState("");
   const [tipoDoc, setTipoDoc] = useState(Object.keys(tiposDocumentos)[0] || "");
 
-  // Calcular fecha máxima para mayores de 17 años
-  const seventeenYearsAgo = new Date();
-  seventeenYearsAgo.setFullYear(seventeenYearsAgo.getFullYear() - 17);
-  const maxDate = seventeenYearsAgo.toISOString().slice(0, 10);
-
   const filteredUsuarios = useMemo(() => {
     if (!userSearch) return usuarios;
     return usuarios.filter(
@@ -163,8 +158,6 @@ function PersonCreateDialog({
                 labelText="Fecha de nacimiento"
                 value={newUser.fecha_nacimiento || ""}
                 required
-                max={maxDate}
-                min="1905-01-01"
               />
 
               {/* Select de usuario */}
