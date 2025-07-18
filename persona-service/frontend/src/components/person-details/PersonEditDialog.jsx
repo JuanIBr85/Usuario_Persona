@@ -301,7 +301,6 @@ function PersonEditDialog({
                   placeholder="Selecciona una red social"
                   onValueChange={(value) => handleSelectChange('red_social_nombre', value)}
                 >
-                  <option value="">Ninguna</option>
                   {redesSociales.map((red, index) => (
                     <SelectItem key={index} value={red}>
                       {red}
