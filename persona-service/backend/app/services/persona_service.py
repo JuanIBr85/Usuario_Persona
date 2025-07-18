@@ -89,7 +89,7 @@ class PersonaService(IPersonaInterface):
 
             validacion = validar_documento_por_tipo(tipo_doc, num_doc)
 
-            if validacion==0:
+            if validacion==-4:
                 raise Exception ("Numero de CUIL/CUIT invalido.")
 
             if not validacion:
@@ -176,7 +176,7 @@ class PersonaService(IPersonaInterface):
             
             validacion = validar_documento_por_tipo(tipo_doc, num_doc)
 
-            if validacion==0:
+            if validacion==-4:
                 raise Exception ("Numero de CUIL/CUIT invalido.")
 
             if not validacion:
