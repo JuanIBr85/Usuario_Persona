@@ -25,7 +25,12 @@ def enviar_codigo_reset_por_email(usuario, codigo_otp):
         </p>
     """.format(codigo=codigo_otp)
 
-    html = render_email_template(saludo, cuerpo)
+    advertencia = """<p style="font-size:13px; margin-top:20px; color: #cccccc;">
+            Este código es personal y confidencial. No lo compartas con nadie.
+            Si no fuiste vos quien lo solicitó, ignorá este mensaje.
+        </p>"""
+
+    html = render_email_template(saludo, cuerpo, advertencia)
 
     msg = Message(
         subject="Código para recuperación de contraseña",
@@ -55,7 +60,12 @@ def enviar_codigo_por_email_registro(email: str, codigo_otp: str):
     extra = """<p style="font-size: 13px; margin-top: 20px; color: #cccccc;">
             Pasadas las 6 horas debera registrarse de nuevo.
         </p>"""
-    html = render_email_template(saludo, cuerpo, extra)
+    
+    advertencia = """<p style="font-size:13px; margin-top:20px; color: #cccccc;">
+            Este código es personal y confidencial. No lo compartas con nadie.
+            Si no fuiste vos quien lo solicitó, ignorá este mensaje.
+        </p>"""
+    html = render_email_template(saludo, cuerpo, extra + advertencia)
 
     msg = Message(
         subject="Código para validar e-mail",
