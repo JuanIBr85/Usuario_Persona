@@ -97,6 +97,12 @@ export default function FormPersonaExtendida({
               placeholder="Ingresa tu fecha de vencimiento del DNI"
               labelText="Fecha de vencimiento del DNI"
               value={personaExtendida?.vencimiento_dni || ""}
+              min={ new Date().toISOString().split("T")[0]}
+              max={(()=>{
+                const fechaActual = new Date();
+                fechaActual.setFullYear(fechaActual.getFullYear() + 16);
+                return fechaActual.toISOString().split("T")[0];
+              })()}
               onChange={(e) => handleChange("vencimiento_dni", e.target.value)}
             />
           </ResponsiveColumnForm>
