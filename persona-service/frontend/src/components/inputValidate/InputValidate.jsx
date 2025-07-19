@@ -82,6 +82,16 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
         input.value = value;
         setInternalValue(value);
 
+
+        if(input.type==="email"){
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            //obtengo el ultimo elemento del email
+            const domain = value.split(".").pop();
+            if(domain.length<2 || !emailPattern.test(value)){
+                setError(true);
+                return;
+            }
+        }
         if (input.checkValidity()) {
             setError(false)
         }
@@ -127,6 +137,7 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
                 //Recargamos la pagina para que se aplique el nuevo patron
                 window.location.href = "/auth/login";
             }
+
             return oldCheck();
         }
 
