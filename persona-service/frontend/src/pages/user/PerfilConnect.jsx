@@ -100,12 +100,15 @@ function PerfilConnect() {
         setDialog({
           title: "Documento registrado",
           actionName: "Continuar",
+          cancelAction: () => setDialog(null),
           description: <>
             El documento esta registrado, pero no esta vinculado a un usuario
             <br/>
             Pongase en contacto en el administrador para resolver este problema
             <br/>
             Porfavor rellene el siguiente formulario para que el administrador pueda resolver este problema
+            <br/>
+            Si este no es su documento <b>{formData.num_doc_persona}</b>, por favor ingrese el documento correcto
           </>,
           action: () => setCurrentStep(3),
         });
