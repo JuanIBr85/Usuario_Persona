@@ -197,9 +197,10 @@ function AuthContextProvider({ children }) {
             })
             .catch((error) => {
                 console.error("Error al renovar el token", error);
+                
                 setDialog({
                     title: "Error al renovar el token",
-                    description: "No se pudo renovar el token",
+                    description: (error.statusCode===429)? "Se renovado demasiadas veces el token":"No se pudo renovar el token",
                     action: () => setDialog(null),
                 });
             });
@@ -253,7 +254,7 @@ function AuthContextProvider({ children }) {
         const timeout = setTimeout(() => {
             setDialog({
                 title: "Renovar sesión",
-                description: "Su sesión expira en 5 minutos. Desea renovarla?",
+                description: "Su sesión expira en 5 minutos. ¿Desea renovarla?",
                 action: () =>tokenRenew(),
                 cancel: "Cancelar",
                 cancelHandle: () => {

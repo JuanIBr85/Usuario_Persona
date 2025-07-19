@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Fade } from "react-awesome-reveal";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, X } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Users, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 import PersonFilter from "@/components/people/PersonFilter";
 import Loading from "@/components/loading/Loading";
@@ -22,6 +23,8 @@ import {
   Pagination,
   PaginationContent,
   PaginationItem,
+  PaginationLink,
+  PaginationEllipsis,
   PaginationPrevious,
   PaginationNext,
 } from "@/components/ui/pagination";
@@ -62,7 +65,7 @@ function AdminPersons() {
   const [filtro, setFiltro] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 15;
 
   // Usar el hook usePersonas para manejar la lógica de personas
   // personas y setPersonas hacen referencias a personas, el nombre debe cambiarse a personas
@@ -95,29 +98,91 @@ function AdminPersons() {
     }
   }, [newUser.codigo_postal]);
 
+  // Efecto para resetear la página actual cuando cambia el filtro
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filtro]);
+
   // Filtra personas según texto en nombre, apellido o documento (insensible a mayúsculas)
-  const personasFiltradas = personas.filter((user) => {
-    const textoMatch =
-      `${user.nombre} ${user.apellido}`
-        .toLowerCase()
-        .includes(filtro.toLowerCase()) ||
-      (user.nro_documento &&
-        user.nro_documento.toLowerCase().includes(filtro.toLowerCase()));
-    return textoMatch;
-  });
+  const personasFiltradas = useMemo(() => {
+    return personas.filter((user) => {
+      const textoMatch =
+        `${user.nombre} ${user.apellido}`
+          .toLowerCase()
+          .includes(filtro.toLowerCase()) ||
+        (user.nro_documento &&
+          user.nro_documento.toLowerCase().includes(filtro.toLowerCase()));
+      return textoMatch;
+    });
+  }, [personas, filtro]);
 
-  // Datos para paginación
+  // Calcular el número total de páginas
   const totalPages = Math.ceil(personasFiltradas.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentItems = personasFiltradas.slice(startIndex, endIndex);
 
-  const handlePreviousPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  // Obtener solo los items de la página actual usando useMemo para optimizar
+  const currentItems = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, personasFiltradas.length);
+    return personasFiltradas.slice(startIndex, endIndex);
+  }, [personasFiltradas, currentPage]);
+
+  // Función para cambiar de página
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
-  const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  // Función para ir a la página siguiente
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  // Función para ir a la página anterior
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  // Generar los números de página a mostrar
+  const getPageNumbers = () => {
+    const pages = [];
+
+    if (totalPages <= 5) {
+      // Si hay 5 o menos páginas, mostrar todas
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Siempre mostrar la primera página
+      pages.push(1);
+
+      // Si la página actual está lejos del inicio, mostrar elipsis
+      if (currentPage > 3) {
+        pages.push("ellipsis-start");
+      }
+
+      // Mostrar páginas alrededor de la actual
+      const startPage = Math.max(2, currentPage - 1);
+      const endPage = Math.min(totalPages - 1, currentPage + 1);
+
+      for (let i = startPage; i <= endPage; i++) {
+        if (i !== 1 && i !== totalPages) {
+          pages.push(i);
+        }
+      }
+
+      // Si la página actual está lejos del final, mostrar elipsis
+      if (currentPage < totalPages - 2) {
+        pages.push("ellipsis-end");
+      }
+
+      // Siempre mostrar la última página
+      pages.push(totalPages);
+    }
+
+    return pages;
   };
 
   /**
@@ -250,7 +315,12 @@ function AdminPersons() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="w-5 h-5 text-primary" />
-              Personas Cargadas
+              Personas Cargadas 
+              {filtro && (
+                <span className="ml-2 text-sm text-muted-foreground font-normal">
+                  {personasFiltradas.length} resultado{personasFiltradas.length !== 1 ? 's' : ''} encontrado{personasFiltradas.length !== 1 ? 's' : ''}
+                </span>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -266,37 +336,93 @@ function AdminPersons() {
 
             {/* Tabla con personas filtradas */}
             <div className="overflow-auto border p-3 rounded-md shadow-sm">
-              <PersonTable
-                persons={currentItems}
-                users={usuarios}
-                onEdit={(user) => {
-                  setEditingUser(user);
-                  showAlert(null); // Limpiar alertas previas
-                }}
-                onDelete={handleDelete}
-                onSeeDetails={handleSeeDetails}
-              />
+              {personasFiltradas.length > 0 ? (
+                <PersonTable
+                  persons={currentItems}
+                  users={usuarios}
+                  onEdit={(user) => {
+                    setEditingUser(user);
+                    showAlert(null); // Limpiar alertas previas
+                  }}
+                  onDelete={handleDelete}
+                  onSeeDetails={handleSeeDetails}
+                />
+              ) : (
+                <p className="text-center py-4 text-muted-foreground">
+                  No se encontraron personas que coincidan con la búsqueda.
+                </p>
+              )}
             </div>
 
-            <Pagination className="mt-4">
-              <PaginationContent className="mx-auto">
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={handlePreviousPage}
-                    className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                  />
-                </PaginationItem>
-                <PaginationItem className="text-sm px-4 py-1 text-muted-foreground">
-                  Página {currentPage} de {totalPages || 1}
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={handleNextPage}
-                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+            {/* Paginación mejorada */}
+            {totalPages > 1 && (
+              <CardFooter className="pt-6">
+                <Pagination className="w-full">
+                  <PaginationContent>
+                    {/* Botón Anterior en español */}
+                    <PaginationItem>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className={`h-9 px-4 flex items-center gap-1 ${
+                          currentPage === 1
+                            ? "opacity-50 pointer-events-none"
+                            : "cursor-pointer"
+                        }`}
+                        onClick={goToPreviousPage}
+                        disabled={currentPage === 1}
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                        Anterior
+                      </Button>
+                    </PaginationItem>
+
+                    {getPageNumbers().map((pageNum, index) => {
+                      if (
+                        pageNum === "ellipsis-start" ||
+                        pageNum === "ellipsis-end"
+                      ) {
+                        return (
+                          <PaginationItem key={`ellipsis-${index}`}>
+                            <PaginationEllipsis />
+                          </PaginationItem>
+                        );
+                      }
+
+                      return (
+                        <PaginationItem key={`page-${pageNum}`}>
+                          <PaginationLink
+                            onClick={() => handlePageChange(pageNum)}
+                            isActive={currentPage === pageNum}
+                            className="cursor-pointer"
+                          >
+                            {pageNum}
+                          </PaginationLink>
+                        </PaginationItem>
+                      );
+                    })}
+
+                    {/* Botón Siguiente en español */}
+                    <PaginationItem>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className={`h-9 px-4 flex items-center gap-1 ${
+                          currentPage === totalPages
+                            ? "opacity-50 pointer-events-none"
+                            : "cursor-pointer"
+                        }`}
+                        onClick={goToNextPage}
+                        disabled={currentPage === totalPages}
+                      >
+                        Siguiente
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </CardFooter>
+            )}
 
             <PersonCreateDialog
               isDialogOpen={isDialogOpen}

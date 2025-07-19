@@ -4,6 +4,7 @@ import Header from "./Header";
 import Footer from "./Footer";
 import Main from "./Main";
 import AccessibilityMenu from './AccesibilityMenu';
+import ScrollToTop from './ScrollToTop';
 
 /**
  * Componente de diseño principal que envuelve el contenido de las páginas.
@@ -28,6 +29,7 @@ const Layout = ({ children }) => {
       </div>
       {!hideHeaderFooter && <Footer />}
       <AccessibilityMenu />
+      <ScrollToTop />
     </div>
   );
 };
