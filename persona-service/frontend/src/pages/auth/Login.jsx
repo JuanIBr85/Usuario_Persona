@@ -11,6 +11,7 @@ import { useAuthContext } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import Loading from "@/components/loading/Loading";
 import AuthLayout from "@/components/authLayout/AuthLayout";
+import useFetchMessage from "@/utils/useFetchMessage";
 
 /**
  * Componente: Login.
@@ -47,7 +48,7 @@ function Login() {
         });
       })
       .catch((error) => {
-        setMessage(error.data?.message ?? "Ocurrió un error inesperado");
+        setMessage(useFetchMessage(error?.data.error, "Ocurrió un error inesperado"));
       })
       .finally(() => {
         setIsLoading(false);
