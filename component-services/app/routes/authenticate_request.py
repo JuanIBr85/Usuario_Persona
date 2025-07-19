@@ -87,6 +87,10 @@ def authenticate_config(app):
             "minutes": "minutos",
             "second": "segundo",
             "seconds": "segundos",
+            "hour": "hora",
+            "hours": "horas",
+            "day": "dia",
+            "days": "dias",
         }
 
         description = e.description
