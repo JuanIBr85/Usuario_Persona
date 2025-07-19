@@ -144,8 +144,7 @@ function PersonEditDialog({
               </SimpleSelect>
 
               <InputValidate
-                id="documento"
-                name="num_doc_persona"
+                id="num_doc_persona"
                 type="text"
                 labelText="Nro. documento"
                 maxLength={13}

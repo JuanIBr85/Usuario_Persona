@@ -332,7 +332,7 @@ def refresh_token():
                     error_code="TOKEN_INVALID",
                 ), 401
         
-        status,mensaje,resultado,code = usuario_service.rotar_refresh_token(session, payload)
+        status,mensaje,resultado,code = usuario_service.rotar_refresh_token(session, jti_refresh_anterior, ComponentRequest.get_user_id(), ComponentRequest.get_user_agent(), ComponentRequest.get_ip())
 
         if code == 200:
             if jti_access_anterior:

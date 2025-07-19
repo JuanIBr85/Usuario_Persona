@@ -362,6 +362,34 @@ class UsuarioService(ServicioBase):
                 "Si no has sido tu puedes dar aviso a los administradores."
             ), None, 403
         logger.info(f"→ Usuario {usuario.id_usuario} autenticado, generando tokens...")
+        
+        # Verificar si el dispositivo ya está registrado
+        dispositivo_confiable = (
+            session.query(DispositivoConfiable)
+            .filter_by(usuario_id=usuario.id_usuario, user_agent=user_agent)
+            .first()
+        )
+        try:
+            if not dispositivo_confiable or dispositivo_confiable.fecha_expira.replace(
+                tzinfo=timezone.utc
+            ) < datetime.now(timezone.utc):
+                # Dispositivo nuevo o expirado → enviar email de validación
+                enviar_email_validacion_dispositivo(usuario, user_agent, ip)
+                logger.info("→ Dispositivo no confiable, se envió mail de validación")
+                return (
+                    ResponseStatus.PENDING,
+                    "Verificación de dispositivo enviada al email. Por favor confírmelo.",
+                    None,
+                    403,
+                )
+        except Exception as error:
+            logger.error("Error al verificar dispositivo", exc_info=error)
+            return ResponseStatus.FAIL, "Error al verificar dispositivo", str(error), 400
+
+
+        return self._get_token(usuario, session, user_agent, ip)
+
+    def _get_token(self, usuario, session, user_agent, ip):
         # Obtener el rol del usuario
         rol_usuario = (
             session.query(Rol)
@@ -383,37 +411,17 @@ class UsuarioService(ServicioBase):
 
         permisos_lista = (p.nombre_permiso for p in permisos)
 
-        # Verificar si el dispositivo ya está registrado
-        dispositivo_confiable = (
-            session.query(DispositivoConfiable)
-            .filter_by(usuario_id=usuario.id_usuario, user_agent=user_agent)
-            .first()
-        )
         try:
-            if not dispositivo_confiable or dispositivo_confiable.fecha_expira.replace(
-                tzinfo=timezone.utc
-            ) < datetime.now(timezone.utc):
-                # Dispositivo nuevo o expirado → enviar email de validación
-                enviar_email_validacion_dispositivo(usuario, user_agent, ip)
-                logger.info("→ Dispositivo no confiable, se envió mail de validación")
-                return (
-                    ResponseStatus.PENDING,
-                    "Verificación de dispositivo enviada al email. Por favor confírmelo.",
-                    None,
-                    403,
-                )
-
-            else:
-                # Crear token de refresh
-                refresh_token, refresh_expires, jti_refresh = crear_token_refresh(usuario.id_usuario)
-                # Crear token con permisos incluidos
-                token, expires_in, expires_seconds = crear_token_acceso(
-                    usuario.id_usuario, usuario.email_usuario, jti_refresh
-                )
-                logger.info("→ Tokens generados correctamente")
+            # Crear token de refresh
+            refresh_token, refresh_expires, jti_refresh = crear_token_refresh(usuario.id_usuario)
+            # Crear token con permisos incluidos
+            token, expires_in, expires_seconds = crear_token_acceso(
+                usuario.id_usuario, usuario.email_usuario, jti_refresh
+            )
+            logger.info("→ Tokens generados correctamente")
         except Exception as error:
             logger.error("Error al generar tokens", exc_info=error)
-            return ResponseStatus.FAIL, "error de dispositivo ", str(error), 400
+            return ResponseStatus.FAIL, "Error al generar tokens", str(error), 400
 
         
         try:
@@ -1009,7 +1017,7 @@ class UsuarioService(ServicioBase):
 
         return usuario_data
 
-    def rotar_refresh_token(self, session: Session, payload: str) -> dict:
+    def rotar_refresh_token(self, session: Session, jti_viejo: str, id_usuario: int, user_agent: str, ip: str) -> dict:
         """
         Rota el refresh token del usuario, generando uno nuevo y revocando el anterior.
 
@@ -1026,30 +1034,18 @@ class UsuarioService(ServicioBase):
          dict: Tupla con estado (`ResponseStatus`), mensaje, diccionario con los nuevos tokens y código HTTP.
                En caso de error (usuario no encontrado), se retorna un mensaje de error y código 404.
         """
+
+        usuario = (
+            session.query(Usuario)
+            .filter_by(id_usuario=id_usuario,eliminado=False)
+            .first()
+        )
+
+        if not usuario:
+            return ResponseStatus.FAIL, "Usuario no encontrado", None, 404
+        
+
         # Revocar el refresh token anterior
-        jti_viejo = payload["jti"]
         revocar_refresh_token(jti_viejo)
 
-        # Crear nuevo refresh token
-        usuario_id = int(payload["sub"])
-        nuevo_refresh_token, refresh_expires, jti_nuevo = crear_token_refresh(usuario_id)
-        registrar_refresh_token(jti_nuevo, refresh_expires)
-
-        tokens = self.refresh_token(session, usuario_id,jti_nuevo)
-        if tokens is None:
-            return (
-                ResponseStatus.FAIL,
-                "Usuario no encontrado",
-                None,
-                404
-        )
-
-        tokens["refresh_token"] = nuevo_refresh_token
-        tokens["refresh_expires"] = refresh_expires.isoformat()
-
-        return (
-            ResponseStatus.SUCCESS,
-            "Nuevo token generado exitosamente.",
-            tokens,
-            200
-        )
+        return self._get_token(usuario, session, user_agent, ip)

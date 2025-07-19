@@ -21,7 +21,7 @@ class ContactoSchema(BaseSchema):
             ])
     red_social_contacto=fields.Str(validate = validar_red_social_contacto)
     red_social_nombre=fields.Str(allow_none=True, required=False, validate=permitir_vacios(REDES_SOCIALES_VALIDAS))
-    email_contacto = fields.Emails(
+    email_contacto = fields.Email(
         required=True,
         validate=[
             validate.Regexp(
