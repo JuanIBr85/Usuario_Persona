@@ -209,6 +209,7 @@ function PersonCreateDialog({
                 value={newUser.domicilio_calle || ""}
                 validatePattern="^(?!\s*$).+"
                 validationMessage="El nombre de la calle no puede estar vacío ni tener solo espacios"
+                required
               />
 
               <InputValidate
@@ -219,6 +220,7 @@ function PersonCreateDialog({
                 value={newUser.domicilio_numero || ""}
                 validatePattern="^\d{1,5}$"
                 validationMessage="Solo se permiten números (máximo 5 dígitos)"
+                required
               />
             </ResponsiveColumnForm>
 

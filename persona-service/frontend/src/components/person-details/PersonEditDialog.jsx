@@ -233,6 +233,7 @@ function PersonEditDialog({
                 labelText="Calle"
                 maxLength={50}
                 value={editingPerson.domicilio?.domicilio_calle || ""}
+                required
               />
 
               <InputValidate
@@ -241,6 +242,7 @@ function PersonEditDialog({
                 labelText="Número"
                 maxLength={10}
                 value={editingPerson.domicilio?.domicilio_numero || ""}
+                required
               />
             </ResponsiveColumnForm>
 
