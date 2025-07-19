@@ -286,6 +286,8 @@ function CreatePerfil() {
             <CardTitle>Completa tu perfil</CardTitle>
             <CardDescription>
               Por favor completa la siguiente información para crear tu perfil
+              <br/>
+              <span >Los campos seran validados al finalizar el formulario</span>
             </CardDescription>
           </CardHeader>
 

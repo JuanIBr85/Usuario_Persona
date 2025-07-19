@@ -23,6 +23,7 @@ const DatosPersonales = ({ hidden, staticData, documento }) => {
           type="text"
           labelText="Nombre"
           cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
+          validationMessage="El nombre es requerido y debe contener solo letras"
           required
         />
         <InputValidate
@@ -31,6 +32,7 @@ const DatosPersonales = ({ hidden, staticData, documento }) => {
           type="text"
           labelText="Apellido"
           cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
+          validationMessage="El apellido es requerido y debe contener solo letras"
           required
         />
       </ResponsiveColumnForm>
