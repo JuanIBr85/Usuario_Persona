@@ -9,7 +9,7 @@ def validar_nombre_apellido(valor: str) -> str:
     """Valida que un string (nombre y apellido) contenga solo letras y espacios simples."""
 
     if valor is None:
-        raise ValidationError("Valor requerido")
+        raise ValidationError("Este es un valor requerido")
 
     valor = valor.strip()
     patron = r'^[A-Za-zÁÉÍÓÚáéíóúÑñÜü]+(?: [A-Za-zÁÉÍÓÚáéíóúÑñÜü]+)*$'
@@ -33,13 +33,13 @@ def validar_domicilio_calle(valor: str) -> str:
     """Valida que el nombre de la calle sea válido y sin espacios sobrantes."""
 
     if valor is None:
-        raise ValidationError("Valor requerido")
+        raise ValidationError("Este es un valor requerido")
 
     valor = valor.strip()
     patron = r'^[A-Za-zÁÉÍÓÚáéíóúÑñÜü0-9]+(?: [A-Za-zÁÉÍÓÚáéíóúÑñÜü0-9]+)*$'
 
     if not valor:
-        raise ValidationError("No puede estar vacío")
+        raise ValidationError("Por favor completar el campo correspondiente. La calle del domicilio no puede estar vacío")
 
     if not re.fullmatch(patron, valor):
         raise ValidationError(
@@ -53,19 +53,19 @@ def validar_domicilio_numero(valor: str) -> str:
     """Valida que el número del domicilio sea numérico (opcionalmente con una letra) o 's/n'."""
     
     if valor is None:
-        raise ValidationError("Número requerido")
+        raise ValidationError("Este es un valor requerido")
 
     valor = valor.strip().lower()
 
     if not valor:
-        raise ValidationError("El número no puede estar vacío")
+        raise ValidationError("Por favor completar el dato correspondiente. El número del domicilio no puede estar vacío.")
 
     if valor == "s/n":
         return valor.upper()  
 
     patron = r'^\d{1,5}[a-zA-Z]?$'
     if not re.fullmatch(patron, valor):
-        raise ValidationError("Formato inválido. Ejemplos válidos: '123', '123B', 's/n'")
+        raise ValidationError("Formato de numero de domicilio inválido. Ejemplos válidos: '123', '123B', 's/n'")
 
     return valor.upper()
 
@@ -75,7 +75,7 @@ def validar_domicilio_piso(valor: str) -> str:
     """Valida que el piso sea alfanumérico simple o abreviaturas como 'PB'."""
 
     if valor is None or len(valor) == 0:
-        return ""  # no es requerido
+        return "" 
 
     valor = valor.strip()
     patron = r'^[0-9]{1,2}[A-Za-z]?$|^[Pp][Bb]$'
@@ -86,18 +86,20 @@ def validar_domicilio_piso(valor: str) -> str:
     return valor
 
 def validar_domicilio_dpto(valor: str) -> str:
+
     """Valida que el departamento sea una cadena alfanumérica corta (1-5 caracteres)."""
+    
     if valor is None or len(valor) == 0:
-        return ""  # No requerido
+        return "" 
 
     valor = valor.strip()
 
     if not valor: 
-        return ""  # Permitido vacío
+        return ""
 
     patron = r'^[A-Za-z0-9]{1,5}$'
     if not re.fullmatch(patron, valor):
-        raise ValidationError("Departamento inválido. Máximo 5 caracteres alfanuméricos sin símbolos ni espacios.")
+        raise ValidationError("Formato de departamento inválido. Máximo 5 caracteres alfanuméricos sin símbolos ni espacios.")
 
     return valor
 
@@ -125,17 +127,19 @@ def validar_referencias(valor: str) -> str:
 
 
 def validar_telefono(valor: str) -> str:
+    """
+    Valida que el numero de teléfono solo permita números con prefijo '+' y sin espacios ni símbolos.
+    Ejemplo válido: +5493512345678
+    """
 
-    """Valida que el teléfono contenga sólo números y guiones."""
-
-    if valor is None or len(valor) == 0:
+    if valor is None or valor.strip() == "":
         return ""
-    
+
     valor = valor.strip()
-    patron = r'^[\d\- ]{6,20}$'
+    patron = r'^\+549\d{10}$'
 
     if not re.fullmatch(patron, valor):
-        raise ValidationError("El teléfono solo puede contener números, guiones y espacios")
+        raise ValidationError("El teléfono debe estar en este formato: +549XXXXXXXXXX")
 
     return valor
 

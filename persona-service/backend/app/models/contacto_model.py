@@ -9,8 +9,8 @@ class Contacto(Base):
     __tablename__ = "contactos"
 
     id_contacto=Column(Integer, primary_key=True)
-    telefono_fijo=Column(String(20), nullable=True)
-    telefono_movil=Column(String(20), nullable=False)
+    telefono_fijo=Column(String(14), nullable=True)
+    telefono_movil=Column(String(14), nullable=False)
     red_social_contacto=Column(String(50),nullable=True)
     red_social_nombre=Column(String(40), nullable=True)
     email_contacto=Column(String(50), nullable=False)
