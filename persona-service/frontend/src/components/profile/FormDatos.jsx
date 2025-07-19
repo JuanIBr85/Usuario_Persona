@@ -42,9 +42,7 @@ export default function FormDatos({
       })
       .catch((error) => {
         console.error("Error updating domicilio:", error.data);
-        errorDialog(<>
-          No se pudieron guardar los datos.<br/>Los datos personales solo pueden editarse una vez cada 30 dias.
-        </>)
+        errorDialog(error.data.error.server)
       })
       .finally(() => setLoading(false));
   };

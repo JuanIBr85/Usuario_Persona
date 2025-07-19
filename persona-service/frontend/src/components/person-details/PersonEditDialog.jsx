@@ -210,6 +210,7 @@ function PersonEditDialog({
                 id="telefono_movil"
                 type="tel"
                 labelText="Teléfono móvil"
+                validatePattern="^\+549\d{10}$"
                 value={person.contacto?.telefono_movil || ""}
                 maxLength={20}
                 required
@@ -222,6 +223,7 @@ function PersonEditDialog({
                 type="tel"
                 labelText="Teléfono fijo"
                 maxLength={20}
+                validatePattern="^\+549\d{10}$" 
                 value={person.contacto?.telefono_fijo || ""}
               />
             </ResponsiveColumnForm>

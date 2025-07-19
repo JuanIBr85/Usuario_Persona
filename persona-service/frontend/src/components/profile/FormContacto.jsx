@@ -35,10 +35,11 @@ export default function FormContacto({
       .then((response) => {
         setPersonaData(response.data);
         okDialog();
-      })
+      }) 
       .catch((error) => {
         console.error("Error updating domicilio:", error.data);
-        errorDialog();
+        
+        errorDialog(error.data.error);
       })
       .finally(() => setLoading(false));
   };
@@ -56,18 +57,18 @@ export default function FormContacto({
               placeholder="Ingresa tu teléfono fijo"
               labelText="Teléfono Fijo"
               value={contacto?.telefono_fijo || ""}
-              validatePattern="^[\+]?[0-9\-\s\(\)]{10,}$"
-              validationMessage="Ingresa un número de teléfono válido"
+              validatePattern="^\+549\d{10}$"
+              validationMessage="Ingresa un número de teléfono válido EJ: +5492926396430"
             />
             <InputValidate
               id="telefono_movil"
               type="tel"
               maxLength={20}
+              validatePattern="^\+549\d{10}$"
               placeholder="Ingresa tu teléfono móvil"
               labelText="Teléfono móvil"
               value={contacto?.telefono_movil || ""}
-              validatePattern="^[\+]?[0-9\-\s\(\)]{10,}$"
-              validationMessage="Ingresa un número de teléfono válido"
+              validationMessage="Ingresa un número de teléfono válido EJ: +5492926396430"
               required
             />
           </ResponsiveColumnForm>
