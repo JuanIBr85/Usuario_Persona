@@ -115,13 +115,13 @@ function OTPValidation() {
           setIsOK(false);
         }
       }).catch((error) => {
-        console.log(error.data);
+        console.log(error?.data);
         setIsOK(false);
         if (error.isJson) {
-          if (error.data.error) {
+          if (error?.data?.error) {
             setMessage(FetchErrorMessage(error));
           } else {
-            setMessage(error.data.message || "Error desconocido");
+            setMessage(error?.data?.message || "Error desconocido");
           }
         } else {
           setMessage(error.message);

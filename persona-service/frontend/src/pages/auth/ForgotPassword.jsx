@@ -50,10 +50,10 @@ function ForgotPassword() {
         setShouldRedirect(false); // Cancela redirección si hay error
         if (error.isJson) {
           // Si el backend devuelve un mensaje específico
-          if (error.data.error) {
+          if (error?.data?.error) {
             setMessage(FetchErrorMessage(error)); // Usa mensaje estandarizado
           } else {
-            setMessage(error.data.message || "Error al procesar la solicitud");
+            setMessage(error?.data?.message || "Error al procesar la solicitud");
           }
         } else {
           setMessage(error.message || "Error de conexión");
@@ -99,6 +99,7 @@ function ForgotPassword() {
             maxLength={50}
             labelText="Email"
             validationMessage="Email inválido"
+            
             required
           />
 

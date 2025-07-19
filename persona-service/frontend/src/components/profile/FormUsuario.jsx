@@ -234,6 +234,7 @@ export default function FormUsuario() {
               placeholder="Ingresa tu correo"
               defaultValue={authData.user.email_usuario || ""}
               validationMessage="Email inválido"
+              
               required
             />
             <InputValidate
@@ -321,6 +322,7 @@ export default function FormUsuario() {
               placeholder="Ingresa tu nuevo correo"
               maxLength={50}
               validationMessage="Email inválido"
+              
               required
             />
             <InputValidate
