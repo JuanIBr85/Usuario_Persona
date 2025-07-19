@@ -35,7 +35,7 @@ export default function FormPersonaExtendida({
       })
       .catch((error) => {
         console.error("Error updating persona extendida:", error);
-        errorDialog();
+        errorDialog(error?.data?.error?.server || error?.data?.error);
       })
       .finally(() => setLoading(false));
   };

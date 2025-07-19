@@ -23,7 +23,7 @@ const minDate = "1905-01-01"
  * @param {Object} props - Props adicionales que serán pasadas al componente <Input>.
  * @param {string} containerClassName - Clases adicionales para el contenedor del input.
  */
-export default function InputValidate({ id, type, placeholder, labelText, validatePattern, validationMessage, value = "", containerClassName, onChange, required=false, iconInput, cleanRegex = /[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ0-9\s\-_.,'()]/g, cleanEmailRegex = /[^a-zA-Z0-9@._-]/g, cleanTelRegex = /[^0-9\s\-\(\)\+]/g, cleanUrlRegex = /[^a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]/g, isCleanValue = true, maxLength=50, min, max, name, ...props }) {
+export default function InputValidate({ id, type, placeholder, labelText, validatePattern, validationMessage, value = "", containerClassName, onChange, required = false, iconInput, cleanRegex = /[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ0-9\s\-_.,'()]/g, cleanEmailRegex = /[^a-zA-Z0-9@._-]/g, cleanTelRegex = /[^0-9\s\-\(\)\+]/g, cleanUrlRegex = /[^a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]/g, isCleanValue = true, maxLength = 50, min, max, name, ...props }) {
     //Este estado sirve para indicar si hubo un error en la validacion del input
     const [error, setError] = React.useState(false)
     //Este estado sirve para indicar si debe o no ocultar la contraseña
@@ -39,11 +39,11 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
 
     const { removeAuthData } = useAuthContext();
 
-    useEffect(()=>{
-        if(name){
+    useEffect(() => {
+        if (name) {
             alert(`InputValidate: ${name} - la propiedad name no es valida, use id en su lugar`);
         }
-    },[name])
+    }, [name])
 
     useEffect(() => {
         setInternalMin(min || (type === "date" ? minDate : undefined));
@@ -51,15 +51,15 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
     }, [min, max]);
 
     useEffect(() => {
-        if(!validatePattern)return;
+        if (!validatePattern) return;
         setInternalPattern(validatePattern);
-        if(inputRef.current)inputRef.current.pattern = validatePattern;
-        if(isInit)handleBlur({target: inputRef.current});
+        if (inputRef.current) inputRef.current.pattern = validatePattern;
+        if (isInit) handleBlur({ target: inputRef.current });
     }, [validatePattern]);
 
     const handleBlur = (event) => {
         const input = event.target;
-        if(!input)return;
+        if (!input) return;
 
         let value = input.value?.trim();
 
@@ -82,32 +82,34 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
         input.value = value;
         setInternalValue(value);
 
-
-        if(input.type==="email"){
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            //obtengo el ultimo elemento del email
-            const domain = value.split(".").pop();
-            if(domain.length<2 || !emailPattern.test(value)){
-                setError(true);
-                return;
-            }
+        switch (type) {
+            case "email":
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                //obtengo el ultimo elemento del email
+                const domain = value.split(".").pop();
+                if (domain.length < 2 || !emailPattern.test(value)) {
+                    setError(true);
+                    return;
+                }
+                break;
         }
+
         if (input.checkValidity()) {
             setError(false)
         }
     }
 
     useEffect(() => {
-        if(!inputRef.current)return;
+        if (!inputRef.current) return;
         const input = inputRef.current;
         const oldCheck = HTMLInputElement.prototype.checkValidity.bind(input);
 
         inputRef.current.checkValidity = () => {
-            if(internalPattern){
+            if (internalPattern) {
                 input.pattern = internalPattern;
             }
             //Si el patron del input es diferente al del validatePattern
-            if ( (type && (input.type !== type && !(type === "password" && input.type === "text")))
+            if ((type && (input.type !== type && !(type === "password" && input.type === "text")))
                 //Si el required difiere de la que se le dio al input al principio
                 || (required && (input.required !== required))
                 //Si el id o name difiere de la que se le dio al input al principio

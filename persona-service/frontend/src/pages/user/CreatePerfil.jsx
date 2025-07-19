@@ -16,7 +16,7 @@ import Resumen from '@/components/createProfile/steps/Resumen';
 import { useAuthContext } from "@/context/AuthContext";
 import { SimpleDialog } from '@/components/SimpleDialog';
 import { PersonaService } from '@/services/personaService';
-
+import useFetchMessage from '@/utils/useFetchMessage'
 /**
  * CreatePerfil.jsx
  *
@@ -187,8 +187,9 @@ function CreatePerfil() {
         setDialog({
           title: "Error",
           actionName: "Cerrar",
-          description: "Error al crear el perfil",
+          description: useFetchMessage(description, error_mesage_default="Error al crear el perfil"),
         })
+
       });
   };
 
