@@ -173,9 +173,6 @@ export default function AdminRoles() {
   }
 
   function handleEditClick(role) {
-    document
-      .getElementById("role-form")
-      ?.scrollIntoView({ behavior: "smooth", block: "center" });
     setEditRoleId(role.id);
     setNewRoleName(role.name);
     const permisosCompletos = availablePermissions.filter((permiso) =>
