@@ -1,5 +1,5 @@
 import threading
-from flask import Blueprint, current_app, request
+from flask import Blueprint, current_app, jsonify, request
 from common.utils.make_endpoints_list import make_endpoints_list
 from common.utils.get_component_info import get_component_info
 from common.decorators.receiver import get_receiver
@@ -67,3 +67,24 @@ def receiver():
         traceback.print_exc()
         logging.error(f"Error al recibir mensaje: {str(e)}")
         return "Error al recibir mensaje", 500
+
+
+@bp.route("/debug", methods=["GET"])
+def debug():
+    """
+    Retorna la lista completa de endpoints del servicio
+    """
+
+    output = []
+    for rule in current_app.url_map.iter_rules():
+        if rule.endpoint == "static":
+            continue
+        methods = sorted(rule.methods - {"HEAD", "OPTIONS"})
+        output.append(
+            {
+                "endpoint": rule.endpoint,
+                "methods": ", ".join(methods),
+                "rule": str(rule),
+            }
+        )
+    return jsonify(output)

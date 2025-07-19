@@ -48,7 +48,8 @@ wheels/
 *.tmp
 *.bak
 *~
-
+*.logs
+*.log
 # Testing
 .coverage
 htmlcov/

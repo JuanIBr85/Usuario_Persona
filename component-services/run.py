@@ -1,14 +1,13 @@
-import os
 import logging
-os.makedirs('logs', exist_ok=True)
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(),
-        logging.FileHandler('logs/app.log')
-    ]
-)
+import os
+
+from common.utils.logging_config import logging_config
+
+logging_config("app.log", logging.INFO)
+logging_config("error.log", logging.ERROR)
+logging_config("warning.log", logging.WARNING)
+
+logging.getLogger().setLevel(logging.WARNING)
 
 from app import create_app
 
