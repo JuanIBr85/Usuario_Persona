@@ -88,8 +88,8 @@ function AuthContextProvider({ children }) {
             localStorage.setItem("token", newData.token);
             Object.assign(tempAuthData, newData);
 
-            //console.log("Datos de autenticación actualizados", newData);
-            //console.log("Datos de usuario actualizados", newData.user);
+            console.log("Datos de autenticación actualizados", newData);
+            console.log("Datos de usuario actualizados", newData.user);
             return newData;
         });
     };
@@ -179,13 +179,20 @@ function AuthContextProvider({ children }) {
     const tokenRenew = () => {
         AuthService.renewToken(authData.user.refresh_token)
             .then((response) => {
-                console.log("RESPUESTA ENVIADA POR RENEW", response);
-                //updateData(response.data);
-                setDialog(makeDialog("Renovacion exitosa", "El token ha sido renovado exitosamente"));
+                updateData(response.data);
+                setDialog({
+                    title: "Sesión renovada",
+                    description: "Su sesión ha sido renovada exitosamente",
+                    action: () => setDialog(null),
+                });
             })
             .catch((error) => {
                 console.error("Error al renovar el token", error);
-                setDialog(makeDialog("Error al renovar el token", "No se pudo renovar el token"));
+                setDialog({
+                    title: "Error al renovar el token",
+                    description: "No se pudo renovar el token",
+                    action: () => setDialog(null),
+                });
             });
     }
     //Verifica si el usuario esta autenticado al cambiar la ruta
@@ -234,7 +241,7 @@ function AuthContextProvider({ children }) {
         
         //Por si se renova el token
         //creo un timeout para que cuando falten 5 minutos o menos lance una advertencia
-        /*const timeout = setTimeout(() => {
+        const timeout = setTimeout(() => {
             setDialog({
                 title: "Renovar sesión",
                 description: "Su sesión expira en 5 minutos. Desea renovarla?",
@@ -244,12 +251,12 @@ function AuthContextProvider({ children }) {
                     setDialog(null);
                 }
             });
-        }, Math.max(timeLeftToExpire()-(60*29), 0)*1000);*/
+        }, Math.max(timeLeftToExpire()-(60*5), 0)*1000);
 
 
         return () => {
             clearInterval(interval);
-            //clearTimeout(timeout);
+            clearTimeout(timeout);
         };
     }, [authData.user?.expires_in]);
 
