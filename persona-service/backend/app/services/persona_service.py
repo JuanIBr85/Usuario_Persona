@@ -177,10 +177,10 @@ class PersonaService(IPersonaInterface):
             validacion = validar_documento_por_tipo(tipo_doc, num_doc)
 
             if validacion==-4:
-                raise Exception ("Numero de CUIL/CUIT invalido.")
+                raise Exception ("Numero de CUIL/CUIT invalido. Verificar el numero ingresado")
 
             if not validacion:
-                raise Exception ("Numero de documento invalido para el tipo selecionado. Verifique y vuelva a intentar.") 
+                raise Exception ("Numero de documento invalido para el tipo seleccionado. Verifique y vuelva a intentar.") 
 
             existe_persona = (
                 session.query(Persona)
