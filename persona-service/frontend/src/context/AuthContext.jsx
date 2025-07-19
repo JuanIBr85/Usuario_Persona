@@ -197,9 +197,10 @@ function AuthContextProvider({ children }) {
             })
             .catch((error) => {
                 console.error("Error al renovar el token", error);
+                
                 setDialog({
                     title: "Error al renovar el token",
-                    description: "No se pudo renovar el token",
+                    description: (error.statusCode===429)? "Se renovado demasiadas veces el token":"No se pudo renovar el token",
                     action: () => setDialog(null),
                 });
             });
