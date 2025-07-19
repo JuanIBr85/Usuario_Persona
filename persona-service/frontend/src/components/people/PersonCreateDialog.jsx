@@ -260,7 +260,7 @@ function PersonCreateDialog({
                 labelText="Teléfono fijo"
                 value={newUser.telefono_fijo || ""}
                 validatePattern="^\+549\d{10}$"
-                validationMessage="Solo se permiten números, mínimo 7 dígitos."
+                validationMessage="El teléfono debe estar en este formato: +549XXXXXXXXXX"
               />
 
               <InputValidate
@@ -272,7 +272,7 @@ function PersonCreateDialog({
                 value={newUser.telefono_movil || ""}
                 required
                 validatePattern="^\+549\d{10}$"
-                validationMessage="Solo se permiten números, mínimo 7 dígitos."
+                validationMessage="El teléfono debe estar en este formato: +549XXXXXXXXXX"
               />
             </ResponsiveColumnForm>
 
