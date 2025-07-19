@@ -51,15 +51,14 @@ function AuthContextProvider({ children }) {
     const location = useLocation();
 
     //Funcion para calcular el tiempo restante para que expire el token
-    const timeLeftToExpire = () => (new Date(authData.user.expires_in) - new Date()) / 1000;
+    const timeLeftToExpire = () => (new Date(authData.user?.expires_in) - new Date()) / 1000;
 
     //Funcion para verificar si el token es valido
     const isTokenValid = () => {
         if (!authData.user?.expires_in) {
-            console.error("No se encontro fecha de expiracion del token", authData);
+            console.error("No se encontro fecha de expiracion del token", authData, !authData.user?.expires_in);
             return false;
         }
-
         const now = new Date(Date.now() + 60000);
         const expirationDate = new Date(authData.user.expires_in);
         return now <= expirationDate;
@@ -84,15 +83,19 @@ function AuthContextProvider({ children }) {
         setAuthData(data => {
             const newData = { ...data, ...values };
 
-            localStorage.setItem("authData", JSON.stringify(newData));
-            localStorage.setItem("token", newData.token);
-            Object.assign(tempAuthData, newData);
-
-            console.log("Datos de autenticación actualizados", newData);
-            console.log("Datos de usuario actualizados", newData.user);
-            return newData;
+            return forceNewData(newData);
         });
     };
+
+    const forceNewData = (newData)=>{
+        localStorage.setItem("authData", JSON.stringify(newData));
+        localStorage.setItem("token", newData.token);
+        Object.assign(tempAuthData, newData);
+
+        console.log("Datos de autenticación actualizados", newData);
+        console.log("Datos de usuario actualizados", newData.user);
+        return newData;
+    }
 
     //Funcion para actualizar los datos del usuario
     const updateUserData = (values) => {
@@ -179,7 +182,13 @@ function AuthContextProvider({ children }) {
     const tokenRenew = () => {
         AuthService.renewToken(authData.user.refresh_token)
             .then((response) => {
-                updateData(response.data);
+                console.warn("token renovado", response);
+                //forceNewData(response.data);
+                updateData({
+                    token: response.data.token, // Guarda el token para futuras peticiones
+                    user: response.data, // Guarda los datos del usuario logueado
+                });
+                //updateUserData(response.data);
                 setDialog({
                     title: "Sesión renovada",
                     description: "Su sesión ha sido renovada exitosamente",
@@ -188,9 +197,10 @@ function AuthContextProvider({ children }) {
             })
             .catch((error) => {
                 console.error("Error al renovar el token", error);
+                
                 setDialog({
                     title: "Error al renovar el token",
-                    description: "No se pudo renovar el token",
+                    description: (error.statusCode===429)? "Se renovado demasiadas veces el token":"No se pudo renovar el token",
                     action: () => setDialog(null),
                 });
             });

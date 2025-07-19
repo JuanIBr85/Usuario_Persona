@@ -28,6 +28,7 @@ import {
   PaginationPrevious,
   PaginationNext,
 } from "@/components/ui/pagination";
+import { Button } from "@/components/ui/button";
 
 /**
  * Componente AdminUsers
