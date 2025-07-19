@@ -92,7 +92,7 @@ function PersonEditDialog({
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && setIsDialogOpen(false)}>
-      <DialogContent className="sm:max-w-[600px] overflow-y-auto max-h-[90vh]">
+      <DialogContent className="sm:max-w-[600px] overflow-y-auto overflow-x-hidden max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>Editar Persona</DialogTitle>
           <DialogDescription>

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Loading from "@/components/loading/Loading";
+import { X } from "lucide-react";
 
 import { PersonaService } from "@/services/personaService";
 import { useUsuariosBasic } from "@/hooks/users/useUsuariosBasic";
-
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 import PersonDetailsCard from "@/components/person-details/PersonDetailsCard";
 import PersonEditDialog from "@/components/person-details/PersonEditDialog";
@@ -40,6 +41,7 @@ import PersonDetailsBreadcrumb from "@/components/person-details/PersonDetailsBr
  */
 function PersonDetails() {
   const { id } = useParams();
+  const [alert, setAlert] = useState(null);
 
   const [person, setPerson] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -53,6 +55,12 @@ function PersonDetails() {
     loading,
     error,
   } = useUsuariosBasic();
+
+  function showAlert(title, description, variant = "default") {
+    setAlert({ title, description, variant });
+    setTimeout(() => setAlert(null), 5000);
+  }
+
   useEffect(() => {
     PersonaService.get_by_id(id)
       .then((res) => {
@@ -86,13 +94,17 @@ function PersonDetails() {
   }, [postal]);
 
   const handleEditSubmit = async (body) => {
-    setIsDialogOpen(false);
     PersonaService.editar(id, body).then((res) => {
       if (res?.data) {
         const persona = res.data;
         setPerson(persona);
         setPostal(persona.domicilio.codigo_postal);
+        showAlert("Persona editada", "Persona editada correctamente");
+        setIsDialogOpen(false);
       }
+    }).catch((err) => {
+      console.error("Error al editar la persona:", err);
+      showAlert("Error", "Error al editar la persona", "destructive");
     })
   };
 
@@ -111,12 +123,31 @@ function PersonDetails() {
         changePostal={setPostal}
         onSubmit={handleEditSubmit}
         redesSociales={redesSociales}
-        tiposDocumentos={tiposDocumentos}
+        tiposDocumentos={tiposDocumentos} 
         localidades={localidades}
         usuarios={usuarios}
         loading={loading}
         error={error}
       />
+      {alert && (
+        <div className="fixed bottom-16 right-4 z-50 w-96">
+          <Alert
+            variant={alert.variant || "default"}
+            className="animate-in slide-in-from-right-8 duration-300 bg-card border-black"
+          >
+            <AlertTitle>{alert.title}</AlertTitle>
+            {alert?.description && (
+              <AlertDescription>{alert.description}</AlertDescription>
+            )}
+            <button
+              onClick={() => setAlert(null)}
+              className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </Alert>
+        </div>
+      )}
     </div>
   );
 }
