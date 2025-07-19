@@ -228,7 +228,7 @@ def crear_persona_restringido():
                 400,
             )
 
-        existe, _, _ = persona_service.verificar_documento_mas_get_id(
+        existe, _, _, _ = persona_service.verificar_documento_mas_get_id(
             data["tipo_documento"], data["num_doc_persona"]
         )
 
@@ -532,7 +532,7 @@ def contar_personas():
 
 #Inicia verificación de persona mediante OTP
 @persona_bp.route("/personas/verify", methods=["POST"])
-@api_access()
+@api_access(limiter=["2 per day"])
 def verificar_persona():
     try:
         usuario_id = ComponentRequest.get_user_id()
@@ -558,7 +558,7 @@ def verificar_persona():
         num = validated_data["num_doc_persona"]
         email_confirmado = validated_data["email_confirmado"]
 
-        exists, email, persona_id = persona_service.verificar_documento_mas_get_id(
+        exists, email, persona_id,_ = persona_service.verificar_documento_mas_get_id(
             tipo, num
         )
         if not exists:
@@ -586,7 +586,7 @@ def verificar_persona():
         return make_response(ResponseStatus.FAIL, "Error al verificar persona"), 500
 
 #Confirma el OTP y vincula la persona con el usuario
-@api_access()
+@api_access(limiter=["3 per day"])
 @persona_bp.route("/personas/verify-otp", methods=["POST"])
 def verificar_otp_persona():
 
@@ -622,7 +622,7 @@ def verificar_otp_persona():
     return make_response(ResponseStatus.SUCCESS, "Persona vinculada con usuario"), 200
 
 #Verifica datos personales cuando no coincide el email
-@api_access()
+@api_access(limiter=["3 per day"])
 @persona_bp.route('/personas/verificar-identidad', methods=['POST'])
 def verificar_identidad():
     try:

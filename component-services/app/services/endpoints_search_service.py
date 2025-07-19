@@ -83,7 +83,7 @@ class EndpointsSearchService:
                 error_cnt += 1
                 # Logea error cada minuto (60 intentos)
                 if error_cnt % (5 * 1) == 0:
-                    logging.error(f"Error conectando con {service.service_name}")
+                    logging.error(f"Error conectando con {service.service_name} - {service_url}")
                 service_endpoint_log.set_error(str(e))
 
                 if not service.service_wait:

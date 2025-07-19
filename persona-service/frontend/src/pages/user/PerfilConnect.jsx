@@ -96,6 +96,20 @@ function PerfilConnect() {
       nextStep();
     } catch (error) {
       console.error(error);
+      if(error.statusCode === 430){
+        setDialog({
+          title: "Documento registrado",
+          actionName: "Continuar",
+          description: <>
+            El documento esta registrado, pero no esta vinculado a un usuario
+            <br/>
+            Pongase en contacto en el administrador para resolver este problema
+            <br/>
+            Porfavor rellene el siguiente formulario para que el administrador pueda resolver este problema
+          </>,
+          action: () => setCurrentStep(3),
+        });
+      }
       if (error.statusCode === 404) {
         setDialog({
           title: "Crear perfil",
@@ -217,9 +231,13 @@ function PerfilConnect() {
       })
     } catch (error) {
       setDialog({
-        title: "Hubo un error",
+        title: <span className="text-destructive">Hubo un error</span>,
         actionName: "Cerrar",
-        description: error.data.message,
+        description: <>
+          Hubo un error al verificar su identidad
+          <br />
+          <b>Razon</b>: {error.data.message}
+        </>,
       });
     } finally {
       setLoading(false);

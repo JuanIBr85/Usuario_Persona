@@ -230,9 +230,20 @@ def verificar_documento():
         tipo_documento = validated_data["tipo_documento"]
         num_doc_persona = validated_data["num_doc_persona"]
 
-        exists, email, id_persona = service.verificar_documento_mas_get_id(
+        exists, email, id_persona, usuario_id = service.verificar_documento_mas_get_id(
             tipo_documento, num_doc_persona
-        )
+        ) 
+
+        if exists and usuario_id is not None:
+            logging.error(f"Documento registrado: {id_persona}")
+            return (
+                make_response(
+                    status=ResponseStatus.SUCCESS,
+                    message="Documento registrado",
+                    data={"exists": True}
+                ),
+                430,#Para que el frontend sepa que el documento esta registrado
+            )
 
         if not exists:
             return (

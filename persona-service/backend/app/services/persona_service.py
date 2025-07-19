@@ -585,19 +585,19 @@ class PersonaService(IPersonaInterface):
                     Persona.tipo_documento == tipo_documento,
                     Persona.num_doc_persona == num_doc_persona,
                     #Persona.deleted_at.is_(None),
-                    Persona.usuario_id.is_(None),
+                    #Persona.usuario_id.is_(None),
                 )
                 .first()
             )
             if not persona:
-                return False, None, None
+                return False, None, None, None
             
             if persona.deleted_at is not None:
                 persona.deleted_at = None
                 session.commit()
                 logging.info(f"Restauracion de la persona con documento {num_doc_persona}")
                 
-            return True, persona.contacto.email_contacto, persona.id_persona
+            return True, persona.contacto.email_contacto, persona.id_persona, persona.usuario_id
         finally:
             session.close()
 
