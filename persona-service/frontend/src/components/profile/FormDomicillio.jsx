@@ -10,10 +10,11 @@ import { SimpleDialog } from "@/components/SimpleDialog"
 import { Ban } from "lucide-react"
 import { useState } from "react"
 import ResponsiveColumnForm from "@/components/ResponsiveColumnForm"
+import CPLocalidad from "@/components/CPLocalidad"
 
 export default function FormDomicillio({ domicilio, setPersonaData, persona_id, showDialog, okDialog, errorDialog }) {
 
-    const { handleSubmit, localidades, codigoPostal, setCodigoPostal, inputCPRef, localidad, loading } = useFormDomicilio(domicilio, setPersonaData, persona_id, showDialog, okDialog, errorDialog);
+    const { handleSubmit, localidad, setLocalidad, loading } = useFormDomicilio(domicilio, setPersonaData, persona_id, showDialog, okDialog, errorDialog);
 
     return (
         <>
@@ -73,35 +74,7 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id, 
                         />
                     </ResponsiveColumnForm>
 
-                    <ResponsiveColumnForm>
-                        {/* Campo Código Postal */}
-                        <InputValidate
-                            id="codigo_postal"
-                            maxLength={8}
-                            type="text"
-                            placeholder="Código postal"
-                            labelText={<>Código Postal<a href="https://www.correoargentino.com.ar/formularios/cpa" target="_blank" className="text-indigo-600 hover:underline cursor-pointer">¿no sabés el código?</a></>}
-                            value={codigoPostal}
-                            ref={inputCPRef}
-                            onChange={(e) => setCodigoPostal(e.target.value)}
-                            validatePattern="^(?:[A-Za-z]\d{4}[A-Za-z]{3}|\d{4})$"
-                            validationMessage="Ingrese CP (4 dígitos) o CPA (1 letra + 4 dígitos + 3 letras, todo en mayúsculas)"
-                            required
-                        />
-                        <SimpleSelect
-                            id="localidad"
-                            label="Localidad"
-                            placeholder="Selecciona una localidad"
-                            value={localidad}
-                            required
-                        >
-                            {localidades.map((localidad) => (
-                                <SelectItem key={localidad} value={localidad}>
-                                    {localidad}
-                                </SelectItem>
-                            ))}
-                        </SimpleSelect>
-                    </ResponsiveColumnForm>
+                    <CPLocalidad showDialog={showDialog} localidad={localidad} codigo_postal={domicilio.domicilio_postal.codigo_postal} setLocalidad={setLocalidad} />
                     {/* Campo Referencia */}
                     <InputValidate
                         id="domicilio_referencia"

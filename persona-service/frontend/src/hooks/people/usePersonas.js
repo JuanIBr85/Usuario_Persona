@@ -192,6 +192,14 @@ export function usePersonas() {
         }
     };
 
+    useEffect(() => {
+        if(alert){
+            setTimeout(() => {
+                setAlert(null);
+            }, 5000);
+        }
+    }, [alert]);
+
     // Exporta el estado y funciones que serán usados en el componente  
     return {
         personas,

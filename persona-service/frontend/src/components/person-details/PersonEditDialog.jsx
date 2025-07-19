@@ -13,6 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import CPLocalidad from "@/components/CPLocalidad";
 
 function PersonEditDialog({
   open,
@@ -28,6 +29,7 @@ function PersonEditDialog({
   error = null,
 }) {
   if (!editingPerson) return null;
+  const [localidad, setLocalidad] = useState(editingPerson?.domicilio?.domicilio_postal?.localidad || "");
 
   const [tipoDoc, setTipoDoc] = useState(
     editingPerson?.tipo_documento || Object.keys(tiposDocumentos)[0] || ""
@@ -273,34 +275,7 @@ function PersonEditDialog({
                 value={editingPerson.domicilio?.domicilio_referencia || ""} 
               />
             </ResponsiveColumnForm>
-
-            <ResponsiveColumnForm>
-              <InputValidate
-                id="codigo_postal"
-                type="text"
-                labelText="Código Postal"
-                maxLength={8}
-                value={editingPerson.domicilio?.domicilio_postal?.codigo_postal || ""}
-                onChange={handleChangePostal}
-              />
-
-              {localidades.length > 0 && (
-                <SimpleSelect
-                  id="localidad"
-                  label="Localidad"
-                  value={editingPerson.domicilio?.domicilio_postal?.localidad || ""}
-                  placeholder="Selecciona una localidad"
-                  required={true}
-                >
-                  <SelectItem>Seleccionar localidad</SelectItem>
-                  {localidades.map((loc, index) => (
-                    <SelectItem key={index} value={loc}>
-                      {loc}
-                    </SelectItem>
-                  ))}
-                </SimpleSelect>
-              )}
-            </ResponsiveColumnForm>
+            <CPLocalidad localidad={localidad} codigo_postal={editingPerson.domicilio?.domicilio_postal?.codigo_postal || ""} setLocalidad={setLocalidad} />
           </div>
 
           {/* Redes Sociales */}

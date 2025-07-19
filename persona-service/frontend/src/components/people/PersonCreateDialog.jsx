@@ -19,6 +19,7 @@ import SimpleSelect from "@/components/SimpleSelect";
 import { SelectItem } from "@/components/ui/select";
 import ResponsiveColumnForm from "@/components/ResponsiveColumnForm";
 import { useState, useMemo } from "react";
+import CPLocalidad from "@/components/CPLocalidad";
 
 /**
  * PersonCreateDialog
@@ -58,6 +59,8 @@ function PersonCreateDialog({
 }) {
   const [userSearch, setUserSearch] = useState("");
   const [tipoDoc, setTipoDoc] = useState(Object.keys(tiposDocumentos)[0] || "");
+
+  const [localidad, setLocalidad] = useState("CORONEL SUAREZ");
 
   // Calcular fecha máxima para mayores de 17 años
   const seventeenYearsAgo = new Date();
@@ -232,8 +235,6 @@ function PersonCreateDialog({
                 labelText="Piso"
                 value={newUser.domicilio_piso || ""}
               />
-            </ResponsiveColumnForm>
-            <ResponsiveColumnForm>
               <InputValidate
                 id="domicilio_dpto"
                 maxLength={2}
@@ -241,41 +242,9 @@ function PersonCreateDialog({
                 labelText="Departamento"
                 value={newUser.domicilio_dpto || ""}
               />
-
-              <InputValidate
-                id="codigo_postal"
-                type="text"
-                placeholder="Ej: 7540"
-                labelText="Código Postal"
-                value={newUser.codigo_postal || ""}
-                onChange={handleChangePostal}
-                validatePattern="^[0-9]{4}$"
-                validationMessage="Código postal inválido, debe tener 4 dígitos numéricos"
-                maxLength={8}
-                required
-              />
             </ResponsiveColumnForm>
 
-            <ResponsiveColumnForm>
-              <SimpleSelect
-                id="localidad"
-                label="Localidad"
-                value={newUser.localidad || ""}
-                placeholder="Selecciona una localidad"
-                onValueChange={(value) =>
-                  handleChange({ target: { name: "localidad", value } })
-                }
-                required
-              >
-                {localidades.map((loc, index) => (
-                  <SelectItem key={`${loc}-${index}`} value={loc}>
-                    {loc}
-                  </SelectItem>
-                ))}
-              </SimpleSelect>
-              <div />{" "}
-              {/* Espacio vacío para mantener el diseño de dos columnas */}
-            </ResponsiveColumnForm>
+            <CPLocalidad localidad={localidad} codigo_postal={"7540"} setLocalidad={setLocalidad} />
           </div>
 
           {/* Contacto */}

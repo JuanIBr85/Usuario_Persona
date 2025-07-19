@@ -177,31 +177,22 @@ function AdminPersons() {
     } catch (error) {
       console.error("Error al crear persona:", error);
 
-      // Intenta extraer mensaje de error HTML (por ejemplo, de un <p>)
-      let rawMsg = error?.data || "Error desconocido";
-
-      // Si el mensaje contiene HTML, extrae solo el texto del primer <p>
-      if (typeof rawMsg === "string" && rawMsg.includes("<p")) {
-        const match = rawMsg.match(/<p[^>]*>(.*?)<\/p>/i);
-        if (match && match[1]) {
-          rawMsg = match[1];
+      try{
+        for(let key in error?.data?.error){
+          setAlert({
+            title: "Error",
+            description: error?.data?.error[key],
+            variant: "destructive"
+          });
         }
-      }
-      // Si error.data es HTML, intenta extraer <p> de ahí también (por si rawMsg no lo trae)
-      else if (typeof error?.data === "string" && error.data.includes("<p")) {
-        const match = error.data.match(/<p[^>]*>(.*?)<\/p>/i);
-        if (match && match[1]) {
-          rawMsg = match[1];
-        }
+      }catch(err){
+        setAlert({
+          title: "Error",
+          description: "Error al crear persona",
+          variant: "destructive"
+        });
       }
 
-      console.error("Mensaje de error procesado:", rawMsg);
-
-      setAlert({
-        title: "Error al crear persona",
-        description: rawMsg,
-        variant: "destructive",
-      });
       setIsDialogOpen(false);
     }
   };
@@ -282,7 +273,7 @@ function AdminPersons() {
                   className="animate-in slide-in-from-right-8 duration-300 bg-card border-black"
                 >
                   <AlertTitle>{alert.title}</AlertTitle>
-                  {alert.description && (
+                  {alert?.description && (
                     <AlertDescription>{alert.description}</AlertDescription>
                   )}
                   <button
