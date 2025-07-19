@@ -342,6 +342,18 @@ def modificar_persona_restringido():
                 404,
             )
 
+        errors = persona_service.schema.validate(data, partial=True)
+
+        if errors:
+            return (
+                make_response(
+                    status=ResponseStatus.ERROR,
+                    message="Error de validacion",
+                    data=errors,
+                ),
+                400,
+            )
+
         persona = persona_service.modificar_persona_restringido(
             persona_usuario["id_persona"], data
         )
