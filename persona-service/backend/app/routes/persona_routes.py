@@ -147,9 +147,9 @@ def crear_persona():
                 ),
                 400,
             )
-        '''    
-        errors = persona_schema.validate(data)
 
+        errors = persona_schema.validate(data)
+    
         if errors:
             return (
                 make_response(
@@ -159,25 +159,8 @@ def crear_persona():
                 ),
                 400,
             )
-        '''
-# Parte nueva (evaluar)
 
-        try:
-            # Valida y transforma los datos usando el schema
-            validated_data = persona_schema.load(data)
-        except ValidationError as err:
-            return (
-                make_response(
-                    status=ResponseStatus.ERROR,
-                    message="Error de validación",
-                    data=err.messages,
-                ),
-                400,
-            )        
-
-#Fin parte nueva 
-    
-        persona = persona_service.crear_persona(validated_data)
+        persona = persona_service.crear_persona(data)
 
         return (
             make_response(
@@ -232,7 +215,7 @@ def crear_persona_restringido():
                 ),
                 400,
             )
-        '''    
+
         errors = persona_schema.validate(data)
 
         if errors:
@@ -244,23 +227,6 @@ def crear_persona_restringido():
                 ),
                 400,
             )
-        '''  
-# Parte nueva (evaluar)
-
-        try:
-            # Valida y transforma los datos usando el schema
-            validated_data = persona_schema.load(data)
-        except ValidationError as err:
-            return (
-                make_response(
-                    status=ResponseStatus.ERROR,
-                    message="Error de validación",
-                    data=err.messages,
-                ),
-                400,
-            )        
-
-#Fin parte nueva         
 
         existe, _, _, _ = persona_service.verificar_documento_mas_get_id(
             data["tipo_documento"], data["num_doc_persona"]
@@ -276,7 +242,7 @@ def crear_persona_restringido():
                 400,
             )
 
-        persona = persona_service.crear_persona(validated_data)
+        persona = persona_service.crear_persona(data)
 
         return (
             make_response(
@@ -313,7 +279,7 @@ def modificar_persona(id):
                 ),
                 400,
             )
-        '''
+        
         errors = persona_service.schema.validate(data, partial=True)
 
         if errors:
@@ -325,22 +291,8 @@ def modificar_persona(id):
                 ),
                 400,
             )
-        '''
-# Parte nueva (evaluar)
-        try:
-            validated_data = persona_service.schema.load(data, partial=True)
-        except ValidationError as err:
-            return (
-                make_response(
-                    status=ResponseStatus.ERROR,
-                    message="Error de validación",
-                    data=err.messages,
-                ),
-                400,
-            )
-#Fin parte nueva         
 
-        persona = persona_service.modificar_persona(id, validated_data)
+        persona = persona_service.modificar_persona(id, data)
         if persona is None:
             return (
                 make_response(
@@ -401,7 +353,7 @@ def modificar_persona_restringido():
                 ),
                 404,
             )
-        '''    
+
         errors = persona_service.schema.validate(data, partial=True)
 
         if errors:
@@ -413,24 +365,9 @@ def modificar_persona_restringido():
                 ),
                 400,
             )
-        '''
-# Parte nueva (evaluar)
-        try:
-            validated_data = persona_service.schema.load(data, partial=True)
-        except ValidationError as err:
-            return (
-                make_response(
-                    status=ResponseStatus.ERROR,
-                    message="Error de validación",
-                    data=err.messages,
-                ),
-                400,
-            )
-#Fin parte nueva  
-
 
         persona = persona_service.modificar_persona_restringido(
-            persona_usuario["id_persona"], validated_data
+            persona_usuario["id_persona"], data
         )
 
         return (

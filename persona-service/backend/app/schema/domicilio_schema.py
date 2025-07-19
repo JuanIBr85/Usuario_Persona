@@ -38,15 +38,9 @@ class DomicilioSchema(BaseSchema):
         ]
         for campo in campos_a_limpiar:
             if campo in data and isinstance(data[campo], str):
-                valor = data[campo].strip()
-
-                if campo == 'domicilio_numero' and valor.lower() == 's/n':
-                    data[campo] = 'S/N'
-                else:
-                    data[campo] = valor if valor else None
+                data[campo] = data[campo].strip()
         return data
     
-
     
 
     
