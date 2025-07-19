@@ -60,12 +60,12 @@ def validar_domicilio_numero(valor: str) -> str:
     if not valor:
         raise ValidationError("Por favor completar el dato correspondiente. El número del domicilio no puede estar vacío.")
 
-    if valor == "s/n":
+    if valor == "sn":
         return valor.upper()
 
     patron = r'^\d{1,5}[a-zA-Z]?$'
     if not re.fullmatch(patron, valor):
-        raise ValidationError("Formato de numero de domicilio inválido. Ejemplos válidos: '123', '123B', 's/n'")
+        raise ValidationError("Formato de numero de domicilio inválido. Ejemplos válidos: '123', '123B', 'sn (sin numero)'")
 
     return valor.upper()
 
