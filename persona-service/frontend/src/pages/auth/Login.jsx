@@ -39,7 +39,7 @@ function Login() {
     AuthService.login(formData) // Envia los datos al backend para autenticar
       .then((json) => {
         // Si es exitoso, se muestra un mensaje y se actualiza el contexto global
-        setMessage(`Login exitoso. Bienvenido ${json.data.nombre_usuario}!`);
+        setMessage(`Login exitoso. ¡Bienvenido ${json.data.nombre_usuario}!`);
         setIsLogin(true);
         updateData({
           token: json.data.token, // Guarda el token para futuras peticiones

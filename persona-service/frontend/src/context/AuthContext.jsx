@@ -254,7 +254,7 @@ function AuthContextProvider({ children }) {
         const timeout = setTimeout(() => {
             setDialog({
                 title: "Renovar sesión",
-                description: "Su sesión expira en 5 minutos. Desea renovarla?",
+                description: "Su sesión expira en 5 minutos. ¿Desea renovarla?",
                 action: () =>tokenRenew(),
                 cancel: "Cancelar",
                 cancelHandle: () => {
