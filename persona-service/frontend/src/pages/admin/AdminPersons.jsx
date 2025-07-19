@@ -18,6 +18,14 @@ import { useUsuariosBasic } from "@/hooks/users/useUsuariosBasic";
 
 import PersonCreateDialog from "@/components/people/PersonCreateDialog";
 
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationPrevious,
+  PaginationNext,
+} from "@/components/ui/pagination";
+
 /**
  * Componente AdminUsers
  * ---------------------
@@ -53,6 +61,8 @@ function AdminPersons() {
   const [mostrarFiltroAvanzado, setMostrarFiltroAvanzado] = useState(false);
   const [filtro, setFiltro] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   // Usar el hook usePersonas para manejar la lógica de personas
   // personas y setPersonas hacen referencias a personas, el nombre debe cambiarse a personas
@@ -95,6 +105,20 @@ function AdminPersons() {
         user.nro_documento.toLowerCase().includes(filtro.toLowerCase()));
     return textoMatch;
   });
+
+  // Datos para paginación
+  const totalPages = Math.ceil(personasFiltradas.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentItems = personasFiltradas.slice(startIndex, endIndex);
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
 
   /**
    * Navega a la pantalla de detalles del usuario.
@@ -243,7 +267,7 @@ function AdminPersons() {
             {/* Tabla con personas filtradas */}
             <div className="overflow-auto border p-3 rounded-md shadow-sm">
               <PersonTable
-                persons={personasFiltradas}
+                persons={currentItems}
                 users={usuarios}
                 onEdit={(user) => {
                   setEditingUser(user);
@@ -253,6 +277,26 @@ function AdminPersons() {
                 onSeeDetails={handleSeeDetails}
               />
             </div>
+
+            <Pagination className="mt-4">
+              <PaginationContent className="mx-auto">
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={handlePreviousPage}
+                    className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                  />
+                </PaginationItem>
+                <PaginationItem className="text-sm px-4 py-1 text-muted-foreground">
+                  Página {currentPage} de {totalPages || 1}
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={handleNextPage}
+                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
 
             <PersonCreateDialog
               isDialogOpen={isDialogOpen}
