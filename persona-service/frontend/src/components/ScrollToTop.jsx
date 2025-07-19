@@ -28,7 +28,7 @@ const ScrollToTop = () => {
     <button
       onClick={scrollTop}
       aria-label="Volver arriba"
-      className={`fixed bottom-20 right-4 md:bottom-24 md:right-8 z-40 p-2 rounded-full bg-[var(--color-primario)] text-white shadow transition-opacity ${visible ? "opacity-100" : "opacity-0 pointer-events-none"
+      className={`fixed bottom-20 right-4 md:bottom-24 md:right-5 z-40 p-2 rounded-full bg-[var(--color-primario)] text-white shadow transition-opacity ${visible ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
     >
       <ArrowUp className="w-6 h-6" />

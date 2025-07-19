@@ -114,7 +114,7 @@ function ComponentTable({ data, setData }) {
       .catch((error) =>
         setResponse({
           status: "fail",
-          message: error.data?.message ?? "Ocurrió un error inesperado",
+          message: error?.data?.message ?? "Ocurrió un error inesperado",
         })
       )
       .finally(() => {
@@ -127,7 +127,7 @@ function ComponentTable({ data, setData }) {
       );
       setResponse(data);
     } catch (error) {
-      let mensaje = error.data?.message ?? "Ocurrió un error inesperado";
+      let mensaje = error?.data?.message ?? "Ocurrió un error inesperado";
       setResponse({ status: "fail", message: mensaje });
     } finally {
       setLoading(false);

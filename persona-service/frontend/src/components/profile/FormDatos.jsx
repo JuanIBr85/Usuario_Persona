@@ -41,7 +41,7 @@ export default function FormDatos({
         okDialog();
       })
       .catch((error) => {
-        console.error("Error updating domicilio:", error.data);
+        console.error("Error updating domicilio:", error?.data);
         errorDialog(error?.data?.error?.server || error?.data?.error);
       })
       .finally(() => setLoading(false));

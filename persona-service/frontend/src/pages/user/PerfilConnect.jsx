@@ -159,7 +159,7 @@ function PerfilConnect() {
       setDialog({
         title: "Hubo un error",
         actionName: "Cerrar",
-        description: error.data.message,
+        description: error?.data?.message,
       });
     } finally {
       setLoading(false);
@@ -191,7 +191,7 @@ function PerfilConnect() {
       setDialog({
         title: "Hubo un error",
         actionName: "Cerrar",
-        description: error.data.message,
+        description: error?.data?.message,
       });
     } finally {
       setLoading(false);
@@ -239,7 +239,7 @@ function PerfilConnect() {
         description: <>
           Hubo un error al verificar su identidad
           <br />
-          <b>Razon</b>: {error.data.message}
+          <b>Razon</b>: {error?.data?.message}
         </>,
       });
     } finally {

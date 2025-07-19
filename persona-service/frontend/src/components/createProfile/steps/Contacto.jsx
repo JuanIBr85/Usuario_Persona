@@ -60,6 +60,7 @@ const Contacto = ({hidden, staticData}) => (
       labelText="Email de contacto"
       placeholder="Ingresa el email de contacto"
       validationMessage="Email inválido"
+      
       required
     />
     <InputValidate
