@@ -57,7 +57,24 @@ function PersonDetails() {
   } = useUsuariosBasic();
 
   function showAlert(title, description, variant = "default") {
-    setAlert({ title, description, variant });
+
+    let descriptionAlert = "Error al acualizar persona";
+    try{
+      if(typeof description === "string"){
+        descriptionAlert = description;
+      }else{
+        descriptionAlert = "";
+        for(let key in description){
+          descriptionAlert += `${key}: ${description[key]}\n`;
+        }
+
+      }
+
+    }catch(err){
+      console.error("Error al mostrar alerta:", err);
+    }
+    
+    setAlert({ title, description:descriptionAlert, variant });
     setTimeout(() => setAlert(null), 5000);
   }
 
@@ -71,6 +88,11 @@ function PersonDetails() {
         }
       })
       .catch((err) => {
+        showAlert(
+          "Error",
+          "No se pudo obtener la persona",
+          "destructive"
+        );
         console.error("Error al obtener la persona:", err);
       });
   }, [id]);
@@ -103,8 +125,7 @@ function PersonDetails() {
         setIsDialogOpen(false);
       }
     }).catch((err) => {
-      console.error("Error al editar la persona:", err);
-      showAlert("Error", "Error al editar la persona", "destructive");
+      showAlert("Error", err?.data?.error, "destructive");
     })
   };
 
@@ -116,7 +137,7 @@ function PersonDetails() {
     <div className="p-6 space-y-6">
       <PersonDetailsCard person={person} onEdit={() => setIsDialogOpen(true)} />
       <PersonDetailsBreadcrumb />
-      <PersonEditDialog
+      {isDialogOpen && <PersonEditDialog
         open={isDialogOpen}
         setIsDialogOpen={setIsDialogOpen}
         editingPerson={person}
@@ -128,7 +149,7 @@ function PersonDetails() {
         usuarios={usuarios}
         loading={loading}
         error={error}
-      />
+      />}
       {alert && (
         <div className="fixed bottom-16 right-4 z-50 w-96">
           <Alert

@@ -64,7 +64,7 @@ function AdminPersons() {
     redesSociales,
     localidades,
     alert,
-    setAlert,
+    showAlert,
     fetchLocalidadesPorCodigoPostal,
     handleDelete,
     handleEditSubmit: handleEditSubmitHook,
@@ -173,27 +173,30 @@ function AdminPersons() {
         setPersonas((prevPersonas) => [...prevPersonas, newUserForTable]);
         setNewUser({});
         setIsDialogOpen(false);
+        showAlert({
+          title: "Éxito",
+          description: "La persona se creó correctamente",
+          variant: "success"
+        });
       });
     } catch (error) {
       console.error("Error al crear persona:", error);
 
       try{
         for(let key in error?.data?.error){
-          setAlert({
+          showAlert({
             title: "Error",
             description: error?.data?.error[key],
             variant: "destructive"
           });
         }
       }catch(err){
-        setAlert({
+        showAlert({
           title: "Error",
           description: "Error al crear persona",
           variant: "destructive"
         });
       }
-
-      setIsDialogOpen(false);
     }
   };
 
@@ -244,7 +247,7 @@ function AdminPersons() {
                 users={usuarios}
                 onEdit={(user) => {
                   setEditingUser(user);
-                  setAlert(null); // Limpiar alertas previas
+                  showAlert(null); // Limpiar alertas previas
                 }}
                 onDelete={handleDelete}
                 onSeeDetails={handleSeeDetails}
@@ -277,7 +280,7 @@ function AdminPersons() {
                     <AlertDescription>{alert.description}</AlertDescription>
                   )}
                   <button
-                    onClick={() => setAlert(null)}
+                    onClick={() => showAlert(null)}
                     className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
                   >
                     <X className="h-4 w-4" />

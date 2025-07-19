@@ -29,20 +29,23 @@ function PersonEditDialog({
   error = null,
 }) {
   if (!editingPerson) return null;
-  const [localidad, setLocalidad] = useState(editingPerson?.domicilio?.domicilio_postal?.localidad || "");
+
+  const [person, setPerson] = useState(JSON.parse(JSON.stringify(editingPerson)));
+
+  const [localidad, setLocalidad] = useState(person?.domicilio?.domicilio_postal?.localidad || "");
 
   const [tipoDoc, setTipoDoc] = useState(
-    editingPerson?.tipo_documento || Object.keys(tiposDocumentos)[0] || ""
+    person?.tipo_documento || Object.keys(tiposDocumentos)[0] || ""
   );
 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    editingPerson[name] = value;
+    person[name] = value;
   };
 
   const handleSelectChange = (name, value) => {
-    editingPerson[name] = value;
+    person[name] = value;
   };
 
   const handleSubmit = async (e) => {
@@ -111,7 +114,7 @@ function PersonEditDialog({
                 labelText="Nombre"
                 maxLength={50}
                 cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
-                value={editingPerson.nombre_persona || ""}
+                value={person.nombre_persona || ""}
                 required
               />
 
@@ -121,20 +124,20 @@ function PersonEditDialog({
                 labelText="Apellido"
                 maxLength={50}
                 cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
-                value={editingPerson.apellido_persona || ""}
+                value={person.apellido_persona || ""}
                 required
               />
             </ResponsiveColumnForm>
 
             <ResponsiveColumnForm>
-              <SimpleSelect
+            <SimpleSelect
                 id="tipo_documento"
                 label="Tipo de documento"
-                value={editingPerson.tipo_documento || tipoDoc}
+                value={person.tipo_documento || "DNI"}
                 placeholder="Selecciona un tipo de documento"
                 onValueChange={(value) => {
                   setTipoDoc(value);
-                  handleSelectChange('tipo_documento', value);
+                  handleChange({ target: { name: "tipo_documento", value } });
                 }}
                 required
               >
@@ -150,7 +153,7 @@ function PersonEditDialog({
                 type="text"
                 labelText="Nro. documento"
                 maxLength={13}
-                value={editingPerson.num_doc_persona || ""}
+                value={person.num_doc_persona || ""}
                 validatePattern={tiposDocumentos[tipoDoc]}
                 validationMessage="Número de documento inválido"
                 required
@@ -162,7 +165,7 @@ function PersonEditDialog({
                 id="fecha_nacimiento"
                 type="date"
                 labelText="Fecha de nacimiento"
-                value={editingPerson.fecha_nacimiento_persona || ""}
+                value={person.fecha_nacimiento_persona || ""}
                 max={today}
               />
 
@@ -170,7 +173,7 @@ function PersonEditDialog({
               <SimpleSelect
                 id="usuario_id"
                 label="Usuario del sistema"
-                value={editingPerson.usuario_id || -1}
+                value={person.usuario_id || -1}
                 placeholder="Selecciona un usuario"
               >
                 <SelectItem value={-1} default>Ningún usuario</SelectItem>
@@ -199,7 +202,7 @@ function PersonEditDialog({
                 type="email"
                 labelText="Email"
                 maxLength={50}
-                value={editingPerson.contacto?.email_contacto || ""}
+                value={person.contacto?.email_contacto || ""}
                 required
               />
 
@@ -207,7 +210,7 @@ function PersonEditDialog({
                 id="telefono_movil"
                 type="tel"
                 labelText="Teléfono móvil"
-                value={editingPerson.contacto?.telefono_movil || ""}
+                value={person.contacto?.telefono_movil || ""}
                 maxLength={20}
                 required
               />
@@ -219,7 +222,7 @@ function PersonEditDialog({
                 type="tel"
                 labelText="Teléfono fijo"
                 maxLength={20}
-                value={editingPerson.contacto?.telefono_fijo || ""}
+                value={person.contacto?.telefono_fijo || ""}
               />
             </ResponsiveColumnForm>
           </div>
@@ -234,7 +237,7 @@ function PersonEditDialog({
                 type="text"
                 labelText="Calle"
                 maxLength={50}
-                value={editingPerson.domicilio?.domicilio_calle || ""}
+                value={person.domicilio?.domicilio_calle || ""}
                 required
               />
 
@@ -243,7 +246,7 @@ function PersonEditDialog({
                 type="text"
                 labelText="Número"
                 maxLength={10}
-                value={editingPerson.domicilio?.domicilio_numero || ""}
+                value={person.domicilio?.domicilio_numero || ""}
                 required
               />
             </ResponsiveColumnForm>
@@ -254,7 +257,7 @@ function PersonEditDialog({
                 type="text"
                 labelText="Piso"
                 maxLength={3}
-                value={editingPerson.domicilio?.domicilio_piso || ""}
+                value={person.domicilio?.domicilio_piso || ""}
               />
 
               <InputValidate
@@ -262,7 +265,7 @@ function PersonEditDialog({
                 type="text"
                 labelText="Departamento"
                 maxLength={2}
-                value={editingPerson.domicilio?.domicilio_dpto || ""}
+                value={person.domicilio?.domicilio_dpto || ""}
               />
             </ResponsiveColumnForm>
 
@@ -272,10 +275,10 @@ function PersonEditDialog({
                 type="text"
                 labelText="Referencia"
                 maxLength={200}
-                value={editingPerson.domicilio?.domicilio_referencia || ""} 
+                value={person.domicilio?.domicilio_referencia || ""} 
               />
             </ResponsiveColumnForm>
-            <CPLocalidad localidad={localidad} codigo_postal={editingPerson.domicilio?.domicilio_postal?.codigo_postal || ""} setLocalidad={setLocalidad} />
+            <CPLocalidad localidad={localidad} codigo_postal={person.domicilio?.domicilio_postal?.codigo_postal || ""} setLocalidad={setLocalidad} />
           </div>
 
           {/* Redes Sociales */}
@@ -287,7 +290,7 @@ function PersonEditDialog({
                 <SimpleSelect
                   id="red_social_nombre"
                   label="Red Social"
-                  value={editingPerson.contacto?.red_social_nombre || ""}
+                  value={person.contacto?.red_social_nombre || ""}
                   placeholder="Selecciona una red social"
                   onValueChange={(value) => handleSelectChange('red_social_nombre', value)}
                 >
@@ -305,7 +308,7 @@ function PersonEditDialog({
                 type="text"
                 labelText="Usuario de la red social"
                 maxLength={50}
-                value={editingPerson.contacto?.red_social_contacto || ""}
+                value={person.contacto?.red_social_contacto || ""}
                 onChange={handleChange}
               />
             </ResponsiveColumnForm>

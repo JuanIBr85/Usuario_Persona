@@ -34,6 +34,27 @@ export function usePersonas() {
     // Estado para notificaciones
     const [alert, setAlert] = useState(null);
 
+    function showAlert({title, description, variant = "default"}) {
+        let descriptionAlert = "Error al acualizar persona";
+        try{
+          if(typeof description === "string"){
+            descriptionAlert = description;
+          }else{
+            descriptionAlert = "";
+            for(let key in description){
+              descriptionAlert += `${key}: ${description[key]}\n`;
+            }
+    
+          }
+    
+        }catch(err){
+          console.error("Error al mostrar alerta:", err);
+        }
+        
+        setAlert({ title, description:descriptionAlert, variant });
+        setTimeout(() => setAlert(null), 5000);
+      }
+
     // Efecto: Carga inicial de datos (personas, redes sociales, tipos de documento)
     useEffect(() => {
         // Cargar todas las personas desde el servicio
@@ -127,7 +148,7 @@ export function usePersonas() {
         PersonaService.borrar(id)
             .then(() => {
                 setPersonas(personas.filter((persona) => persona.id !== id));
-                setAlert({
+                showAlert({
                     title: "Éxito",
                     description: "La persona se eliminó correctamente",
                     variant: "success"
@@ -138,7 +159,7 @@ export function usePersonas() {
 
                 console.log("Error al eliminar persona:", msg);
 
-                setAlert({
+                showAlert({
                     title: "Error",
                     description: msg,
                     variant: "destructive"
@@ -172,7 +193,7 @@ export function usePersonas() {
             // Actualiza el estado local solo si la petición fue exitosa
             setPersonas(personas.map((p) => (p.id === editingUser.id ? editingUser : p)));
 
-            setAlert({
+            showAlert({
                 title: "Éxito",
                 description: "La persona se actualizó correctamente",
                 variant: "success"
@@ -182,7 +203,7 @@ export function usePersonas() {
         } catch (err) {
             console.error("Error actualizando persona:", err);
 
-            setAlert({
+            showAlert({
                 title: "Error al actualizar persona",
                 description: err?.data?.error?.server || "Error actualizando persona",
                 variant: "destructive"
@@ -192,14 +213,6 @@ export function usePersonas() {
         }
     };
 
-    useEffect(() => {
-        if(alert){
-            setTimeout(() => {
-                setAlert(null);
-            }, 5000);
-        }
-    }, [alert]);
-
     // Exporta el estado y funciones que serán usados en el componente  
     return {
         personas,
@@ -208,7 +221,7 @@ export function usePersonas() {
         redesSociales,
         localidades,
         alert,
-        setAlert,
+        showAlert,
         fetchLocalidadesPorCodigoPostal,
         setLocalidades,
         handleDelete,
