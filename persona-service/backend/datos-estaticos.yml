@@ -36,8 +36,6 @@ estado_civil:
   - Soltero/a
   - Viudo/a
   - Divorciado/a
-  - Unión convivencial
-  - Otros estados civiles
 
 ocupacion:
   - Prefiero no responder
