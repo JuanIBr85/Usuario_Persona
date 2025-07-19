@@ -62,9 +62,9 @@ const Header = () => {
                   Panel de Administrador
                 </NavLink>
               </li>
-              {hasProfile() ? <li>
+              <li>
                 <NavLink
-                  to="/profile"
+                  to={hasProfile()?"/profile":"/profileconnect"}
                   className={({ isActive }) =>
                     `relative text-white transition-all duration-100 ease-in-out
                                     ${
@@ -76,7 +76,7 @@ const Header = () => {
                 >
                   Perfil
                 </NavLink>
-              </li>:<></>}
+              </li>
               <li>
                 <NavLink to="/auth/logout">Cerrar Sesión</NavLink>
               </li>
@@ -101,11 +101,11 @@ const Header = () => {
                 Panel de Administrador
               </NavLink>
             </li>
-            {hasProfile() ? <li>
-              <NavLink to="/profile" onClick={() => setIsOpen(false)}>
+            <li>
+              <NavLink to={hasProfile()?"/profile":"/profileconnect"} onClick={() => setIsOpen(false)}>
                 Perfil
               </NavLink>
-            </li>:<></>}
+            </li>
             <li>
               <NavLink to="/auth/logout" onClick={() => setIsOpen(false)}>
                 Cerrar Sesión
