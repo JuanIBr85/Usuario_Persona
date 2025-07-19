@@ -279,6 +279,18 @@ def modificar_persona(id):
                 ),
                 400,
             )
+        
+        errors = persona_service.schema.validate(data, partial=True)
+
+        if errors:
+            return (
+                make_response(
+                    status=ResponseStatus.ERROR,
+                    message="Error de validacion",
+                    data=errors,
+                ),
+                400,
+            )
 
         persona = persona_service.modificar_persona(id, data)
         if persona is None:
