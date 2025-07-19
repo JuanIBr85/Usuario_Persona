@@ -33,7 +33,7 @@ export function useFormDomicilio(domicilio, setPersonaData, persona_id, showDial
                 okDialog();
             })
             .catch(error => {
-                errorDialog();
+                errorDialog(error?.data?.error?.server || error?.data?.error);
             })
             .finally(() => setLoading(false));
     };

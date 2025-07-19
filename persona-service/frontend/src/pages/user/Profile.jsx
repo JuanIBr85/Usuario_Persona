@@ -18,7 +18,7 @@ import { tiempoTranscurrido } from "@/utils/dateUtils"
 import ProfileNick from '@/components/ProfileNick'
 
 import { Ban, Check } from "lucide-react";
-
+import useFetchMessage from '@/utils/useFetchMessage'
 /**
  * Profile.jsx
  *
@@ -74,17 +74,17 @@ const ProfileForm = () => {
   const showDialog = (title, description, actionName=undefined, action=undefined) => {
     setDialog({
       title,
-      description,
+      description: useFetchMessage(description),
       action,
       actionName
     })
   };
 
   //Modal para confirmar éxito
-  const okDialog = () => {
+  const okDialog = (description="Datos actualizados correctamente.") => {
     showDialog(
       <div className="flex flex-row items-center gap-2"><Check /> Exito</div>,
-      "Datos actualizados correctamente.",
+      description,
       "Cerrar"
     );
   }

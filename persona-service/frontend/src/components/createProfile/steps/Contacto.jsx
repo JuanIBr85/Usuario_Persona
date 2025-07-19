@@ -14,17 +14,17 @@ const Contacto = ({hidden, staticData}) => (
         maxLength={20}
         placeholder="Ingresa tu teléfono fijo"
         labelText="Teléfono Fijo"
-        validatePattern="^[\+]?[0-9\-\s\(\)]{10,}$"
-        validationMessage="Ingresa un número de teléfono válido"
+        validatePattern="^\+549\d{10}$"
+        validationMessage="Ingresa un número de teléfono válido EJ: +5492926396430"
       />
       <InputValidate
         id="telefono_movil"
         type="tel"
         maxLength={20}
+        validatePattern="^\+549\d{10}$"
         placeholder="Ingresa tu teléfono móvil"
         labelText="Teléfono móvil"
-        validatePattern="^[\+]?[0-9\-\s\(\)]{10,}$"
-        validationMessage="Ingresa un número de teléfono válido"
+        validationMessage="Ingresa un número de teléfono válido EJ: +5492926396430"
         required
       />
     </ResponsiveColumnForm>
