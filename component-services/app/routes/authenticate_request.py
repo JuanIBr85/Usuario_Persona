@@ -80,10 +80,23 @@ def authenticate_config(app):
     # Rate limit handler
     @app.errorhandler(429)
     def ratelimit_handler(e):
+
+        replace = {
+            " per ": " veces por ",
+            "minute": "minuto",
+            "minutes": "minutos",
+            "second": "segundo",
+            "seconds": "segundos",
+        }
+
+        description = e.description
+        for key, value in replace.items():
+            description = description.replace(key, value)
+
         return (
             make_response(
                 ResponseStatus.FAIL,
-                f"Ha intentado ingresar demasiadas veces a esta ruta: {e.description}",
+                f"Ha intentado ingresar demasiadas veces a esta ruta: {description}",
                 {"message": "Ha intentado ingresar demasiadas veces a esta ruta"},
             ),
             429,
@@ -123,7 +136,7 @@ def authenticate_config(app):
             g.jwt = payload
 
         # Si es una peticion local, no se verifica la autenticacion
-        if LOCALHOST_AUTH_DISABLE and is_local_connection():
+        if True and is_local_connection():
             return
 
         # Si no tiene el token y no es publico, aborto con 401
