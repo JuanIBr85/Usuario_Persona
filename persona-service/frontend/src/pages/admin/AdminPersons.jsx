@@ -65,7 +65,7 @@ function AdminPersons() {
   const [filtro, setFiltro] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 1;
+  const itemsPerPage = 15;
 
   // Usar el hook usePersonas para manejar la lógica de personas
   // personas y setPersonas hacen referencias a personas, el nombre debe cambiarse a personas
