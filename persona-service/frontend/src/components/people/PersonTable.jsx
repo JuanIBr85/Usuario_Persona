@@ -9,8 +9,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Eye, Pencil, Trash2, ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
+import {
+  Eye,
+  Pencil,
+  Trash2,
+  ArrowUp,
+  ArrowDown,
+  ArrowUpDown,
+} from "lucide-react";
 import PersonaDeleteDialog from "./PersonDeleteDialog";
+import { Fade } from "react-awesome-reveal";
 
 // Función para formatear la fecha en formato DD-MM-YYYY
 function formatearFecha(fechaStr) {
@@ -22,107 +30,113 @@ function formatearFecha(fechaStr) {
 function PersonTable({ persons, users, onEdit, onSeeDetails, onDelete }) {
   const [isTimeout, setIsTimeout] = useState(true);
   const [countdown, setCountdown] = useState(3);
-  
+
   // Estados para el ordenamiento
   const [sortConfig, setSortConfig] = useState({
-    key: null,     // columna por la que ordenar
-    direction: 'asc' // dirección: 'asc' o 'desc'
+    key: null, // columna por la que ordenar
+    direction: "asc", // dirección: 'asc' o 'desc'
   });
-  
+
   // Ordenar los datos
   const sortedPersons = React.useMemo(() => {
     if (!sortConfig.key) return persons;
-    
+
     return [...persons].sort((a, b) => {
       // Ordenar por nombre completo
-      if (sortConfig.key === 'nombre') {
+      if (sortConfig.key === "nombre") {
         const nombreA = `${a.nombre} ${a.apellido}`.toLowerCase();
         const nombreB = `${b.nombre} ${b.apellido}`.toLowerCase();
-        
-        if (nombreA < nombreB) return sortConfig.direction === 'asc' ? -1 : 1;
-        if (nombreA > nombreB) return sortConfig.direction === 'asc' ? 1 : -1;
+
+        if (nombreA < nombreB) return sortConfig.direction === "asc" ? -1 : 1;
+        if (nombreA > nombreB) return sortConfig.direction === "asc" ? 1 : -1;
         return 0;
       }
-      
+
       // Ordenar por tipo de documento
-      if (sortConfig.key === 'tipo_documento') {
-        const tipoA = a.tipo_documento?.toLowerCase() || '';
-        const tipoB = b.tipo_documento?.toLowerCase() || '';
-        
-        if (tipoA < tipoB) return sortConfig.direction === 'asc' ? -1 : 1;
-        if (tipoA > tipoB) return sortConfig.direction === 'asc' ? 1 : -1;
+      if (sortConfig.key === "tipo_documento") {
+        const tipoA = a.tipo_documento?.toLowerCase() || "";
+        const tipoB = b.tipo_documento?.toLowerCase() || "";
+
+        if (tipoA < tipoB) return sortConfig.direction === "asc" ? -1 : 1;
+        if (tipoA > tipoB) return sortConfig.direction === "asc" ? 1 : -1;
         return 0;
       }
-      
+
       // Ordenar por número de documento
-      if (sortConfig.key === 'nro_documento') {
-        const nroA = a.nro_documento || '';
-        const nroB = b.nro_documento || '';
-        
+      if (sortConfig.key === "nro_documento") {
+        const nroA = a.nro_documento || "";
+        const nroB = b.nro_documento || "";
+
         // Intenta ordenar numéricamente si ambos son números
-        const numA = parseInt(nroA.replace(/\D/g, ''));
-        const numB = parseInt(nroB.replace(/\D/g, ''));
-        
+        const numA = parseInt(nroA.replace(/\D/g, ""));
+        const numB = parseInt(nroB.replace(/\D/g, ""));
+
         if (!isNaN(numA) && !isNaN(numB)) {
-          return sortConfig.direction === 'asc' 
-            ? numA - numB 
-            : numB - numA;
+          return sortConfig.direction === "asc" ? numA - numB : numB - numA;
         }
-        
+
         // Orden alfabético como fallback
-        if (nroA < nroB) return sortConfig.direction === 'asc' ? -1 : 1;
-        if (nroA > nroB) return sortConfig.direction === 'asc' ? 1 : -1;
+        if (nroA < nroB) return sortConfig.direction === "asc" ? -1 : 1;
+        if (nroA > nroB) return sortConfig.direction === "asc" ? 1 : -1;
         return 0;
       }
-      
+
       // Ordenar por fecha de nacimiento
-      if (sortConfig.key === 'fecha_nacimiento') {
-        const fechaA = a.fecha_nacimiento || '0000-00-00';
-        const fechaB = b.fecha_nacimiento || '0000-00-00';
-        
+      if (sortConfig.key === "fecha_nacimiento") {
+        const fechaA = a.fecha_nacimiento || "0000-00-00";
+        const fechaB = b.fecha_nacimiento || "0000-00-00";
+
         // Convertir a objetos Date para comparar
-        const dateA = fechaA === '0000-00-00' ? new Date(0) : new Date(fechaA);
-        const dateB = fechaB === '0000-00-00' ? new Date(0) : new Date(fechaB);
-        
-        if (dateA < dateB) return sortConfig.direction === 'asc' ? -1 : 1;
-        if (dateA > dateB) return sortConfig.direction === 'asc' ? 1 : -1;
+        const dateA = fechaA === "0000-00-00" ? new Date(0) : new Date(fechaA);
+        const dateB = fechaB === "0000-00-00" ? new Date(0) : new Date(fechaB);
+
+        if (dateA < dateB) return sortConfig.direction === "asc" ? -1 : 1;
+        if (dateA > dateB) return sortConfig.direction === "asc" ? 1 : -1;
         return 0;
       }
-      
+
       // Ordenar por usuario vinculado
-      if (sortConfig.key === 'usuario') {
-        const usuarioA = users.find((u) => u.id === a.usuario_id)?.email_usuario?.toLowerCase() || '';
-        const usuarioB = users.find((u) => u.id === b.usuario_id)?.email_usuario?.toLowerCase() || '';
-        
-        if (usuarioA < usuarioB) return sortConfig.direction === 'asc' ? -1 : 1;
-        if (usuarioA > usuarioB) return sortConfig.direction === 'asc' ? 1 : -1;
+      if (sortConfig.key === "usuario") {
+        const usuarioA =
+          users
+            .find((u) => u.id === a.usuario_id)
+            ?.email_usuario?.toLowerCase() || "";
+        const usuarioB =
+          users
+            .find((u) => u.id === b.usuario_id)
+            ?.email_usuario?.toLowerCase() || "";
+
+        if (usuarioA < usuarioB) return sortConfig.direction === "asc" ? -1 : 1;
+        if (usuarioA > usuarioB) return sortConfig.direction === "asc" ? 1 : -1;
         return 0;
       }
-      
+
       return 0;
     });
   }, [persons, users, sortConfig]);
-  
+
   // Función para manejar el click en un encabezado ordenable
   const requestSort = (key) => {
-    let direction = 'asc';
-    
-    if (sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
+    let direction = "asc";
+
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
     }
-    
+
     setSortConfig({ key, direction });
   };
-  
+
   // Función para obtener el icono de ordenamiento según el estado
   const getSortIcon = (columnKey) => {
     if (sortConfig.key !== columnKey) {
       return <ArrowUpDown className="ml-1 h-4 w-4" />;
     }
-    
-    return sortConfig.direction === 'asc' 
-      ? <ArrowUp className="ml-1 h-4 w-4" />
-      : <ArrowDown className="ml-1 h-4 w-4" />;
+
+    return sortConfig.direction === "asc" ? (
+      <ArrowUp className="ml-1 h-4 w-4" />
+    ) : (
+      <ArrowDown className="ml-1 h-4 w-4" />
+    );
   };
 
   useEffect(() => {
@@ -150,10 +164,7 @@ function PersonTable({ persons, users, onEdit, onSeeDetails, onDelete }) {
 
   // Componente para renderizar encabezados ordenables
   const SortableHeader = ({ column, label }) => (
-    <TableHead 
-      className="cursor-pointer"
-      onClick={() => requestSort(column)}
-    >
+    <TableHead className="cursor-pointer" onClick={() => requestSort(column)}>
       <div className="flex items-center">
         {label}
         {getSortIcon(column)}
@@ -238,6 +249,7 @@ function PersonTable({ persons, users, onEdit, onSeeDetails, onDelete }) {
             </TableCell>
           </TableRow>
         )}
+        
       </TableBody>
     </Table>
   );

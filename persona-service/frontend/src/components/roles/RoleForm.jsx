@@ -16,7 +16,7 @@ export default function RoleForm({
 }) {
   return (
     <Fade duration={300} triggerOnce>
-      <Card>
+      <Card id="role-form" >
         <CardHeader>
           <CardTitle>{isEditing ? "Editar este rol" : "Agrega un nuevo rol"}</CardTitle>
         </CardHeader>

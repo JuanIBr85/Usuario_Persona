@@ -53,7 +53,12 @@ export default function AdminRoles() {
     setErrorDialog({ open: true, message });
   }
 
-  function showShadcnAlert(title, description, variant = "default", timeout = 4000) {
+  function showShadcnAlert(
+    title,
+    description,
+    variant = "default",
+    timeout = 4000
+  ) {
     setAlert({ open: true, title, description, variant });
     setTimeout(() => {
       setAlert((prev) => ({ ...prev, open: false }));
@@ -109,7 +114,6 @@ export default function AdminRoles() {
     return resultado;
   }
 
-
   function handleRoleToggle(roleId) {
     setSelectedRoleIds((prev) =>
       prev.includes(roleId)
@@ -134,7 +138,9 @@ export default function AdminRoles() {
     // Validación de solo letras y espacios
     const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{3,50}$/;
     if (!regex.test(trimmedName)) {
-      return showError("Ingresa un nombre de rol válido (solo letras y espacios)");
+      return showError(
+        "Ingresa un nombre de rol válido (solo letras y espacios)"
+      );
     }
     // Validación de existencia
     const exists = roles.some(
@@ -167,6 +173,9 @@ export default function AdminRoles() {
   }
 
   function handleEditClick(role) {
+    document
+      .getElementById("role-form")
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
     setEditRoleId(role.id);
     setNewRoleName(role.name);
     const permisosCompletos = availablePermissions.filter((permiso) =>
@@ -305,7 +314,7 @@ export default function AdminRoles() {
         )}
 
         <RoleAssignmentWithSearch
-          usuarios={usuarios.filter(u => u.id !== 1)}
+          usuarios={usuarios.filter((u) => u.id !== 1)}
           selectedUserId={selectedUserId}
           setSelectedUserId={setSelectedUserId}
           roles={roles}
