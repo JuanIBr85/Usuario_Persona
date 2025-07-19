@@ -197,7 +197,6 @@ export default function RoleList({
             <CardFooter className="pt-6">
               <Pagination className="w-full">
                 <PaginationContent>
-                  {/* Botón Anterior en español */}
                   <PaginationItem>
                     <Button
                       variant="outline"
@@ -240,7 +239,6 @@ export default function RoleList({
                     );
                   })}
 
-                  {/* Botón Siguiente en español */}
                   <PaginationItem>
                     <Button
                       variant="outline"

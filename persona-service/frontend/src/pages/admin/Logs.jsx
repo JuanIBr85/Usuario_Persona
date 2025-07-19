@@ -61,7 +61,7 @@ const config = {
 };
 
 /**
- * Nombres de los meses en español.
+ * Nombres de los meses 
  */
 const monthNames = [
   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
