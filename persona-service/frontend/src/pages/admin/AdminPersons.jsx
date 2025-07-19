@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Fade } from "react-awesome-reveal";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, X } from "lucide-react";
+import { Users, X, ChevronLeft, ChevronRight } from "lucide-react";
 
 import PersonFilter from "@/components/people/PersonFilter";
 import Loading from "@/components/loading/Loading";
@@ -25,6 +25,7 @@ import {
   PaginationPrevious,
   PaginationNext,
 } from "@/components/ui/pagination";
+import { Button } from "@/components/ui/button";
 
 /**
  * Componente AdminUsers
@@ -278,22 +279,45 @@ function AdminPersons() {
               />
             </div>
 
+            {/* Paginación personalizada con botones en español */}
             <Pagination className="mt-4">
               <PaginationContent className="mx-auto">
                 <PaginationItem>
-                  <PaginationPrevious
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={`h-9 px-4 flex items-center gap-1 ${
+                      currentPage === 1
+                        ? "opacity-50 pointer-events-none"
+                        : "cursor-pointer"
+                    }`}
                     onClick={handlePreviousPage}
-                    className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                  />
+                    disabled={currentPage === 1}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    Anterior
+                  </Button>
                 </PaginationItem>
+
                 <PaginationItem className="text-sm px-4 py-1 text-muted-foreground">
                   Página {currentPage} de {totalPages || 1}
                 </PaginationItem>
+
                 <PaginationItem>
-                  <PaginationNext
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={`h-9 px-4 flex items-center gap-1 ${
+                      currentPage === totalPages
+                        ? "opacity-50 pointer-events-none"
+                        : "cursor-pointer"
+                    }`}
                     onClick={handleNextPage}
-                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-                  />
+                    disabled={currentPage === totalPages}
+                  >
+                    Siguiente
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
                 </PaginationItem>
               </PaginationContent>
             </Pagination>
