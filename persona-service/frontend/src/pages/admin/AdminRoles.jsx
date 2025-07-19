@@ -99,14 +99,8 @@ export default function AdminRoles() {
       if (typeof permiso !== "string") return;
       // Extraer el módulo antes del primer punto
       const modulo = permiso.split(".")[0];
-
-      // Formatear la última parte como en tu función original
-      const ultimaParte = permiso.substring(permiso.lastIndexOf(".") + 1);
-      const formateado = ultimaParte
-        .replace(/_/g, " ")
-        .split(" ")
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" ");
+      // Formatear el nombre del permiso
+      const formateado = formatPermissionName(permiso);
 
       if (!resultado[modulo]) resultado[modulo] = [];
       resultado[modulo].push(formateado);
