@@ -132,7 +132,7 @@ export default function RoleList({
                     <Users className="w-5 h-5 mt-1 text-muted-foreground shrink-0" />
                     <div>
                       <CardTitle className="text-base">{role.name}</CardTitle>
-                      <p className="text-xs text-muted-foreground">
+                      <div className="text-xs text-muted-foreground">
                         {Object.entries(
                           groupPermissionsByModule(role.permissions)
                         ).map(([modulo, permisos]) => (
@@ -153,7 +153,7 @@ export default function RoleList({
                             ))}
                           </div>
                         ))}
-                      </p>
+                      </div>
                     </div>
                   </div>
                   <div className="flex gap-2 mt-5 md:mt-0">
