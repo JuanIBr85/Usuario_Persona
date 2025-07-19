@@ -44,8 +44,8 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id, 
                             placeholder="Número de domicilio"
                             labelText="Número"
                             value={domicilio?.domicilio_numero || ''}
-                            validatePattern="^[0-9]{1,9}[a-zA-Z]?$"
-                            validationMessage="Ingresa un número válido (ej: 1234, 123A)"
+                            validatePattern="^([0-9]{1,9}[a-zA-Z]?|[Ss][Nn])$"
+                            validationMessage="Ingresa un número válido (ej: 1234, 123A, SN)"
                             required
                         />
 

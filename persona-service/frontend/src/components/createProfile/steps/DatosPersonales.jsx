@@ -23,6 +23,7 @@ const DatosPersonales = ({ hidden, staticData, documento }) => {
           type="text"
           labelText="Nombre"
           cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
+          validatePattern="^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$"
           validationMessage="El nombre es requerido y debe contener solo letras"
           required
         />
@@ -32,6 +33,7 @@ const DatosPersonales = ({ hidden, staticData, documento }) => {
           type="text"
           labelText="Apellido"
           cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
+          validatePattern="^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$"
           validationMessage="El apellido es requerido y debe contener solo letras"
           required
         />

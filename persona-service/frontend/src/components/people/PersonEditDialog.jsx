@@ -77,6 +77,8 @@ function PersonEditDialog({
                 labelText="Nombre"
                 value={editingUser.nombre || ""}
                 onChange={(e) => setEditingUser({ ...editingUser, nombre: e.target.value })}
+                validatePattern="^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$"
+                validationMessage="El nombre debe contener solo letras"
                 required
               />
 
@@ -88,6 +90,8 @@ function PersonEditDialog({
                 labelText="Apellido"
                 value={editingUser.apellido || ""}
                 onChange={(e) => setEditingUser({ ...editingUser, apellido: e.target.value })}
+                validatePattern="^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$"
+                validationMessage="El apellido debe contener solo letras"
                 required
               />
 
@@ -127,6 +131,8 @@ function PersonEditDialog({
                 value={editingUser.fecha_nacimiento || ""}
                 onChange={(e) => setEditingUser({ ...editingUser, fecha_nacimiento: e.target.value })}
                 max={maxDate}
+                validationMessage="La fecha de nacimiento es requerida"
+                required
               />
 
               <SimpleSelect

@@ -1,0 +1,17 @@
+id;validatePattern;validationMessage
+telefono_fijo;^\+549\d{10}$;Ingresa un número de teléfono válido EJ: +5492926396430
+telefono_movil;^\+549\d{10}$;Ingresa un número de teléfono válido EJ: +5492926396430
+red_social_contacto;;Email inválido
+email_contacto;;Email inválido
+observacion_contacto;;Se a ingresado uno o mas caracteres invalidos
+nombre_persona;^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$;El nombre debe contener solo letras
+apellido_persona;^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$;El apellido debe contener solo letras
+num_doc_persona;;Número de documento inválido
+fecha_nacimiento_persona;;La fecha de nacimiento es requerida
+email;;Email inválido
+domicilio_calle;^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s,.]{2,50}$;Ingresa un nombre de calle válido (2-50 caracteres, solo letras, espacios, puntos y comas)
+domicilio_numero;^([0-9]{1,9}[a-zA-Z]?|[Ss][Nn])$;Ingresa un número válido (ej: 1234, 123A)
+domicilio_piso;^[0-9]{1,3}$|^$;Ingresa un piso válido (máximo 3 dígitos)
+domicilio_dpto;^[a-zA-Z0-9]{1,2}$|^$;Ingresa un departamento válido (máximo 2 caracteres)
+domicilio_referencia;.{0,200};Máximo 200 caracteres
+vencimiento_dni;;Vencimiento invalido

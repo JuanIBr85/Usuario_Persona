@@ -55,7 +55,7 @@ const InfoAdicional = ({hidden, staticData}) => (
         type="date"
         placeholder="Ingresa tu fecha de vencimiento del DNI"
         labelText="Fecha de vencimiento del DNI"
-        min={ new Date().toISOString().split("T")[0]}
+        min={new Date().toISOString().split("T")[0]}
         max={(()=>{
           const fechaActual = new Date();
           fechaActual.setFullYear(fechaActual.getFullYear() + 16);

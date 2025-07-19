@@ -115,6 +115,8 @@ function PersonEditDialog({
                 maxLength={50}
                 cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
                 value={person.nombre_persona || ""}
+                validatePattern="^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$"
+                validationMessage="El nombre debe contener solo letras"
                 required
               />
 
@@ -125,6 +127,8 @@ function PersonEditDialog({
                 maxLength={50}
                 cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
                 value={person.apellido_persona || ""}
+                validatePattern="^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$"
+                validationMessage="El apellido debe contener solo letras"
                 required
               />
             </ResponsiveColumnForm>
@@ -167,6 +171,8 @@ function PersonEditDialog({
                 labelText="Fecha de nacimiento"
                 value={person.fecha_nacimiento_persona || ""}
                 max={today}
+                validationMessage="La fecha de nacimiento es requerida"
+                required
               />
 
               {/* Select de usuario */}
@@ -203,6 +209,7 @@ function PersonEditDialog({
                 labelText="Email"
                 maxLength={50}
                 value={person.contacto?.email_contacto || ""}
+                validationMessage="Email inválido"
                 required
               />
 
@@ -213,6 +220,7 @@ function PersonEditDialog({
                 validatePattern="^\+549\d{10}$"
                 value={person.contacto?.telefono_movil || ""}
                 maxLength={20}
+                validationMessage="Ingresa un número de teléfono válido EJ: +5492926396430"
                 required
               />
             </ResponsiveColumnForm>
@@ -225,6 +233,7 @@ function PersonEditDialog({
                 maxLength={20}
                 validatePattern="^\+549\d{10}$" 
                 value={person.contacto?.telefono_fijo || ""}
+                validationMessage="Ingresa un número de teléfono válido EJ: +5492926396430"
               />
             </ResponsiveColumnForm>
           </div>
@@ -240,6 +249,8 @@ function PersonEditDialog({
                 labelText="Calle"
                 maxLength={50}
                 value={person.domicilio?.domicilio_calle || ""}
+                validatePattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s,.]{2,50}$"
+                validationMessage="Ingresa un nombre de calle válido (2-50 caracteres, solo letras, espacios, puntos y comas)"
                 required
               />
 
@@ -249,6 +260,8 @@ function PersonEditDialog({
                 labelText="Número"
                 maxLength={10}
                 value={person.domicilio?.domicilio_numero || ""}
+                validatePattern="^([0-9]{1,9}[a-zA-Z]?|[Ss][Nn])$"
+                validationMessage="Ingresa un número válido (ej: 1234, 123A, SN)"
                 required
               />
             </ResponsiveColumnForm>
@@ -260,6 +273,8 @@ function PersonEditDialog({
                 labelText="Piso"
                 maxLength={3}
                 value={person.domicilio?.domicilio_piso || ""}
+                validatePattern="^[0-9]{1,3}$|^$"
+                validationMessage="Ingresa un piso válido (máximo 3 dígitos)"
               />
 
               <InputValidate
@@ -268,6 +283,8 @@ function PersonEditDialog({
                 labelText="Departamento"
                 maxLength={2}
                 value={person.domicilio?.domicilio_dpto || ""}
+                validatePattern="^[a-zA-Z0-9]{1,2}$|^$"
+                validationMessage="Ingresa un departamento válido (máximo 2 caracteres)"
               />
             </ResponsiveColumnForm>
 
@@ -277,7 +294,8 @@ function PersonEditDialog({
                 type="text"
                 labelText="Referencia"
                 maxLength={200}
-                value={person.domicilio?.domicilio_referencia || ""} 
+                value={person.domicilio?.domicilio_referencia || ""}
+                validationMessage="Máximo 200 caracteres"
               />
             </ResponsiveColumnForm>
             <CPLocalidad localidad={localidad} codigo_postal={person.domicilio?.domicilio_postal?.codigo_postal || ""} setLocalidad={setLocalidad} />
@@ -312,6 +330,7 @@ function PersonEditDialog({
                 maxLength={50}
                 value={person.contacto?.red_social_contacto || ""}
                 onChange={handleChange}
+                validationMessage="Caracteres invalidos"
               />
             </ResponsiveColumnForm>
           </div>

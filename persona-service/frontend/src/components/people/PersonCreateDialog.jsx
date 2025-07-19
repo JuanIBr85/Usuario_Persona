@@ -164,6 +164,7 @@ function PersonCreateDialog({
                 required
                 max={maxDate}
                 min="1905-01-01"
+                validationMessage="La fecha de nacimiento es requerida"
               />
 
               {/* Select de usuario */}
@@ -210,8 +211,8 @@ function PersonCreateDialog({
                 type="text"
                 labelText="Calle"
                 value={newUser.domicilio_calle || ""}
-                validatePattern="^(?!\s*$).+"
-                validationMessage="El nombre de la calle no puede estar vacío ni tener solo espacios"
+                validatePattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s,.]{2,50}$"
+                validationMessage="Ingresa un nombre de calle válido (2-50 caracteres, solo letras, espacios, puntos y comas)"
                 required
               />
 
@@ -221,8 +222,8 @@ function PersonCreateDialog({
                 type="text"
                 labelText="Número"
                 value={newUser.domicilio_numero || ""}
-                validatePattern="^\d{1,5}$"
-                validationMessage="Solo se permiten números (máximo 5 dígitos)"
+                validatePattern="^([0-9]{1,9}[a-zA-Z]?|[Ss][Nn])$"
+                validationMessage="Ingresa un número válido (ej: 1234, 123A, SN)"
                 required
               />
             </ResponsiveColumnForm>
@@ -234,6 +235,8 @@ function PersonCreateDialog({
                 type="text"
                 labelText="Piso"
                 value={newUser.domicilio_piso || ""}
+                validatePattern="^[0-9]{1,3}$|^$"
+                validationMessage="Ingresa un piso válido (máximo 3 dígitos)"
               />
               <InputValidate
                 id="domicilio_dpto"
@@ -241,6 +244,8 @@ function PersonCreateDialog({
                 type="text"
                 labelText="Departamento"
                 value={newUser.domicilio_dpto || ""}
+                validatePattern="^[a-zA-Z0-9]{1,2}$|^$"
+                validationMessage="Ingresa un departamento válido (máximo 2 caracteres)"
               />
             </ResponsiveColumnForm>
 
@@ -260,7 +265,7 @@ function PersonCreateDialog({
                 labelText="Teléfono fijo"
                 value={newUser.telefono_fijo || ""}
                 validatePattern="^\+549\d{10}$"
-                validationMessage="El teléfono debe estar en este formato: +549XXXXXXXXXX"
+                validationMessage="Ingresa un número de teléfono válido EJ: +5492926396430"
               />
 
               <InputValidate
@@ -272,7 +277,7 @@ function PersonCreateDialog({
                 value={newUser.telefono_movil || ""}
                 required
                 validatePattern="^\+549\d{10}$"
-                validationMessage="El teléfono debe estar en este formato: +549XXXXXXXXXX"
+                validationMessage="Ingresa un número de teléfono válido EJ: +5492926396430"
               />
             </ResponsiveColumnForm>
 
@@ -307,6 +312,7 @@ function PersonCreateDialog({
                       !newUser.red_social_nombre ||
                       newUser.red_social_nombre === redesSociales[0]
                     }
+                    validationMessage="Email inválido"
                   />
                 )}
             </ResponsiveColumnForm>
@@ -318,6 +324,7 @@ function PersonCreateDialog({
                 maxLength={50}
                 labelText="Email de contacto"
                 value={newUser.email_contacto || ""}
+                validationMessage="Email inválido"
                 required
               />
               <div />{" "}
@@ -332,6 +339,7 @@ function PersonCreateDialog({
                 labelText="Observaciones de contacto"
                 value={newUser.observacion_contacto || ""}
                 className="w-full"
+                validationMessage="Se a ingresado uno o mas caracteres invalidos"
               />
             </div>
           </div>

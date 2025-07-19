@@ -104,6 +104,7 @@ export default function FormPersonaExtendida({
                 return fechaActual.toISOString().split("T")[0];
               })()}
               onChange={(e) => handleChange("vencimiento_dni", e.target.value)}
+              validationMessage="Fecha de vencimiento inválida"
             />
           </ResponsiveColumnForm>
 

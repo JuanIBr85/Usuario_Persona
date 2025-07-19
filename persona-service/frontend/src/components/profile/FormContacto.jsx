@@ -81,6 +81,7 @@ export default function FormContacto({
               placeholder="Nombre del Usuario"
               labelText="Red social de contacto"
               value={contacto?.red_social_contacto || ""}
+              validationMessage="Email inválido"
             />
             <SimpleSelect
               label="Red social"
@@ -114,6 +115,7 @@ export default function FormContacto({
             placeholder="Ingresa una observación"
             value={contacto?.observacion_contacto || ""}
             maxLength={300}
+            validationMessage="Se a ingresado uno o mas caracteres invalidos"
           />
         </div>
         <div className="flex flex-col gap-3 pt-4">
