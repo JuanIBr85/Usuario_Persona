@@ -12,7 +12,6 @@ from app.utils.jwt import (
     crear_token_refresh,
     generar_token_reset,
     crear_token_refresh,
-    create_access_token,
 )
 from app.schemas.usuarios_schema import (
     LoginSchema,
