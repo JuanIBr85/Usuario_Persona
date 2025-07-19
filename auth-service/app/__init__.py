@@ -73,7 +73,7 @@ def create_app():
 
 
 def init_app():
-    FORZAR_RESET = True
+    FORZAR_RESET = False
     if FORZAR_RESET:
         print("[i] Reiniciando base de datos y datos del seed...")
         eliminar_base()
@@ -96,8 +96,9 @@ def funcion_que_recibe_mensajes(message: dict, app_flask: Flask) -> None:
         with app_flask.app_context():
             time.sleep(5)
             actualizar_roles()
-
+    print("[Mensajería] Procesando evento: ", message.get("event_type"), message.get("event_type") == "creus_give_user_rol")
     if message.get("event_type") == "creus_give_user_rol":
+        
         logger.error("[Mensajería] Procesando evento: creus_give_user_rol")
         logger.warning(f"Mensaje completo recibido: {message}")
 
@@ -115,19 +116,20 @@ def funcion_que_recibe_mensajes(message: dict, app_flask: Flask) -> None:
             logger.warning("Token JWT no recibido")
             return
 
-        session = SessionLocal()
+        
         with app_flask.app_context():
             from app.database.session import SessionLocal
             from app.models import RolUsuario, Rol, Usuario, Permiso, RolPermiso
             from flask_jwt_extended import decode_token
             from app.extensions import get_redis
+            session = SessionLocal()
             try:
                 usuario = session.query(Usuario).filter_by(id_usuario=usuario_id, eliminado=False).first()
                 if not usuario:
                     logger.warning(f"Usuario con ID {usuario_id} no encontrado")
                     return
 
-                rol_creus = session.query(Rol).filter_by(nombre_rol="creus-usuario").first()
+                rol_creus = session.query(Rol).filter_by(nombre_rol="admin-persona").first()
                 if not rol_creus:
                     logger.error("El rol 'creus-usuario' no está creado en la base de datos")
                     return

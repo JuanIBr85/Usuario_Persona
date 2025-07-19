@@ -31,13 +31,14 @@ class MessageService:
             lambda session: session.filter_by(service_name=to_service).first(),
             not_dump=True,
         ))
-        if not get_health(service.service_url):
-            return None, 400, "Servicio no disponible"
 
-            
         # Si el servicio no existe
         if service is None:
             return None, 404, "Servicio no encontrado"
+
+        
+        if not get_health(service.service_url):
+            return None, 400, "Servicio no disponible"
 
         # Si el servicio no esta disponible
         if not service.service_available:

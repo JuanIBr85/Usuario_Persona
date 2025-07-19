@@ -24,12 +24,12 @@ def test_creus_event():
         logger.error(f"Token inválido en la ruta test_event: {e}")
         return jsonify({"error": "Token inválido o expirado"}), 400
 
-    send_message(
-        to_service="auth_service",
+    
+    return jsonify(send_message(
+        to_service="auth-service",
         message={
             "id_usuario": id_usuario,
             "token": token
         },
         event_type="creus_give_user_rol"
-    )
-    return jsonify({"status": "Evento simulado enviado correctamente"}), 200
+    )), 200

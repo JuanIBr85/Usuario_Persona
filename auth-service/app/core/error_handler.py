@@ -4,7 +4,7 @@ from flask import jsonify
 
 def registrar_manejador_errores(app):
 
-    @app.errorhandler(Exception)
+    #@app.errorhandler(Exception)
     def manejar_error_global(e):
         logger = logging.getLogger()
         trace = "".join(traceback.format_exception(type(e), e, e.__traceback__))
