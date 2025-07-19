@@ -10,7 +10,7 @@ const InfoAdicional = ({hidden, staticData}) => (
     <ResponsiveColumnForm>
       {/* Estado Civil */}
       <SimpleSelect
-        name="estado_civil"
+        id="estado_civil"
         label="Estado Civil"
         placeholder="Selecciona tu estado civil"
       >
@@ -23,7 +23,7 @@ const InfoAdicional = ({hidden, staticData}) => (
 
       {/* Ocupación */}
       <SimpleSelect
-        name="ocupacion"
+        id="ocupacion"
         label="Ocupación"
         placeholder="Selecciona tu ocupación"
       >
@@ -38,7 +38,7 @@ const InfoAdicional = ({hidden, staticData}) => (
     <ResponsiveColumnForm>
       {/* Nivel de Estudios */}
       <SimpleSelect
-        name="estudios_alcanzados"
+        id="estudios_alcanzados"
         label="Nivel de Estudios"
         placeholder="Selecciona tu nivel de estudios"
       >

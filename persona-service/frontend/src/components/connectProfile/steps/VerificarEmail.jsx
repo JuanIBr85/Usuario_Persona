@@ -13,7 +13,6 @@ export function VerificarEmail({ formRef, email, onSubmit, onEmailIncorrecto, lo
       />
       <InputValidate
         id="email_confirmado"
-        name="email_confirmado"
         type="email"
         labelText="Escribe tu email"
         placeholder={email}

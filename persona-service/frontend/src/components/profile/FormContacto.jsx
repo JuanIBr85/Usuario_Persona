@@ -51,7 +51,6 @@ export default function FormContacto({
             {/* Datos editables con InputValidate */}
             <InputValidate
               id="telefono_fijo"
-              name="telefono_fijo"
               type="tel"
               maxLength={20}
               placeholder="Ingresa tu teléfono fijo"
@@ -62,7 +61,6 @@ export default function FormContacto({
             />
             <InputValidate
               id="telefono_movil"
-              name="telefono_movil"
               type="tel"
               maxLength={20}
               placeholder="Ingresa tu teléfono móvil"
@@ -76,7 +74,6 @@ export default function FormContacto({
           <ResponsiveColumnForm>
             <InputValidate
               id="red_social_contacto"
-              name="red_social_contacto"
               type="text"
               maxLength={50}
               cleanRegex={/[^a-zA-Z0-9@._-]/g}
@@ -85,7 +82,6 @@ export default function FormContacto({
               value={contacto?.red_social_contacto || ""}
             />
             <SimpleSelect
-              name="red_social_nombre"
               label="Red social"
               placeholder="Selecciona una red social"
               value={contacto?.red_social_nombre}

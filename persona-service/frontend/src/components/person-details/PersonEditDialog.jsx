@@ -126,7 +126,7 @@ function PersonEditDialog({
 
             <ResponsiveColumnForm>
               <SimpleSelect
-                name="tipo_documento"
+                id="tipo_documento"
                 label="Tipo de documento"
                 value={editingPerson.tipo_documento || tipoDoc}
                 placeholder="Selecciona un tipo de documento"
@@ -166,7 +166,7 @@ function PersonEditDialog({
 
               {/* Select de usuario */}
               <SimpleSelect
-                name="usuario_id"
+                id="usuario_id"
                 label="Usuario del sistema"
                 value={editingPerson.usuario_id || -1}
                 placeholder="Selecciona un usuario"
@@ -284,7 +284,7 @@ function PersonEditDialog({
 
               {localidades.length > 0 && (
                 <SimpleSelect
-                  name="localidad"
+                  id="localidad"
                   label="Localidad"
                   value={editingPerson.domicilio?.domicilio_postal?.localidad || ""}
                   placeholder="Selecciona una localidad"
@@ -308,7 +308,7 @@ function PersonEditDialog({
             <ResponsiveColumnForm>
               {redesSociales.length > 0 && (
                 <SimpleSelect
-                  name="red_social_nombre"
+                  id="red_social_nombre"
                   label="Red Social"
                   value={editingPerson.contacto?.red_social_nombre || ""}
                   placeholder="Selecciona una red social"
@@ -324,7 +324,6 @@ function PersonEditDialog({
 
               <InputValidate
                 id="red_social_contacto"
-                name="red_social_contacto"
                 cleanRegex={/[^a-zA-Z0-9@._-]/g}
                 type="text"
                 labelText="Usuario de la red social"

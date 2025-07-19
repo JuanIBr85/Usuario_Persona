@@ -9,7 +9,7 @@ export function Documento({ formRef, tipoDocumento, onSubmit, loading }) {
   return (
     <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-8">
       <SimpleSelect
-        name="tipo_documento"
+        id="tipo_documento"
         label="Tipo de documento"
         placeholder="Selecciona un tipo de documento"
         onValueChange={(value) => setTipoDoc(value)}
@@ -23,7 +23,6 @@ export function Documento({ formRef, tipoDocumento, onSubmit, loading }) {
       </SimpleSelect>
       <InputValidate
         id="num_doc_persona"
-        name="num_doc_persona"
         type="text"
         value=""
         maxLength={13}

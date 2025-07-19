@@ -71,7 +71,6 @@ function PersonEditDialog({
             <div className="grid gap-4">
               <InputValidate
                 id="nombre"
-                name="nombre"
                 cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
                 type="text"
                 maxLength={50}
@@ -83,7 +82,6 @@ function PersonEditDialog({
 
               <InputValidate
                 id="apellido"
-                name="apellido"
                 cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
                 maxLength={50}
                 type="text"
@@ -94,7 +92,7 @@ function PersonEditDialog({
               />
 
               <SimpleSelect
-                name="tipo_documento"
+                id="tipo_documento"
                 label="Tipo de documento"
                 value={editingUser.tipo_documento || tipoDoc}
                 placeholder="Selecciona un tipo de documento"
@@ -113,7 +111,6 @@ function PersonEditDialog({
 
               <InputValidate
                 id="nro_documento"
-                name="nro_documento"
                 type="text"
                 labelText="Número de Documento"
                 maxLength={13}
@@ -125,7 +122,6 @@ function PersonEditDialog({
 
               <InputValidate
                 id="fecha_nacimiento"
-                name="fecha_nacimiento"
                 type="date"
                 labelText="Fecha de Nacimiento"
                 value={editingUser.fecha_nacimiento || ""}
@@ -135,7 +131,6 @@ function PersonEditDialog({
 
               <SimpleSelect
                 label="Usuario del sistema"
-                name="usuario_id"
                 id="usuario_id"
                 value={usuarioValue}
                 onValueChange={(value) => {

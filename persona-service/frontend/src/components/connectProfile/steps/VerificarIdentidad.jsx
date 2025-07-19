@@ -11,7 +11,6 @@ export function VerificarIdentidad({ formRef, setDialog, onSubmit }) {
         <ResponsiveColumnForm>
           <InputValidate
             id="nombre_persona"
-            name="nombre_persona"
             type="text"
             labelText="Nombre"
             maxLength={50}
@@ -20,7 +19,6 @@ export function VerificarIdentidad({ formRef, setDialog, onSubmit }) {
           />
           <InputValidate
             id="apellido_persona"
-            name="apellido_persona"
             maxLength={50}
             type="text"
             labelText="Apellido"
@@ -31,7 +29,6 @@ export function VerificarIdentidad({ formRef, setDialog, onSubmit }) {
         <ResponsiveColumnForm>
           <InputValidate
             id="fecha_nacimiento_persona"
-            name="fecha_nacimiento_persona"
             type="date"
             placeholder="Ingresa tu fecha de nacimiento"
             labelText="Fecha de nacimiento"
@@ -41,7 +38,6 @@ export function VerificarIdentidad({ formRef, setDialog, onSubmit }) {
           />
           <InputValidate
             id="telefono_movil"
-            name="telefono_movil"
             maxLength={20}
             type="tel"
             placeholder="Ingresa tu teléfono móvil"

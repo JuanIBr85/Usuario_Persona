@@ -48,7 +48,7 @@ export default function FormPersonaExtendida({
           <ResponsiveColumnForm>
             {/* Estado Civil */}
             <SimpleSelect
-              name="estado_civil"
+              id="estado_civil"
               label="Estado Civil"
               placeholder="Selecciona tu estado civil"
               value={personaExtendida?.estado_civil || ""}
@@ -62,7 +62,7 @@ export default function FormPersonaExtendida({
 
             {/* Ocupación */}
             <SimpleSelect
-              name="ocupacion"
+              id="ocupacion"
               label="Ocupación"
               placeholder="Selecciona tu ocupación"
               value={personaExtendida?.ocupacion || ""}
@@ -78,7 +78,7 @@ export default function FormPersonaExtendida({
           <ResponsiveColumnForm>
             {/* Nivel de Estudios */}
             <SimpleSelect
-              name="estudios_alcanzados"
+              id="estudios_alcanzados"
               label="Nivel de Estudios"
               placeholder="Selecciona tu nivel de estudios"
               value={personaExtendida?.estudios_alcanzados || ""}

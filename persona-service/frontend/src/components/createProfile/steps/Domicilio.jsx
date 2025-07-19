@@ -81,7 +81,7 @@ const Domicilio = ({ hidden, staticData }) => {
             required
           />
           <SimpleSelect
-            name="localidad"
+            id="localidad"
             label="Localidad"
             placeholder="Selecciona una localidad"
             value={localidad}

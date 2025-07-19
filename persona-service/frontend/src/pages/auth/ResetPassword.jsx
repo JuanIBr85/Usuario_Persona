@@ -116,7 +116,6 @@ const ResetPassword = () => {
           {/* Campo para nueva contraseña con validación */}
           <InputValidate
             id="password"
-            name="password"
             type="password"
             maxLength={70}
             isCleanValue={false}
@@ -130,7 +129,6 @@ const ResetPassword = () => {
           {/* Campo para confirmar la contraseña */}
           <InputValidate
             id="confirm_password"
-            name="confirm_password"
             type="password"
             maxLength={70}
             isCleanValue={false}

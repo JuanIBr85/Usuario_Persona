@@ -98,7 +98,6 @@ function PersonCreateDialog({
             <ResponsiveColumnForm>
               <InputValidate
                 id="nombre"
-                name="nombre"
                 type="text"
                 labelText="Nombre(s)"
                 value={newUser.nombre || ""}
@@ -111,7 +110,6 @@ function PersonCreateDialog({
 
               <InputValidate
                 id="apellido"
-                name="apellido"
                 cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
                 type="text"
                 labelText="Apellido(s)"
@@ -125,7 +123,7 @@ function PersonCreateDialog({
 
             <ResponsiveColumnForm>
               <SimpleSelect
-                name="tipo_documento"
+                id="tipo_documento"
                 label="Tipo de documento"
                 value={newUser.tipo_documento || "DNI"}
                 placeholder="Selecciona un tipo de documento"
@@ -144,7 +142,6 @@ function PersonCreateDialog({
 
               <InputValidate
                 id="nro_documento"
-                name="nro_documento"
                 type="text"
                 labelText="Nro. documento"
                 maxLength={13}
@@ -158,7 +155,6 @@ function PersonCreateDialog({
             <ResponsiveColumnForm>
               <InputValidate
                 id="fecha_nacimiento"
-                name="fecha_nacimiento"
                 type="date"
                 labelText="Fecha de nacimiento"
                 value={newUser.fecha_nacimiento || ""}
@@ -170,7 +166,6 @@ function PersonCreateDialog({
               {/* Select de usuario */}
               <SimpleSelect
                 label="Usuario del sistema"
-                name="usuario_id"
                 id="usuario_id"
                 value="-1"
                 disabled={loading}
@@ -208,7 +203,6 @@ function PersonCreateDialog({
             <ResponsiveColumnForm>
               <InputValidate
                 id="domicilio_calle"
-                name="domicilio_calle"
                 maxLength={50}
                 type="text"
                 labelText="Calle"
@@ -219,7 +213,6 @@ function PersonCreateDialog({
 
               <InputValidate
                 id="domicilio_numero"
-                name="domicilio_numero"
                 maxLength={10}
                 type="text"
                 labelText="Número"
@@ -232,7 +225,6 @@ function PersonCreateDialog({
             <ResponsiveColumnForm>
               <InputValidate
                 id="domicilio_piso"
-                name="domicilio_piso"
                 maxLength={3}
                 type="text"
                 labelText="Piso"
@@ -242,7 +234,6 @@ function PersonCreateDialog({
             <ResponsiveColumnForm>
               <InputValidate
                 id="domicilio_dpto"
-                name="domicilio_dpto"
                 maxLength={2}
                 type="text"
                 labelText="Departamento"
@@ -251,7 +242,6 @@ function PersonCreateDialog({
 
               <InputValidate
                 id="codigo_postal"
-                name="codigo_postal"
                 type="text"
                 placeholder="Ej: 7540"
                 labelText="Código Postal"
@@ -266,7 +256,7 @@ function PersonCreateDialog({
 
             <ResponsiveColumnForm>
               <SimpleSelect
-                name="localidad"
+                id="localidad"
                 label="Localidad"
                 value={newUser.localidad || ""}
                 placeholder="Selecciona una localidad"
@@ -293,7 +283,6 @@ function PersonCreateDialog({
             <ResponsiveColumnForm>
               <InputValidate
                 id="telefono_fijo"
-                name="telefono_fijo"
                 maxLength={20}
                 minLength={7}
                 type="tel"
@@ -305,7 +294,6 @@ function PersonCreateDialog({
 
               <InputValidate
                 id="telefono_movil"
-                name="telefono_movil"
                 maxLength={20}
                 minLength={7}
                 type="tel"
@@ -319,7 +307,7 @@ function PersonCreateDialog({
 
             <ResponsiveColumnForm>
               <SimpleSelect
-                name="red_social_nombre"
+                id="red_social_nombre"
                 label="Red social"
                 value={newUser.red_social_nombre || redesSociales[0] || ""}
                 placeholder="Selecciona una red social"
@@ -338,7 +326,6 @@ function PersonCreateDialog({
                 newUser.red_social_nombre !== redesSociales[0] && (
                   <InputValidate
                     id="red_social_contacto"
-                    name="red_social_contacto"
                     cleanRegex={/[^a-zA-Z0-9@._-]/g}
                     maxLength={50}
                     type="text"
@@ -356,7 +343,6 @@ function PersonCreateDialog({
             <ResponsiveColumnForm>
               <InputValidate
                 id="email_contacto"
-                name="email_contacto"
                 type="email"
                 maxLength={50}
                 labelText="Email de contacto"
@@ -370,7 +356,6 @@ function PersonCreateDialog({
             <div className="w-full">
               <InputValidate
                 id="observacion_contacto"
-                name="observacion_contacto"
                 type="text"
                 maxLength={300}
                 labelText="Observaciones de contacto"

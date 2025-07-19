@@ -10,7 +10,6 @@ const Contacto = ({hidden, staticData}) => (
     <ResponsiveColumnForm>
       <InputValidate
         id="telefono_fijo"
-        name="telefono_fijo"
         type="tel"
         maxLength={20}
         placeholder="Ingresa tu teléfono fijo"
@@ -20,7 +19,6 @@ const Contacto = ({hidden, staticData}) => (
       />
       <InputValidate
         id="telefono_movil"
-        name="telefono_movil"
         type="tel"
         maxLength={20}
         placeholder="Ingresa tu teléfono móvil"
@@ -33,7 +31,6 @@ const Contacto = ({hidden, staticData}) => (
     <ResponsiveColumnForm className="items-end">
       <InputValidate
         id="red_social_contacto"
-        name="red_social_contacto"
         type="text"
         maxLength={50}
         placeholder="Nombre del Usuario"
@@ -42,10 +39,9 @@ const Contacto = ({hidden, staticData}) => (
         value=""
       />
       <SimpleSelect
-        name="red_social_nombre"
+        id="red_social_nombre"
         label="Red social"
         placeholder="Selecciona una red social"
-        id="red_social_nombre"
         onChange={(e) => console.log(e.target.value)}
       >
         {staticData.redes_sociales.map((red) => (

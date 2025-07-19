@@ -23,7 +23,7 @@ const minDate = "1905-01-01"
  * @param {Object} props - Props adicionales que serán pasadas al componente <Input>.
  * @param {string} containerClassName - Clases adicionales para el contenedor del input.
  */
-export default function InputValidate({ id, type, placeholder, labelText, validatePattern, validationMessage, value = "", containerClassName, onChange, required=false, iconInput, cleanRegex = /[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ0-9\s\-_.,'()]/g, cleanEmailRegex = /[^a-zA-Z0-9@._-]/g, cleanTelRegex = /[^0-9\s\-\(\)\+]/g, cleanUrlRegex = /[^a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]/g, isCleanValue = true, maxLength=50, min, max, ...props }) {
+export default function InputValidate({ id, type, placeholder, labelText, validatePattern, validationMessage, value = "", containerClassName, onChange, required=false, iconInput, cleanRegex = /[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ0-9\s\-_.,'()]/g, cleanEmailRegex = /[^a-zA-Z0-9@._-]/g, cleanTelRegex = /[^0-9\s\-\(\)\+]/g, cleanUrlRegex = /[^a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]/g, isCleanValue = true, maxLength=50, min, max, name, ...props }) {
     //Este estado sirve para indicar si hubo un error en la validacion del input
     const [error, setError] = React.useState(false)
     //Este estado sirve para indicar si debe o no ocultar la contraseña
@@ -38,6 +38,12 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
     const [isInit, setIsInit] = React.useState(false);
 
     const { removeAuthData } = useAuthContext();
+
+    useEffect(()=>{
+        if(name){
+            alert(`InputValidate: ${name} - la propiedad name no es valida, use id en su lugar`);
+        }
+    },[name])
 
     useEffect(() => {
         setInternalMin(min || (type === "date" ? minDate : undefined));

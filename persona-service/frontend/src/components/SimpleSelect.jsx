@@ -20,6 +20,12 @@ function SimpleSelect({
     ...props
 }) {
 
+    useEffect(()=>{
+        if(name){
+            alert(`SimpleSelect: ${name} - la propiedad name no es valida, use id en su lugar`);
+        }
+    },[name])
+
     const [internalValue, setInternalValue] = useState(value);
     useEffect(() => {
         setInternalValue(value)
@@ -27,9 +33,9 @@ function SimpleSelect({
     
     return (
         <div className="grid w-full items-center gap-1.5 ">
-            <Label htmlFor={name}>{label}{required && <span className="text-destructive">*</span>}</Label>
+            <Label htmlFor={id}>{label}{required && <span className="text-destructive">*</span>}</Label>
             <div className="relative">
-                <Select id={id} name={name} value={internalValue} onValueChange={(e) => {
+                <Select id={id} name={id} value={internalValue} onValueChange={(e) => {
                     setInternalValue(e);
                     onValueChange && onValueChange(e);
                 }} required={required} {...props}>

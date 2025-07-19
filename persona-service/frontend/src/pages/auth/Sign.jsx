@@ -139,7 +139,6 @@ function Sign() {
 
           <InputValidate
             id="password_repeat"
-            name="password_repeat" 
             type="password"
             maxLength={70}
             isCleanValue={false}
