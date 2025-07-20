@@ -87,7 +87,7 @@ export const componentService = {
     const state = available ? 1 : 0;
     return fetchService.fetch({
       url: `${ServiceURL.control}/services/set_service_available/${id}/${state}`,
-      method: HttpMethod.GET,
+      method: HttpMethod.PUT,
       showError: componentService.showError,
       useToken: true
     });
