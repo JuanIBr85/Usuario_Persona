@@ -1,5 +1,6 @@
 # ejecutar con: python -m app.script.seed_data
 
+import os
 from app.database.session import SessionLocal
 from app.models.rol import Rol, RolUsuario
 from app.models.permisos import Permiso, RolPermiso
@@ -57,7 +58,7 @@ def seed():
     db.commit()
 
     # Crear superadmin
-    email = "superadmin@admin.com"
+    email = os.getenv("ADMIN_EMAIL", "superadmin@admin.com")
     superadmin = db.query(Usuario).filter_by(email_usuario=email).first()
     if not superadmin:
         superadmin = Usuario(

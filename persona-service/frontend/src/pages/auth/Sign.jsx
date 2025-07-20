@@ -65,7 +65,7 @@ function Sign() {
         setIsOK(true);
       })
       .catch((error) => {
-        setMessage(FetchErrorMessage(error));
+        setMessage(error.data.message);
         setIsOK(false);
       })
       .finally(() => {
@@ -95,7 +95,7 @@ function Sign() {
       {/* Layout del formulario de registro */}
       <AuthLayout
         title="Creación de cuenta"
-        visualContent={<UserPlus className="text-white w-42 h-42" />}
+        visualContent={<UserPlus className="text-white w-56 h-56" />}
       >
         <form onSubmit={handleSubmit} className="flex flex-col gap-3 h-full overflow-y-auto">
           {/* Input de email */}

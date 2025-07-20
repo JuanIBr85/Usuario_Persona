@@ -165,7 +165,7 @@ def enviar_solicitud_restauracion_admin(usuario):
     
     msg = Message(
         subject="Solicitud de restauración de usuario",
-        recipients=["superadmin@admin.com"], #[current_app.config['superadmin@admin.com']],
+        recipients=[usuario.email_usuario],
         html=html,
     )
     mail.send(msg)

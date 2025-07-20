@@ -40,7 +40,7 @@ const AuthLayout = ({
                   <p className="text-center text-white/80">{description}</p>
                 )}
               </CardHeader>
-              <CardContent className="flex items-center justify-center h-full">
+              <CardContent className="flex mt-[120px] justify-center h-full">
                 {visualContent}
               </CardContent>
               <CardFooter className="flex justify-center">

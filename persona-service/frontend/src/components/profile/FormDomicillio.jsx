@@ -57,8 +57,8 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id, 
                             placeholder="Piso (opcional)"
                             labelText="Piso"
                             value={domicilio?.domicilio_piso || ''}
-                            validatePattern="^[0-9]{1,3}$|^$"
-                            validationMessage="Ingresa un piso válido (máximo 3 dígitos)"
+                            validatePattern="^[0-9]{1,2}[A-Za-z]?$|^[Pp][Bb]$"
+                            validationMessage="Formato de piso inválido. Ejemplos válidos: '3', '3A', 'PB'"
                         />
 
                         {/* Campo Departamento (opcional) */}

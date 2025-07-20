@@ -119,10 +119,14 @@ class UsuarioService(ServicioBase):
 
         if usuario_existente:
             if usuario_existente.eliminado:
-                enviar_solicitud_restauracion_admin(usuario_existente)
+                email = data_validada["email_usuario"].lower()
+                #Prevengo que se envie un correo de restauracion si ya se envio
+                lock_verificar_dispositivo = get_redis().set(f"lock:restauracion:{email}", "true", ex=60*30, nx=True)
+                if lock_verificar_dispositivo:
+                    enviar_solicitud_restauracion_admin(usuario_existente)
                 return (
                     ResponseStatus.FAIL,
-                    "Ya existe una cuenta con este email desactivada. Hemos notificado al administrador. Verifique su email en las proximas 48 horas",
+                    "Ya existe una cuenta con este email desactivada. Verifique su email.",
                     None,
                     403,
                 )
@@ -664,6 +668,9 @@ class UsuarioService(ServicioBase):
             usuario = session.query(Usuario).filter_by(id_usuario=usuario_id, eliminado=False).first()
             if not usuario:
                 raise ValueError("Usuario no encontrado")
+            
+            if usuario.email_usuario == nuevo_email:
+                raise ValueError("El nuevo email ya a sido cambiado")
 
             usuario.email_usuario = nuevo_email
             session.commit()

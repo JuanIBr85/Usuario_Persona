@@ -138,7 +138,7 @@ function OTPRegister() {
       {/* Layout principal de autenticación */}
       <AuthLayout
         title="Verificación de dos factores"
-        visualContent={<ShieldCheck className="text-white w-42 h-42" />}
+        visualContent={<ShieldCheck className="text-white w-56 h-56" />}
       >
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 h-full">
           <div className="grid w-full items-center gap-1.5">

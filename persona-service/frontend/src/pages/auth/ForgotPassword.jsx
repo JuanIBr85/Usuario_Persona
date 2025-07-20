@@ -84,7 +84,7 @@ function ForgotPassword() {
       {/* Layout de autenticación con formulario */}
       <AuthLayout
         title="Recuperar contraseña"
-        visualContent={<Mail className="text-white w-42 h-42" />}
+        visualContent={<Mail className="text-white w-56 h-56" />}
       >
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 h-full">
           <p className="text-sm text-muted-foreground">

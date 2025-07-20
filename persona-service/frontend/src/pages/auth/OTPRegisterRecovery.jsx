@@ -141,7 +141,7 @@ function OTPRegisterRecovery() {
       {/* Layout con ícono y título */}
       <AuthLayout
         title="Verificación de dos factores"
-        visualContent={<ShieldCheck className="text-white w-42 h-42" />}
+        visualContent={<ShieldCheck className="text-white w-56 h-56" />}
       >
         <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-4 h-full">
           {/* Campo OTP */}

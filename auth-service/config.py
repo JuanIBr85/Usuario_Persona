@@ -32,3 +32,4 @@ class Config:
     USER_RESTORE_CONFIRM_URL = os.getenv("USER_RESTORE_CONFIRM_URL", "http://localhost:5000/confirmar-restauracion")
     USER_EMAIL_MODIFICATION_URL = os.getenv("USER_EMAIL_MODIFICATION_URL", "http://localhost:5000/confirmar-modificar-email")
     USER_DELETION_CONFIRM_URL = os.getenv("USER_DELETION_CONFIRM_URL", "http://localhost:5002/api/auth/confirmar-eliminacion")
+    ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "superadmin@superadmin.com")

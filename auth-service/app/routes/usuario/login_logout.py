@@ -3,7 +3,7 @@ from typing import Any, Literal
 from app.schemas.usuarios_schema import UsuarioModificarSchema,UsuarioModificarEmailSchema,UsuarioEliminarSchema
 from marshmallow import ValidationError
 from common.utils.component_request import ComponentRequest
-from flask import request, Blueprint,render_template
+from flask import current_app, request, Blueprint,render_template
 from app.database.session import SessionLocal
 from app.services.usuario_service import UsuarioService
 from common.decorators.api_access import api_access
@@ -409,7 +409,9 @@ def confirmar_eliminacion_usuario():
         if status != ResponseStatus.SUCCESS:
             raise ValueError(mensaje)
 
-        return render_template("eliminacion_exitosa.html")
+        admin_email = current_app.config['ADMIN_EMAIL']
+
+        return render_template("eliminacion_exitosa.html", admin_email=admin_email)
 
     except Exception as e:
         session.rollback()

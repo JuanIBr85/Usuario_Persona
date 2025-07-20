@@ -87,7 +87,7 @@ function Login() {
       {/* Layout visual general del formulario de login */}
       <AuthLayout
         title="Inicio de sesión"
-        visualContent={<KeyRound className="text-white w-42 h-42" />}
+        visualContent={<KeyRound className="text-white w-56 h-56" />}
       >
         {/* Formulario de login */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 h-full">
