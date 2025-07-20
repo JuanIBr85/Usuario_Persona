@@ -1,3 +1,4 @@
+import logging
 from common.utils.component_request import ComponentRequest
 from flask import request, Blueprint
 from app.database.session import SessionLocal
@@ -63,6 +64,13 @@ def iniciar_registro_usuario():
             session, data
         )
         return make_response(status, mensaje, contenido), codigo
+    except Exception as e:
+        logging.error(f"Error al iniciar el registro: {str(e)}")
+        session.rollback()
+        return make_response(
+            ResponseStatus.FAIL,
+            "Error al iniciar el registro",
+        ), 500
     finally:
         session.close()
 
