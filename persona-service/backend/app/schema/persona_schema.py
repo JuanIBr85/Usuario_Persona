@@ -6,30 +6,15 @@ from app.schema.persona_extendida_schema import PersonaExtendidaSchema
 from app.schema.base_schema import BaseSchema
 from app.utils.validar_string import validar_nombre_apellido
 from app.utils.validar_fechas import validar_fecha_nacimiento
+from app.schema.persona_vincular_schema import ValidarDocumentoSchema
 
 
-class FormatoDocumentoSchema(BaseSchema):
-    @post_load
-    def format_num_doc_persona(self, data, **kwargs):
-        """Formatea el número de documento según el tipo"""
-        tipo_documento = data.get('tipo_documento')
-        num_doc_persona = data.get('num_doc_persona', "")
-        
-        if tipo_documento in ["CUIL", "CUIT"] and len(num_doc_persona) == 11:
-            # Formatear como XX-XXXXXXXX-X
-            data['num_doc_persona'] = f"{num_doc_persona[:2]}-{num_doc_persona[2:10]}-{num_doc_persona[10:]}"
-        
-        return data
 
-class PersonaSchema(FormatoDocumentoSchema):
+class PersonaSchema(ValidarDocumentoSchema):
     id_persona = fields.Int(dump_only=True)
     nombre_persona = fields.Str(required=True,validate=validar_nombre_apellido)
     apellido_persona = fields.Str(required=True,validate=validar_nombre_apellido)
     fecha_nacimiento_persona = fields.Date(required=True,validate = validar_fecha_nacimiento)
-    tipo_documento = fields.Str(
-        required=True, validate=validate.OneOf(list(TIPOS_DOCUMENTO_VALIDOS.keys()))
-    )
-    num_doc_persona = fields.Str(required=True)
 
     usuario_id = fields.Int(required=False, allow_none=True)
 
@@ -50,13 +35,9 @@ class PersonaSchema(FormatoDocumentoSchema):
         return data
     
 
-class PersonaResumidaSchema(FormatoDocumentoSchema):
+class PersonaResumidaSchema(ValidarDocumentoSchema):
     id_persona = fields.Int(dump_only=True)
     nombre_persona = fields.Str(required=True,validate=validar_nombre_apellido)
     apellido_persona = fields.Str(required=True,validate=validar_nombre_apellido)
     fecha_nacimiento_persona = fields.Date(required=True,validate = validar_fecha_nacimiento)
-    tipo_documento = fields.Str(
-        required=True, validate=validate.OneOf(list(TIPOS_DOCUMENTO_VALIDOS.keys()))
-    )
-    num_doc_persona = fields.Str(required=True)
     usuario_id = fields.Int(required=False)
