@@ -35,6 +35,7 @@ def generar_token_reset(email: str):
         "email": email,
         "type": "reset",
         "exp": datetime.now(timezone.utc) + timedelta(minutes=10),
+        "jti": str(uuid4()),
     }
     return encode(payload, getenv("JWT_SECRET_KEY"), algorithm="HS256")
 
@@ -107,6 +108,7 @@ def generar_token_restauracion(email: str) -> str:
         "email": email,
         "type": "restauracion_admin",
         "exp": datetime.now(timezone.utc) + timedelta(minutes=720),
+        "jti": str(uuid4()),
     }
     return encode(payload, getenv("JWT_SECRET_KEY"), algorithm="HS256")
 
@@ -117,6 +119,7 @@ def generar_token_confirmacion_usuario(email: str) -> str:
         "email": email,
         "type": "restauracion_usuario",
         "exp": datetime.now(timezone.utc) + timedelta(minutes=30),
+        "jti": str(uuid4()),
     }
     return encode(payload, getenv("JWT_SECRET_KEY"), algorithm="HS256")
 
@@ -154,7 +157,8 @@ def generar_token_dispositivo(email, user_agent, ip):
         "user_agent": user_agent,
         "ip": ip,
         "type": "verificar_dispositivo",
-        "exp": datetime.now(timezone.utc) + timedelta(minutes=30)
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=30),
+        "jti": str(uuid4()),
     }
     return encode(payload, getenv("JWT_SECRET_KEY"), algorithm='HS256')
 
@@ -176,6 +180,7 @@ def generar_token_modificar_email(email:str,id_usuario:int)->str:
         "nuevo_email": email,
         "type": "modificar_email",
         "exp": datetime.now(timezone.utc) + timedelta(minutes=30),
+        "jti": str(uuid4()),
     }
     return encode(payload, getenv("JWT_SECRET_KEY"), algorithm="HS256")
 

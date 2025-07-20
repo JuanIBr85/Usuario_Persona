@@ -59,8 +59,9 @@ def login1():
     Returns:
         JSON con status, mensaje, datos (tokens) y código HTTP correspondiente.
     """
-    session = SessionLocal()
+
     try:
+
         logger.info("→ [ROUTE] Solicitud de login recibida")
         data = request.get_json()
         if not data:
@@ -79,7 +80,11 @@ def login1():
                 "Datos inválidos",
                 errors,
             )
+    except Exception as e:
+        logger.error("→ [ROUTE] Excepción en login", exc_info=e)
 
+    session = SessionLocal()
+    try:
         user_agent = ComponentRequest.get_user_agent()
         ip = ComponentRequest.get_ip()
         logger.debug(f"→ [ROUTE] IP: {ip} | User-Agent: {user_agent}")

@@ -1,5 +1,6 @@
 from datetime import datetime, timezone, timedelta
 import traceback
+from common.utils.component_request import ComponentRequest
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -10,6 +11,7 @@ from app.services.rol import get_rol_por_nombre
 from app.utils.jwt import (
     crear_token_acceso,
     crear_token_refresh,
+    generar_token_dispositivo,
     generar_token_reset,
     crear_token_refresh,
     create_access_token,
@@ -197,12 +199,19 @@ class UsuarioService(ServicioBase):
                 )
             )
 
+         
+            # Registrar el dispositivo como confiable
+            nuevo_dispositivo = DispositivoConfiable(
+                usuario_id=nuevo_usuario.id_usuario,
+                user_agent=user_agent,
+                token_dispositivo=generar_token_dispositivo(email, user_agent, ComponentRequest.get_ip()  ),
+                fecha_registro=datetime.now(timezone.utc),
+                fecha_expira=datetime.now(timezone.utc) + timedelta(days=365),
+            )
+                
+
             session.add(
-                DispositivoConfiable(
-                    usuario_id=nuevo_usuario.id_usuario,
-                    user_agent=user_agent,
-                    fecha_expira=datetime.now(timezone.utc) + timedelta(days=365),
-                )
+                nuevo_dispositivo
             )
 
             session.commit()
@@ -217,10 +226,10 @@ class UsuarioService(ServicioBase):
                 ResponseStatus.ERROR,
                 "Error interno al registrar usuario",
                 str(e),
-                500,
+                500,    
             )
         
-        try:
+        try:    
             send_message(
                 to_service="persona-service",
                 message={

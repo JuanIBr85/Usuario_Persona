@@ -252,6 +252,7 @@ def verificar_dispositivo():
     token = request.args.get("token")
     if not token:
         return "Token faltante", 400
+
     try:
         datos = decodificar_token_verificacion(token)
 
@@ -259,12 +260,19 @@ def verificar_dispositivo():
         email = datos["email"]
         user_agent = datos.get("user_agent", "")
         ip = datos["ip"]
+        jti = datos["jti"]
 
         # Buscar usuario
         session = SessionLocal()
         usuario = session.query(Usuario).filter_by(email_usuario=email,eliminado=False).first()
         if not usuario:
             return "Usuario no encontrado.", 404
+
+        # Para evitar que se envie multiples veces el correo
+        lock_verificar_dispositivo = get_redis().set(f"lock:verificar_dispositivo:{jti}", "true", ex=60*30, nx=True)
+        
+        if not lock_verificar_dispositivo:
+            return render_template("error_generico.html", error="Token usado")
 
         # Registrar el dispositivo como confiable
         nuevo_dispositivo = DispositivoConfiable(
@@ -274,6 +282,7 @@ def verificar_dispositivo():
             fecha_registro=datetime.now(timezone.utc),
             fecha_expira=datetime.now(timezone.utc) + timedelta(days=30),
         )
+
         session.add(nuevo_dispositivo)
         session.commit()
 
