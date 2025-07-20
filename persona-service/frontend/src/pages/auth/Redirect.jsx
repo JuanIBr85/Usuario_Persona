@@ -10,14 +10,24 @@ import { PersonaService } from '@/services/personaService';
 const Redirect = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { authData, encode, timeLeftToExpire, removeAuthData } = useAuthContext();
+  const { authData, encode, timeLeftToExpire, removeAuthData, tokenRenew } = useAuthContext();
   const [loadingText, setLoadingText] = useState('Analizando consulta...');
 
   const validateToRedirect = async () => {
     //Valido que la sesion no expire en menos de 10 minutos
     if (timeLeftToExpire() < 60 * 10) {
-      setLoadingText("Tu sesión expira en menos de 10 minutos vuelva a iniciar sesión para continuar");
-      setTimeout(() => navigate('/auth/logout'), 2000);
+      setLoadingText("Tu sesión expira en menos de 10 minutos vamos a renovar el token");
+      tokenRenew((success) => {
+        if (success) {
+          setLoadingText("Renovando sesión");
+          setTimeout(() => validateToRedirect(), 2000);
+        } else {
+          setLoadingText("Tu sesión expira en menos de 10 minutos vuelva a iniciar sesión para continuar");
+          setTimeout(() => navigate('/auth/logout'), 2000);
+        }
+      },false);
+      
+      //setTimeout(() => navigate('/auth/logout'), 2000);
       return;
     }
 
