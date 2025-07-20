@@ -165,14 +165,15 @@ function AuthContextProvider({ children }) {
         //Comprobamos si el token es valido
         if (!isTokenValid()) {
             setIsUnauthorizedRoute(true);
-            setDialog(makeDialog({
+            navigate('/auth/login', "Token invalido")
+            /*setDialog(makeDialog({
                 title: "No autorizado",
                 description: "No tienes permiso para acceder a esta página",
                 action: () => navigate('/auth/login', "Token invalido"),
                 timeout: setTimeout(() => {
                     navigate('/auth/login', "Token invalido timeout");
                 }, 10000)
-            }));
+            }));*/
             return false;
         }
 
