@@ -70,6 +70,15 @@ def login1():
                 "Datos de entrada requeridos",
                 error_code="NO_INPUT",
             )
+        
+        errors = usuario_service.schema_login.validate(data)
+        if errors:
+            logger.warning("→ [ROUTE] Datos inválidos: {}".format(errors))
+            return make_response(
+                ResponseStatus.FAIL,
+                "Datos inválidos",
+                errors,
+            )
 
         user_agent = ComponentRequest.get_user_agent()
         ip = ComponentRequest.get_ip()
@@ -82,6 +91,10 @@ def login1():
 
     except Exception as e:
         logger.error("→ [ROUTE] Excepción en login", exc_info=e)
+        try:
+            session.rollback()
+        except Exception as e:
+            pass
         return (
             make_response(
                 ResponseStatus.ERROR, "Error en login", str(e), error_code="LOGIN_ERROR"
