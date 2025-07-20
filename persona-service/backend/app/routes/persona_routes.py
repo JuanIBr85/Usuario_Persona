@@ -15,6 +15,7 @@ from app.schema.persona_schema import PersonaSchema
 from app.models.persona_model import Persona
 from common.decorators.api_access import api_access
 from common.utils.response import make_response, ResponseStatus
+from app.utils.documentos_utils import validar_documento_por_tipo
 from common.models.cache_settings import CacheSettings
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -581,6 +582,12 @@ def verificar_persona():
         tipo = validated_data["tipo_documento"]
         num = validated_data["num_doc_persona"]
         email_confirmado = validated_data["email_confirmado"]
+
+        validacion = validar_documento_por_tipo(tipo, num)
+        if validacion == -4:
+            return make_response(ResponseStatus.FAIL, "Numero de CUIL/CUIT invalido"), 431
+        if not validacion:
+            return make_response(ResponseStatus.FAIL, "Numero de documento invalido"), 400        
 
         exists, email, persona_id,_ = persona_service.verificar_documento_mas_get_id(
             tipo, num

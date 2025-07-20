@@ -131,7 +131,7 @@ function PerfilConnect() {
         setDialog({
           title: "Hubo un error",
           actionName: "Cerrar",
-          description: useFetchMessage(error?.data?.error?.server || error?.data?.error, "Documento invalido"),
+          description: useFetchMessage(error?.data?.error?.server || error?.data?.error || error?.data?.message, "Documento invalido"),
           action: () =>setDialog(null)
         });
       }

@@ -179,7 +179,7 @@ function AuthContextProvider({ children }) {
         return true;
     }
 
-    const tokenRenew = () => {
+    const tokenRenew = (callback, dialog=true) => {
         AuthService.renewToken(authData.user.refresh_token)
             .then((response) => {
                 console.warn("token renovado", response);
@@ -189,20 +189,28 @@ function AuthContextProvider({ children }) {
                     user: response.data, // Guarda los datos del usuario logueado
                 });
                 //updateUserData(response.data);
-                setDialog({
-                    title: "Sesión renovada",
-                    description: "Su sesión ha sido renovada exitosamente",
-                    action: () => setDialog(null),
-                });
+                if(dialog){
+                    setDialog({
+                        title: "Sesión renovada",
+                        description: "Su sesión ha sido renovada exitosamente",
+                        action: () => {setDialog(null);callback && callback(true)},
+                    });
+                }else{
+                    callback && callback(true);
+                }
             })
             .catch((error) => {
                 console.error("Error al renovar el token", error);
                 
-                setDialog({
-                    title: "Error al renovar el token",
-                    description: (error.statusCode===429)? "Se renovado demasiadas veces el token":"No se pudo renovar el token",
-                    action: () => setDialog(null),
-                });
+                if(dialog){
+                    setDialog({
+                        title: "Error al renovar el token",
+                        description: (error.statusCode===429)? "Se renovado demasiadas veces el token":"No se pudo renovar el token",
+                        action: () => {setDialog(null); callback && callback(false)},
+                    });
+                }else{
+                    callback && callback(false);
+                }
             });
     }
     //Verifica si el usuario esta autenticado al cambiar la ruta
@@ -372,7 +380,8 @@ function AuthContextProvider({ children }) {
             decode,
             timeLeftToExpire,
             unauthorizedUser,
-            updateUserData
+            updateUserData,
+            tokenRenew
         }}>
             {dialog && <SimpleDialog
                 title={dialog.title}
