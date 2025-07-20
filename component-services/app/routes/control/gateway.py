@@ -42,7 +42,7 @@ def research():
 
 
 @bp.route("/research_status", methods=["GET"])
-@cp_api_access(is_public=False, limiter=["5 per minute"], access_permissions=["component.control.investigacion"])
+@cp_api_access(is_public=False, limiter=["20 per minute"], access_permissions=["component.control.investigacion"])
 def get_research_status():
     return (
         make_response(
