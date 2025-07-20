@@ -46,9 +46,9 @@ function SimpleDialog({ title, description, action = "Aceptar", cancel = "", act
  * Componente para mostrar mensajes de error de forma estilizada.
  * 
  * @param {Object} error - Objeto de error que contiene los mensajes a mostrar
- * @param {Object} error.data - Datos del error
- * @param {string} error.data.message - Mensaje general del error
- * @param {Object} error.data.error - Objeto con errores específicos por campo
+ * @param {Object} error?.data - Datos del error
+ * @param {string} error?.data.message - Mensaje general del error
+ * @param {Object} error?.data?.error - Objeto con errores específicos por campo
  * @returns {JSX.Element} Componente de React que muestra los mensajes de error
  */
 function FetchErrorMessage(error) {
@@ -56,12 +56,12 @@ function FetchErrorMessage(error) {
     <div className="border border-red-400 bg-red-50 text-red-700 p-4 my-3 rounded-md shadow-sm">
       {/* Mostrar el mensaje general del error */}
       <div className="font-semibold text-red-800 mb-3 text-lg">
-        {error.data.message}
+        {error?.data?.message}
       </div>
 
       {/* Contenedor para los errores específicos de campo */}
       <div className="mt-2">
-        {Object.entries(error.data.error).map(([fieldName, fieldSpecificErrors]) => (
+        {Object.entries( error?.data?.error || error?.data || {"front_error": error?.data?.message}).map(([fieldName, fieldSpecificErrors]) => (
           <div key={fieldName} className="mb-2 last:mb-0">
             {/* Nombre del campo con error */}
             <div className="font-medium text-red-700 capitalize mb-1">
@@ -69,7 +69,7 @@ function FetchErrorMessage(error) {
             </div>
             {/* Lista de mensajes de error para ese campo */}
             <ul className="list-disc list-inside pl-2 text-sm text-red-600">
-              {fieldSpecificErrors.map((errMsg, index) => (
+              {Array.from([fieldSpecificErrors] || []).map((errMsg, index) => (
                 <li key={index} className="mb-0.5">
                   {errMsg}
                 </li>

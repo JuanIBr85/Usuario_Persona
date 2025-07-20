@@ -47,7 +47,17 @@ function Login() {
         });
       })
       .catch((error) => {
-        setMessage(error.data?.message ?? "Ocurrió un error inesperado");
+        if (error.isJson) {
+          // Si el backend devuelve un mensaje específico
+          if (error?.data?.error) {
+            console.log(error?.data);
+            setMessage(FetchErrorMessage(error)); // Usa mensaje estandarizado
+          } else {
+            setMessage(error?.data?.message || "Error al procesar la solicitud");
+          }
+        } else {
+          setMessage(error.message || "Error de conexión");
+        }
       })
       .finally(() => {
         setIsLoading(false);
@@ -71,7 +81,7 @@ function Login() {
             ? () => setTimeout(() => navigate("/searchprofile"), 1000)
             : undefined
         }
-        // Si el login fue exitoso, redirige al perfil después de cerrar el diálogo
+      // Si el login fue exitoso, redirige al perfil después de cerrar el diálogo
       />
 
       {/* Layout visual general del formulario de login */}
@@ -89,6 +99,7 @@ function Login() {
             maxLength={50}
             labelText="Email"
             validationMessage="Email inválido"
+            
             required
           />
 

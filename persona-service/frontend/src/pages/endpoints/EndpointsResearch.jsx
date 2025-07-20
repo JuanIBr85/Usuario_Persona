@@ -13,6 +13,7 @@ function EndpointsResearch() {
   const [loading, setLoading] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
+  const [researchInterval, setResearchInterval] = useState(1000*30);
 
   const fetchStatus = async () => {
     try {
@@ -40,6 +41,7 @@ function EndpointsResearch() {
   const startResearch = async () => {
     try {
       setLoading(true);
+      setResearchInterval(1000*5);
       await gatewayService.startResearch();
       await fetchStatus();
       await fetchServices();
@@ -55,6 +57,7 @@ function EndpointsResearch() {
 
   const stopResearch = async () => {
     try {
+      setResearchInterval(1000*30);
       await gatewayService.stopResearch();
       await fetchStatus();
     } catch (error) {
@@ -96,6 +99,22 @@ function EndpointsResearch() {
     fetchStatus();
     fetchServices();
   }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchStatus();
+      fetchServices();
+    }, researchInterval);
+
+    const timeout = (researchInterval !== 1000*30) ? setTimeout(() => {
+      setResearchInterval(1000*30);
+    }, 1000*30) : null;
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }, [researchInterval]);
 
   return (
     <div className="p-6 space-y-6 py-15 px-3 md:py-10 md:px-15">

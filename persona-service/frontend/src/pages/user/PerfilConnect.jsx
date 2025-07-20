@@ -15,6 +15,7 @@ import { VerificarEmail } from "@/components/connectProfile/steps/VerificarEmail
 import { VerificarOTP } from "@/components/connectProfile/steps/VerificarOTP";
 import { VerificarIdentidad } from "@/components/connectProfile/steps/VerificarIdentidad";
 import { useAuthContext } from "@/context/AuthContext";
+import useFetchMessage from "@/utils/useFetchMessage";
 
 /**
  * PerfilConnect.jsx
@@ -112,8 +113,7 @@ function PerfilConnect() {
           </>,
           action: () => setCurrentStep(3),
         });
-      }
-      if (error.statusCode === 404) {
+      }else if (error.statusCode === 404) {
         setDialog({
           title: "Crear perfil",
           action: () => navigate("/createperfil",{state: formData}),
@@ -127,6 +127,13 @@ function PerfilConnect() {
             <b>Documento: </b>{formData.num_doc_persona}
           </>
         })
+      }else{
+        setDialog({
+          title: "Hubo un error",
+          actionName: "Cerrar",
+          description: useFetchMessage(error?.data?.error?.server || error?.data?.error, "Documento invalido"),
+          action: () =>setDialog(null)
+        });
       }
     } finally {
       setLoading(false);
@@ -159,7 +166,7 @@ function PerfilConnect() {
       setDialog({
         title: "Hubo un error",
         actionName: "Cerrar",
-        description: error.data.message,
+        description: error?.data?.message,
       });
     } finally {
       setLoading(false);
@@ -191,7 +198,7 @@ function PerfilConnect() {
       setDialog({
         title: "Hubo un error",
         actionName: "Cerrar",
-        description: error.data.message,
+        description: error?.data?.message,
       });
     } finally {
       setLoading(false);
@@ -239,7 +246,7 @@ function PerfilConnect() {
         description: <>
           Hubo un error al verificar su identidad
           <br />
-          <b>Razon</b>: {error.data.message}
+          <b>Razon</b>: {error?.data?.message}
         </>,
       });
     } finally {

@@ -37,7 +37,7 @@ export default function FormContacto({
         okDialog();
       }) 
       .catch((error) => {
-        console.error("Error updating domicilio:", error.data);
+        console.error("Error updating domicilio:", error?.data);
         
         errorDialog(error?.data?.error?.server || error?.data?.error);
       })
@@ -106,6 +106,7 @@ export default function FormContacto({
             placeholder="Ingresa el email de contacto"
             validationMessage="Email inválido"
             value={contacto?.email_contacto || ""}
+            
             required
           />
           <InputValidate

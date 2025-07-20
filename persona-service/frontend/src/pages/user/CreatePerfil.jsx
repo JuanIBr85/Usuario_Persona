@@ -187,7 +187,7 @@ function CreatePerfil() {
         setDialog({
           title: "Error",
           actionName: "Cerrar",
-          description: useFetchMessage(description, error_mesage_default="Error al crear el perfil"),
+          description: useFetchMessage(error?.data?.error?.server || error?.data?.error, error_mesage_default="Error al crear el perfil"),
         })
 
       });

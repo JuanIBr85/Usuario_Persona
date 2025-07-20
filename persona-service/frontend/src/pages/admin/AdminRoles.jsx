@@ -17,6 +17,7 @@ import { userService } from "@/services/userService";
 
 // Hooks
 import { useRoles } from "@/hooks/roles/useRoles";
+import { get } from "react-hook-form";
 
 export default function AdminRoles() {
   const [showNewRoleForm, setShowNewRoleForm] = useState(false);
@@ -53,7 +54,12 @@ export default function AdminRoles() {
     setErrorDialog({ open: true, message });
   }
 
-  function showShadcnAlert(title, description, variant = "default", timeout = 4000) {
+  function showShadcnAlert(
+    title,
+    description,
+    variant = "default",
+    timeout = 4000
+  ) {
     setAlert({ open: true, title, description, variant });
     setTimeout(() => {
       setAlert((prev) => ({ ...prev, open: false }));
@@ -65,6 +71,14 @@ export default function AdminRoles() {
     setSelectedPermissions([]);
     setShowNewRoleForm(false);
     setEditRoleId(null);
+
+    console.log("Botón cancelar presionado, formulario reiniciado");
+    console.log(document.getElementById("role-list"));
+    setTimeout(() => {
+      const roleList = document.getElementById("role-list");
+      console.log("Attempting to scroll to:", roleList);
+      roleList?.scrollIntoView({ behavior: "smooth", block: "start"});
+    }, 100);
   }
 
   function formatPermissionName(permission) {
@@ -109,7 +123,6 @@ export default function AdminRoles() {
     return resultado;
   }
 
-
   function handleRoleToggle(roleId) {
     setSelectedRoleIds((prev) =>
       prev.includes(roleId)
@@ -134,7 +147,9 @@ export default function AdminRoles() {
     // Validación de solo letras y espacios
     const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{3,50}$/;
     if (!regex.test(trimmedName)) {
-      return showError("Ingresa un nombre de rol válido (solo letras y espacios)");
+      return showError(
+        "Ingresa un nombre de rol válido (solo letras y espacios)"
+      );
     }
     // Validación de existencia
     const exists = roles.some(
@@ -167,6 +182,9 @@ export default function AdminRoles() {
   }
 
   function handleEditClick(role) {
+    document
+      .getElementById("role-form")
+      ?.scrollIntoView({ behavior: "smooth" });
     setEditRoleId(role.id);
     setNewRoleName(role.name);
     const permisosCompletos = availablePermissions.filter((permiso) =>
@@ -305,7 +323,7 @@ export default function AdminRoles() {
         )}
 
         <RoleAssignmentWithSearch
-          usuarios={usuarios.filter(u => u.id !== 1)}
+          usuarios={usuarios.filter((u) => u.id !== 1)}
           selectedUserId={selectedUserId}
           setSelectedUserId={setSelectedUserId}
           roles={roles}

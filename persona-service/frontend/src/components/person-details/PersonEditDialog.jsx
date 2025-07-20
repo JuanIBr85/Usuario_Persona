@@ -210,6 +210,7 @@ function PersonEditDialog({
                 maxLength={50}
                 value={person.contacto?.email_contacto || ""}
                 validationMessage="Email inválido"
+                
                 required
               />
 

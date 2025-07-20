@@ -149,7 +149,7 @@ export const fetchService = {
                 `Fetch [${url}] error: ${error.message}`, 
                 false, 
                 error.statusCode || 500, 
-                error.data || null
+                error?.data || null
             ); 
         })
         .finally(() => {

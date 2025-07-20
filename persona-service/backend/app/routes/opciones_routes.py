@@ -207,7 +207,7 @@ def buscar_domicilio_postal():
 
 # verificar documento de persona por tipo_documento y num_doc_persona
 @api_access(
-    # limiter=["3 per minute"],
+    limiter=["3 per minute"],
 )
 #Comprueba si un documento ya está registrado
 @opciones_bp.route("/opciones/verificar-documento", methods=["POST"])

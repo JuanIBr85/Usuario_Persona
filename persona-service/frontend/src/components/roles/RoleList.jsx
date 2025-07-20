@@ -111,7 +111,7 @@ export default function RoleList({
   return (
     <div className="flex flex-col gap-5">
       <Card>
-        <CardHeader className="flex items-center gap-2">
+        <CardHeader className="flex items-center gap-2" id="role-list">
           <BadgeCheck className="w-5 h-5 text-muted-foreground" />
           <CardTitle>
             Lista de roles creados{" "}
@@ -121,7 +121,7 @@ export default function RoleList({
             </span>
           </CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-col gap-4">
+        <CardContent className="flex flex-col gap-4" >
           {currentRoles.map((role) => {
             const isSuperadminRole = role.id === 1;
             return (
@@ -132,13 +132,14 @@ export default function RoleList({
                     <Users className="w-5 h-5 mt-1 text-muted-foreground shrink-0" />
                     <div>
                       <CardTitle className="text-base">{role.name}</CardTitle>
-                      <p className="text-xs text-muted-foreground">
+                      <div className="text-xs text-muted-foreground">
                         {Object.entries(
                           groupPermissionsByModule(role.permissions)
                         ).map(([modulo, permisos]) => (
                           <div
                             key={modulo}
                             className="mb-1 flex flex-wrap items-center gap-1"
+                            id={`role-permissions-${role.id}`}
                           >
                             <span className="font-semibold capitalize mr-1">
                               {modulo}:
@@ -153,7 +154,7 @@ export default function RoleList({
                             ))}
                           </div>
                         ))}
-                      </p>
+                      </div>
                     </div>
                   </div>
                   <div className="flex gap-2 mt-5 md:mt-0">
@@ -197,7 +198,6 @@ export default function RoleList({
             <CardFooter className="pt-6">
               <Pagination className="w-full">
                 <PaginationContent>
-                  {/* Botón Anterior en español */}
                   <PaginationItem>
                     <Button
                       variant="outline"
@@ -240,7 +240,6 @@ export default function RoleList({
                     );
                   })}
 
-                  {/* Botón Siguiente en español */}
                   <PaginationItem>
                     <Button
                       variant="outline"

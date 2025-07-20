@@ -167,7 +167,7 @@ export default function FormUsuario() {
     <>
       {loading && <Loading isFixed />}
 
-      <div className="min-h-69 space-y-4">
+      <div className="min-h-33 space-y-4">
         <ResponsiveColumnForm>
           <InputValidate
             id="info_nombre_usuario"
@@ -186,25 +186,29 @@ export default function FormUsuario() {
             readOnly
           />
         </ResponsiveColumnForm>
-        <div className="flex flex-col gap-3 pt-4">
-          <Button onClick={requestOtp}>Cambiar Contraseña</Button>
-
-          <Button onClick={() => setOpenUsernameDialog(true)}>
-            Cambiar Nombre de Usuario
-          </Button>
-
-          <Button onClick={() => setOpenEmailDialog(true)}>
-            Cambiar Correo
-          </Button>
-
-          <Button
-            variant="destructive"
-            onClick={() => setOpenDeleteDialog(true)}
-          >
-            Eliminar Cuenta
-          </Button>
-        </div>
       </div >
+
+      <div className="flex flex-col gap-3 pt-4">
+
+        <Button onClick={requestOtp}>
+          Cambiar Contraseña
+        </Button>
+
+        <Button onClick={() => setOpenUsernameDialog(true)}>
+          Cambiar Nombre de Usuario
+        </Button>
+
+        <Button onClick={() => setOpenEmailDialog(true)}>
+          Cambiar Correo
+        </Button>
+
+        <Button
+          variant="destructive"
+          onClick={() => setOpenDeleteDialog(true)}
+        >
+          Eliminar Cuenta
+        </Button>
+      </div>
 
       {/* ─────────── Diálogos ─────────── */}
 
@@ -230,6 +234,7 @@ export default function FormUsuario() {
               placeholder="Ingresa tu correo"
               defaultValue={authData.user.email_usuario || ""}
               validationMessage="Email inválido"
+              
               required
             />
             <InputValidate
@@ -317,6 +322,7 @@ export default function FormUsuario() {
               placeholder="Ingresa tu nuevo correo"
               maxLength={50}
               validationMessage="Email inválido"
+              
               required
             />
             <InputValidate

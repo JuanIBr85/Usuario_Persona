@@ -373,6 +373,18 @@ class UsuarioService(ServicioBase):
             if not dispositivo_confiable or dispositivo_confiable.fecha_expira.replace(
                 tzinfo=timezone.utc
             ) < datetime.now(timezone.utc):
+                
+                # Para evitar que se envie multiples veces el correo
+                lock_validacion_dispositivo = get_redis().set(f"lock:validacion_dispositivo:{usuario.id_usuario}", "true", ex=60*30, nx=True)
+                
+                if not lock_validacion_dispositivo:
+                    return (
+                        ResponseStatus.FAIL,
+                        "Verificación de dispositivo ya fue enviada al email. Por favor confírmelo.",
+                        None,
+                        403,
+                    )
+                
                 # Dispositivo nuevo o expirado → enviar email de validación
                 enviar_email_validacion_dispositivo(usuario, user_agent, ip)
                 logger.info("→ Dispositivo no confiable, se envió mail de validación")

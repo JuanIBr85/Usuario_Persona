@@ -65,7 +65,7 @@ function Sign() {
         setIsOK(true);
       })
       .catch((error) => {
-        setMessage(error.data?.message ?? "Ocurrió un error inesperado");
+        setMessage(error?.data?.message ?? "Ocurrió un error inesperado");
         setIsOK(false);
       })
       .finally(() => {
@@ -106,6 +106,7 @@ function Sign() {
             maxLength={50}
             labelText="Email"
             validationMessage="Email inválido"
+            
             required
           />
 
