@@ -11,7 +11,7 @@ class Contacto(Base):
     id_contacto=Column(Integer, primary_key=True)
     telefono_fijo=Column(String(14), nullable=True)
     telefono_movil=Column(String(14), nullable=False)
-    red_social_contacto=Column(String(50),nullable=True)
+    red_social_contacto=Column(String(30),nullable=True)
     red_social_nombre=Column(String(40), nullable=True)
     email_contacto=Column(String(50), nullable=False)
     observacion_contacto=Column(String(150), nullable=True)

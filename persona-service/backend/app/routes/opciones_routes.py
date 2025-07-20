@@ -15,6 +15,7 @@ from app.services.persona_service import PersonaService
 from common.decorators.api_access import api_access
 from common.models.cache_settings import CacheSettings
 from app.schema.persona_vincular_schema import ValidarDocumentoSchema
+from app.utils.documentos_utils import validar_documento_por_tipo
 
 opciones_bp = Blueprint("opciones_bp", __name__)
 
@@ -229,6 +230,26 @@ def verificar_documento():
 
         tipo_documento = validated_data["tipo_documento"]
         num_doc_persona = validated_data["num_doc_persona"]
+
+        validacion = validar_documento_por_tipo(tipo_documento, num_doc_persona)
+        if validacion == -4:
+            return (
+                make_response(
+                    status=ResponseStatus.FAIL,
+                    message="Numero de CUIL/CUIT invalido",
+                    data=None,
+                ),
+                431,
+            )
+        if not validacion:
+            return (
+                make_response(
+                    status=ResponseStatus.FAIL,
+                    message="Numero de documento invalido",
+                    data=None,
+                ),
+                400,
+            )
 
         exists, email, id_persona, usuario_id = service.verificar_documento_mas_get_id(
             tipo_documento, num_doc_persona

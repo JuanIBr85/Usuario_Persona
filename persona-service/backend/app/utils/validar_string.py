@@ -151,7 +151,7 @@ def validar_red_social_contacto(valor: str) -> str:
         return ""
 
     valor = valor.strip()
-    patron = r'^[A-Za-z0-9@._\-]{3,50}$'
+    patron = r'^[A-Za-z0-9@._\-]{3,30}$'
 
     if not re.fullmatch(patron, valor):
         raise ValidationError("La red social contiene caracteres inválidos")
