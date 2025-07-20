@@ -129,14 +129,14 @@ function EndpointsResearch() {
   return (
     <div className="p-6 space-y-6 py-15 px-3 md:py-10 md:px-15">
       <Fade duration={500} triggerOnce>
+        <ResearchStatusTable status={status} />
+
         <ResearchActions
           loading={loading}
           onStart={startResearch}
           onStop={stopResearch}
         />
-
-        <ResearchStatusTable status={status} />
-
+        
         <ServicesList
           services={services}
           onToggleAvailable={toggleServiceAvailable}
