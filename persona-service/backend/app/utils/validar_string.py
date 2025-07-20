@@ -47,7 +47,7 @@ def validar_domicilio_calle(valor: str) -> str:
 
     if not re.fullmatch(patron, valor):
         raise ValidationError(
-            "Solo se permiten letras y espacios. Excepcines: 'Av xxx', 'Avenida xxx' o 'Calle xxx' (xxx es un numero que puede tener 1 a 3 dígitos)."
+            "Solo se permiten letras y espacios. Excepciones: 'Av xxx', 'Avenida xxx' o 'Calle xxx' (xxx es un numero que puede tener 1 a 3 dígitos)."
         )
 
     return valor
