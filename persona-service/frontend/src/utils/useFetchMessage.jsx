@@ -14,7 +14,7 @@ function useFetchMessage(error, error_mesage_default = "Fetch Error") {
                 if(esJSON(description[key])){
                     descriptionAlert.push(useFetchMessage(description[key]));
                 }else{
-                    descriptionAlert.push(<><b>{key}</b>: {description[key]}<br/></>);
+                    descriptionAlert.push(<><b>{key?.replaceAll("_", " ") || key}</b>: {description[key]}<br/></>);
                 }
             }
             return descriptionAlert

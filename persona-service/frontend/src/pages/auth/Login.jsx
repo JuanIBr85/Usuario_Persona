@@ -11,7 +11,6 @@ import { useAuthContext } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import Loading from "@/components/loading/Loading";
 import AuthLayout from "@/components/authLayout/AuthLayout";
-import useFetchMessage from "@/utils/useFetchMessage";
 
 /**
  * Componente: Login.
