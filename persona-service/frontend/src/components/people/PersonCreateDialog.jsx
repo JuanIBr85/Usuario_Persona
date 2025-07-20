@@ -211,8 +211,8 @@ function PersonCreateDialog({
                 type="text"
                 labelText="Calle"
                 value={newUser.domicilio_calle || ""}
-                validatePattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s,.]{2,50}$"
-                validationMessage="Ingresa un nombre de calle válido (2-50 caracteres, solo letras, espacios, puntos y comas)"
+                validatePattern="^[A-Za-zÁÉÍÓÚáéíóúÑñÜü0-9]+(?: [A-Za-zÁÉÍÓÚáéíóúÑñÜü0-9]+)*$"
+                validationMessage="Ingresa un nombre de calle válido, sólo se permiten letras, números y un espacio entre cada palabra"
                 required
               />
 

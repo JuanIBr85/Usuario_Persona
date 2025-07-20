@@ -24,8 +24,8 @@ const Domicilio = ({ hidden, staticData }) => {
             maxLength={50}
             placeholder="Ingresa el nombre de la calle"
             labelText="Calle"
-            validatePattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s,.]{2,50}$"
-            validationMessage="Ingresa un nombre de calle válido (2-50 caracteres, solo letras, espacios, puntos y comas)"
+            validatePattern="^[A-Za-zÁÉÍÓÚáéíóúÑñÜü0-9]+(?: [A-Za-zÁÉÍÓÚáéíóúÑñÜü0-9]+)*$"
+            validationMessage="Ingresa un nombre de calle válido, sólo se permiten letras, números y un espacio entre cada palabra"
             containerClassName="sm:col-span-3"
             required
           />
