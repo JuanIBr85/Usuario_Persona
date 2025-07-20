@@ -3,18 +3,18 @@ from marshmallow import ValidationError
 
 def validar_vencimiento_dni(valor):
 
-    """Valida que la fecha de vencimiento del DNI sea posterior al 01-04-2032 y no excesivamente futura."""
+    """Valida que la fecha de vencimiento del DNI."""
 
     if valor is None:
         return None
 
-    fecha_minima = date(2032, 4, 1)
+    fecha_minima = date.today()
     fecha_maxima = date.today() + timedelta(days=365*20)
     if valor < fecha_minima:
-        raise ValidationError("La fecha de vencimiento del DNI no puede ser anterior al 1 de abril de 2032.")
+        raise ValidationError("La fecha de vencimiento del DNI no puede ser anterior a la fecha actual")
 
     if valor > fecha_maxima:
-        raise ValidationError("La fecha de vencimiento del DNI excede el límite razonable (20 años).")
+        raise ValidationError(f"La fecha de vencimiento del DNI excede el límite razonable (20 años).")
 
     return valor
 
