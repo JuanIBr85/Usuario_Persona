@@ -102,7 +102,7 @@ def login1():
             pass
         return (
             make_response(
-                ResponseStatus.ERROR, "Error en login", str(e), error_code="LOGIN_ERROR"
+                ResponseStatus.ERROR, "Error en login", {"error": str(e)}, error_code="LOGIN_ERROR"
             ),
             500,
         )
@@ -157,7 +157,7 @@ def logout_usuario() -> tuple[dict[Any, Any], Any] | tuple[dict[Any, Any], Liter
             make_response(
                 ResponseStatus.ERROR,
                 "Error al hacer logout",
-                str(e),
+                {"error": str(e)},
                 error_code="LOGOUT_ERROR",
             ),
             500,

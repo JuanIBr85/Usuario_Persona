@@ -1,6 +1,7 @@
 import logging
 import traceback
 from flask import jsonify
+from app.database.session import DatabaseError
 
 def registrar_manejador_errores(app):
 
