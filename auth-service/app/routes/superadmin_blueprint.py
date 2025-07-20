@@ -1,3 +1,4 @@
+import logging
 from flask import Blueprint, Response, request, current_app,render_template
 import json
 from app.database.session import SessionLocal
@@ -458,6 +459,7 @@ def ver_usuarios_eliminados():
         usuarios = superadmin_service.obtener_usuarios(session, solo_eliminados=True)
         return make_response(ResponseStatus.SUCCESS,"lista de eliminados obtenida con exito", data=usuarios)
     except Exception as e:
+        session.rollback()
         return make_response(ResponseStatus.ERROR,"Error al cargar los usuarios eliminados",str(e),500)
     finally:
         session.close()
@@ -506,8 +508,10 @@ def restaurar_usuario_desde_token():
         return render_template("correo_enviado_confirmacion.html", email=email), 200
 
     except ExpiredSignatureError:
+        session.rollback()
         return "El enlace ha expirado.", 400
     except InvalidTokenError:
+        session.rollback()
         return "Token inválido.", 400
     finally:
         session.close()
@@ -523,5 +527,12 @@ def ver_logs_usuario(usuario_id):
     try:
         status, mensaje, data, code = superadmin_service.obtener_logs_usuario(session, usuario_id)
         return make_response(status, mensaje, data), code
+    except Exception as e:
+        logging.error(f"Error al iniciar el registro: {str(e)}")
+        session.rollback()
+        return make_response(
+            ResponseStatus.FAIL,
+            "Error al iniciar el registro",
+        ), 500
     finally:
         session.close()

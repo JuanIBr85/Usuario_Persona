@@ -119,6 +119,13 @@ def confirmar_registro_usuario():
             session, email, otp, user_agent or ""
         )
         return make_response(status, mensaje, contenido), codigo
+    except Exception as e:
+        logging.error(f"Error al confirmar el registro: {str(e)}")
+        session.rollback()
+        return make_response(
+            ResponseStatus.FAIL,
+            "Error al confirmar el registro",
+        ), 500
     finally:
         session.close()
 
@@ -150,5 +157,12 @@ def reenviar_otp_registro():
             session, email
         )
         return make_response(status, mensaje, contenido), codigo
+    except Exception as e:
+        logging.error(f"Error al reenviar el OTP: {str(e)}")
+        session.rollback()
+        return make_response(
+            ResponseStatus.FAIL,
+            "Error al reenviar el OTP",
+        ), 500
     finally:
         session.close()

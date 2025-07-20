@@ -1,4 +1,5 @@
 import json
+import logging
 import traceback
 from flask import render_template
 from common.utils.component_request import ComponentRequest
@@ -80,6 +81,7 @@ def solicitar_otp():
         return make_response(status, mensaje, data), code
 
     except Exception as e:
+        session.rollback()
         return (
             make_response(
                 ResponseStatus.ERROR,
@@ -135,6 +137,7 @@ def verificar_otp():
         return make_response(status, mensaje, data), code
 
     except Exception as e:
+        session.rollback()
         return (
             make_response(
                 ResponseStatus.ERROR,
@@ -211,6 +214,7 @@ def reset_con_otp():
         import traceback
 
         traceback.print_exc()
+        session.rollback()
         return (
             make_response(
                 ResponseStatus.ERROR,
@@ -341,7 +345,13 @@ def refresh_token():
                 revocar_refresh_token(jti_refresh_anterior)
         
         return make_response(status, mensaje, resultado), code
-
+    except Exception as e:
+        logging.error(f"Error al rotar refresh token: {str(e)}")
+        session.rollback()
+        return make_response(
+                ResponseStatus.FAIL,
+                "Error al rotar refresh token",
+            ), 500
     finally:
         session.close()
 

@@ -150,6 +150,7 @@ class ServicioBase:
                 )
 
         except Exception as error:
+            session.rollback()
             # El error es manejado por el controlador
             raise error
 

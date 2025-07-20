@@ -82,6 +82,7 @@ def login1():
 
     except Exception as e:
         logger.error("→ [ROUTE] Excepción en login", exc_info=e)
+        session.rollback()
         return (
             make_response(
                 ResponseStatus.ERROR, "Error en login", str(e), error_code="LOGIN_ERROR"
@@ -135,6 +136,7 @@ def logout_usuario() -> tuple[dict[Any, Any], Any] | tuple[dict[Any, Any], Liter
         return make_response(status, mensaje, data), code
 
     except Exception as e:
+        session.rollback()
         return (
             make_response(
                 ResponseStatus.ERROR,
@@ -187,6 +189,7 @@ def modificar_nombre_usuario():
         return make_response(ResponseStatus.FAIL, "Datos inválidos", err.messages), 400
     
     except Exception as e:
+        session.rollback()
         return (
             make_response(
                 ResponseStatus.ERROR,
@@ -238,6 +241,7 @@ def modificar_email_usuario():
         return make_response(ResponseStatus.FAIL, "Datos inválidos", err.messages), 400
     
     except Exception as e:
+        session.rollback()
         return (
             make_response(
                 ResponseStatus.ERROR,
@@ -334,6 +338,7 @@ def eliminar_usuario():
         return make_response(status, mensaje, data), code
 
     except Exception as e:
+        session.rollback()
         return make_response(
             ResponseStatus.ERROR,
             "Error al eliminar usuario",
@@ -430,6 +435,7 @@ def perfil_usuario():
         return make_response(status, mensaje, data, code), code
 
     except Exception as e:
+        session.rollback()
         return (
             make_response(
                 ResponseStatus.ERROR,
