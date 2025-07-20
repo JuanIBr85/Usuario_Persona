@@ -36,14 +36,18 @@ def validar_domicilio_calle(valor: str) -> str:
         raise ValidationError("Este es un valor requerido")
 
     valor = valor.strip()
-    patron = r'^[A-Za-zÁÉÍÓÚáéíóúÑñÜü0-9]+(?: [A-Za-zÁÉÍÓÚáéíóúÑñÜü0-9]+)*$'
+    patron = (
+        r"^(?:[A-Za-zÁÉÍÓÚáéíóúÑñÜü]+"
+        r"(?: [A-Za-zÁÉÍÓÚáéíóúÑñÜü]+)*"
+        r"|(?:[Aa][Vv]|[Aa]venida|[Cc]alle) \d{1,3})$"
+    )
 
     if not valor:
         raise ValidationError("Por favor completar el campo correspondiente. La calle del domicilio no puede estar vacío")
 
     if not re.fullmatch(patron, valor):
         raise ValidationError(
-            "Sólo se permiten letras, números y un espacio entre cada palabra"
+            "Solo se permiten letras y espacios. Excepcines: 'Av xxx', 'Avenida xxx' o 'Calle xxx' (xxx es un numero que puede tener 1 a 3 dígitos)."
         )
 
     return valor
