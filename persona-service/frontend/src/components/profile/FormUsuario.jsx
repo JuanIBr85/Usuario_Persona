@@ -288,7 +288,7 @@ export default function FormUsuario() {
               labelText="Nuevo nombre"
               cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\-_,.'()]/g}
               placeholder="Ingresa el nuevo nombre"
-              validatePattern="^[a-zA-Z0-9_-]{4,20}$"
+              validatePattern="^[a-zA-Z0-9_\-]{4,20}$"
               validationMessage="El nombre de usuario no puede tener espacios ni caracteres especiales y tener entre 4 y 20 caracteres"
               required
             />

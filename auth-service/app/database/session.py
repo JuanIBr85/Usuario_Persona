@@ -3,6 +3,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from app.models.base_model import Base
 from dotenv import load_dotenv
+from sqlalchemy import event
 
 # Carga las variables de entorno definidas en un archivo .env
 load_dotenv()  
@@ -23,6 +24,17 @@ engine = create_engine(DATABASE_URL)
 # Se usa scoped_session para manejar el contexto de la sesión de manera segura en aplicaciones multihilo
 # autocommit=False y autoflush=False para controlar el comportamiento de las transacciones
 SessionLocal = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
+
+# Para esconder todo el codigo de error de sqlalchemy
+class DatabaseError(Exception):
+    pass
+
+def _global_handle_error(exception_context):
+    raise DatabaseError("Se produjo un error en la DB")
+
+# Registra el listener en todas las conexiones
+event.listen(engine, "handle_error", _global_handle_error)
+
 
 # Exponer DB_PATH para otros scripts (como reset_db.py)
 __all__ = ["Base", "engine", "SessionLocal"]
