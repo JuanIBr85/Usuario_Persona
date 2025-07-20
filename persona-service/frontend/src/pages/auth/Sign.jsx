@@ -118,7 +118,7 @@ function Sign() {
             cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\-_,.'()]/g}
             placeholder="Nombre de usuario"
             labelText="Nombre"
-            validatePattern="^[a-zA-Z0-9_-]{4,20}$"
+            validatePattern="^[a-zA-Z0-9_\-]{4,20}$"
             validationMessage="El nombre de usuario no puede tener espacios ni caracteres especiales y tener entre 4 y 20 caracteres"
             required
           />
