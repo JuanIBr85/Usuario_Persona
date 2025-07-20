@@ -17,6 +17,7 @@ import { userService } from "@/services/userService";
 
 // Hooks
 import { useRoles } from "@/hooks/roles/useRoles";
+import { get } from "react-hook-form";
 
 export default function AdminRoles() {
   const [showNewRoleForm, setShowNewRoleForm] = useState(false);
@@ -70,6 +71,14 @@ export default function AdminRoles() {
     setSelectedPermissions([]);
     setShowNewRoleForm(false);
     setEditRoleId(null);
+
+    console.log("Botón cancelar presionado, formulario reiniciado");
+    console.log(document.getElementById("role-list"));
+    setTimeout(() => {
+      const roleList = document.getElementById("role-list");
+      console.log("Attempting to scroll to:", roleList);
+      roleList?.scrollIntoView({ behavior: "smooth", block: "start"});
+    }, 100);
   }
 
   function formatPermissionName(permission) {
@@ -99,8 +108,14 @@ export default function AdminRoles() {
       if (typeof permiso !== "string") return;
       // Extraer el módulo antes del primer punto
       const modulo = permiso.split(".")[0];
-      // Formatear el nombre del permiso
-      const formateado = formatPermissionName(permiso);
+
+      // Formatear la última parte como en tu función original
+      const ultimaParte = permiso.substring(permiso.lastIndexOf(".") + 1);
+      const formateado = ultimaParte
+        .replace(/_/g, " ")
+        .split(" ")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
 
       if (!resultado[modulo]) resultado[modulo] = [];
       resultado[modulo].push(formateado);
@@ -167,6 +182,9 @@ export default function AdminRoles() {
   }
 
   function handleEditClick(role) {
+    document
+      .getElementById("role-form")
+      ?.scrollIntoView({ behavior: "smooth" });
     setEditRoleId(role.id);
     setNewRoleName(role.name);
     const permisosCompletos = availablePermissions.filter((permiso) =>

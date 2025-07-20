@@ -18,16 +18,16 @@ export default function RoleForm({
 
   const groupedPermissions = useMemo(() => {
     const result = {};
-    
+
     availablePermissions.forEach((permission) => {
       if (!permission.name) return;
-      
+
       const module = permission.name.split(".")[0];
-      
+
       if (!result[module]) result[module] = [];
       result[module].push(permission);
     });
-    
+
     return result;
   }, [availablePermissions]);
 
@@ -42,6 +42,7 @@ export default function RoleForm({
   }
 
   useEffect(() => {
+    // Desplazar al formulario cuando se renderiza el componente
     const timer = setTimeout(() => {
       if (formRef.current) {
         formRef.current.scrollIntoView({
@@ -73,15 +74,19 @@ export default function RoleForm({
             value={newRoleName}
             onChange={(e) => setNewRoleName(e.target.value)}
           />
-          
-         
+
           <div className="space-y-5">
             {Object.entries(groupedPermissions).map(([module, permissions]) => (
               <div key={module} className="border rounded-lg p-4">
-                <h3 className="font-medium text-lg capitalize mb-3">{module}</h3>
+                <h3 className="font-medium text-lg capitalize mb-3">
+                  {module}
+                </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                   {permissions.map((permission) => (
-                    <label key={permission.id} className="flex items-center gap-2">
+                    <label
+                      key={permission.id}
+                      className="flex items-center gap-2"
+                    >
                       <input
                         type="checkbox"
                         checked={selectedPermissions.some(

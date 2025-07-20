@@ -111,7 +111,7 @@ export default function RoleList({
   return (
     <div className="flex flex-col gap-5">
       <Card>
-        <CardHeader className="flex items-center gap-2">
+        <CardHeader className="flex items-center gap-2" id="role-list">
           <BadgeCheck className="w-5 h-5 text-muted-foreground" />
           <CardTitle>
             Lista de roles creados{" "}
@@ -121,7 +121,7 @@ export default function RoleList({
             </span>
           </CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-col gap-4">
+        <CardContent className="flex flex-col gap-4" >
           {currentRoles.map((role) => {
             const isSuperadminRole = role.id === 1;
             return (
@@ -139,6 +139,7 @@ export default function RoleList({
                           <div
                             key={modulo}
                             className="mb-1 flex flex-wrap items-center gap-1"
+                            id={`role-permissions-${role.id}`}
                           >
                             <span className="font-semibold capitalize mr-1">
                               {modulo}:
