@@ -65,7 +65,7 @@ function Sign() {
         setIsOK(true);
       })
       .catch((error) => {
-        setMessage(error?.data?.message ?? "Ocurrió un error inesperado");
+        setMessage(FetchErrorMessage(error));
         setIsOK(false);
       })
       .finally(() => {
@@ -115,11 +115,11 @@ function Sign() {
             id="nombre_usuario"
             type="text"
             maxLength={20}
-            cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
+            cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\-_,.'()]/g}
             placeholder="Nombre de usuario"
             labelText="Nombre"
-            validatePattern=".{4,}"
-            validationMessage="El nombre debe tener al menos 4 caracteres"
+            validatePattern="^[a-zA-Z0-9_-]{4,20}$"
+            validationMessage="El nombre de usuario no puede tener espacios ni caracteres especiales y tener entre 4 y 20 caracteres"
             required
           />
 

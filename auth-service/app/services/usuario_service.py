@@ -99,6 +99,12 @@ class UsuarioService(ServicioBase):
          ValidationError: Si los datos no cumplen con el esquema.
          Exception: Si ocurre un error al guardar datos o enviar el correo.
         """
+
+
+        errors = self.schema.validate(data)
+        if errors:
+            return ResponseStatus.FAIL, "Error en los datos de entrada", errors, 400
+
         try:
             data_validada = self.schema.load(data)
         except ValidationError as e:
