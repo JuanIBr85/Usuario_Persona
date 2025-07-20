@@ -139,7 +139,7 @@ def verificar_otp():
             make_response(
                 ResponseStatus.ERROR,
                 "Error al verificar OTP",
-               {"error": str(e)},,
+               {"error": str(e)},
                 error_code="OTP_VERIFICACION_ERROR",
             ),
             500,
@@ -215,7 +215,7 @@ def reset_con_otp():
             make_response(
                 ResponseStatus.ERROR,
                 "Error al cambiar contraseña",
-               {"error": str(e)},,
+               {"error": str(e)},
                 error_code="RESET_ERROR",
             ),
             500,
