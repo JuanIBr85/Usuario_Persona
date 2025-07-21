@@ -23,14 +23,14 @@ const defaultData = Object.freeze({
     },
 });
 
-const _authData = localStorage.getItem("authData");
+const _authData = sessionStorage.getItem("authData");
 let isInvalidData = false;
 if(_authData?.user?.expires_in){
     const now = new Date(Date.now() + 1000*10);
     const expirationDate = new Date(_authData.user.expires_in);
     if(now > expirationDate){
-        localStorage.removeItem("authData");
-        localStorage.removeItem("token");
+        sessionStorage.removeItem("authData");
+        sessionStorage.removeItem("token");
         isInvalidData = true;
         console.log("Token expirado borrado");
     }
@@ -101,8 +101,8 @@ function AuthContextProvider({ children }) {
     };
 
     const forceNewData = (newData)=>{
-        localStorage.setItem("authData", JSON.stringify(newData));
-        localStorage.setItem("token", newData.token);
+        sessionStorage.setItem("authData", JSON.stringify(newData));
+        sessionStorage.setItem("token", newData.token);
         Object.assign(tempAuthData, newData);
 
         console.log("Datos de autenticación actualizados", newData);
@@ -129,12 +129,12 @@ function AuthContextProvider({ children }) {
         if(callToLogout){
             AuthService.logout()
                 .finally(() => {
-                    localStorage.removeItem('token');
+                    sessionStorage.removeItem('token');
                 });
         }
 
         setAuthData(defaultData);
-        localStorage.removeItem('authData');
+        sessionStorage.removeItem('authData');
         Object.assign(tempAuthData, defaultData);
     }
 
@@ -230,7 +230,7 @@ function AuthContextProvider({ children }) {
     //Verifica si el usuario esta autenticado al cambiar la ruta
     useEffect(() => {
         //Si el usuario esta esperando a que un admin lo vincule, lo redirijo a la pantalla de espera
-        if(!window.location.pathname.includes("/auth/waiting") && localStorage.getItem("persona-esperando-admin")){
+        if(!window.location.pathname.includes("/auth/waiting") && sessionStorage.getItem("persona-esperando-admin")){
             _navigate("/auth/waiting")
             return;
         }

@@ -69,6 +69,7 @@ function CPLocalidad({showDialog, localidad, codigo_postal, setLocalidad, id_cod
             value={codigoPostal}
             ref={inputCPRef}
             onChange={(e) => setCodigoPostal(e.target.value)}
+            cleanRegex={/[^0-9]/g}
             validatePattern="^(?:[A-Za-z]\d{4}[A-Za-z]{3}|\d{4})$"
             validationMessage="Ingrese CP (4 dígitos) o CPA (1 letra + 4 dígitos + 3 letras, todo en mayúsculas)"
             required

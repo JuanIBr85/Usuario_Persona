@@ -30,6 +30,8 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
     const [showPassword, setShowPassword] = React.useState(false);
     const inputRef = React.useRef(null)
 
+    const [validateTimeout, setValidateTimeout] = React.useState(null);
+
     const [internalMin, setInternalMin] = React.useState(min || (type === "date" ? minDate : undefined));
     const [internalMax, setInternalMax] = React.useState(max || (type === "date" ? maxDate : undefined));
     const [internalPattern, setInternalPattern] = React.useState(validatePattern);
@@ -160,6 +162,13 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
         if (!isInit) return;
         const input = event.target
         setInternalValue(input.value)
+
+        if(validateTimeout){
+            clearTimeout(validateTimeout);
+        }
+        validateTimeout = setTimeout(() => {
+            handleBlur(event);
+        }, 2000);
 
         if (onChange) {
             onChange(event)
