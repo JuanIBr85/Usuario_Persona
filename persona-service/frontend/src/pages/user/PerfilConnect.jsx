@@ -32,6 +32,10 @@ import useFetchMessage from "@/utils/useFetchMessage";
  * Este proceso sirve para asegurar que el usuario actual tiene acceso legítimo a un perfil en el sistema.
  */
 
+const {
+  VITE_WAITING_TIME: waitingTime = 1,
+  } = import.meta.env;
+
 const steps = [
   'Documento',
   'Email',
@@ -91,9 +95,9 @@ function PerfilConnect() {
     setLoading(true);
 
     try {
+      setTempData(formData);
       const response = await PersonaService.verificar_documento(formData);
       setEmail(response.data.email);
-      setTempData(formData);
       nextStep();
     } catch (error) {
       console.error(error);
@@ -226,7 +230,7 @@ function PerfilConnect() {
         action: () => {
           //Marcamos este cliente como esperando al admin para su vinculacion.
           const expirationTime = new Date();
-          expirationTime.setMinutes(expirationTime.getMinutes() + 1);
+          expirationTime.setMinutes(expirationTime.getMinutes() + waitingTime);
           //expirationTime.setHours(expirationTime.getHours() + 6);
           localStorage.setItem("persona-esperando-admin", expirationTime.toISOString());
           navigate('/searchprofile')
