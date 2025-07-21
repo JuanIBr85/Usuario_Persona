@@ -1,3 +1,5 @@
+"""Esquema con información opcional de la persona."""
+
 from marshmallow import ValidationError, fields, pre_load
 from config import ESTADO_CIVIL,ESTUDIOS_ALCANZADOS,OCUPACION
 from app.utils.vacios import permitir_vacios
@@ -6,6 +8,8 @@ from app.utils.validar_string import validar_foto_perfil
 from app.schema.base_schema import BaseSchema
 
 class PersonaExtendidaSchema(BaseSchema):
+
+    """Datos adicionales que puede registrar la persona."""
 
     id_extendida=fields.Int(dump_only=True)
     estado_civil = fields.Str(allow_none=True, required=False,validate=permitir_vacios(ESTADO_CIVIL))

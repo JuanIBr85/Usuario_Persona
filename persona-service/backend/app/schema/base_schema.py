@@ -1,5 +1,13 @@
 from marshmallow import Schema, post_dump, pre_load
 
+"""Utilidades base para esquemas de ``marshmallow``.
+
+Este módulo define comportamientos comunes de normalización para todos los
+esquemas del servicio ``persona``. Se encarga principalmente de formatear
+campos de texto para que la información sea consistente tanto al recibir como
+al devolver datos.
+"""
+
 CAPITALIZE_FIELDS = {
     "domicilio_referencia",
     "observacion_contacto",
@@ -34,6 +42,13 @@ def titulo_con_excepciones(texto):
 
 
 def _normalizacion_string(data):
+
+    """Normaliza los valores de texto de acuerdo a la configuración.
+
+    Recorre el diccionario recibido y aplica distintas transformaciones en
+    minúsculas, capitalización o formato título según corresponda.
+    """
+
     for key, value in data.items():
         if not isinstance(value, str):
             continue

@@ -1,3 +1,5 @@
+"""Esquemas de domicilio utilizados por el servicio de personas."""
+
 from marshmallow import fields, pre_load, validate
 from marshmallow.validate import Length
 from app.schema.domicilio_postal_schema import DomicilioPostalSchema
@@ -11,6 +13,8 @@ from app.utils.validar_string import (
     )
 
 class DomicilioSchema(BaseSchema):
+
+    """Describe el domicilio principal asociado a una persona."""
 
     id_domicilio=fields.Int(dump_only=True)
     domicilio_calle=fields.Str(required=True, validate=validar_domicilio_calle)

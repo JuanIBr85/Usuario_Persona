@@ -1,3 +1,5 @@
+"""Esquemas principales de la entidad Persona."""
+
 from marshmallow import fields, validate, post_load, pre_load
 from config import TIPOS_DOCUMENTO_VALIDOS
 from app.schema.contacto_schema import ContactoSchema
@@ -22,6 +24,9 @@ class FormatoDocumentoSchema(BaseSchema):
         return data
 
 class PersonaSchema(FormatoDocumentoSchema):
+
+    """Esquema completo de una persona."""
+
     id_persona = fields.Int(dump_only=True)
     nombre_persona = fields.Str(required=True,validate=validar_nombre_apellido)
     apellido_persona = fields.Str(required=True,validate=validar_nombre_apellido)
@@ -51,6 +56,9 @@ class PersonaSchema(FormatoDocumentoSchema):
     
 
 class PersonaResumidaSchema(FormatoDocumentoSchema):
+
+    """Versión reducida de ``PersonaSchema`` para listados."""
+
     id_persona = fields.Int(dump_only=True)
     nombre_persona = fields.Str(required=True,validate=validar_nombre_apellido)
     apellido_persona = fields.Str(required=True,validate=validar_nombre_apellido)

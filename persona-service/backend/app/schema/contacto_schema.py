@@ -1,3 +1,5 @@
+"""Esquemas relacionados con los datos de contacto de una persona."""
+
 from marshmallow import fields, validate,pre_load
 from marshmallow.validate import Length,Email
 from app.schema.base_schema import BaseSchema
@@ -11,6 +13,8 @@ from app.utils.validar_string import (
 
 
 class ContactoSchema(BaseSchema):
+    
+    """Define la estructura de los datos de contacto."""    
 
     id_contacto=fields.Int(dump_only=True)
     telefono_fijo=fields.Str(validate = validar_telefono)
