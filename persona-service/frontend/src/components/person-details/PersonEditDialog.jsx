@@ -294,7 +294,7 @@ function PersonEditDialog({
                 id="domicilio_referencia"
                 type="text"
                 labelText="Referencia"
-                maxLength={200}
+                maxLength={150}
                 value={person.domicilio?.domicilio_referencia || ""}
                 validationMessage="Máximo 200 caracteres"
               />

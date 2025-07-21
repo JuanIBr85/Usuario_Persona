@@ -115,7 +115,7 @@ export default function FormContacto({
             labelText="Observación del contacto"
             placeholder="Ingresa una observación"
             value={contacto?.observacion_contacto || ""}
-            maxLength={300}
+            maxLength={150}
             validationMessage="Se a ingresado uno o mas caracteres invalidos"
           />
         </div>

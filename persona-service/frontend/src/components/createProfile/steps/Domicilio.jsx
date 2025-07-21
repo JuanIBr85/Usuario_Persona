@@ -70,7 +70,7 @@ const Domicilio = ({ hidden, staticData }) => {
         <InputValidate
           id="domicilio_referencia"
           type="text"
-          maxLength={200}
+          maxLength={150}
           placeholder="Referencia (ej: Entre Calles X e Y)"
           labelText="Referencia"
           validatePattern=".{0,200}"

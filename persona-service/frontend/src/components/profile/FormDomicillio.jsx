@@ -79,7 +79,7 @@ export default function FormDomicillio({ domicilio, setPersonaData, persona_id, 
                     <InputValidate
                         id="domicilio_referencia"
                         type="text"
-                        maxLength={200}
+                        maxLength={150}
                         placeholder="Referencia (ej: Entre Calles X e Y)"
                         labelText="Referencia"
                         value={domicilio?.domicilio_referencia || ''}

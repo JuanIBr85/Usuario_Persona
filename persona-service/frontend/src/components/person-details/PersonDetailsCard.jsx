@@ -109,7 +109,7 @@ function PersonDetailsCard({ person, onEdit }) {
           {campos.map(({ label, icon: Icon, value }) => (
             <div
               key={label}
-              className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-4 border-b pb-4"
+              className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-4 border-b pb-4 break-words"
             >
               <span className="text-sm text-gray-500 font-medium inline-flex items-center gap-1">
                 <Icon className="w-4 h-4" /> {label}

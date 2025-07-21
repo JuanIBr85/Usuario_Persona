@@ -66,7 +66,7 @@ const Contacto = ({hidden, staticData}) => (
     <InputValidate
       id="observacion_contacto"
       type="text"
-      maxLength={300}
+      maxLength={150}
       labelText="Observación del contacto"
       placeholder="Ingresa una observación"
     />

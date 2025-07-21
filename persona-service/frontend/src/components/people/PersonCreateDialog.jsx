@@ -335,7 +335,7 @@ function PersonCreateDialog({
               <InputValidate
                 id="observacion_contacto"
                 type="text"
-                maxLength={300}
+                maxLength={150}
                 labelText="Observaciones de contacto"
                 value={newUser.observacion_contacto || ""}
                 className="w-full"
