@@ -34,7 +34,7 @@ import useFetchMessage from "@/utils/useFetchMessage";
 
 const {
   VITE_WAITING_TIME: waitingTime = 1,
-  } = import.meta.env;
+} = import.meta.env;
 
 const steps = [
   'Documento',
@@ -63,8 +63,8 @@ function PerfilConnect() {
   const { authData } = useAuthContext();
 
   // Si el usuario ya tiene un perfil vinculado, redirigir a /profile
-  useEffect(()=>{
-    if(authData?.user?.id_persona && authData?.user?.id_persona !== 0){
+  useEffect(() => {
+    if (authData?.user?.id_persona && authData?.user?.id_persona !== 0) {
       navigate('/profile');
     }
   }, [authData])
@@ -101,42 +101,43 @@ function PerfilConnect() {
       nextStep();
     } catch (error) {
       console.error(error);
-      if(error.statusCode === 430){
+      if (error.statusCode === 430) {
         setDialog({
           title: "Documento registrado",
           actionName: "Continuar",
           cancelAction: () => setDialog(null),
           description: <>
-            El documento esta registrado, pero no esta vinculado a un usuario
-            <br/>
-            Pongase en contacto en el administrador para resolver este problema
-            <br/>
-            Porfavor rellene el siguiente formulario para que el administrador pueda resolver este problema
-            <br/>
+            El documento ya se encuentra vinculado a un usuario
+            <br />
+            Póngase en contacto con el administrador para resolver este problema
+            <br />
+            Por favor, rellene el siguiente formulario para que el administrador pueda resolver este problema
+            <br />
+            <br />
             Si este no es su documento <b>{formData.num_doc_persona}</b>, por favor ingrese el documento correcto
           </>,
           action: () => setCurrentStep(3),
         });
-      }else if (error.statusCode === 404) {
+      } else if (error.statusCode === 404) {
         setDialog({
           title: "Crear perfil",
-          action: () => navigate("/createperfil",{state: formData}),
+          action: () => navigate("/createperfil", { state: formData }),
           cancelAction: () => setDialog(null),
           description: <>
             No se encontró el documento, vamos a crear un nuevo perfil
 
             Estos datos son correctos antes de continuar?
-            <br/><br/>
-            <b>Tipo: </b>{formData.tipo_documento}<br/>
+            <br /><br />
+            <b>Tipo: </b>{formData.tipo_documento}<br />
             <b>Documento: </b>{formData.num_doc_persona}
           </>
         })
-      }else{
+      } else {
         setDialog({
           title: "Hubo un error",
           actionName: "Cerrar",
           description: useFetchMessage(error?.data?.error?.server || error?.data?.error || error?.data?.message, "Documento invalido"),
-          action: () =>setDialog(null)
+          action: () => setDialog(null)
         });
       }
     } finally {
@@ -222,7 +223,7 @@ function PerfilConnect() {
       const response = await PersonaService.verificar_identidad({
         ...formData,
         ...tempData,
-        usuario_email:authData.user.email_usuario
+        usuario_email: authData.user.email_usuario
       });
 
       setDialog({
@@ -236,12 +237,12 @@ function PerfilConnect() {
           navigate('/searchprofile')
         },
         description: <>
-            Tus petición fue aceptada, enviaremos una petición de verificación al administrador, te contactaremos pronto
-            <br />
-            En caso de no ser contactado, puedes contactarnos al correo <a className="text-blue-500" href="mailto:soporte@persona.com">soporte@persona.com</a>
-            <br />
-            o llamar al número <a className="text-blue-500" href="tel:+56912345678">+56912345678</a>
-          </>
+          Tus petición fue aceptada, enviaremos una petición de verificación al administrador, te contactaremos pronto
+          <br />
+          En caso de no ser contactado, puedes contactarnos al correo <a className="text-blue-500" href="mailto:soporte@persona.com">soporte@persona.com</a>
+          <br />
+          o llamar al número <a className="text-blue-500" href="tel:+56912345678">+56912345678</a>
+        </>
       })
     } catch (error) {
       setDialog({
@@ -264,7 +265,7 @@ function PerfilConnect() {
     setCurrentStep(prev => Math.min(prev + 1, 3));
   };
 
-  
+
   // Si el usuario indica que su email es incorrecto, pasa a validación manual
   const handleEmailIncorrecto = () => {
     setCurrentStep(3); // Ir directamente al paso de verificación de identidad
@@ -340,7 +341,7 @@ function PerfilConnect() {
             <CardHeader className="text-center">
               <CardTitle className="text-2xl">
                 Vinculación de perfil
-              </CardTitle>              
+              </CardTitle>
               <CardDescription>
                 <p>Conecta tu perfil con tu cuenta de usuario</p>
                 <p>Verificaremos si estás en el sistema</p>
@@ -350,7 +351,7 @@ function PerfilConnect() {
             <CardContent className="flex flex-col flex-1 min-h-70">
               <div className="space-y-8 flex-1">
                 {/* Barra de progreso del flujo */}
-                <ProgressBar currentStep={currentStep} steps={steps} size={10}/>
+                <ProgressBar currentStep={currentStep} steps={steps} size={10} />
                 <div className="mb-6">
                   {renderStep()}
                 </div>
