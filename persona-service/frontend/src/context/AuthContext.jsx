@@ -24,7 +24,20 @@ const defaultData = Object.freeze({
 });
 
 const _authData = localStorage.getItem("authData");
-const saveAuthData = _authData ? JSON.parse(_authData) : defaultData;
+let isInvalidData = false;
+if(_authData?.user?.expires_in){
+    const now = new Date(Date.now() + 1000*10);
+    const expirationDate = new Date(_authData.user.expires_in);
+    if(now > expirationDate){
+        localStorage.removeItem("authData");
+        localStorage.removeItem("token");
+        isInvalidData = true;
+        console.log("Token expirado borrado");
+    }
+
+}
+
+const saveAuthData = isInvalidData? defaultData: (_authData ? JSON.parse(_authData) : defaultData);
 
 //Datos de autenticación temporales para verificar roles
 const tempAuthData = { ...saveAuthData };

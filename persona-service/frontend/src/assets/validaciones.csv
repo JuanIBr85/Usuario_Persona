@@ -9,7 +9,7 @@ apellido_persona;^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$;El apellido debe conte
 num_doc_persona;;Número de documento inválido
 fecha_nacimiento_persona;;La fecha de nacimiento es requerida
 email;;Email inválido
-domicilio_calle;^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s,.]{2,50}$;Ingresa un nombre de calle válido, sólo se permiten letras, números y un espacio entre cada palabra
+domicilio_calle;^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s,.]{2,50}$;Solo se permiten letras y espacios. Excepciones: 'Av xxx', 'Avenida xxx' o 'Calle xxx' (xxx es un numero que puede tener 1 a 3 dígitos).
 domicilio_numero;^([0-9]{1,9}[a-zA-Z]?|[Ss][Nn])$;Ingresa un número válido (ej: 1234, 123A)
 domicilio_piso;^[0-9]{1,2}[A-Za-z]?$|^[Pp][Bb]$;Formato de piso inválido. Ejemplos válidos: '3', '3A', 'PB'
 domicilio_dpto;^[a-zA-Z0-9]{1,2}$|^$;Ingresa un departamento válido (máximo 2 caracteres)

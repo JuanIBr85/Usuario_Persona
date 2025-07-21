@@ -78,7 +78,7 @@ function Login() {
         setIsOpen={setIsOpen}
         actionHandle={
           isLogin
-            ? () => setTimeout(() => navigate("/searchprofile"), 1000)
+            ? () => setTimeout(() => window.location.href = "/searchprofile", 1000)
             : undefined
         }
       // Si el login fue exitoso, redirige al perfil después de cerrar el diálogo

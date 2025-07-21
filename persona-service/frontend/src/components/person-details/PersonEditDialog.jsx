@@ -250,8 +250,8 @@ function PersonEditDialog({
                 labelText="Calle"
                 maxLength={50}
                 value={person.domicilio?.domicilio_calle || ""}
-                validatePattern="^[A-Za-zÁÉÍÓÚáéíóúÑñÜü0-9]+(?: [A-Za-zÁÉÍÓÚáéíóúÑñÜü0-9]+)*$"
-                validationMessage="Ingresa un nombre de calle válido, sólo se permiten letras, números y un espacio entre cada palabra"
+                validatePattern="^(?:[A-Za-zÁÉÍÓÚáéíóúÑñÜü]+(?: [A-Za-zÁÉÍÓÚáéíóúÑñÜü]+)*|(?:[Aa][Vv]|[Aa]venida|[Cc]alle) \d{1,3})$"
+                validationMessage="Solo se permiten letras y espacios. Excepciones: 'Av xxx', 'Avenida xxx' o 'Calle xxx' (xxx es un numero que puede tener 1 a 3 dígitos)."
                 required
               />
 
