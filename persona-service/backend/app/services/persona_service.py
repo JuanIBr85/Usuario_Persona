@@ -651,7 +651,7 @@ class PersonaService(IPersonaInterface):
                 .filter(
                     Persona.tipo_documento == tipo_doc,
                     Persona.num_doc_persona == num_doc,
-                    Persona.usuario_id.is_(None),
+                    #Persona.usuario_id.is_(None),
                 )
                 .first()
             )

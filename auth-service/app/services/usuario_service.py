@@ -293,8 +293,16 @@ class UsuarioService(ServicioBase):
                 f"No hay registro pendiente para {email}.",
                 None,
                 404,
+            )
+        #lock para evitar el envio de otp constante.   
+        lock = get_redis().set(f"lock:reenviar_otp_registro:{email}", "true", ex=60*2, nx=True)  # una vez cada 2 minutos
+        if not lock:
+            return (
+                ResponseStatus.FAIL,
+                "Ya se envió un código recientemente. Por favor, esperá un momento.",
+                None,
+                403,
             )   
-
         # Generar nuevo OTP y guarda
         nuevo_otp = generar_codigo_otp()
         guardar_otp(email, nuevo_otp)
@@ -623,7 +631,16 @@ class UsuarioService(ServicioBase):
             existente = session.query(Usuario).filter_by(email_usuario=nuevo_email_normalizado).first()
             if existente:
                 return ResponseStatus.FAIL, "El email ya está en uso", None, 409
-
+            
+            #lock para no generar spam cuando se modifica el email. 1 vez cada 30 min
+            lock = get_redis().set(f"lock:modificar_email:{usuario.id_usuario}", "true", ex=60*30, nx=True)
+            if not lock:
+                return (ResponseStatus.FAIL, 
+                        "Ya solicitaste un cambio de email. Revisá tu correo.", 
+                        None, 
+                        403
+                )
+            
             enviar_email_modificar_email(usuario, nuevo_email_normalizado)
 
             return ResponseStatus.SUCCESS, "Email enviado al nuevo correo", None, 200
@@ -737,7 +754,15 @@ class UsuarioService(ServicioBase):
                         None,
                         400,
                     )
-
+                #lock para no dejar solicitar la eliminacion seguidamente.
+                lock = get_redis().set(f"lock:solicitar_eliminacion:{usuario_id}", "true", ex=60*60, nx=True)
+                if not lock:
+                    return (ResponseStatus.FAIL, 
+                            "Ya hiciste una solicitud reciente. Revisá tu email.", 
+                            None, 
+                            403
+                    )
+                
                 enviar_email_confirmacion_eliminacion(usuario, user_agent, ip_solicitud, jti, jti_refresh)
 
                 # Bloquear el login por 30 minutos
@@ -746,7 +771,11 @@ class UsuarioService(ServicioBase):
                 #Se crea un log de la solicitud solo por si no fue el mismo usuario el que la pidio para tener un registro.
                 log_usuario_accion(session, usuario_id, "solicitar_eliminacion")
 
-                return ResponseStatus.SUCCESS, "Se envió un email al correo para verificar su eliminación de cuenta.", None, 200
+                return (ResponseStatus.SUCCESS, 
+                        "Se envió un email al correo para verificar su eliminación de cuenta.", 
+                        None, 
+                        200
+                    )
 
             except Exception as e:
                 session.rollback()
@@ -854,7 +883,17 @@ class UsuarioService(ServicioBase):
             usuario = session.query(Usuario).filter_by(email_usuario=email,eliminado=False).first()
             if not usuario:
                 return ResponseStatus.FAIL, "Email no registrado", None, 404
-
+            
+            #lock para reenvio de otp.solo deja pedir uno cada 3 minutos
+            lock = get_redis().set(f"lock:solicitar_codigo_reset:{email}", "true", ex=60*3, nx=True)  # una vez cada 3 minutos
+            if not lock:
+                return (
+                    ResponseStatus.FAIL,
+                    "Ya se envió un código recientemente. Por favor, esperá un momento.",
+                    None,
+                    403,
+                )   
+            
             otp = generar_codigo_otp()
             guardar_otp(email, otp)
             enviar_codigo_reset_por_email(usuario, otp)
