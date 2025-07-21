@@ -34,7 +34,7 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
 
     const [internalMin, setInternalMin] = React.useState(min || (type === "date" ? minDate : min));
     const [internalMax, setInternalMax] = React.useState(max || (type === "date" ? maxDate : max));
-    const [internalPattern, setInternalPattern] = React.useState(validatePattern || (type === "email" ? "^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$" : validatePattern));
+    const [internalPattern, setInternalPattern] = React.useState(validatePattern || (type === "email" ? "^[^\\s@]+@[^\\s@]+\\.[a-zA-Z]{2,}$" : validatePattern));
     const [internalValue, setInternalValue] = React.useState(value || '');
 
     const [isInit, setIsInit] = React.useState(false);
