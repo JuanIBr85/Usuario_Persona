@@ -62,6 +62,8 @@ const Redirect = () => {
       setTimeout(() => {
         //Borro el redirect para que perfil no siga mandando a redirect al usuario
         sessionStorage.removeItem('_redirect');
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('authData');
         window.location.href = `${redirect}?token=${b64Data}`;
       }, 1000);
     }, 1000);
