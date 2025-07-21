@@ -75,6 +75,7 @@ class PersonaService(IPersonaInterface):
         finally:
             session.close()
 
+#Metodo para crear la persona
     def crear_persona(self, data):
         session = SessionLocal()
 
@@ -109,7 +110,7 @@ class PersonaService(IPersonaInterface):
                 raise Exception(
                     "La persona ya se encuentra registrada con ese tipo y numero de documento")
 
-            # Se crea el contacto, domicilio
+            # Se crea el contacto, domicilio y la persona extendida
             domicilio = self.domicilio_service.crear_domicilio(
                 data_validada.pop("domicilio"), session=session
             )
@@ -154,6 +155,7 @@ class PersonaService(IPersonaInterface):
         finally:
             session.close()
 
+#Metodo que permite modificar los datos de la persona
     def modificar_persona(self, id, data):
         session = SessionLocal()
 
@@ -290,6 +292,7 @@ class PersonaService(IPersonaInterface):
         finally:
             session.close()
 
+#Metodo que restringe la modificacion de alguno datos por parte de la persona
     def modificar_persona_restringido(self, id, data):
         session = SessionLocal()
 
@@ -387,16 +390,12 @@ class PersonaService(IPersonaInterface):
 
                 dias = (ahora - ultima_modificacion).days
 
-                #evaluar_restriccion = False
-
                 if dias < dias_restriccion:
                     raise Exception(
                         f"Los campos Nombre y Apellido solo pueden modificarse cada {dias_restriccion} días. Si es necesario contacte a un administrador. "
                         f"Última modificación: {ultima_modificacion.date()}"
                     )
                  # Aplica las modificaciones
-                 
-            #hubo_cambios_persona = False
             
             for campo in cambios_realizados:
                 setattr(persona, campo, data_validada[campo])
@@ -423,6 +422,8 @@ class PersonaService(IPersonaInterface):
         finally:
             session.close()
 
+
+#Realiza un borrado logico a una persona
     def borrar_persona(self, id_persona):
         session = SessionLocal()
 
@@ -465,7 +466,8 @@ class PersonaService(IPersonaInterface):
 
         finally:
             session.close()
-
+            
+#Restaura la perdona
     def restaurar_persona(self, id):
         session = SessionLocal()
 
@@ -584,8 +586,6 @@ class PersonaService(IPersonaInterface):
                 .filter(
                     Persona.tipo_documento == tipo_documento,
                     Persona.num_doc_persona == num_doc_persona,
-                    #Persona.deleted_at.is_(None),
-                    #Persona.usuario_id.is_(None),
                 )
                 .first()
             )
@@ -621,8 +621,8 @@ class PersonaService(IPersonaInterface):
         try:
             session.query(Persona).filter_by(id_persona=persona_id).update(
                 {"usuario_id": usuario_id}
-            )  # asocia la persona al usuario
-            session.commit()  # guarda los cambios en la base de datos
+            )  
+            session.commit()  
         finally:
             session.close()
 
@@ -676,7 +676,7 @@ class PersonaService(IPersonaInterface):
                 persona.nombre_persona.strip().lower() == nombre.strip().lower()
                 and persona.apellido_persona.strip().lower() == apellido.strip().lower()
                 and persona.fecha_nacimiento_persona == fecha_nac_dt
-                #and persona.contacto.telefono_movil.strip() == telefono.strip()
+                
             )
 
             # Enviar notificación al administrador

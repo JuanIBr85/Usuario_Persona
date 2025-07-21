@@ -16,7 +16,8 @@ class PersonaExtendidaService(IPersonaExtendidaInterface):
 
     def listar_persona_extendida_id(self, id):
         return super().listar_persona_extendida_id(id)    
-
+    
+#Metodo que crea a la persona extendida
     def crear_persona_extendida(self, data, session=None):
         cerrar = False
         if session is None:
@@ -41,6 +42,7 @@ class PersonaExtendidaService(IPersonaExtendidaInterface):
             if cerrar:
                 session.close()    
 
+#Metodo que permite modificar los datos de la persona extendida
     def modificar_persona_extendida(self, id, data, session=None):
 
         cerrar = False
@@ -84,7 +86,7 @@ class PersonaExtendidaService(IPersonaExtendidaInterface):
             if cerrar:
                 session.close()
         
-    
+#Borrado logido a la persona extendia    
     def borrar_persona_extendida(self, id, session =None):
         cerrar = False
         if session is None:
@@ -108,7 +110,7 @@ class PersonaExtendidaService(IPersonaExtendidaInterface):
                 session.close()
                 session.commit()
 
-    
+#Restaurar a la persona extendida    
     def restaurar_persona_extendida(self, id,session=None):
         cerrar = False
 
