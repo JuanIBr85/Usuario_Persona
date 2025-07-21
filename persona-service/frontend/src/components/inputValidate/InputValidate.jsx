@@ -59,10 +59,7 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
         if (isInit) handleBlur({ target: inputRef.current });
     }, [validatePattern]);
 
-    const handleBlur = (event) => {
-        const input = event.target;
-        if (!input) return;
-
+    function cleanValue(input) {
         let value = input.value?.trim();
 
         if (isCleanValue) {
@@ -72,6 +69,17 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
                     break;
                 case "tel":
                     value = value?.replace(cleanTelRegex, '');
+
+                    if (value.startsWith("0")) {
+                        value = value.replace("0", "");
+                    }
+                    if (value.length === 12 && value.substring(4, 6) === "15") {
+                        value = value.substring(0, 4) + value.substring(6);
+                    }
+
+                    if (value.length === 10 && !value.startsWith("+549")) {
+                        value = `+549${value}`;
+                    }
                     break;
                 case "url":
                     value = value?.replace(cleanUrlRegex, '');
@@ -83,7 +91,9 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
         }
         input.value = value;
         setInternalValue(value);
+    }
 
+    function validateValue(input) {
         switch (type) {
             case "email":
                 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -99,6 +109,15 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
         if (input.checkValidity()) {
             setError(false)
         }
+    }
+
+    const handleBlur = (event) => {
+        const input = event.target;
+        if (!input) return;
+
+        cleanValue(input);
+
+        validateValue(input);
     }
 
     useEffect(() => {
@@ -163,12 +182,12 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
         const input = event.target
         setInternalValue(input.value)
 
-        if(validateTimeout){
+        if (validateTimeout) {
             clearTimeout(validateTimeout);
         }
         validateTimeout = setTimeout(() => {
-            handleBlur(event);
-        }, 2000);
+            validateValue(input);
+        }, 500);
 
         if (onChange) {
             onChange(event)
