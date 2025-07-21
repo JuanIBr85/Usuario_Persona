@@ -59,14 +59,14 @@ function PersonEditDialog({
 
   return (
     <Dialog open={!!editingUser} onOpenChange={(open) => !open && setEditingUser(null)}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className=" sm:min-w-[425px] justify-center">
         <DialogHeader>
           <DialogTitle>Editar Persona</DialogTitle>
           <DialogDescription>
             Modifica los datos de la persona. Guarda los cambios al finalizar.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit}>
+        <form onSubmit={onSubmit} >
           <div className="grid gap-4 py-4">
             <div className="grid gap-4">
               <InputValidate
