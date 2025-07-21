@@ -104,7 +104,7 @@ def funcion_que_recibe_mensajes(message: dict, app_flask: Flask) -> None:
 
         data = message.get("message", {})
         usuario_id = data.get("id_usuario")
-        token = data.get("token")
+        token = data.get("token_jwt")
 
         logger.error(f"usuario_id recibido: {usuario_id}")
         logger.error(f"token recibido (recortado): {token[:40]}...")
