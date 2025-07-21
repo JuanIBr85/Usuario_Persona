@@ -185,9 +185,9 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
         if (validateTimeout) {
             clearTimeout(validateTimeout);
         }
-        validateTimeout = setTimeout(() => {
+        setValidateTimeout(setTimeout(() => {
             validateValue(input);
-        }, 500);
+        }, 500));
 
         if (onChange) {
             onChange(event)
