@@ -10,7 +10,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import PersonDetailsCard from "@/components/person-details/PersonDetailsCard";
 import PersonEditDialog from "@/components/person-details/PersonEditDialog";
 import PersonDetailsBreadcrumb from "@/components/person-details/PersonDetailsBreadcrumb";
-
+import useFetchMessage from "@/utils/useFetchMessage";
 /**
  * PersonDetails component
  *
@@ -57,19 +57,10 @@ function PersonDetails() {
   } = useUsuariosBasic();
 
   function showAlert(title, description, variant = "default") {
-
-    let descriptionAlert = "Error al acualizar persona";
+    let descriptionAlert = "Hubo un error al actualizar la persona";
+    
     try{
-      if(typeof description === "string"){
-        descriptionAlert = description;
-      }else{
-        descriptionAlert = "";
-        for(let key in description){
-          descriptionAlert += `${key}: ${description[key]}\n`;
-        }
-
-      }
-
+      descriptionAlert = useFetchMessage(description, "Hubo un error al actualizar la persona");
     }catch(err){
       console.error("Error al mostrar alerta:", err);
     }
@@ -151,7 +142,7 @@ function PersonDetails() {
         error={error}
       />}
       {alert && (
-        <div className="fixed bottom-16 right-4 z-50 w-96">
+        <div className="fixed bottom-16 right-4 z-50 w-110">
           <Alert
             variant={alert.variant || "default"}
             className="animate-in slide-in-from-right-8 duration-300 bg-card border-black"

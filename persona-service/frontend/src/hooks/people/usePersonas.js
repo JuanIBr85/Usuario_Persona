@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { PersonaService } from "@/services/personaService";
 import { formSubmitJson } from "@/utils/formUtils";
 import { traducirRateLimitMessage } from "@/utils/traductores";
+import useFetchMessage from "@/utils/useFetchMessage";
 /**
  * Hook personalizado que encapsula la lógica de obtención de personas,
  * tipos de documentos, redes sociales y localidades según código postal.
@@ -36,19 +37,11 @@ export function usePersonas() {
 
     function showAlert({title, description, variant = "default"}) {
         let descriptionAlert = "Error al acualizar persona";
+    
         try{
-          if(typeof description === "string"){
-            descriptionAlert = description;
-          }else{
-            descriptionAlert = "";
-            for(let key in description){
-              descriptionAlert += `${key}: ${description[key]}\n`;
-            }
-    
-          }
-    
+        descriptionAlert = useFetchMessage(description, "Hubo un error al actualizar la persona");
         }catch(err){
-          console.error("Error al mostrar alerta:", err);
+        console.error("Error al mostrar alerta:", err);
         }
         
         setAlert({ title, description:descriptionAlert, variant });
