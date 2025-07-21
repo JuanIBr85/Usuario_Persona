@@ -36,6 +36,7 @@ class PersonaService(IPersonaInterface):
         self.persona_ext_service = PersonaExtendidaService()
         self.otp_service = OtpService()
 
+#Metodo para buscar todos las persona creadas
     def listar_personas(self):
         session = SessionLocal()
         try:
@@ -45,6 +46,7 @@ class PersonaService(IPersonaInterface):
         finally:
             session.close()
 
+#Metodo para buscar una persona determinada a traves de su id
     def listar_persona_id(self, id):
         session = SessionLocal()
         try:
@@ -60,6 +62,7 @@ class PersonaService(IPersonaInterface):
         finally:
             session.close()
 
+#Metodo para buscar una persona determinada a traves del id de usuario
     def listar_persona_usuario_id(self, id):
         session = SessionLocal()
         try:
@@ -466,7 +469,7 @@ class PersonaService(IPersonaInterface):
 
         finally:
             session.close()
-            
+
 #Restaura la perdona
     def restaurar_persona(self, id):
         session = SessionLocal()

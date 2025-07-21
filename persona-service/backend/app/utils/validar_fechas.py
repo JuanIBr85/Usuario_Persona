@@ -1,9 +1,11 @@
+"""Validadores comunes para campos de fecha."""
+
 from datetime import date, timedelta
 from marshmallow import ValidationError
 
 def validar_vencimiento_dni(valor):
 
-    """Valida que la fecha de vencimiento del DNI."""
+    """Valida que la fecha de vencimiento del DNI sea coherente."""
 
     if valor is None:
         return None

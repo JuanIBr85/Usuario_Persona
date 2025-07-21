@@ -1,3 +1,5 @@
+"""Conjunto de validadores de cadenas para distintos campos de la persona."""
+
 import re
 from marshmallow import ValidationError
 

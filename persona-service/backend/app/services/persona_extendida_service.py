@@ -9,14 +9,7 @@ class PersonaExtendidaService(IPersonaExtendidaInterface):
 
     def __init__(self):
         self.schema=PersonaExtendidaSchema()
-
-    def listar_personas_extendida(self):
-        return super().listar_personas_extendida()
-
-
-    def listar_persona_extendida_id(self, id):
-        return super().listar_persona_extendida_id(id)    
-    
+        
 #Metodo que crea a la persona extendida
     def crear_persona_extendida(self, data, session=None):
         cerrar = False

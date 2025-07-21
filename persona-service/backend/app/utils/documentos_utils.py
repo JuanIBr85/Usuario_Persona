@@ -1,3 +1,5 @@
+"""Funciones de validación para documentos y CUIT/CUIL."""
+
 import logging
 import re
 from config import TIPOS_DOCUMENTO_VALIDOS
@@ -7,7 +9,11 @@ PESOS_CUIT = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2]
 
 
 def validar_cuit(cuit: str) -> bool:
-    #https://wiki.python.org.ar/recetario/validarcuit/
+    """Valida un número de CUIT/CUIL.
+
+    La lógica se basa en el algoritmo de verificación oficial.
+    """
+    # https://wiki.python.org.ar/recetario/validarcuit/
 
     base = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2]
 
@@ -29,7 +35,9 @@ def validar_cuit(cuit: str) -> bool:
 
 
 def validar_documento_por_regex(documento: str, regex: str) -> bool:
+
     """Valida un número de documento según una expresión regular."""
+
     try:
         # Valido el documento contra el patron(regex)
         resultado = bool(re.match(regex, documento))
@@ -40,6 +48,7 @@ def validar_documento_por_regex(documento: str, regex: str) -> bool:
 
 
 def validar_documento_por_tipo(tipo_documento: str, numero: str) -> bool | int:
+
     """Valida el número de documento según el tipo especificado."""
 
     if (

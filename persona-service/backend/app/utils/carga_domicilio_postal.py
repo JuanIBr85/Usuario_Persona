@@ -5,6 +5,20 @@ from app.models.domicilio_postal_model import DomicilioPostal
 
 def cargar_domicilios_postales_csv(path_csv):
 
+    """Carga registros de ``DomicilioPostal`` desde un archivo CSV.
+
+    El CSV debe contener las columnas ``codigo_postal``, ``localidad``,
+    ``partido`` y ``provincia``. Las filas incompletas o duplicadas son
+    ignoradas y solo se insertan en la base aquellos registros que no
+    existen previamente.
+
+    Parameters
+    ----------
+    path_csv: str
+        Ruta al archivo CSV que contiene los domicilios postales.
+    """
+
+# Se crea una sesión nueva por cada carga.
     session=SessionLocal()
 
     try:

@@ -15,8 +15,10 @@ class DomicilioService(IDomicilioInterface):
         self.domicilio_postal_service = DomicilioPostalService()
 
     def listar_domicilio_id(self, id):
+        #No esta implementado en la version actual
         return
-    
+
+#Crea el domicilio de la persona    
     def crear_domicilio(self, data, session = None):
           cerrar= False
           
@@ -53,7 +55,9 @@ class DomicilioService(IDomicilioInterface):
           finally:
               if cerrar:
                 session.close()         
-    
+
+
+#Metodo para modidicar un domicilio determinado a traves del id
     def modificar_domicilio(self, id_domicilio, data, session):
         domicilio = session.query(Domicilio).get(id_domicilio)
         if not domicilio:
@@ -104,7 +108,7 @@ class DomicilioService(IDomicilioInterface):
  
         return cambios
         
-    
+   #Metodo para borrar logicamente el domicilio de la persona asociada al id 
     def borrar_domicilio(self, id_domicilio, session=None):
         cerrar= False
 
@@ -130,7 +134,7 @@ class DomicilioService(IDomicilioInterface):
             if cerrar:
                 session.commit()
                 session.close()
-
+   #Metodo para restaurar el borrado logico del domicilio 
     def restaurar_domicilio(self, id, session=None):
         cerrar=False
 

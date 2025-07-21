@@ -11,6 +11,7 @@ class DomicilioPostalService(IDomicilioPostalInterface):
         self.schema=DomicilioPostalSchema()
         self.varios_schema=DomicilioPostalSchema(many=True)
 
+#Metodo para obtener el domicilio postal por id
     def listar_domicilio_postal_id(self, id):
         """Obtiene un domicilio postal por su ID."""
         session = SessionLocal()
@@ -27,7 +28,7 @@ class DomicilioPostalService(IDomicilioPostalInterface):
             session.close()
 
 
-
+#Metodo que permite obtener el domicilio postar a traves del CP+Localidad
     def obtener_domicilio_postal_por_cod_postal_localidad(self, codigo_postal, localidad, session=None):
         """Busca un domicilio postal por código postal y localidad."""
 
@@ -46,8 +47,9 @@ class DomicilioPostalService(IDomicilioPostalInterface):
 
         finally:
             if cerrar:
-                session.close()     
+                session.close()  
 
+#Permite buscar las localidades que comparten un mismo codigo postal
     def buscar_localidades_por_codigo_postal(self, codigo_postal, session=None):
         """Devuelve una lista de localidades para un determinado Codigo Postal."""
         
@@ -70,26 +72,4 @@ class DomicilioPostalService(IDomicilioPostalInterface):
             if cerrar:
                 session.close()                 
 
-    #No se utiliza
-    def crear_domicilio_postal(self, data, session=None):
-        """Crea un nuevo registro de domicilio postal."""
-
-        cerrar = False
-        if session is None:    
-            session= SessionLocal()
-            cerrar=True
-
-        try:
-            data_validada=self.schema.load(data)
-            domicilio_postal = DomicilioPostal(**data_validada)
-            session.add(domicilio_postal)
-            session.flush()
-
-            return domicilio_postal
-        except Exception as e:
-            session.rollback()
-            raise e
-        finally:
-            if cerrar:
-                session.close()
              

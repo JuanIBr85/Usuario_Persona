@@ -11,6 +11,7 @@ class ContactoService(IContactoInterface):
         """Inicializa el esquema de validación."""
         self.schema=ContactoSchema()
 
+
     def crear_contacto(self, data, session = None):
         """Crea un contacto y lo asocia a la sesión dada."""
 
