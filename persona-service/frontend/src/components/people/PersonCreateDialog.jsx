@@ -325,7 +325,6 @@ function PersonCreateDialog({
                 labelText="Email de contacto"
                 value={newUser.email_contacto || ""}
                 validationMessage="Email inválido"
-                
                 required
               />
               <div />{" "}

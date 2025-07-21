@@ -32,9 +32,9 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
 
     const [validateTimeout, setValidateTimeout] = React.useState(null);
 
-    const [internalMin, setInternalMin] = React.useState(min || (type === "date" ? minDate : undefined));
-    const [internalMax, setInternalMax] = React.useState(max || (type === "date" ? maxDate : undefined));
-    const [internalPattern, setInternalPattern] = React.useState(validatePattern);
+    const [internalMin, setInternalMin] = React.useState(min || (type === "date" ? minDate : min));
+    const [internalMax, setInternalMax] = React.useState(max || (type === "date" ? maxDate : max));
+    const [internalPattern, setInternalPattern] = React.useState(validatePattern || (type === "email" ? "^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$" : validatePattern));
     const [internalValue, setInternalValue] = React.useState(value || '');
 
     const [isInit, setIsInit] = React.useState(false);
@@ -94,7 +94,7 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
     }
 
     function validateValue(input) {
-        switch (type) {
+        /*switch (type) {
             case "email":
                 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 //obtengo el ultimo elemento del email
@@ -104,7 +104,7 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
                     return;
                 }
                 break;
-        }
+        }*/
 
         if (input.checkValidity()) {
             setError(false)
@@ -118,6 +118,9 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
         cleanValue(input);
 
         validateValue(input);
+        if(onChange){
+            onChange(event);
+        }
     }
 
     useEffect(() => {

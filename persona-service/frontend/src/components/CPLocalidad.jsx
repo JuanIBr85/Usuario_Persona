@@ -12,6 +12,7 @@ function CPLocalidad({showDialog, localidad, codigo_postal, setLocalidad, id_cod
     const [codigoPostal, setCodigoPostal] = useState(codigo_postal);
     const [codigoPostalAnterior, setCodigoPostalAnterior] = useState(codigo_postal);
     const [localidades, setLocalidades] = useState([]);
+    const [cpaMemory, setCpaMemory] = useState({});
     const inputCPRef = useRef(null);
     
     const fetchLocalidades = useCallback(() => {
@@ -35,6 +36,12 @@ function CPLocalidad({showDialog, localidad, codigo_postal, setLocalidad, id_cod
         
         setCodigoPostalAnterior(codigoPostal);
 
+        if(cpaMemory[cpa]){
+            setLocalidades(cpaMemory[cpa]);
+            setLocalidad(cpaMemory[cpa][0]);
+            return;
+        }
+
         PersonaService
             .get_localidades_by_codigo_postal(cpa)
             .then(response => {
@@ -42,6 +49,10 @@ function CPLocalidad({showDialog, localidad, codigo_postal, setLocalidad, id_cod
                 if(codigoPostalAnterior!==codigoPostal){
                     setLocalidad(response.data[0]);
                 }
+                setCpaMemory({
+                    ...cpaMemory,
+                    [cpa]: response.data
+                });
             })
             .catch(error => {
                 console.error('Error fetching localidades:', error);
