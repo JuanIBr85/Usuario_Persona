@@ -23,7 +23,10 @@ service = PersonaService()
 validar_documento_schema = ValidarDocumentoSchema()
 
 #Lista de tipos válidos de documento
-@api_access(cache=CacheSettings(expiration=60 * 60))
+@api_access(
+        cache=CacheSettings(expiration=60 * 60),
+        limiter=["100 per minute"]    
+    )
 @opciones_bp.route("/tipos_documento", methods=["GET"])
 def obtener_tipos_documento():
     return (
@@ -39,7 +42,10 @@ def obtener_tipos_documento():
     )
 
 #Lista de redes sociales válidas
-@api_access(cache=CacheSettings(expiration=60 * 60))
+@api_access(
+        cache=CacheSettings(expiration=60 * 60),
+        limiter=["100 per minute"]
+    )
 @opciones_bp.route("/redes_sociales", methods=["GET"])
 def obtener_red_social():
 
@@ -53,7 +59,10 @@ def obtener_red_social():
     )
 
 #Estados civiles posibles
-@api_access(cache=CacheSettings(expiration=60 * 60))
+@api_access(
+        cache=CacheSettings(expiration=60 * 60),
+        limiter=["100 per minute"]
+        )
 @opciones_bp.route("/estados_civiles", methods=["GET"])
 def obtener_estado_civile():
 
@@ -67,7 +76,10 @@ def obtener_estado_civile():
     )
 
 #Ocupaciones disponibles
-@api_access(cache=CacheSettings(expiration=60 * 60))
+@api_access(
+        cache=CacheSettings(expiration=60 * 60),
+        limiter=["100 per minute"]
+        )
 @opciones_bp.route("/ocupaciones", methods=["GET"])
 def obtener_ocupacion():
 
@@ -81,7 +93,10 @@ def obtener_ocupacion():
     )
 
 #Niveles educativos posibles
-@api_access(cache=CacheSettings(expiration=60 * 60))
+@api_access(
+        cache=CacheSettings(expiration=60 * 60),
+        limiter=["100 per minute"]
+        )
 @opciones_bp.route("/estudios_alcanzados", methods=["GET"])
 def obtener_estudios_alcanzados():
 
@@ -95,7 +110,10 @@ def obtener_estudios_alcanzados():
     )
 
 #Localidades según el código postal
-@api_access(cache=CacheSettings(expiration=60, params=["codigo_postal"]))
+@api_access(
+        cache=CacheSettings(expiration=60, params=["codigo_postal"]),
+        limiter=["30 per minute"]
+        )
 @opciones_bp.route("/domicilios_postales/localidades", methods=["GET"])
 def buscar_localidades_por_codigo_postal():
     try:
@@ -147,7 +165,10 @@ def buscar_localidades_por_codigo_postal():
         )
 
 #Busca un domicilio postal por código y localidad
-@api_access(cache=CacheSettings(expiration=60, params=["codigo_postal", "localidad"]))
+@api_access(
+        cache=CacheSettings(expiration=60, params=["codigo_postal", "localidad"]),
+        limiter=["30 per minute"]   
+        )
 @opciones_bp.route("/domicilios_postales/buscar", methods=["GET"])
 def buscar_domicilio_postal():
 

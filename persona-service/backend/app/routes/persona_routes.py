@@ -29,7 +29,7 @@ validar_documento_email_schema = ValidarDocumentoEmailSchema()
 
 #Retorna un listado completo de personas registradas
 @api_access(
-    cache=CacheSettings(expiration=30), access_permissions=["persona.admin.ver_persona"]
+    cache=CacheSettings(expiration=60), access_permissions=["persona.admin.ver_persona"]
 )
 @persona_bp.route("/personas", methods=["GET"])
 def listar_personas():
@@ -87,7 +87,7 @@ def _obtener_persona_x_id(id):
     )
 
 #Devuelve la persona vinculada al usuario autenticado
-@api_access()
+@api_access(limiter=["60 per minute"])
 @persona_bp.route("/persona_by_id", methods=["GET"])
 def persona_by_id():
     try:
@@ -108,9 +108,9 @@ def persona_by_id():
             500,
         )
 
-#Recupera los datos extendidos de una persona
+#Recupera los datos de una persona
 @api_access(
-    cache=CacheSettings(expiration=10), access_permissions=["persona.admin.ver_persona"]
+    cache=CacheSettings(expiration=120), access_permissions=["persona.admin.ver_persona"]
 )
 @persona_bp.route("/personas/<int:id>", methods=["GET"])
 def obtener_persona(id):
@@ -133,7 +133,10 @@ def obtener_persona(id):
 
 
 # Crea una nueva persona con su información básica y relacionescrea una persona
-@api_access(access_permissions=["persona.admin.crear_persona"])
+@api_access(
+        access_permissions=["persona.admin.crear_persona"],
+        limiter=["20 per minute", "100 per hour"]
+    )
 @persona_bp.route("/crear_persona", methods=["POST"])
 def crear_persona():
     try:
@@ -187,7 +190,7 @@ def crear_persona():
         )
 
 #Crea la persona asociada al usuario autenticado
-@api_access()  # limiter=["2 per hour"]
+@api_access(limiter=["2 per hour", "5 per day"])
 @persona_bp.route("/crear_persona_restringido", methods=["POST"])
 def crear_persona_restringido():
     try:
@@ -266,7 +269,7 @@ def crear_persona_restringido():
 
 
 #Modifica los datos de una persona existente
-@api_access(access_permissions=["persona.admin.modificar_persona"])
+@api_access(access_permissions=["persona.admin.modificar_persona"],limiter=["30 per minute"])
 @persona_bp.route("/modificar_persona/<int:id>", methods=["PUT"])
 def modificar_persona(id):
     try:
@@ -328,7 +331,7 @@ def modificar_persona(id):
         )
 
 #Modifica la persona vinculada al usuario
-@api_access()
+@api_access(limiter=["30 per minute"])
 @persona_bp.route("/modificar_persona_restringido", methods=["PUT"])
 def modificar_persona_restringido():
     try:
@@ -392,7 +395,10 @@ def modificar_persona_restringido():
 
 
 #Elimina lógicamente una persona
-@api_access(access_permissions=["persona.admin.eliminar_persona"])
+@api_access(
+        access_permissions=["persona.admin.eliminar_persona"],
+        limiter=["10 per minute", "50 per hour"]
+        )
 @persona_bp.route("/borrar_persona/<int:id>", methods=["DELETE"])
 def borrar_persona(id):
 
@@ -432,7 +438,10 @@ def borrar_persona(id):
 
 
 # Restaura una persona previamente eliminada
-@api_access(access_permissions=["persona.admin.restaurar_persona"])
+@api_access(
+        access_permissions=["persona.admin.restaurar_persona"],
+        limiter=["15 per minute", "75 per hour"]
+        )
 @persona_bp.route("/restaurar_persona/<int:id>", methods=["PATCH"])
 def restaurar_persona(id):
 
