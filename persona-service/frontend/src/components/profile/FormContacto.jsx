@@ -12,33 +12,50 @@ import Loading from "@/components/loading/Loading";
 import { SimpleDialog } from "@/components/SimpleDialog";
 import ResponsiveColumnForm from "@/components/ResponsiveColumnForm";
 
+/**
+ * FormContacto
+  *
+ * Formulario utilizado para editar la información de contacto de una persona.
+ * Envía los datos al backend mediante PersonaService y muestra un diálogo de
+  * confirmación o error según corresponda.
+ */
+
+
+
 export default function FormContacto({
-  persona_id,
-  setPersonaData,
-  contacto,
-  redes_sociales,
+  persona_id, // identificador de la persona a modificar
+  setPersonaData, // callback para actualizar el estado del padre
+  contacto, // datos de contacto actuales
+  redes_sociales, // listado de redes sociales disponibles
   showDialog,
-  okDialog,
-  errorDialog
+  okDialog, // función que muestra el diálogo de éxito
+  errorDialog  // función que muestra el diálogo de error
 
 }) {
   const [loading, setLoading] = useState(false);
 
+  // Maneja el envío del formulario
   const handleSubmit = async (event) => {
+    // Obtiene los datos validados del formulario
     const formData = await formSubmitJson(event);
     document.activeElement.blur();
+    // Muestra indicador de carga
     setLoading(true);
 
+    // Llama al servicio para actualizar el contacto en el backend
     PersonaService.editar_restringido({
       contacto: formData,
     })
       .then((response) => {
+        // Actualiza el estado con los datos devueltos
         setPersonaData(response.data);
+        // Notifica éxito al usuario
         okDialog();
-      }) 
+      })
       .catch((error) => {
+        // Registra el error y muestra el mensaje correspondiente
         console.error("Error updating domicilio:", error?.data);
-        
+
         errorDialog(error?.data?.error?.server || error?.data?.error);
       })
       .finally(() => setLoading(false));
@@ -106,7 +123,7 @@ export default function FormContacto({
             placeholder="Ingresa el email de contacto"
             validationMessage="Email inválido"
             value={contacto?.email_contacto || ""}
-            
+
             required
           />
           <InputValidate
