@@ -23,7 +23,7 @@ service = PersonaService()
 validar_documento_schema = ValidarDocumentoSchema()
 
 #Lista de tipos válidos de documento
-@api_access(cache=CacheSettings(expiration=1))
+@api_access(cache=CacheSettings(expiration=60 * 60))
 @opciones_bp.route("/tipos_documento", methods=["GET"])
 def obtener_tipos_documento():
     return (

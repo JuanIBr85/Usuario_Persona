@@ -9,26 +9,26 @@ class ServiceRequest:
     """
 
     @staticmethod
-    def request(method: str, url: str, timeout: int = 15, **kwargs: Any) -> requests.Response:
+    def request(method: str, url: str, timeout: int = 30, **kwargs: Any) -> requests.Response:
         """Request base"""
         return requests.request(method, url, timeout=timeout, **kwargs)
 
     @staticmethod
-    def get(url: str, timeout: int = 15, **kwargs: Any) -> requests.Response:
+    def get(url: str, timeout: int = 30, **kwargs: Any) -> requests.Response:
         """Request GET"""
         return ServiceRequest.request("GET", url, timeout=timeout, **kwargs)
     
     @staticmethod
-    def post(url: str, timeout: int = 15, **kwargs: Any) -> requests.Response:
+    def post(url: str, timeout: int = 30, **kwargs: Any) -> requests.Response:
         """Request POST"""
         return ServiceRequest.request("POST", url, timeout=timeout, **kwargs)
     
     @staticmethod
-    def put(url: str, timeout: int = 15, **kwargs: Any) -> requests.Response:
+    def put(url: str, timeout: int = 30, **kwargs: Any) -> requests.Response:
         """Request PUT"""
         return ServiceRequest.request("PUT", url, timeout=timeout, **kwargs)
     
     @staticmethod
-    def delete(url: str, timeout: int = 15, **kwargs: Any) -> requests.Response:
+    def delete(url: str, timeout: int = 30, **kwargs: Any) -> requests.Response:
         """Request DELETE"""
         return ServiceRequest.request("DELETE", url, timeout=timeout, **kwargs)   

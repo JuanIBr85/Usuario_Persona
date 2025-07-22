@@ -59,7 +59,7 @@ class EndpointsSearchService:
                 service_prefix = service.service_prefix
                 response = ServiceRequest.get(
                     f"{service_url}/component_service/endpoints",
-                    timeout=10,
+                    timeout=30,
                 ).json()
 
                 # Resetea contador de errores en éxito
