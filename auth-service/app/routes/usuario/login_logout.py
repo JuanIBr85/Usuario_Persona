@@ -114,7 +114,8 @@ def login1():
 
 @bp.route("/logout", methods=["POST"])
 @api_access(
-    is_public=True#SE PUSO EN TRUE POR UNA RAZON Y SE PUSO UNA CONDICION PARA EVITAR QUE UN USUARIO SIN LOGIN PASARA
+    is_public=True,#SE PUSO EN TRUE POR UNA RAZON Y SE PUSO UNA CONDICION PARA EVITAR QUE UN USUARIO SIN LOGIN PASARA
+    limiter=["5 per minute", "20 per hour"]
 )
 def logout_usuario() -> tuple[dict[Any, Any], Any] | tuple[dict[Any, Any], Literal[500]]:
     """
@@ -270,7 +271,10 @@ def modificar_email_usuario():
         session.close()
 
 @bp.route("/confirmar-modificar-email", methods=["GET"])
-@api_access(is_public=True)
+@api_access(
+        is_public=True,
+        limiter=["5 per minute", "10 per hour"]    
+        )
 def confirmar_cambio_email():
     """
     Endpoint para la confirmación del mail que envia la ruta /cambiar-email.
@@ -364,7 +368,10 @@ def eliminar_usuario():
         session.close()
 
 @bp.route("/confirmar-eliminacion", methods=["GET"])
-@api_access(is_public=True)
+@api_access(
+            is_public=True,
+            limiter=["2 per minute", "10 per hour"]
+        )
 def confirmar_eliminacion_usuario():
     """
     Envia un mail para que el usuario confirme la eliminacion de la cuenta.
