@@ -43,6 +43,10 @@ def insert_initial_services(target, connection, **kw):
         for service_data in services:
             logging.info(f"Conectando con {service_data['service_name']}...")
             info = get_component_info(service_data["service_url"], wait=True)
+            
+            if info is None:
+                logging.error(f"Error al conectarse con {service_data['service_name']}")
+                continue
 
             service = ServiceModel(
                 **info["service"], service_url=service_data["service_url"]

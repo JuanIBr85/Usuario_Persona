@@ -62,3 +62,20 @@ def get_research_status():
 def stop_research():
     endpoints_search_service.stop_search()
     return make_response(ResponseStatus.SUCCESS, "Busqueda de endpoints detenida"), 200
+
+
+
+
+
+@bp.route("/get_all_endpoints", methods=["GET"])
+@cp_api_access(is_public=True)
+def get_all_endpoints():
+    """
+    Obtiene un listado completo de los endpoints de los servicios que estan en componentes cargados
+    """
+    try:
+        endpoints = list(map(lambda x: x.to_dict(), endpoints_search_service.get_services_route().values()))
+        return make_response(ResponseStatus.SUCCESS, "Endpoints obtenidos correctamente", endpoints), 200
+    except Exception as e:
+        return make_response(ResponseStatus.ERROR, "Error obteniendo endpoints", e.__class__.__name__), 500
+        

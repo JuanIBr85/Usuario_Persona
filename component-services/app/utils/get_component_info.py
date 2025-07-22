@@ -15,6 +15,10 @@ def get_component_info(service_url, wait=False) -> list[str] | None:
             # logging.error(msg=f"Error al conectarse con {service_url}: {str(e)}")
             #Si no se espera, o se han intentado 10 veces, sale
             error_cnt += 1
-            if not wait or error_cnt > 10:
+            if not wait and error_cnt > 10:
                 break
+            
+            if error_cnt%30==0:
+                logging.warning(msg=f"Error al conectarse con {service_url}: {str(e)}")
+
             time.sleep(1)

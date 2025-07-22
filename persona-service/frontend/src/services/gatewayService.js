@@ -147,4 +147,17 @@ export const gatewayService = {
       useToken: true,
     });
   },
+
+  /**
+   * Obtiene todos los endpoints disponibles
+   * @returns {Promise}
+   */
+  getAllEndpoints: async () => {
+    return fetchService.fetch({
+      url: `${ServiceURL.control}/gateway/get_all_endpoints`,
+      method: HttpMethod.GET,
+      showError: gatewayService.showError,
+      useToken: true,
+    });
+  },
 };

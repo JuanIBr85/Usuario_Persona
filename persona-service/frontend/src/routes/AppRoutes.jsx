@@ -28,6 +28,7 @@ import CreatePerfil from "@/pages/user/CreatePerfil";
 import OTPRegisterRecovery from "@/pages/auth/OTPRegisterRecovery";
 import SearchProfile from "@/pages/user/SearchProfile";
 import WaitingView from "@/pages/auth/WaitingView";
+import ComponentGateway from "@/pages/component/ComponentGateway";
 /**
  * Componente que define todas las rutas de la aplicación utilizando react-router-dom.
  * Cada ruta se asocia con un componente de página específico para renderizar.
@@ -53,6 +54,7 @@ function AppRoutes() {
       
 
       <Route path="adminservices/endpoints-research/" element={<EndpointsResearch />} />
+      <Route path="adminservices/gateway/" element={<ComponentGateway />} />
 
       <Route path="persondetails/:id" element={<PersonDetails />} />
       <Route path="faq/privacypolicy" element={<AboutPrivacyPolicy />} />
