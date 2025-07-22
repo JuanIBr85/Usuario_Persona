@@ -2,8 +2,7 @@ from flask_mail import Message
 from flask import current_app
 from app.extensions import mail
 from app.utils.render_template_email import render_email_template
-from app.utils.jwt import generar_token_restauracion,generar_token_eliminacion,generar_token_dispositivo,generar_token_modificar_email
-import random
+from app.utils.jwt import generar_token_eliminacion,generar_token_dispositivo,generar_token_modificar_email,generar_token_restauracion_usuario
 
 
 def enviar_codigo_reset_por_email(usuario, codigo_otp):
@@ -124,6 +123,10 @@ def enviar_email_validacion_dispositivo(usuario, user_agent, ip):
         <p style="font-size:14px;word-break:break-all;">
             <a href="{enlace}" style="color:#80bfff;text-decoration:underline;">{enlace}</a>
         </p>
+
+        <p style="font-size:13px;margin-top:20px;">
+            Este token es personal y confidencial. No lo compartas con nadie. Si no fuiste vos quien lo solicitó, ignorá este mensaje.
+    </p>
     """
 
     # ───────── 2) Render final ─────────
@@ -159,6 +162,10 @@ def enviar_solicitud_restauracion_admin(usuario):
             <a href="{enlace}" style="background-color:#FFFFFF; color:#000000; padding:12px 24px;
             text-decoration:none; border-radius:5px; font-weight:bold;">Restaurar cuenta</a>
         </p>
+
+        <p style="font-size:13px;margin-top:20px;">
+        Este token es personal y confidencial. No lo compartas con nadie. Si no fuiste vos quien lo solicitó, ignorá este mensaje.
+    </p>
     """
 
     html = render_email_template(saludo, cuerpo, extra, "Este enlace expirará en 30 minutos.")
@@ -171,7 +178,9 @@ def enviar_solicitud_restauracion_admin(usuario):
     mail.send(msg)
 
 
-def enviar_mail_confirmacion_usuario(usuario, enlace):
+def enviar_mail_restauracion_usuario(usuario):
+    token_usuario = generar_token_restauracion_usuario(usuario.email_usuario)
+    enlace = f"{current_app.config['USER_RESTORE_CONFIRM_URL']}?token={token_usuario}"
     saludo = f"<p>Hola <strong>{usuario.nombre_usuario}</strong>,</p>"
     cuerpo = """
         <p>Recibimos una solicitud para restaurar tu cuenta.</p>
@@ -182,6 +191,10 @@ def enviar_mail_confirmacion_usuario(usuario, enlace):
             <a href="{enlace}" style="background-color:#FFFFFF;color:#000000;padding:12px 24px;
             text-decoration:none; border-radius:5px;font-weight:bold;">Confirmar restauración</a>
         </p>
+
+                <p style="font-size:13px;margin-top:20px;">
+        Este token es personal y confidencial. No lo compartas con nadie. Si no fuiste vos quien lo solicitó, ignorá este mensaje.
+    </p>
     """
 
     html = render_email_template(saludo, cuerpo, extra)
@@ -243,6 +256,11 @@ def enviar_email_modificar_email(usuario,nuevo_email):
         <p style="font-size:14px;word-break:break-all;">
             <a href="{enlace}" style="color:#80bfff;text-decoration:underline;">{enlace}</a>
         </p>
+
+                <p style="font-size:13px;margin-top:20px;">
+        Este token es personal y confidencial. No lo compartas con nadie. Si no fuiste vos quien lo solicitó, ignorá este mensaje.
+    </p>
+
     """
 
     
@@ -275,7 +293,7 @@ def enviar_email_confirmacion_eliminacion(usuario, user_agent, ip_solicitud, jti
               <path d="M11 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5z"/>
               <path d="M2 13s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H2z"/>
             </svg>
-            Hola <strong>{usuario.nombre_usuario}</strong>,
+            <span>Hola <strong>{usuario.nombre_usuario}</strong></span>
         </p>
     """
 
@@ -316,6 +334,10 @@ def enviar_email_confirmacion_eliminacion(usuario, user_agent, ip_solicitud, jti
         <p style="font-size:14px;word-break:break-all;">
             <a href="{enlace}" style="color:#80bfff;text-decoration:underline;">{enlace}</a>
         </p>
+
+        <p style="font-size:13px;margin-top:20px;">
+        Este código es personal y confidencial. No lo compartas con nadie. Si no fuiste vos quien lo solicitó, ignorá este mensaje.
+    </p>
     """
 
     html = render_email_template(

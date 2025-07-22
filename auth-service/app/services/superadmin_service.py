@@ -385,8 +385,8 @@ class SuperAdminService:
             if not logs:
                 return ResponseStatus.FAIL, "No se encontraron logs para este usuario", None, 404
 
-            data = UsuarioLog(many=True).dump(logs)
-            return ResponseStatus.SUCCESS, "Logs obtenidos con éxito", data, 200
+            
+            return ResponseStatus.SUCCESS, "Logs obtenidos con éxito", logs, 200
 
         except Exception as e:
             session.rollback()

@@ -143,7 +143,15 @@ Campos:
 - email (email): Obligatorio. Usado para iniciar el flujo de recuperación de contraseña.
 """
 class RecuperarPasswordSchema(Schema):
-    email = fields.Email(required=True)
+    email = fields.Email(
+        required=True,
+         validate=[validate.Regexp( r"^[^+\s]+@[^\s@]+\.[^\s@]+$",
+         error="El email no puede contener espacios ni alias con '+'."),
+         validate.Length(max=60, error="El Email debe tener menos de 60 caracteres.")],
+        error_messages={
+            "required": "El email es obligatorio.",
+            "invalid": "Debe ser un email válido."}
+    )
 
 """
 Schema: ResetPasswordSchema

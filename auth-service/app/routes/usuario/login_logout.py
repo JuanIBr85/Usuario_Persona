@@ -12,13 +12,13 @@ from common.utils.response import make_response, ResponseStatus
 from app.utils.jwt import verificar_token_modificar_email,verificar_token_eliminacion
 from app.extensions import get_redis
 import logging
-
 bp = Blueprint(
     "usuario_login_logout", __name__, cli_group="usuario"
 )
 
 usuario_service = UsuarioService()
 logger = logging.getLogger(__name__)
+logger_local = logging.getLogger("auth-service")
 """
 Módulo de autenticación de usuario.
 
@@ -62,10 +62,11 @@ def login1():
 
     try:
 
-        logger.info("→ [ROUTE] Solicitud de login recibida")
+        logger.info("[ROUTE] Solicitud de login recibida")
         data = request.get_json()
+        logger_local.debug("Datos de entrada: %s", request.json)
         if not data:
-            logger.warning("→ [ROUTE] No se recibieron datos de entrada")
+            logger.warning("[ROUTE] No se recibieron datos de entrada")
             return make_response(
                 ResponseStatus.FAIL,
                 "Datos de entrada requeridos",
@@ -74,28 +75,28 @@ def login1():
         
         errors = usuario_service.schema_login.validate(data)
         if errors:
-            logger.warning("→ [ROUTE] Datos inválidos: {}".format(errors))
+            logger.warning("[ROUTE] Datos inválidos: {}".format(errors))
             return make_response(
                 ResponseStatus.FAIL,
                 "Datos inválidos",
                 errors,
             )
     except Exception as e:
-        logger.error("→ [ROUTE] Excepción en login", exc_info=e)
+        logger.error("[ROUTE] Excepción en login", exc_info=e)
 
     session = SessionLocal()
     try:
         user_agent = ComponentRequest.get_user_agent()
         ip = ComponentRequest.get_ip()
-        logger.debug(f"→ [ROUTE] IP: {ip} | User-Agent: {user_agent}")
+        logger.error(f"[ROUTE] IP: {ip} | User-Agent: {user_agent}")
         status, mensaje, data, code = usuario_service.login_usuario(
             session, data, user_agent, ip
         )
-        logger.info(f"→ [ROUTE] Login procesado, status: {status}, code: {code}")
+        logger.info(f"[ROUTE] Login procesado, status: {status}, code: {code}")
         return make_response(status, mensaje, data), code
 
     except Exception as e:
-        logger.error("→ [ROUTE] Excepción en login", exc_info=e)
+        logger.error("[ROUTE] Excepción en login", exc_info=e)
         try:
             session.rollback()
         except Exception as e:
@@ -383,11 +384,14 @@ def confirmar_eliminacion_usuario():
     session = SessionLocal()
     token = request.args.get("token")
     try:
-        if not token:
+        if not token:  
+            logger_local.debug("token vacio?: %s", token)
             raise ValueError("Token faltante")
 
         datos = verificar_token_eliminacion(token)
+        logger_local.debug("Datos decodificados: %s", datos)
         if not datos:
+            logger_local.debug("Sin Datos : %s", datos)
             raise ValueError("Token inválido o expirado")
 
         usuario_id = int(datos.get("sub"))
@@ -407,6 +411,7 @@ def confirmar_eliminacion_usuario():
 
         status, mensaje, _, _ = usuario_service.eliminar_usuario(session, usuario_id)
         if status != ResponseStatus.SUCCESS:
+            logger_local.debug("status  success: %s", mensaje)
             raise ValueError(mensaje)
 
         admin_email = current_app.config['ADMIN_EMAIL']
@@ -414,7 +419,9 @@ def confirmar_eliminacion_usuario():
         return render_template("eliminacion_exitosa.html", admin_email=admin_email)
 
     except Exception as e:
+        logger_local.debug("antes del rollback: %s", str(e),exc_info=e)
         session.rollback()
+        logger_local.error("dsp del rollback: %s", str(e),exc_info=e)
         return render_template("eliminacion_fallida.html", mensaje=str(e)), 400
 
     finally:

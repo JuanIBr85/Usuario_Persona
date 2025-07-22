@@ -1,14 +1,10 @@
-from flask import Blueprint, Response, request, current_app,render_template
+from flask import Blueprint, Response, request
 import json
 from app.database.session import SessionLocal
 from app.services.superadmin_service import SuperAdminService
 from common.decorators.api_access import api_access
 from common.models.cache_settings import CacheSettings
-from app.models import Usuario
 from common.utils.response import make_response, ResponseStatus
-from app.utils.jwt import generar_token_confirmacion_usuario,verificar_token_restauracion
-from app.utils.email import enviar_mail_confirmacion_usuario
-from jwt import ExpiredSignatureError,InvalidTokenError
 
 superadmin_bp = Blueprint("admin", __name__)
 
@@ -461,57 +457,10 @@ def ver_usuarios_eliminados():
         return make_response(ResponseStatus.ERROR,"Error al cargar los usuarios eliminados",str(e),500)
     finally:
         session.close()
-        
-# =============================
-# Restaurar Usuario
-# =============================
-@superadmin_bp.route("/restaurar-usuario", methods=["GET"])
-@api_access(
-    is_public=True,
-    limiter=["3 per minute"],
-    access_permissions=["auth.admin.restaurar_usuario"],
-    cache=CacheSettings(expiration=600, params=["token"]),
-    )
-def restaurar_usuario_desde_token():
-    """
-    Restaura un usuario eliminado utilizando un token enviado por email.
 
-    Query Params:
-        - token: token JWT de restauración
-
-    Returns:
-        - 200 si se envía el correo de confirmación al usuario.
-        - 400 si el token es inválido o ha expirado.
-        - 404 si el usuario no existe.
-    """
-    session = SessionLocal()
-    token = request.args.get("token")
-    try:
-        email = verificar_token_restauracion(token, tipo="restauracion_admin")
-        if not email:
-            return render_template("token_invalido.html"), 400
-
-        usuario = session.query(Usuario).filter_by(email_usuario=email, eliminado=True).first()
-
-        if not usuario:
-            return render_template("usuario_no_encontrado.html"), 404
-
-        # 1) Generar nuevo token para que el usuario confirme
-        token_usuario = generar_token_confirmacion_usuario(email)
-        enlace_usuario = f"{current_app.config['USER_RESTORE_CONFIRM_URL']}?token={token_usuario}"
-
-        # 2) Enviar mail de confirmación al usuario
-        enviar_mail_confirmacion_usuario(usuario, enlace_usuario)
-
-        return render_template("correo_enviado_confirmacion.html", email=email), 200
-
-    except ExpiredSignatureError:
-        return "El enlace ha expirado.", 400
-    except InvalidTokenError:
-        return "Token inválido.", 400
-    finally:
-        session.close()
-
+# ========================================
+# logs de acciones de la db
+# ========================================
 
 @superadmin_bp.route("/logs/<int:usuario_id>", methods=["GET"])
 @api_access(

@@ -16,10 +16,14 @@ from app.utils.jwt import decodificar_token_verificacion,generar_token_dispositi
 from app.utils.logs_utils import log_usuario_accion
 from app.extensions import get_redis
 from app.utils.otp_manager import revocar_refresh_token
+import logging
+
 bp = Blueprint(
     "usuario_recuperacion_pass_otp", __name__, cli_group="usuario"
 )
 
+logger = logging.getLogger(__name__)
+logger_local = logging.getLogger("auth-service")
 usuario_service = UsuarioService()
 
 """
@@ -152,7 +156,7 @@ def verificar_otp():
 @bp.route("/reset-password-con-codigo", methods=["POST"])
 @api_access(
     is_public=True, 
-    limiter=["3 per day"],
+    limiter=["3 per minute", "12 per day"],
 )
 def reset_con_otp():
     """
@@ -358,7 +362,7 @@ def refresh_token():
 @bp.route("/confirmar-restauracion", methods=["GET"])
 @api_access(
     is_public=True,
-    limiter=["1 per minute", "5 per day"]
+    limiter=["3 per minute", "5 per day"]
 )
 def confirmar_restauracion():
     """
@@ -376,23 +380,29 @@ def confirmar_restauracion():
     """
     token = request.args.get("token")
     try:
-        email = verificar_token_restauracion_usuario(token)
-        if not email:
-            return make_response(ResponseStatus.FAIL, "Token inválido o expirado", None, 400)
-        
         session = SessionLocal()
+        email = verificar_token_restauracion_usuario(token, tipo="restauracion_usuario")
+        if not email:
+            return render_template("token_invalido.html")
+            
         usuario = session.query(Usuario).filter_by(email_usuario=email, eliminado=True).first()
-
         if not usuario:
-            return "Usuario no encontrado o ya restaurado.", 404
-
+            return render_template("usuario_no_encontrado.html")
+            
         usuario.eliminado = False
         usuario.deleted_at = None
         session.commit()
         log_usuario_accion(session, usuario.id_usuario, "Restauración de cuenta exitosa.")
         return render_template("cuenta_restaurada.html")
 
-    except ExpiredSignatureError:
-        return "El enlace ha expirado.", 400
-    except InvalidTokenError:
-        return "Token inválido.", 400
+    except Exception as e:
+        logger.error("Error inesperado al confirmar restauración")
+        logger_local.debug("Error no manejado %s", str(e))
+        return make_response(
+            ResponseStatus.ERROR,
+            "Ocurrió un error inesperado al procesar tu solicitud.",
+            str(e),
+            500
+        )
+    finally:
+        session.close()

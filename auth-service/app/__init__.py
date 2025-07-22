@@ -24,6 +24,7 @@ from app.utils.actualizar_roles_permisos import actualizar_roles
 from app.core.logging_config import configurar_logger_global
 from app.core.error_handler import registrar_manejador_errores
 import logging
+from app.core.logging_config import configurar_logger_local
 logger = logging.getLogger(__name__)
 def create_app():
     #monkey patch para no lanzar el log de mails.
@@ -45,7 +46,9 @@ def create_app():
     #logger general para excepciones no manejadas
     configurar_logger_global()
     registrar_manejador_errores(app_flask)
-
+    #logger local para debug
+    auth_logger = configurar_logger_local()
+    auth_logger.info("Logger de auth listo.")
 
     if os.environ.get("WERKZEUG_RUN_MAIN") != "true":
         init_app()

@@ -14,7 +14,6 @@ from app.utils.jwt import (
     generar_token_dispositivo,
     generar_token_reset,
     crear_token_refresh,
-    create_access_token,
 )
 from app.schemas.usuarios_schema import (
     LoginSchema,
@@ -30,7 +29,7 @@ from app.models.permisos import Permiso
 from app.utils.email import (
     enviar_codigo_reset_por_email,
     enviar_codigo_por_email_registro,
-    enviar_solicitud_restauracion_admin,
+    enviar_mail_restauracion_usuario,
     enviar_email_validacion_dispositivo,
     enviar_email_modificar_email,
     enviar_email_confirmacion_eliminacion,
@@ -122,8 +121,10 @@ class UsuarioService(ServicioBase):
                 email = data_validada["email_usuario"].lower()
                 #Prevengo que se envie un correo de restauracion si ya se envio
                 lock_verificar_dispositivo = get_redis().set(f"lock:restauracion:{email}", "true", ex=60*30, nx=True)
+                logger.debug("email %s", email)
                 if lock_verificar_dispositivo:
-                    enviar_solicitud_restauracion_admin(usuario_existente)
+                    logger.debug("enviando email %s",usuario_existente)
+                    enviar_mail_restauracion_usuario(usuario_existente)
                 return (
                     ResponseStatus.FAIL,
                     "Ya existe una cuenta con este email desactivada. Verifique su email.",

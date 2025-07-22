@@ -5,11 +5,14 @@ from app.database.session import SessionLocal
 from app.services.usuario_service import UsuarioService
 from common.decorators.api_access import api_access
 from common.utils.response import make_response, ResponseStatus
+import logging
+from logging import getLogger
 
 bp = Blueprint(
     "usuario_registro_verificacion", __name__, cli_group="usuario"
 )
-
+logger = logging.getLogger(__name__)
+logger_local = getLogger("auth-service")
 usuario_service = UsuarioService()
 
 """
@@ -65,7 +68,7 @@ def iniciar_registro_usuario():
         )
         return make_response(status, mensaje, contenido), codigo
     except Exception as e:
-        logging.error(f"Error al iniciar el registro: {str(e)}")
+        logger_local.debug(f"Error al iniciar el registro: {str(e)}")
         session.rollback()
         return make_response(
             ResponseStatus.FAIL,

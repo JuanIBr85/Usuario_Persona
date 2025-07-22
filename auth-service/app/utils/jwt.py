@@ -100,20 +100,7 @@ def verificar_refresh_token_valido(token: str) -> Tuple[Optional[dict], Optional
 
     return payload, None
 
-
-
-def generar_token_restauracion(email: str) -> str:
-    payload = {
-        "sub": email,
-        "email": email,
-        "type": "restauracion_admin",
-        "exp": datetime.now(timezone.utc) + timedelta(minutes=720),
-        "jti": str(uuid4()),
-    }
-    return encode(payload, getenv("JWT_SECRET_KEY"), algorithm="HS256")
-
-
-def generar_token_confirmacion_usuario(email: str) -> str:
+def generar_token_restauracion_usuario(email: str) -> str:
     payload = {
         "sub": email,
         "email": email,
@@ -122,20 +109,6 @@ def generar_token_confirmacion_usuario(email: str) -> str:
         "jti": str(uuid4()),
     }
     return encode(payload, getenv("JWT_SECRET_KEY"), algorithm="HS256")
-
-def verificar_token_restauracion(token: str, tipo: str = "restauracion_admin") -> str | None:
-    try:
-        payload = decode(token, getenv("JWT_SECRET_KEY"), algorithms=["HS256"])
-        if payload.get("type") != tipo:
-            logger.error("[verificar_token_restauracion] Type inválido", exc_info=None)
-            return None
-        return payload.get("email")
-    except ExpiredSignatureError as e:
-        logger.error("[verificar_token_restauracion] Token expirado", exc_info=e)
-        return None
-    except InvalidTokenError as e:
-        logger.error("[verificar_token_restauracion] Token inválido", exc_info=e)
-        return None
     
 def verificar_token_restauracion_usuario(token: str, tipo: str = "restauracion_usuario") -> str | None:
     try:
