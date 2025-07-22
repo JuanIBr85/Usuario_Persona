@@ -126,13 +126,13 @@ function PersonTable({
         {persons.length > 0 ? (
           persons.map((user) => (
             <TableRow key={user.id}>
-              <TableCell className="font-medium">
+              <TableCell className="font-medium truncate max-w-40">
                 {user.nombre} {user.apellido}
               </TableCell>
               <TableCell>{user.tipo_documento}</TableCell>
               <TableCell>{user.nro_documento}</TableCell>
               <TableCell>{formatearFecha(user.fecha_nacimiento)}</TableCell>
-              <TableCell>
+              <TableCell className="truncate max-w-40">
                 {users.find((u) => u.id === user.usuario_id)
                   ? users.find((u) => u.id === user.usuario_id).email_usuario
                   : "No vinculado"}
