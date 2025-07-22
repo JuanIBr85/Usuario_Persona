@@ -66,6 +66,7 @@ function AdminPersons() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15;
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
 
   // Usar el hook usePersonas para manejar la lógica de personas
   // personas y setPersonas hacen referencias a personas, el nombre debe cambiarse a personas
@@ -116,15 +117,83 @@ function AdminPersons() {
     });
   }, [personas, filtro]);
 
+  // Ordenar las personas filtradas antes de paginar para que el orden afecte a toda la lista
+  const sortedPersonas = useMemo(() => {
+    if (!sortConfig.key) return personasFiltradas;
+
+    return [...personasFiltradas].sort((a, b) => {
+      if (sortConfig.key === "nombre") {
+
+        // Ordenar por apellido (y nombre como desempate)
+        const nombreA = `${a.apellido} ${a.nombre}`.toLowerCase();
+        const nombreB = `${b.apellido} ${b.nombre}`.toLowerCase();
+
+        if (nombreA < nombreB) return sortConfig.direction === "asc" ? -1 : 1;
+        if (nombreA > nombreB) return sortConfig.direction === "asc" ? 1 : -1;
+        return 0;
+      }
+
+      if (sortConfig.key === "tipo_documento") {
+        const tipoA = a.tipo_documento?.toLowerCase() || "";
+        const tipoB = b.tipo_documento?.toLowerCase() || "";
+
+        if (tipoA < tipoB) return sortConfig.direction === "asc" ? -1 : 1;
+        if (tipoA > tipoB) return sortConfig.direction === "asc" ? 1 : -1;
+        return 0;
+      }
+
+      if (sortConfig.key === "nro_documento") {
+        const nroA = a.nro_documento || "";
+        const nroB = b.nro_documento || "";
+
+        const numA = parseInt(nroA.replace(/\D/g, ""));
+        const numB = parseInt(nroB.replace(/\D/g, ""));
+
+        if (!isNaN(numA) && !isNaN(numB)) {
+          return sortConfig.direction === "asc" ? numA - numB : numB - numA;
+        }
+
+        if (nroA < nroB) return sortConfig.direction === "asc" ? -1 : 1;
+        if (nroA > nroB) return sortConfig.direction === "asc" ? 1 : -1;
+        return 0;
+      }
+
+      if (sortConfig.key === "fecha_nacimiento") {
+        const fechaA = a.fecha_nacimiento || "0000-00-00";
+        const fechaB = b.fecha_nacimiento || "0000-00-00";
+
+        const dateA = fechaA === "0000-00-00" ? new Date(0) : new Date(fechaA);
+        const dateB = fechaB === "0000-00-00" ? new Date(0) : new Date(fechaB);
+
+        if (dateA < dateB) return sortConfig.direction === "asc" ? -1 : 1;
+        if (dateA > dateB) return sortConfig.direction === "asc" ? 1 : -1;
+        return 0;
+      }
+
+      if (sortConfig.key === "usuario") {
+        const usuarioA =
+          usuarios.find((u) => u.id === a.usuario_id)?.email_usuario?.toLowerCase() || "";
+        const usuarioB =
+          usuarios.find((u) => u.id === b.usuario_id)?.email_usuario?.toLowerCase() || "";
+
+        if (usuarioA < usuarioB) return sortConfig.direction === "asc" ? -1 : 1;
+        if (usuarioA > usuarioB) return sortConfig.direction === "asc" ? 1 : -1;
+        return 0;
+      }
+
+      return 0;
+    });
+  }, [personasFiltradas, sortConfig, usuarios]);
+
   // Calcular el número total de páginas
-  const totalPages = Math.ceil(personasFiltradas.length / itemsPerPage);
+  const totalPages = Math.ceil(sortedPersonas.length / itemsPerPage);
 
   // Obtener solo los items de la página actual usando useMemo para optimizar
   const currentItems = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = Math.min(startIndex + itemsPerPage, personasFiltradas.length);
-    return personasFiltradas.slice(startIndex, endIndex);
-  }, [personasFiltradas, currentPage]);
+    const endIndex = Math.min(startIndex + itemsPerPage, sortedPersonas.length);
+    return sortedPersonas.slice(startIndex, endIndex);
+  }, [sortedPersonas, currentPage]);
 
   // Función para cambiar de página
   const handlePageChange = (page) => {
@@ -271,15 +340,15 @@ function AdminPersons() {
     } catch (error) {
       console.error("Error al crear persona:", error);
 
-      try{
-        for(let key in error?.data?.error){
+      try {
+        for (let key in error?.data?.error) {
           showAlert({
             title: "Error",
             description: error?.data?.error[key],
             variant: "destructive"
           });
         }
-      }catch(err){
+      } catch (err) {
         showAlert({
           title: "Error",
           description: "Error al crear persona",
@@ -315,10 +384,10 @@ function AdminPersons() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="w-5 h-5 text-primary" />
-              Personas Cargadas 
+              Personas Cargadas
               {filtro && (
                 <span className="ml-2 text-sm text-muted-foreground font-normal">
-                  {personasFiltradas.length} resultado{personasFiltradas.length !== 1 ? 's' : ''} encontrado{personasFiltradas.length !== 1 ? 's' : ''}
+                  {sortedPersonas.length} resultado{sortedPersonas.length !== 1 ? 's' : ''} encontrado{sortedPersonas.length !== 1 ? 's' : ''}
                 </span>
               )}
             </CardTitle>
@@ -336,10 +405,12 @@ function AdminPersons() {
 
             {/* Tabla con personas filtradas */}
             <div className="overflow-auto border p-3 rounded-md shadow-sm">
-              {personasFiltradas.length > 0 ? (
+              {sortedPersonas.length > 0 ? (
                 <PersonTable
                   persons={currentItems}
                   users={usuarios}
+                  sortConfig={sortConfig}
+                  onSortChange={setSortConfig}
                   onEdit={(user) => {
                     setEditingUser(user);
                     showAlert(null); // Limpiar alertas previas
@@ -364,11 +435,10 @@ function AdminPersons() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className={`h-9 px-4 flex items-center gap-1 ${
-                          currentPage === 1
-                            ? "opacity-50 pointer-events-none"
-                            : "cursor-pointer"
-                        }`}
+                        className={`h-9 px-4 flex items-center gap-1 ${currentPage === 1
+                          ? "opacity-50 pointer-events-none"
+                          : "cursor-pointer"
+                          }`}
                         onClick={goToPreviousPage}
                         disabled={currentPage === 1}
                       >
@@ -407,11 +477,10 @@ function AdminPersons() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className={`h-9 px-4 flex items-center gap-1 ${
-                          currentPage === totalPages
-                            ? "opacity-50 pointer-events-none"
-                            : "cursor-pointer"
-                        }`}
+                        className={`h-9 px-4 flex items-center gap-1 ${currentPage === totalPages
+                          ? "opacity-50 pointer-events-none"
+                          : "cursor-pointer"
+                          }`}
                         onClick={goToNextPage}
                         disabled={currentPage === totalPages}
                       >
