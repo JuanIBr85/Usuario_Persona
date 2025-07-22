@@ -124,12 +124,11 @@ function AdminPersons() {
     return [...personasFiltradas].sort((a, b) => {
       if (sortConfig.key === "nombre") {
 
-        // Ordenar por apellido (y nombre como desempate)
-        const nombreA = `${a.apellido} ${a.nombre}`.toLowerCase();
-        const nombreB = `${b.apellido} ${b.nombre}`.toLowerCase();
+        const fullNameA = `${a.nombre} ${a.apellido}`.trim().toLowerCase();
+        const fullNameB = `${b.nombre} ${b.apellido}`.trim().toLowerCase();
 
-        if (nombreA < nombreB) return sortConfig.direction === "asc" ? -1 : 1;
-        if (nombreA > nombreB) return sortConfig.direction === "asc" ? 1 : -1;
+        if (fullNameA < fullNameB) return sortConfig.direction === "asc" ? -1 : 1;
+        if (fullNameA > fullNameB) return sortConfig.direction === "asc" ? 1 : -1;
         return 0;
       }
 

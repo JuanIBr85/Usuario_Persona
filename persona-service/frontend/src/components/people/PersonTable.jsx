@@ -47,7 +47,7 @@ function PersonTable({
   const [countdown, setCountdown] = useState(3);
 
   // Los datos ya vienen ordenados desde el componente padre
-  const sortedPersons = persons;
+  //const sortedPersons = persons;
 
   // Función para manejar el click en un encabezado ordenable
   // Informa al componente padre que cambió la columna o dirección de orden
@@ -123,8 +123,8 @@ function PersonTable({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {sortedPersons.length > 0 ? (
-          sortedPersons.map((user) => (
+        {persons.length > 0 ? (
+          persons.map((user) => (
             <TableRow key={user.id}>
               <TableCell className="font-medium">
                 {user.nombre} {user.apellido}
