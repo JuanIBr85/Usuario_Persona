@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import {
   Select,
   SelectTrigger,
@@ -7,6 +7,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export default function UserSelectWithSearch({
   usuarios = [],
@@ -18,6 +19,19 @@ export default function UserSelectWithSearch({
   label = "",
 }) {
   const [userSearch, setUserSearch] = useState("");
+  const [debouncedUserSearch, setDebouncedUserSearch] = useState("");
+  const inputRef = useRef(null);
+
+  useDebounce(()=>{
+    setUserSearch(debouncedUserSearch);
+  }, 500, [debouncedUserSearch]);
+
+  // Mantener el foco en el input después de actualizar
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [userSearch]);
 
   const filteredUsuarios = useMemo(() => {
     if (!userSearch) return usuarios;
@@ -52,9 +66,15 @@ export default function UserSelectWithSearch({
         <SelectContent>
           <div className="px-2 py-1">
             <Input
+              ref={inputRef}
               autoFocus
-              value={userSearch}
-              onChange={(e) => setUserSearch(e.target.value)}
+              value={debouncedUserSearch}
+              onChange={(e) => {
+                setDebouncedUserSearch(e.target.value);
+              }}
+              onKeyDown={(e) => {
+                e.stopPropagation();
+              }}
               placeholder="Buscar por email o usuario..."
               className="w-full"
             />
