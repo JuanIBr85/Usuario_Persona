@@ -465,6 +465,7 @@ def ver_usuarios_eliminados():
 @superadmin_bp.route("/logs/<int:usuario_id>", methods=["GET"])
 @api_access(
     is_public=False,
+    limiter=["15 per minute", "30 per hour"],
     access_permissions=["auth.admin.ver_logs_usuario"]
 )
 def ver_logs_usuario(usuario_id):
