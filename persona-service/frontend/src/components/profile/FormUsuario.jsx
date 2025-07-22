@@ -20,6 +20,15 @@ import { useAuthContext } from "@/context/AuthContext";
 import ResponsiveColumnForm from "@/components/ResponsiveColumnForm";
 
 
+/**
+ * Formulario de opciones del usuario dentro del perfil.
+ *
+ * Muestra la información básica del usuario y permite
+ * gestionar acciones como cambiar contraseña, correo o
+ * nombre de usuario, además de solicitar la eliminación
+ * de la cuenta.
+ */
+
 
 
 export default function FormUsuario() {
@@ -29,27 +38,41 @@ export default function FormUsuario() {
 
   const [loading, setLoading] = useState(false);
 
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);//modal de eliminar cuenta
-  const [deleteResultOpen, setDeleteResultOpen] = useState(false);//respuesta de eliminar cuenta
-  const [deleteMessage, setDeleteMessage] = useState("");//mensaje de eliminar cuenta
+  // Estados para gestionar la eliminación de la cuenta
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);   // Modal de confirmación
+  const [deleteResultOpen, setDeleteResultOpen] = useState(false);   // Resultado de la solicitud
+  const [deleteMessage, setDeleteMessage] = useState("");            // Mensaje mostrado
+
+  // Estados para cambio de contraseña mediante OTP
 
   const [otpDialogOpen, setOtpDialogOpen] = useState(false);
   const [otpMessage, setOtpMessage] = useState("");
   const [redirectToOtp, setRedirectToOtp] = useState(false);
 
+  // Estados para cambio de correo electrónico
+
   const [openEmailDialog, setOpenEmailDialog] = useState(false);
   const [emailResultOpen, setEmailResultOpen] = useState(false);
   const [emailMessage, setEmailMessage] = useState("");
 
+  // Estados para cambio de nombre de usuario
+
   const [openUsernameDialog, setOpenUsernameDialog] = useState(false);
   const [usernameResultOpen, setUsernameResultOpen] = useState(false);
   const [usernameMessage, setUsernameMessage] = useState("");
+
+  // Indicadores de éxito en acciones
 
   const [deleteOk, setDeleteOk] = useState(false);
   const [emailOk, setEmailOk] = useState(false);
 
 
 
+  /**
+   * Envía la solicitud para eliminar la cuenta del usuario.
+   *
+   * @param {Event} event - Evento del formulario que contiene email y contraseña.
+   */
   const submitDeleteRequest = async (event) => {
 
     const formData = await formSubmitJson(event);
@@ -84,6 +107,10 @@ export default function FormUsuario() {
       });
   };
 
+  /**
+   * Solicita un código OTP para realizar el cambio de contraseña.
+   */
+
   const requestOtp = () => {
     setLoading(true);
     AuthService.requestOtp({ email: authData.user.email_usuario })
@@ -106,6 +133,11 @@ export default function FormUsuario() {
       });
   };
 
+  /**
+   * Envía la solicitud para actualizar el correo electrónico del usuario.
+   *
+   * @param {Event} event - Evento del formulario con el nuevo correo y contraseña actual.
+   */
   const submitChangeEmail = async (event) => {
     const formData = await formSubmitJson(event);
     setLoading(true);
@@ -138,6 +170,11 @@ export default function FormUsuario() {
       });
   };
 
+  /**
+     * Procesa el formulario para cambiar el nombre de usuario.
+     *
+     * @param {Event} event - Evento del formulario con el nuevo nombre.
+     */
   const submitChangeUsername = async (event) => {
     const formData = await formSubmitJson(event);
     setLoading(true);
@@ -234,7 +271,7 @@ export default function FormUsuario() {
               placeholder="Ingresa tu correo"
               defaultValue={authData.user.email_usuario || ""}
               validationMessage="Email inválido"
-              
+
               required
             />
             <InputValidate
@@ -322,7 +359,7 @@ export default function FormUsuario() {
               placeholder="Ingresa tu nuevo correo"
               maxLength={50}
               validationMessage="Email inválido"
-              
+
               required
             />
             <InputValidate
