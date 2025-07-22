@@ -1,5 +1,6 @@
 import threading
-from flask import Blueprint
+from common.utils.make_endpoints_list import make_endpoints_list
+from flask import Blueprint, current_app
 from app.decorators.cp_api_access import cp_api_access
 from app.services.endpoints_search_service import EndpointsSearchService
 from app.services.services_search_service import ServicesSearchService
@@ -75,7 +76,12 @@ def get_all_endpoints():
     """
     try:
         endpoints = list(map(lambda x: x.to_dict(), endpoints_search_service.get_services_route().values()))
+        
+        for e in make_endpoints_list(current_app).values():
+            e["access_url"] = e["access_url"].replace("api/", "")
+            endpoints.append(e)
+
         return make_response(ResponseStatus.SUCCESS, "Endpoints obtenidos correctamente", endpoints), 200
-    except Exception as e:
+    except Exception as e:  
         return make_response(ResponseStatus.ERROR, "Error obteniendo endpoints", e.__class__.__name__), 500
         

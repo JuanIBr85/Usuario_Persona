@@ -312,7 +312,7 @@ def confirmar_cambio_email():
 @bp.route("/solicitar-eliminacion", methods=["POST"])
 @api_access(
     is_public=False, 
-    limiter="2 per day",
+    limiter=["2 per day"],
 )
 def eliminar_usuario():
     """
