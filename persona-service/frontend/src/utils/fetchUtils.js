@@ -1,6 +1,6 @@
 //URL PARA EL HOST
-//const BASE_URL = "http://186.19.137.9:8486/api";
-const BASE_URL = "http://localhost:5002/api";
+//export const BASE_URL = "http://186.19.137.9:8486/api";
+export const BASE_URL = "http://localhost:5002/api";
 
 export const ServiceURL = Object.freeze({
     auth: `${BASE_URL}/auth`,

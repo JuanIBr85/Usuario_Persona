@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { Home, ShieldUser, MonitorCog, MonitorCheck } from "lucide-react";
+import { Home, ShieldUser, MonitorCog, MonitorCheck, Bug } from "lucide-react";
 import { Fade } from "react-awesome-reveal";
 
 import {
@@ -60,6 +60,12 @@ function AdminServices() {
       title: "Monitoreo de Servicios",
       description: "Iniciar y controlar el análisis de servicios registrados.",
       path: "/adminservices/endpoints-research",
+    },,
+    {
+      icon : <Bug className="w-6 h-6" />,
+      title: "Gateway",
+      description: "Listado de endpoints.",
+      path: "/adminservices/gateway",
     },
   ];
 

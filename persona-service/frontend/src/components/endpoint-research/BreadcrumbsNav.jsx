@@ -6,7 +6,7 @@ import {
   BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
-function BreadcrumbsNav() {
+function BreadcrumbsNav({actualPath="Monitoreo de Servicios"}) {
   return (
     <Breadcrumb className="mt-auto self-start">
       <BreadcrumbList>
@@ -31,7 +31,7 @@ function BreadcrumbsNav() {
         <BreadcrumbItem>
           <BreadcrumbPage className="flex items-center gap-1">
             <Eye className="w-4 h-4" />
-            Monitoreo de Servicios
+            {actualPath}
           </BreadcrumbPage>
         </BreadcrumbItem>
       </BreadcrumbList>
