@@ -1,6 +1,6 @@
 from flask import request, g
 from common.services.service_request import ServiceRequest
-
+import logging
 # Headers que se envian al microservicio
 SAFE_HEADERS = (
     "ACCEPT",
@@ -42,8 +42,10 @@ def request_to_service(url:str):
         # Guardo el id del usuario en X-USER-ID en el header
         headers["X-USER-ID"] = g.jwt["sub"]
         headers["X-JWT-JTI"] = g.jwt["jti"]
-        headers["X-JWT-JTI-REFRESH"] = g.jwt["jti_refresh"]
-        
+        try:
+            headers["X-JWT-JTI-REFRESH"] = g.jwt["jti_refresh"]
+        except Exception as e:
+            logging.error(f"Error al obtener el jti_refresh: {e}, data {g.jwt}")
 
     headers["X-CLIENT-IP"] = request.remote_addr
     headers["X-CLIENT-USER-AGENT"] = request.user_agent.string
