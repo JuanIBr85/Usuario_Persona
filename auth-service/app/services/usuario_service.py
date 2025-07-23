@@ -473,8 +473,9 @@ class UsuarioService(ServicioBase):
         try:
             # tomo el identificador unico del token y lo guardo en redis con sus permisos
             decoded = decode_token(token)
-            get_redis().rpush(decoded["jti"], *permisos_lista)
-            get_redis().expire(decoded["jti"], expires_seconds)
+            access_jti = decoded["jti"]
+            get_redis().rpush(f"access_token:{access_jti}", *permisos_lista)
+            get_redis().expire(f"access_token:{access_jti}", expires_seconds)
             logger.info("→ Permisos almacenados en Redis")
         except Exception as e:
             logger.error("Error al guardar permisos en Redis", exc_info=e)
@@ -1078,8 +1079,8 @@ class UsuarioService(ServicioBase):
 
         # Guardar en Redis
         try:
-            get_redis().rpush(access_jti, *permisos_lista)
-            get_redis().expire(access_jti, expires_seconds)
+            get_redis().rpush(f"access_token:{access_jti}", *permisos_lista)
+            get_redis().expire(f"access_token:{access_jti}", expires_seconds)
         except Exception as e:
             return (f"[!] Error al registrar access token en Redis: {e}")
         

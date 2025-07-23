@@ -19,22 +19,24 @@ jwt_cache = TTLCacheUtil(maxsize=1000, ttl=20)
 def get_jwt_permissions(jti):
     # Si esta en el cache devuelvo los permisos
     # sino consulto a redis
+    key = f"access_token:{jti}"
     def get_perms():
-        perms = redis_client_auth.lrange(jti, 0, -1)
+        perms = redis_client_auth.lrange(key, 0, -1)
         if not perms:
             return None
         return set(perms)
-    return jwt_cache.get_or_cache(jti, get_perms)
+    return jwt_cache.get_or_cache(key, get_perms)
 
 
 # Comprueba que el token no alla sido revocado
-@jwt.token_in_blocklist_loader
+#@jwt.token_in_blocklist_loader
 def check_if_token_is_revoked(jwt_header, jwt_payload: dict):
     jti = jwt_payload["jti"]
-    # Si esta en el cache es un token valido
-    if jti in jwt_cache:
-        return False
 
+    # Si esta en el cache es un token valido
+    if f"access_token:{jti}" in jwt_cache:
+        return False
+    
     # Si no esta en el cache compruebo si esta en redis
     return get_jwt_permissions(jti) is None
 
@@ -137,10 +139,20 @@ def authenticate_config(app):
         # Si tiene el token, lo guardo en el contexto
         if identity:
             payload = get_jwt()
+            #Al ser opcional jwt requiere de una validacion por dentro y no por el decorador.
+            if check_if_token_is_revoked(None, payload):
+                response = make_response(
+                    ResponseStatus.FAIL,
+                    "El token ha expirado o no es valido. Por favor, inicie sesión nuevamente.",
+                    {"message": "Token expirado"},
+                )
+                response.status_code = 401
+                abort(response)
+
             g.jwt = payload
 
         # Si es una peticion local, no se verifica la autenticacion
-        if True and is_local_connection():
+        if LOCALHOST_AUTH_DISABLE and is_local_connection():
             return
 
         # Si no tiene el token y no es publico, aborto con 401
