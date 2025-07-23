@@ -76,7 +76,7 @@ def create_app():
 
 
 def init_app():
-    FORZAR_RESET = True
+    FORZAR_RESET = False
     if FORZAR_RESET:
         print("[i] Reiniciando base de datos y datos del seed...")
         eliminar_base()
