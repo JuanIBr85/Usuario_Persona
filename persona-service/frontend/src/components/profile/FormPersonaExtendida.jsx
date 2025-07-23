@@ -10,30 +10,48 @@ import { Ban } from "lucide-react";
 import { SimpleDialog } from "@/components/SimpleDialog";
 import ResponsiveColumnForm from "@/components/ResponsiveColumnForm";
 
+/**
+ * FormPersonaExtendida
+ *
+ * Formulario para editar la información complementaria de una persona.
+ * Envía los datos al backend mediante `PersonaService` y muestra un diálogo
+ * de confirmación o error según corresponda.
+ */
+
+
 export default function FormPersonaExtendida({
   persona_id,
-  personaExtendida,
-  estadosCiviles,
-  ocupaciones,
-  estudiosAlcanzados,
-  setPersonaData, showDialog, okDialog, errorDialog
+  personaExtendida, // datos actuales de la persona extendida
+  estadosCiviles, // lista de estados civiles disponibles
+  ocupaciones, // lista de ocupaciones disponibles
+  estudiosAlcanzados, // lista de niveles de estudio disponibles
+  setPersonaData, // callback para actualizar el estado del padre
+  showDialog,
+  okDialog, // función que muestra el diálogo de éxito
+  errorDialog // función que muestra el diálogo de error
 }) {
   const [loading, setLoading] = useState(false);
-  
 
+  // Maneja el envío del formulario
   const handleSubmit = async (event) => {
+    // Obtiene los datos validados del formulario
     const formData = await formSubmitJson(event);
     document.activeElement.blur();
+    // Muestra indicador de carga
     setLoading(true);
     console.log(formData);
+    // Envía la información actualizada al backend
     PersonaService.editar_restringido({
       persona_extendida: formData,
     })
       .then((response) => {
+        // Actualiza el estado con los datos devueltos
         setPersonaData(response.data);
+        // Notifica éxito al usuario
         okDialog();
       })
       .catch((error) => {
+        // Registra el error y muestra el mensaje correspondiente
         console.error("Error updating persona extendida:", error);
         errorDialog(error?.data?.error?.server || error?.data?.error);
       })
@@ -97,8 +115,8 @@ export default function FormPersonaExtendida({
               placeholder="Ingresa tu fecha de vencimiento del DNI"
               labelText="Fecha de vencimiento del DNI"
               value={personaExtendida?.vencimiento_dni || ""}
-              min={ new Date().toISOString().split("T")[0]}
-              max={(()=>{
+              min={new Date().toISOString().split("T")[0]}
+              max={(() => {
                 const fechaActual = new Date();
                 fechaActual.setFullYear(fechaActual.getFullYear() + 16);
                 return fechaActual.toISOString().split("T")[0];
