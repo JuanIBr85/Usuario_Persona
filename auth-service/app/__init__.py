@@ -167,7 +167,7 @@ def funcion_que_recibe_mensajes(message: dict, app_flask: Flask) -> None:
                     permisos_lista = [p.nombre_permiso for p in permisos]
 
                     redis = get_redis()
-                    redis.rpush(f"access_token:{jti}", *permisos_lista)
+                    redis.rpush(jti, *permisos_lista)
                     logger.error(f"Permisos actualizados en Redis para jti: {jti}")
                 except Exception as e:
                     logger.warning("Error al actualizar permisos en Redis", exc_info=e)

@@ -19,13 +19,12 @@ jwt_cache = TTLCacheUtil(maxsize=1000, ttl=20)
 def get_jwt_permissions(jti):
     # Si esta en el cache devuelvo los permisos
     # sino consulto a redis
-    key = f"access_token:{jti}"
     def get_perms():
-        perms = redis_client_auth.lrange(key, 0, -1)
+        perms = redis_client_auth.lrange(jti, 0, -1)
         if not perms:
             return None
         return set(perms)
-    return jwt_cache.get_or_cache(key, get_perms)
+    return jwt_cache.get_or_cache(jti, get_perms)
 
 
 # Comprueba que el token no alla sido revocado
@@ -34,7 +33,7 @@ def check_if_token_is_revoked(jwt_header, jwt_payload: dict):
     jti = jwt_payload["jti"]
 
     # Si esta en el cache es un token valido
-    if f"access_token:{jti}" in jwt_cache:
+    if jti in jwt_cache:
         return False
     
     # Si no esta en el cache compruebo si esta en redis
