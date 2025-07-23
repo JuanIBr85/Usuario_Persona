@@ -1,21 +1,30 @@
-# 📄 Documentación Técnica – `persona-service`
+# Documentación Técnica – `persona-service`
 
-## 1. 📌 Introducción
+## 1. Introducción
 
 El microservicio `persona-service` forma parte de un sistema distribuido basado en microservicios. Su principal responsabilidad es gestionar la información relacionada a las personas (usuarios), incluyendo datos personales, contactos, domicilios y validaciones de identidad mediante verificación OTP.
 
-## 2. 🧱 Arquitectura y tecnologías
+## 2. Arquitectura y tecnologías
 
-- **Lenguaje**: Python 3.13
+- **Lenguaje**: Python 3.10
 - **Framework**: Flask
 - **ORM**: SQLAlchemy
 - **Autenticación**: JWT
-- **Base de datos**: SQLite (local)
+- **Base de datos**: PostgreSQL
 - **Correo electrónico**: Flask-Mail
 - **Contenedores**: Docker
 - **Entorno**: `.env`, Dockerfile y scripts de configuración para desarrollo
 
-## 3. ⚙️ Estructura de carpetas principal
+### Dependencias principales
+
+Esta versión utiliza:
+
+- Flask 3.1.1
+- Flask-JWT-Extended 4.7.1
+- SQLAlchemy 2.0.41
+- Marshmallow 4.0.0
+
+## 3. Estructura de carpetas principal
 
 ```
 persona-service/
@@ -26,9 +35,10 @@ persona-service/
 │   │   ├── database/                # Módulo de conexión a base de datos
 │   │   ├── interfaces/              # Interfaces de estructuras de datos
 │   │   ├── models/                  # Modelos SQLAlchemy (por revisar)
-│   │   ├── resources/               # Rutas y controladores
-│   │   ├── schemas/                 # Validaciones con Marshmallow
+│   │   ├── routes/                  # Rutas y controladores
+│   │   ├── schema/                  # Validaciones con Marshmallow
 │   │   ├── services/                # Lógica de negocio (servicios OTP, personas, etc.)
+│   │   ├── messaging/               # Consumo de eventos de otros servicios
 │   │   ├── utils/                   # Funciones auxiliares (correo, tokens)
 │   │   ├── __init__.py              # Inicialización de la app Flask
 │   │   └── extensions.py            # Registro de extensiones Flask
@@ -38,12 +48,12 @@ persona-service/
 │   └── .env / .env.example          # Variables de entorno
 ```
 
-## 4. 🚀 Ejecución local
+## 4. Ejecución local
 
 **Requisitos:**
-- Python 3.13
+- Python 3.10
 - Virtualenv
-- SQLite
+- PostgreSQL
 - Docker (opcional)
 
 **Pasos básicos:**
@@ -67,11 +77,11 @@ python run.py
 docker build -t persona-backend .
 docker run -p 5001:5001 persona-backend
 ```
-## 5. 🧠 Modelos de Datos y schemas
+## 5. Modelos de Datos y schemas
 
 Se resume la definición de los modelos de base de datos y los schemas de validación usados por el microservicio.
 
-## 📚 Modelos
+## Modelos
 
 - **Persona**: datos principales de la persona.
   - `id_persona` (PK)
@@ -122,7 +132,7 @@ Se resume la definición de los modelos de base de datos y los schemas de valida
   - `partido`
   - `provincia`
 
-## 📝 Schemas
+## Schemas
 
 - **PersonaSchema**: valida el cuerpo completo de una persona, incluyendo domicilio, contacto y datos extendidos.
 - **PersonaResumidaSchema**: versión condensada para listados.
@@ -134,14 +144,14 @@ Se resume la definición de los modelos de base de datos y los schemas de valida
 
 Las implementaciones se encuentran en [`app/models`](app/models) y [`app/schema`](app/schema).
 
-## 6. 📬 Endpoints disponibles
+## 6. Endpoints disponibles
 
 El microservicio `persona-service` expone una serie de endpoints organizados principalmente en dos grupos:
 
 - **Opciones generales**: para obtener listas de valores permitidos como tipos de documento, ocupaciones, etc.
 - **Gestión de persona**: incluye verificación, creación y vinculación de datos personales.
 
-### 🧩 Rutas de opciones
+### Rutas de opciones
 
 Estos endpoints devuelven catálogos de valores utilizados para completar formularios y validar datos:
 
@@ -177,13 +187,13 @@ Este conjunto de endpoints permite gestionar datos personales, consultar por ID,
 | `/personas/verify-otp`           | POST   | `verificar_otp_persona`          | Confirma el OTP y vincula la persona con el usuario           |
 | `/personas/verificar-identidad`  | POST   | `verificar_identidad`            | Verifica datos personales cuando no coincide el email         |
 
-> ℹ️ Estos endpoints son parte central del flujo de verificación y registro de personas dentro del sistema.
+> ℹEstos endpoints son parte central del flujo de verificación y registro de personas dentro del sistema.
 
-## 7. 🔐 Flujo de verificación OTP
+## 7. Flujo de verificación OTP
 
 El sistema implementa un mecanismo de verificación basado en códigos OTP (One-Time Password) enviados por correo electrónico para validar la identidad de una persona antes de crearla o vincularla con un usuario.
 
-### 🧠 Lógica del servicio
+### Lógica del servicio
 
 El servicio `OtpService`, ubicado en `app/services/otp_service.py`, tiene la siguiente funcionalidad:
 
@@ -195,7 +205,7 @@ class OtpService:
         return codigo
 ```
 
-### ✉️ Flujo de funcionamiento
+### Flujo de funcionamiento
 
 1. Se detecta que la persona ya existe por su tipo y número de documento.
 2. Se invoca `OtpService.solicitar_otp(persona)` para:
@@ -205,17 +215,17 @@ class OtpService:
 4. El cliente (frontend) debe mostrar una pantalla para que el usuario ingrese el código OTP recibido.
 5. El backend verifica que el código ingresado coincida con el enviado y que no haya expirado.
 
-### 📬 Envío del correo
+### Envío del correo
 
 El envío se realiza con la función auxiliar `enviar_codigo_por_email_persona`, ubicada en `app/utils/email_util.py`.
 
-> 🔐 Este mecanismo agrega una capa de validación de identidad antes de permitir la modificación o vinculación de datos sensibles.
+> Este mecanismo agrega una capa de validación de identidad antes de permitir la modificación o vinculación de datos sensibles.
 
-## 8. 🔗 Integración con otros microservicios
+## 8. Integración con otros microservicios
 
 El microservicio `persona-service` se integra con otros componentes del sistema distribuido para garantizar seguridad, comunicación y descubrimiento dinámico.
 
-### 🔐 Autenticación con `auth-service`
+### Autenticación con `auth-service`
 
 - Se utiliza **JWT (JSON Web Token)** para validar las identidades de los usuarios que acceden a los endpoints protegidos.
 - En el archivo `app/__init__.py` se inicializa la extensión:
@@ -227,7 +237,7 @@ jwt.init_app(app)
 
 - Los tokens JWT son generados por `auth-service` y verificados localmente en `persona-service` para proteger los endpoints.
 
-### 🌐 Registro en API Gateway con `component-service`
+### Registro en API Gateway con `component-service`
 
 - El servicio se registra automáticamente en el gateway mediante el módulo:
 
@@ -237,15 +247,19 @@ component_service(app)
 ```
 
 - Esto permite que el `API Gateway` (component-service) detecte y enrute peticiones al microservicio de persona dinámicamente.
+### Integración mediante mensajería
 
-> 🧠 Esta arquitectura permite escalar, versionar e integrar múltiples servicios de manera desacoplada y segura.
+- En `app/messaging/reciever.py` se define un consumidor que escucha eventos del sistema.
+- Cuando `auth-service` publica el evento `auth_user_register`, este servicio busca una persona con el email registrado y la vincula automáticamente con el usuario.
 
-## 9. 🧠 Casos de uso típicos y flujos
+> Esta arquitectura permite escalar, versionar e integrar múltiples servicios de manera desacoplada y segura.
+
+## 9. Casos de uso típicos y flujos
 
 A continuación se describen los flujos de uso más comunes que implican la interacción con el microservicio `persona-service`.
 
 
-### 🔍 Caso 1: Verificar si la persona ya existe por documento
+### Caso 1: Verificar si la persona ya existe por documento
 
 **Objetivo**: Evitar duplicación de registros.
 
@@ -258,7 +272,7 @@ A continuación se describen los flujos de uso más comunes que implican la inte
    - Se le solicita al usuario completar un formulario para registrar su información personal.
 
 
-### 📝 Caso 2: Registrar nueva persona
+### Caso 2: Registrar nueva persona
 
 **Objetivo**: Crear un nuevo registro de persona cuando no existe.
 
@@ -269,16 +283,16 @@ A continuación se describen los flujos de uso más comunes que implican la inte
 4. El usuario queda registrado y puede continuar con su proceso (por ejemplo: acceder a otros módulos del sistema).
 
 
-### ✏️ Caso 3: Modificar datos de una persona existente
+### Caso 3: Modificar datos de una persona existente
 
 **Objetivo**: Actualizar información por parte de un operador o el propio usuario.
 
 **Flujo**:
-1. Se obtiene la persona por su ID mediante `GET /persona_by_id/<id>`.
+1. Se obtiene la persona por su ID mediante `GET /personas/<id>`.
 2. El frontend muestra el formulario con los datos actuales.
 3. Al guardar cambios, se realiza una solicitud `PUT /modificar_persona/<id>` con los datos actualizados.
 
-### 📋 Caso 4: Completar formulario con opciones dinámicas
+### Caso 4: Completar formulario con opciones dinámicas
 
 **Objetivo**: Permitir al usuario seleccionar datos validados.
 
@@ -291,4 +305,4 @@ A continuación se describen los flujos de uso más comunes que implican la inte
    - `/estudios_alcanzados`
 2. Se cargan en listas desplegables para asegurar la consistencia del input del usuario.
 
-> ✅ Estos flujos están diseñados para garantizar la integridad de los datos, evitar duplicaciones y mejorar la experiencia de usuario.
+> Estos flujos están diseñados para garantizar la integridad de los datos, evitar duplicaciones y mejorar la experiencia de usuario.
