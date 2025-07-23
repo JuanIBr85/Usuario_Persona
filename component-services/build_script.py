@@ -5,8 +5,6 @@ Funciona en Windows y Linux con manejo mejorado de permisos
 """
 
 """
-Elimine los emojis, por que el profe lo dijo, pero yo los deje por que me gustaban
-Solo para añadirle un poco mas de vida aunque solo se vieran en linux.
 Esto es solo un script para automatizarme la compilacion del modulo common.
 Se puede hacer a mano pero asi me ahorro problemas y tiempo.
 
