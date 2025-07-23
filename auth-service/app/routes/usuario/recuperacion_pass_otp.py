@@ -305,7 +305,7 @@ def verificar_dispositivo():
 @bp.route("/refresh", methods=["POST"])
 @api_access(
     is_public=True,
-    limiter=["1 per 30 seconds", "6 per hour"],  # limitacion estricta para no dejar crear mas de 5 jti_refresh basado en los 15 min q dura el access token.
+    limiter=["2 per 1 minute", "8 per hour"],  # limitacion estricta para no dejar crear mas de 5 jti_refresh basado en los 15 min q dura el access token.
 )
 def refresh_token():
     """
