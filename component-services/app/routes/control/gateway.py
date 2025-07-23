@@ -62,6 +62,7 @@ def get_research_status():
 @cp_api_access(is_public=False, limiter=["2 per minute"], access_permissions=["component.control.investigacion"])
 def stop_research():
     endpoints_search_service.stop_search()
+    send_event("research_stop", {})
     return make_response(ResponseStatus.SUCCESS, "Busqueda de endpoints detenida"), 200
 
 

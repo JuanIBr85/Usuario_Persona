@@ -82,6 +82,12 @@ def research(app: Flask, message_data: dict):
     endpoints_search_service.refresh_endpoints()
     ServicesSearchService().update_redirect()
 
+# Recarga la api gateway
+@register_redis_receiver("research_stop")
+def research_stop(app: Flask, message_data: dict):
+    logging.info("Recargan de endpoints detenida")
+    endpoints_search_service.stop_search()
+
 
 # Detiene todo el sistema
 @register_redis_receiver("stop_services")
