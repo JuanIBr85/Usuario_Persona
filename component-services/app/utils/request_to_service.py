@@ -74,7 +74,7 @@ def request_to_service(url:str):
             timeout=60  # para prevenir que el request se quede indefinidamente esperando
         )
     except Exception as e:
-        logging.error(f"Error al enviar la request al microservicio: {e}, url: {url}, headers: {headers}, params: {request.args}, data: {request_data}")
+        logging.error(f"Error al enviar la request al microservicio: {e}, url: {url}, params: {request.args}, data: {request_data}")
         raise
 
     # Filtrar headers que Flask no debe reenviar

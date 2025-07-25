@@ -37,9 +37,15 @@ def api_gateway(subpath) -> Response:
     try:
         if endpoint.cache:
             response = cache_response(lambda: request_to_service(url), url, endpoint)
+            
+            # Header de cache para el navegador, para que cachee la respuesta tambien
+            cache_ttl = endpoint.cache["expiration"] or 10
+            response["headers"]["Cache-Control"] = f"private, max-age={cache_ttl}"
         else:
             response = request_to_service(url)
     except Exception as e:
+        import logging
+        logging.error(f"Error al enviar la request al microservicio: {e}, url: {url}, headers: {headers}, params: {request.args}, data: {request_data}")
         return make_response(ResponseStatus.ERROR, "Ah ocurrido un error al intentar redirigir la peticion al microservicio"), 500
     # Devolver la respuesta completa con headers, contenido y status code
     return Response(**response)
