@@ -175,14 +175,15 @@
     #   container_name: nginx
     #   build: ./nginx
     #   ports:
-    #     - "8486:80"
+    #     - "80:80"
     #     - "443:443"
     #   volumes:
     #     - ./nginx/conf.d:/etc/nginx/conf.d
-    #     - ./nginx/cert:/etc/nginx/cert
+    #     - ./nginx/cert:/etc/letsencrypt
     #     - ./nginx/logs:/var/log/nginx
+    #     - ./nginx/html:/var/www
+    #     - ./nginx/snippets:/etc/nginx/snippets
     #   depends_on:
-    #     - persona-frontend
     #     - persona-backend
     #     - component-service
 

@@ -18,3 +18,4 @@ env/
 # IDEs
 .vscode/
 .idea/
+logs/

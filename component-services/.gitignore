@@ -8,7 +8,7 @@ env/
 
 # Archivos de entorno
 .env
-
+logs/
 # Archivos de base de datos
 *.db
 *.sqlite3

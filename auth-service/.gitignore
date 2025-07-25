@@ -13,6 +13,8 @@ env/
 # Archivos sensibles
 .env
 
+logs/
+
 # Archivos de logs y bases temporales
 *.sqlite3
 
