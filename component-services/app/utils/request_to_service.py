@@ -1,5 +1,6 @@
 from flask import request, g
 from common.services.service_request import ServiceRequest
+from common.utils.response import ResponseStatus, make_response
 import logging
 # Headers que se envian al microservicio
 SAFE_HEADERS = (
@@ -60,17 +61,21 @@ def request_to_service(url:str):
 
     # Armo la request para enviar al microservicio con todos los datos recibidos
     # Envio la request al microservicio
-    response = ServiceRequest.request(
-        method=request.method,
-        **{
-            "url": url,
-            "headers": headers,
-            "params": request.args,
-            "allow_redirects": False,#Previene que el request siga redirigiendose
-            **request_data
-        },
-        timeout=60  # para prevenir que el request se quede indefinidamente esperando
-    )
+    try:
+        response = ServiceRequest.request(
+            method=request.method,
+            **{
+                "url": url,
+                "headers": headers,
+                "params": request.args,
+                "allow_redirects": False,#Previene que el request siga redirigiendose
+                **request_data
+            },
+            timeout=60  # para prevenir que el request se quede indefinidamente esperando
+        )
+    except Exception as e:
+        logging.error(f"Error al enviar la request al microservicio: {e}, url: {url}, headers: {headers}, params: {request.args}, data: {request_data}")
+        raise
 
     # Filtrar headers que Flask no debe reenviar
     response_headers = {
