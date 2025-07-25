@@ -55,7 +55,7 @@ function ComponentGateway() {
   }, [endpoints, searchTerm]);
 
   // Calcular el número total de páginas
-  const totalPages = Math.ceil(endpoints.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredEndpoints.length / itemsPerPage);
 
   // Función para manejar el ordenamiento
   const sortedEndpoints = useMemo(() => {
@@ -105,7 +105,7 @@ function ComponentGateway() {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = Math.min(startIndex + itemsPerPage, sortedEndpoints.length);
     return sortedEndpoints.slice(startIndex, endIndex);
-  }, [sortedEndpoints, currentPage]);
+  }, [sortedEndpoints, currentPage, searchTerm]);
 
   // Función para manejar el cambio de ordenamiento
   const requestSort = (key) => {
