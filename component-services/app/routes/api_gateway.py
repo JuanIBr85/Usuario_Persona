@@ -45,7 +45,7 @@ def api_gateway(subpath) -> Response:
             response = request_to_service(url)
     except Exception as e:
         import logging
-        logging.error(f"Error al enviar la request al microservicio: {e}, url: {url}, headers: {headers}, params: {request.args}, data: {request_data}")
+        logging.error(f"Error al enviar la request al microservicio: {e}, url: {url}, headers: {request.headers}, params: {request.args}, data: {request.get_data()}")
         return make_response(ResponseStatus.ERROR, "Ah ocurrido un error al intentar redirigir la peticion al microservicio"), 500
     # Devolver la respuesta completa con headers, contenido y status code
     return Response(**response)
