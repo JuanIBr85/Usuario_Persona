@@ -354,6 +354,42 @@ class SuperAdminService:
             resultado.append(usuario_dict)
         return resultado
 
+    def obtener_usuarios_limitado(self, session, solo_eliminados=False):
+        """
+        Obtiene todos los usuarios con sus roles
+
+        Args:
+            session (Session): Sesión activa.
+            solo_eliminados (bool): Si True, devuelve solo los eliminados lógicamente.
+
+        Returns:
+            list: Lista de usuarios con datos extendidos.
+        """
+        query = session.query(Usuario)
+        if solo_eliminados:
+            query = query.filter_by(eliminado=True).order_by(Usuario.deleted_at.desc())
+        else:
+            query = query.filter_by(eliminado=False)
+            
+        usuarios = query.all()
+        resultado = []
+        for u in usuarios:
+            # Obtener roles asociados (nombres)
+            roles = [ru.rol.nombre_rol for ru in u.roles if ru.rol and not ru.rol.deleted_at]
+
+            # Obtener ids de roles
+            roles_ids = [ru.rol.id_rol for ru in u.roles if ru.rol and not ru.rol.deleted_at]
+
+            usuario_dict = {
+                "id": u.id_usuario,
+                "nombre_usuario": u.nombre_usuario,
+                "email_usuario": u.email_usuario,
+                "roles": roles,
+                "roles_ids": roles_ids,     
+            }
+            resultado.append(usuario_dict)
+        return resultado
+
   # =========================
   # =========================
 

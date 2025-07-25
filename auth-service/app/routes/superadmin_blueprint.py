@@ -431,6 +431,35 @@ def obtener_usuarios():
     finally:
         session.close()
 
+@superadmin_bp.route("/usuarios_limitado", methods=["GET"])
+@api_access(
+    is_public=False,
+    limiter=["25 per minute"],
+    access_permissions=["auth.admin.obtener_usuarios"],
+    cache=CacheSettings(expiration=10),
+)
+def obtener_usuarios_limitado():
+    """
+    Obtiene la lista de usuarios activos (no eliminados).
+
+    Returns:
+        - 200 con la lista de usuarios.
+        - 500 si ocurre un error inesperado.
+    """
+    session = SessionLocal()
+    try:
+        usuarios = superadmin_service.obtener_usuarios_limitado(session, solo_eliminados=False)
+        return Response(json.dumps(usuarios), status=200, mimetype="application/json")
+    except Exception as e:
+        session.rollback()
+        return Response(
+            json.dumps({"error": f"Error al obtener usuarios: {str(e)}"}),
+            status=500,
+            mimetype="application/json",
+        )
+    finally:
+        session.close()
+
 # ========================================
 # obtener todos los usuarios eliminados
 # ========================================

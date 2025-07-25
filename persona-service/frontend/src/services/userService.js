@@ -10,7 +10,7 @@ export const userService = {
   // Método para obtener todos los usuarios
   getAllUsers: async () => {
     return fetchService.fetch({
-      url: `${ServiceURL.auth}/super-admin/usuarios`,
+      url: `${ServiceURL.auth}/super-admin/usuarios_limitado`,
       method: HttpMethod.GET,
       showError: userService.showError,
       useToken: true,
