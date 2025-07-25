@@ -415,10 +415,9 @@ class PersonaService(IPersonaInterface):
             return self.schema.dump(persona)
 
         except Exception as e:
-            import traceback
-
-            print("Error al modificar persona:")
-            print(traceback.format_exc())
+            #import traceback
+            #print("Error al modificar persona:")
+            #print(traceback.format_exc())
             session.rollback()
             raise e
 
