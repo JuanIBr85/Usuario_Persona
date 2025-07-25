@@ -403,12 +403,23 @@ class UsuarioService(ServicioBase):
             ) < datetime.now(timezone.utc):
                 
                 # Para evitar que se envie multiples veces el correo
-                lock_validacion_dispositivo = get_redis().set(f"lock:validacion_dispositivo:{usuario.id_usuario}", "true", ex=60*30, nx=True)
+                lock_validacion_dispositivo = get_redis().set(f"lock:validacion_dispositivo:{usuario.id_usuario}:{ComponentRequest.get_user_agent()}", "true", ex=60*30, nx=True)
                 
                 if not lock_validacion_dispositivo:
                     return (
                         ResponseStatus.FAIL,
-                        "Verificación de dispositivo ya fue enviada al email. Por favor confírmelo.",
+                        "Ya se envió un correo de verificación recientemente. Por favor, esperá unos minutos.",
+                        None,
+                        403,
+                    )
+
+                # Para evitar que se envie multiples veces el correo
+                lock_validacion_dispositivo_usuario = get_redis().set(f"lock:validacion_dispositivo:usuario:{usuario.id_usuario}", "true", ex=60*10, nx=True)
+                
+                if not lock_validacion_dispositivo_usuario:
+                    return (
+                        ResponseStatus.FAIL,
+                        "Usted ya a enviado una peticion de verificacion de dispositivo recientemente. Por favor, esperá unos minutos.",
                         None,
                         403,
                     )

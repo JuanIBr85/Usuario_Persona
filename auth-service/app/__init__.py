@@ -25,6 +25,8 @@ from app.core.logging_config import configurar_logger_global
 from app.core.error_handler import registrar_manejador_errores
 import logging
 from app.core.logging_config import configurar_logger_local
+
+
 logger = logging.getLogger(__name__)
 def create_app():
     #monkey patch para no lanzar el log de mails.
@@ -72,6 +74,14 @@ def create_app():
             )
         return jsonify(output)
 
+    #Crea la db si no existe
+    with app_flask.app_context():
+        from app.database.session import SessionLocal
+        from app.models.usuarios import Usuario
+        crear_base()
+        db = SessionLocal()
+        if not db.query(Usuario).filter_by(email_usuario="superadmin@admin.com").first():
+            seed()
     return app_flask
 
 
