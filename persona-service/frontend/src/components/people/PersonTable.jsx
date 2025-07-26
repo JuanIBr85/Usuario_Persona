@@ -133,7 +133,7 @@ function PersonTable({
               <TableCell>{user.nro_documento}</TableCell>
               <TableCell>{formatearFecha(user.fecha_nacimiento)}</TableCell>
               <TableCell className="truncate max-w-40">
-                {users.find((u) => u.id === user.usuario_id)
+                {users.find((u) => +u.id === +user.usuario_id)
                   ? users.find((u) => u.id === user.usuario_id).email_usuario
                   : user.usuario_id>0 ? "Usuario eliminado" : "No vinculado"}
               </TableCell>

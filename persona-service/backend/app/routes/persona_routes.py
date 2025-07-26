@@ -110,7 +110,7 @@ def persona_by_id():
 
 #Recupera los datos de una persona
 @api_access(
-    cache=CacheSettings(expiration=120), access_permissions=["persona.admin.ver_persona"]
+    cache=CacheSettings(expiration=15), access_permissions=["persona.admin.ver_persona"]
 )
 @persona_bp.route("/personas/<int:id>", methods=["GET"])
 def obtener_persona(id):

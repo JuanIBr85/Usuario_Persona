@@ -324,7 +324,7 @@ function AdminPersons() {
           tipo_documento: formData.tipo_documento || "DNI",
           nro_documento: formData.nro_documento || "",
           fecha_nacimiento: formData.fecha_nacimiento || "",
-          usuario_id: formData.usuario_id || "",
+          usuario_id: +formData.usuario_id || "",
         };
 
         setPersonas((prevPersonas) => [...prevPersonas, newUserForTable]);
@@ -375,7 +375,6 @@ function AdminPersons() {
 
   // Muestra loader si aún no hay personas cargadas
   if (!personas) return <Loading />;
-
   return (
     <div className="p-6 space-y-6 py-15 px-3 md:py-10 md:px-15">
       <Fade duration={300} triggerOnce>
