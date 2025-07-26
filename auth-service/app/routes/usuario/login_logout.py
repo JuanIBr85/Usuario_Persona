@@ -12,6 +12,7 @@ from common.utils.response import make_response, ResponseStatus
 from app.utils.jwt import verificar_token_modificar_email,verificar_token_eliminacion
 from app.extensions import get_redis
 import logging
+import os
 bp = Blueprint(
     "usuario_login_logout", __name__, cli_group="usuario"
 )
@@ -420,8 +421,8 @@ def confirmar_eliminacion_usuario():
         if status != ResponseStatus.SUCCESS:
             logger_local.debug("status  success: %s", mensaje)
             raise ValueError(mensaje)
-
-        admin_email = current_app.config['ADMIN_EMAIL']
+ 
+        admin_email = os.getenv("ADMIN_EMAIL", "superadmin@superadmin.com")
 
         return render_template("eliminacion_exitosa.html", admin_email=admin_email)
 
