@@ -62,7 +62,7 @@ export default function FormDatos({
               value={personaData.nombre_persona || ""}
               cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
               readOnly={(dias < 30 && dias !== undefined)}
-              className={dias < 30 && dias !== undefined ? "cursor-not-allowed" : ""}
+              className={dias < 30 && dias !== undefined ? "cursor-not-allowed bg-gray-100" : ""}
               validatePattern={"^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$"}
               validationMessage="El nombre debe contener solo letras"
             />
@@ -74,7 +74,7 @@ export default function FormDatos({
               value={personaData.apellido_persona || ""}
               cleanRegex={/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\-_,.'()]/g}
               readOnly={(dias < 30 && dias !== undefined)}
-              className={dias < 30 && dias !== undefined ? "cursor-not-allowed" : ""}
+              className={dias < 30 && dias !== undefined ? "cursor-not-allowed bg-gray-100" : ""}
               validatePattern={"^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$"}
               validationMessage="El apellido debe contener solo letras"
             />

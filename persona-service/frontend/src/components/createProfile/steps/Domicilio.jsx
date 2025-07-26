@@ -65,7 +65,7 @@ const Domicilio = ({ hidden, staticData }) => {
           />
         </ResponsiveColumnForm>
 
-        <CPLocalidad showDialog={(e)=>{}} localidad={localidad} codigo_postal={"7540"} setLocalidad={setLocalidad} />
+        <CPLocalidad showDialog={(e)=>{}} localidad={localidad}  setLocalidad={setLocalidad} />
         {/* Campo Referencia */}
         <InputValidate
           id="domicilio_referencia"

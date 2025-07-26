@@ -249,7 +249,7 @@ function PersonCreateDialog({
               />
             </ResponsiveColumnForm>
 
-            <CPLocalidad localidad={localidad} codigo_postal={"7540"} setLocalidad={setLocalidad} />
+            <CPLocalidad localidad={localidad}  setLocalidad={setLocalidad} />
           </div>
 
           {/* Contacto */}
