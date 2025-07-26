@@ -18,8 +18,9 @@ import InputValidate from "@/components/inputValidate/InputValidate";
 import SimpleSelect from "@/components/SimpleSelect";
 import { SelectItem } from "@/components/ui/select";
 import ResponsiveColumnForm from "@/components/ResponsiveColumnForm";
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import CPLocalidad from "@/components/CPLocalidad";
+import UsuarioSelect from "@/components/UsuarioSelect";
 
 /**
  * PersonCreateDialog
@@ -57,7 +58,7 @@ function PersonCreateDialog({
   loading = false,
   error = null,
 }) {
-  const [userSearch, setUserSearch] = useState("");
+  
   const [tipoDoc, setTipoDoc] = useState(Object.keys(tiposDocumentos)[0] || "");
 
   const [localidad, setLocalidad] = useState("CORONEL SUAREZ");
@@ -66,17 +67,6 @@ function PersonCreateDialog({
   const seventeenYearsAgo = new Date();
   seventeenYearsAgo.setFullYear(seventeenYearsAgo.getFullYear() - 17);
   const maxDate = seventeenYearsAgo.toISOString().slice(0, 10);
-
-  const filteredUsuarios = useMemo(() => {
-    if (!userSearch) return usuarios;
-    return usuarios.filter(
-      (u) =>
-        (u.nombre_usuario &&
-          u.nombre_usuario.toLowerCase().includes(userSearch.toLowerCase())) ||
-        (u.email_usuario &&
-          u.email_usuario.toLowerCase().includes(userSearch.toLowerCase()))
-    );
-  }, [userSearch, usuarios]);
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -168,35 +158,7 @@ function PersonCreateDialog({
               />
 
               {/* Select de usuario */}
-              <SimpleSelect
-                label="Usuario del sistema"
-                id="usuario_id"
-                value="-1"
-                disabled={loading}
-                placeholder="Buscar usuario por nombre o email"
-              >
-                <div className="px-2 py-1">
-                  <Input
-                    autoFocus
-                    value={userSearch}
-                    placeholder="Buscar por email o usuario..."
-                    className="w-full"
-                  />
-                </div>
-                <SelectItem value="-1">Ningún usuario</SelectItem>
-                {loading && (
-                  <SelectItem disabled>Cargando usuarios...</SelectItem>
-                )}
-                {error && <SelectItem disabled>{error}</SelectItem>}
-                {filteredUsuarios.length === 0 && !loading && !error && (
-                  <SelectItem disabled>No se encontraron usuarios</SelectItem>
-                )}
-                {filteredUsuarios.map((u) => (
-                  <SelectItem key={u.id} value={`${u.id}`}>
-                    {u.nombre_usuario} ({u.email_usuario})
-                  </SelectItem>
-                ))}
-              </SimpleSelect>
+              <UsuarioSelect usuarios={usuarios}/>
             </ResponsiveColumnForm>
           </div>
 
@@ -249,7 +211,7 @@ function PersonCreateDialog({
               />
             </ResponsiveColumnForm>
 
-            <CPLocalidad localidad={localidad}  setLocalidad={setLocalidad} />
+            <CPLocalidad localidad={localidad} setLocalidad={setLocalidad} />
           </div>
 
           {/* Contacto */}

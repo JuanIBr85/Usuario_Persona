@@ -72,9 +72,8 @@ export default function UserSelectWithSearch({
               onChange={(e) => {
                 setDebouncedUserSearch(e.target.value);
               }}
-              onKeyDown={(e) => {
-                e.stopPropagation();
-              }}
+              onKeyDown={(e) => e.stopPropagation()}
+              onMouseDown={(e) => e.stopPropagation()}
               placeholder="Buscar por email o usuario..."
               className="w-full"
             />

@@ -7,13 +7,17 @@ import { SelectItem } from "@/components/ui/select"
 import { useCallback } from "react"
 import { useDebounce } from "@/hooks/useDebounce"
 import { PersonaService } from "@/services/personaService"
+import { Input } from "@/components/ui/input"
+import { useEffect } from "react"
 
 function CPLocalidad({showDialog, localidad, codigo_postal, setLocalidad, id_codigo_postal="codigo_postal", id_localidad="localidad"}) {
     const [codigoPostal, setCodigoPostal] = useState(codigo_postal);
     const [codigoPostalAnterior, setCodigoPostalAnterior] = useState(codigo_postal);
     const [localidades, setLocalidades] = useState([]);
     const [cpaMemory, setCpaMemory] = useState({});
+    const [search, setSearch] = useState("");
     const inputCPRef = useRef(null);
+    const [filteredLocalidades, setFilteredLocalidades] = useState([]);
     
     const fetchLocalidades = useCallback(() => {
         let cpa = String(codigoPostal);
@@ -47,7 +51,7 @@ function CPLocalidad({showDialog, localidad, codigo_postal, setLocalidad, id_cod
             .then(response => {
                 setLocalidades(response.data || []);
                 if(codigoPostalAnterior!==codigoPostal){
-                    setLocalidad(response.data[0]);
+                    setLocalidad(response.data[0][0]);
                 }
                 setCpaMemory({
                     ...cpaMemory,
@@ -68,6 +72,9 @@ function CPLocalidad({showDialog, localidad, codigo_postal, setLocalidad, id_cod
 
     useDebounce(fetchLocalidades, 500, [codigoPostal]);
 
+    useDebounce(()=>{
+        setFilteredLocalidades(localidades.filter(localidad => `${localidad[0]} - ${localidad[1]}`.toLowerCase().includes(search.toLowerCase())));
+    }, 500, [localidades, search]);
 
     return (<ResponsiveColumnForm>
         {/* Campo Código Postal */}
@@ -92,9 +99,19 @@ function CPLocalidad({showDialog, localidad, codigo_postal, setLocalidad, id_cod
             value={localidad}
             required
         >
-            {localidades.map((localidad) => (
-                <SelectItem key={localidad} value={localidad}>
-                    {localidad}
+            <div className="px-2 py-1">
+            <Input
+                placeholder="Buscar por localidad o provincia..."
+                className="w-full"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
+            />
+            </div>
+            {filteredLocalidades.map((localidad) => (
+                <SelectItem key={localidad[0]} value={localidad[0]}>
+                    {localidad[0]} - {localidad[1]}
                 </SelectItem>
             ))}
         </SimpleSelect>

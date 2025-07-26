@@ -60,13 +60,13 @@ class DomicilioPostalService(IDomicilioPostalInterface):
 
         try:
 
-            lista_localidades= (session.query(DomicilioPostal.localidad)
+            lista_localidades= (session.query(DomicilioPostal.localidad, DomicilioPostal.provincia)
                 .filter(DomicilioPostal.codigo_postal==codigo_postal.strip())
                 .distinct()
                 .all()
                 )
             
-            return [fila.localidad for fila in lista_localidades]
+            return [[fila.localidad, fila.provincia] for fila in lista_localidades]
 
         finally:
             if cerrar:

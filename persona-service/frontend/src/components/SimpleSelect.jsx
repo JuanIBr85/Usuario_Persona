@@ -16,33 +16,37 @@ function SimpleSelect({
     id,
     required,
     placeholder,
+    className,
     children,
     ...props
 }) {
 
-    useEffect(()=>{
-        if(name){
+    useEffect(() => {
+        if (name) {
             alert(`SimpleSelect: ${name} - la propiedad name no es valida, use id en su lugar`);
         }
-    },[name])
+    }, [name])
 
     const [internalValue, setInternalValue] = useState(value);
     useEffect(() => {
         setInternalValue(value)
     }, [value]);
-    
+
     return (
-        <div className="grid w-full items-center gap-1.5 ">
+        <div className="grid w-full items-center gap-1.5 relative">
             <Label htmlFor={id}>{label}{required && <span className="text-destructive">*</span>}</Label>
-            <div className="relative">
-                <Select id={id} name={id} value={internalValue} onValueChange={(e) => {
+            <div className="relative overflow-hidden w-full">
+                <Select id={id} name={id} value={internalValue} className={className} onValueChange={(e) => {
                     setInternalValue(e);
                     onValueChange && onValueChange(e);
                 }} required={required} {...props}>
-                    <SelectTrigger className="w-full">
-                        <SelectValue placeholder={placeholder} />
+                    <SelectTrigger className="w-full max-w-full">
+                        <SelectValue placeholder={placeholder} className="truncate" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent
+                        className="min-w-[var(--radix-select-trigger-width)] max-w-none z-50"
+                        position="popper"
+                        align="start">
                         {children}
                     </SelectContent>
                 </Select>
