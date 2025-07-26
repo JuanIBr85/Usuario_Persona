@@ -759,7 +759,9 @@ class UsuarioService(ServicioBase):
                         400,
                     )                         
 
-                if email_data != usuario.email_usuario:
+                if email_data.lower() != usuario.email_usuario:
+                    
+                    
                     
                     return (
                         ResponseStatus.FAIL,
