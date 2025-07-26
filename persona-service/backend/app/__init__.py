@@ -43,7 +43,7 @@ def create_app():
 
         if session.query(DomicilioPostal).count() == 0:
             base_dir = os.path.abspath(os.path.dirname(__file__))
-            csv_path = os.path.join(base_dir, "seeds", "domicilio_postal_ba2.csv")
+            csv_path = os.path.join(base_dir, "seeds", "localidades_arg.csv")
 
             if os.path.exists(csv_path):
                 cargar_domicilios_postales_csv(csv_path)
