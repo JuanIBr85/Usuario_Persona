@@ -23,7 +23,7 @@ def cargar_domicilios_postales_csv(path_csv):
 
     try:
         with open(path_csv, newline='',encoding='utf-8-sig') as csvfile:
-            reader = csv.DictReader(csvfile)
+            reader = csv.DictReader(csvfile, delimiter=';')
             print("Encabezados encontrados en el CSV:", reader.fieldnames)
             domicilios_postales=[]
 
