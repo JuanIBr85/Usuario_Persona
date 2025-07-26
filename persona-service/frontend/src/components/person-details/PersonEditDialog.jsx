@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import CPLocalidad from "@/components/CPLocalidad";
+import UsuarioSelect from "@/components/UsuarioSelect";
 
 function PersonEditDialog({
   open,
@@ -52,14 +53,14 @@ function PersonEditDialog({
     e.preventDefault();
     if (!e.currentTarget.checkValidity()) return;
     const formData = await formSubmitJson(e);
-
+    console.warn(formData)
     const body = {
       nombre_persona: formData.nombre_persona || "",
       apellido_persona: formData.apellido_persona || "",
       fecha_nacimiento_persona: formData.fecha_nacimiento || "",
       tipo_documento: formData.tipo_documento || "DNI",
       num_doc_persona: formData.num_doc_persona || "",
-      usuario_id: formData?.usuario_id,
+      usuario_id: formData?.usuario_id==="-1"?-1:formData.usuario_id,
       domicilio: {
         domicilio_calle: formData.domicilio_calle || "",
         domicilio_numero: formData.domicilio_numero || "",
@@ -92,7 +93,6 @@ function PersonEditDialog({
 
   // es la fecha actual para limitar la fecha de nacimiento
   const today = new Date().toISOString().slice(0, 10);
-
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && setIsDialogOpen(false)}>
       <DialogContent className="sm:max-w-[600px] overflow-y-auto overflow-x-hidden max-h-[90vh]">
@@ -175,26 +175,7 @@ function PersonEditDialog({
                 required
               />
 
-              {/* Select de usuario */}
-              <SimpleSelect
-                id="usuario_id"
-                label="Usuario del sistema"
-                value={person.usuario_id || -1}
-                placeholder="Selecciona un usuario"
-              >
-                <SelectItem value={-1} default>Ningún usuario</SelectItem>
-                {loading && (
-                  <SelectItem disabled>Cargando usuarios...</SelectItem>
-                )}
-                {error && (
-                  <SelectItem disabled>{error}</SelectItem>
-                )}
-                {usuarios.map(u => (
-                  <SelectItem key={u.id} value={u.id}>
-                    {u.nombre_usuario} {u.email_usuario}
-                  </SelectItem>
-                ))}
-              </SimpleSelect>
+              <UsuarioSelect usuarios={usuarios} value={person.usuario_id || -1}/>
             </ResponsiveColumnForm>
           </div>
 

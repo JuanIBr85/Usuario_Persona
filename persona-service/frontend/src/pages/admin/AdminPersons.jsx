@@ -276,7 +276,7 @@ function AdminPersons() {
           ? Number(editingUser.usuario_id)
           : null,
     };
-
+    window.console.log(userForSubmit)
     const result = await handleEditSubmitHook(e, userForSubmit);
     if (result?.success) {
       setEditingUser(null);

@@ -137,7 +137,16 @@ function PersonEditDialog({
                 required
               />
 
-              <UsuarioSelect usuarios={usuarios}/>
+              <UsuarioSelect 
+                usuarios={usuarios} 
+                value={editingUser.usuario_id || -1}
+                onValueChange={(value) => {
+                  setEditingUser({
+                    ...editingUser,
+                    usuario_id: value === "-1" ? null : value,
+                  });
+                }}
+                />
             </div>
           </div>
           <DialogFooter>

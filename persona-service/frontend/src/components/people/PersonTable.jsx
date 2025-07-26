@@ -135,7 +135,7 @@ function PersonTable({
               <TableCell className="truncate max-w-40">
                 {users.find((u) => u.id === user.usuario_id)
                   ? users.find((u) => u.id === user.usuario_id).email_usuario
-                  : "No vinculado"}
+                  : user.usuario_id>0 ? "Usuario eliminado" : "No vinculado"}
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end items-center gap-2">
