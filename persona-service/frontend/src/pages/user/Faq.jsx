@@ -5,59 +5,79 @@ import { Fade } from "react-awesome-reveal";
  * Preguntas Frecuentes para PRISMA
  *
  * Este componente muestra las preguntas y respuestas clave sobre el sistema PRISMA,
- * cubriendo gestión de personas, usuarios, roles, registros, servicios y monitoreo.
+ * cubriendo desde la creación de cuentas, inicio de sesión, gestión de personas y administración, hasta recuperación de contraseña y monitoreo de servicios.
  */
 
 const faqs = [
   {
-    question: "¿Qué es PRISMA?",
+    question: "¿Qué es P.R.I.S.M.A?",
     answer:
-      "PRISMA es un sistema centralizado para la gestión de personas, usuarios, permisos y servicios, pensado para organizaciones (Como el municipio de Coronel Suárez) que requieren control granular, trazabilidad y administración de su información."
+      "P.R.I.S.M.A es una plataforma que centraliza y simplifica la interacción de los ciudadanos con servicios municipales, educativos y administrativos. Permite gestionar tu identidad, acceder a trámites y servicios, y recibir notificaciones desde un solo lugar."
   },
   {
-    question: "¿Cómo se registran personas y usuarios en PRISMA?",
+    question: "¿Cómo creo una cuenta en P.R.I.S.M.A?",
     answer:
-      "Las personas pueden ser registradas manualmente desde el panel de administración o importadas desde otros servicios. Los usuarios se registran mediante el módulo de autenticación, y luego pueden ser vinculados a una persona existente, ya sea automáticamente o de forma manual."
+      "Debes acceder al sitio oficial, hacer clic en '¿No tienes una cuenta? Regístrate', completar el formulario con tu email, nombre de usuario y contraseña segura. Luego, recibirás un código por correo electrónico para verificar tu cuenta e ingresarlo en la plataforma."
   },
   {
-    question: "¿Cómo funciona la vinculación automática de personas a usuarios?",
+    question: "¿Cómo debe ser mi contraseña?",
     answer:
-      "Cuando se registra un usuario, PRISMA busca coincidencias de email entre los usuarios y las personas ya registradas. Si encuentra coincidencia, la vinculación se realiza automáticamente. Si no hay coincidencia, la asignación puede hacerse manualmente desde el panel."
+      "La contraseña debe tener al menos 8 caracteres, incluyendo una mayúscula, una minúscula, un número y un símbolo."
   },
   {
-    question: "¿Qué puedo gestionar desde el Panel de Administración?",
+    question: "¿Qué hago si no recibo el código de verificación?",
     answer:
-      "Desde el Panel de Administración puedes gestionar personas (creación, edición, eliminación y vinculación a usuarios), administrar roles y permisos, consultar registros (logs) del sistema y controlar servicios activos."
+      "Utiliza la opción '¿No te llegó el código? Reenviar'. Se enviará un nuevo código a tu correo electrónico registrado."
   },
   {
-    question: "¿Cómo puedo consultar los registros del sistema?",
+    question: "¿Cómo inicio sesión?",
     answer:
-      "En la sección 'Registros' puedes visualizar estadísticas mensuales, diarias y acumuladas sobre las personas registradas, así como detalles sobre personas activas, inactivas, vinculadas y no vinculadas a usuarios. Esto facilita la auditoría y el seguimiento de la información cargada en PRISMA."
+      "Ingresa tu correo electrónico y contraseña en la página principal. Si accedes desde un dispositivo nuevo, se te solicitará una verificación adicional (2FA) a través de tu correo."
   },
   {
-    question: "¿Qué funcionalidades avanzadas tiene la gestión de personas?",
+    question: "Olvidé mi contraseña, ¿cómo la recupero?",
     answer:
-      "Además de crear y editar personas, puedes filtrarlas por nombre, apellido, documento o estado, editar datos desde un modal, ver detalles completos y eliminar registros. También puedes identificar rápidamente personas sin usuario asociado o inactivas."
+      "Haz clic en '¿Olvidaste tu contraseña?'. Ingresa tu correo electrónico y sigue los pasos para recibir un código de verificación. Luego, ingresa el código y crea una nueva contraseña segura."
   },
   {
-    question: "¿Cómo se gestionan los roles y permisos?",
+    question: "¿Qué sucede la primera vez que inicio sesión?",
     answer:
-      "En la sección 'Roles' puedes crear nuevos roles, asignarles permisos específicos y asignar roles a usuarios. Esto permite un control preciso sobre quién puede acceder a cada funcionalidad dentro de PRISMA."
+      "Se te pedirá que ingreses tu tipo y número de documento para vincular tu usuario con tu perfil personal. Si tus datos ya existen y el email coincide, la vinculación es automática. Si el email no coincide o no lo reconoces, deberás completar datos personales para que un administrador valide tu identidad."
   },
   {
-    question: "¿Qué es la Gestión de Servicios en PRISMA?",
+    question: "¿Qué tipo de datos debo cargar en mi perfil?",
     answer:
-      "La gestión de servicios permite controlar y administrar los microservicios activos, instalar nuevos servicios ingresando su URL, y desactivar servicios cuando sea necesario. También puedes acceder al monitoreo de endpoints para ver el estado de cada servicio."
+      "Debes ingresar nombre, apellido, fecha de nacimiento, teléfono y email de contacto, además de domicilio (calle, número, código postal) y, si lo deseas, datos adicionales."
   },
   {
-    question: "¿Cómo funciona el monitoreo de servicios y endpoints?",
+    question: "¿Qué puedo hacer desde el panel de administración?",
     answer:
-      "PRISMA detecta y muestra los servicios registrados, la cantidad de endpoints encontrados, su estado, fecha de inicio, errores y disponibilidad. Esto permite a los administradores identificar rápidamente problemas o caídas y tomar acciones correctivas."
+      "Puedes gestionar personas (ver, editar, eliminar, crear nuevas), administrar roles y permisos de usuarios, visualizar registros y estadísticas, y controlar los servicios activos en la plataforma."
+  },
+  {
+    question: "¿Cómo gestiono roles y permisos?",
+    answer:
+      "Puedes crear nuevos roles, asignarles permisos específicos y luego asignar uno o varios roles a los usuarios registrados. Así controlas quién puede acceder a cada funcionalidad."
+  },
+  {
+    question: "¿Qué es la gestión de servicios y monitoreo en P.R.I.S.M.A?",
+    answer:
+      "Permite controlar e instalar microservicios, monitorear sus endpoints, ver el estado de cada servicio, analizar disponibilidad y errores, y gestionar acciones de mantenimiento."
   },
   {
     question: "¿Qué hago si un servicio muestra estado de error o no está disponible?",
     answer:
-      "Verifica la URL configurada del microservicio, asegúrate de que el servicio esté en línea y funcionando, y revisa los detalles del error en la herramienta de monitoreo. Si el problema persiste, contacta con el área técnica para soporte."
+      "Verifica la URL configurada del microservicio, asegúrate de que esté en línea y revisa los detalles del error en la herramienta de monitoreo. Si el problema persiste, contacta con el área técnica para soporte."
+  },
+  {
+    question: "¿Dónde puedo consultar mis registros o actividad?",
+    answer:
+      "En la sección 'Registros', puedes visualizar estadísticas mensuales y diarias sobre personas registradas y actividad general, facilitando la auditoría y seguimiento."
+  },
+  {
+    question: "¿A dónde acudir si tengo problemas o dudas?",
+    answer:
+      "Contacta al área de soporte o administración mediante los canales oficiales que figuran en la plataforma."
   }
 ];
 
