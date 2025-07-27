@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Separator } from "@/components/ui/separator";
 import { Link } from "react-router-dom";
 import { isAdmin, hasToken } from "@/context/AuthContext";
-import { SquareArrowOutUpRight } from 'lucide-react';
 
 // Variables de entorno
 const {
@@ -12,9 +11,11 @@ const {
   VITE_DIRECCION: direccion = 'Av. Alsina 150 (7540) Coronel Suárez Buenos Aires - Argentina',
   VITE_DIRECCION_URL: direccionUrl = 'https://www.openstreetmap.org/#map=20/-37.4445931/-61.9241133&layers=H',
   VITE_FACEBOOK: facebook = 'https://www.facebook.com/suarezmunicipio/?locale=es_LA',
-  VITE_INSTAGRAM: instagram = 'https://www.instagram.com/suarezmunicipio/?hl=es'
+  VITE_INSTAGRAM: instagram = 'https://www.instagram.com/suarezmunicipio/?hl=es',
+  VITE_MANUAL_USUARIO: manualUsuario = 'guia_de_usuario.pdf',
+  VITE_MANUAL_ADMINISTRADOR: manualAdministrador = 'guia_de_administrador.pdf'
 } = import.meta.env;
-
+  
 const Footer = () => {
   const [_isAdmin, setIsAdmin] = useState(false);
   useEffect(() => {
@@ -144,13 +145,24 @@ const Footer = () => {
           </li>
           <li>
             <a
-              href="/guia_de_usuario.pdf" target="_blank"
+              href={`/${manualUsuario}`} target="_blank"
               rel="noopener noreferrer"
-              download="guia_de_usuario.pdf"
+              download={manualUsuario}
               className="text-sm text-gray-600 transition-colors duration-300 hover:text-deep-purple-accent-400">
                 Descargar manual de usuario
               </a>
           </li>
+          {isAdmin() && (
+            <li>
+              <a
+                href={`/${manualAdministrador}`} target="_blank"
+                rel="noopener noreferrer"
+                download={manualAdministrador}
+                className="text-sm text-gray-600 transition-colors duration-300 hover:text-deep-purple-accent-400">
+                  Descargar manual de administrador
+                </a>
+            </li>
+          )}
         </ul>
       </div>
     </footer>

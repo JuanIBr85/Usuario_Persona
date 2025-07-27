@@ -2,6 +2,8 @@ import React from "react";
 import { Fade } from "react-awesome-reveal";
 import { Button } from "@/components/ui/button";
 import { SquareArrowOutUpRight } from 'lucide-react';
+import ResponsiveColumnForm from "@/components/ResponsiveColumnForm";
+import { isAdmin } from "@/context/AuthContext";
 
 /**
  * Preguntas Frecuentes para PRISMA
@@ -9,6 +11,8 @@ import { SquareArrowOutUpRight } from 'lucide-react';
  * Este componente muestra las preguntas y respuestas clave sobre el sistema PRISMA,
  * cubriendo desde la creación de cuentas, inicio de sesión, gestión de personas y administración, hasta recuperación de contraseña y monitoreo de servicios.
  */
+
+const { VITE_MANUAL_USUARIO, VITE_MANUAL_ADMINISTRADOR } = import.meta.env;
 
 const faqs = [
   {
@@ -88,13 +92,20 @@ function Faq() {
     <Fade duration={500} triggerOnce>
       <div className="max-w-4xl mx-auto px-4 py-10 text-gray-800">
         <h1 className="text-3xl font-bold mb-8 text-center">Preguntas Frecuentes (FAQ)</h1>
-        <div className="flex justify-center w-full">
-        <Button className="px-6 py-3 text-lg md:px-8 md:py-4 md:text-xl" asChild><a 
-          href="/guia_de_usuario.pdf" target="_blank" 
-          rel="noopener noreferrer"
-          download="guia_de_usuario.pdf"><SquareArrowOutUpRight /> Descargar manual de usuario</a>
-        </Button>
-        </div>
+        <ResponsiveColumnForm className={isAdmin() ? "m-4" : "m-4 flex flex-col items-center"}>
+          <Button className="px-6 py-3 text-lg md:px-8 md:py-4 md:text-xl" asChild><a
+            href={`/${VITE_MANUAL_USUARIO}`} target="_blank"
+            rel="noopener noreferrer"
+            download={VITE_MANUAL_USUARIO}> Descargar manual de usuario<SquareArrowOutUpRight /></a>
+          </Button>
+          {isAdmin() && (
+            <Button className="px-6 py-3 text-lg md:px-8 md:py-4 md:text-xl" asChild><a
+            href={`/${VITE_MANUAL_ADMINISTRADOR}`} target="_blank"
+            rel="noopener noreferrer"
+            download={VITE_MANUAL_ADMINISTRADOR}> Descargar manual de Administrador<SquareArrowOutUpRight /></a>
+          </Button>
+          )}
+        </ResponsiveColumnForm>
         <div className="space-y-6">
           {faqs.map((faq, idx) => (
             <div key={idx}>
