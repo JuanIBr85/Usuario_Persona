@@ -159,9 +159,7 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
                 setInternalValue("");
                 input.value = "";
                 //removeAuthData("Alteracion de formularios");
-                //alert(`No, eso no funcionara, Atras espiritu del mal`);
-                
-                alert("Hemos detectado una alteracion en los formularios, por seguridad la pagina se recargara, si este problema persiste intente ingresar desde otro navegador o dispositivo.")
+                alert("Por motivos de seguridad, hemos detectado una posible alteración en el formulario y la página se recargará.\n\nSi el problema continúa, por favor intenta lo siguiente:\n• Ingresa desde otro navegador o dispositivo.\n• Desactiva temporalmente tu bloqueador de anuncios.\n\nLamentamos las molestias que esto pueda ocasionar.")
                 window.location.reload();
                 //Recargamos la pagina para que se aplique el nuevo patron
                 //window.location.href = "/auth/login";
