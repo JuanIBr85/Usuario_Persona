@@ -65,7 +65,6 @@ def login1():
 
         logger.info("[ROUTE] Solicitud de login recibida")
         data = request.get_json()
-        logger_local.debug("Datos de entrada: %s", request.json)
         if not data:
             logger.warning("[ROUTE] No se recibieron datos de entrada")
             return make_response(
@@ -93,7 +92,6 @@ def login1():
         status, mensaje, data, code = usuario_service.login_usuario(
             session, data, user_agent, ip
         )
-        logger.info(f"[ROUTE] Login procesado, status: {status}, code: {code}")
         return make_response(status, mensaje, data), code
 
     except Exception as e:
