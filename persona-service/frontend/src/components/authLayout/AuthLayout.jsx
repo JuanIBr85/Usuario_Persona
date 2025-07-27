@@ -50,7 +50,7 @@ const AuthLayout = ({
           )}
 
           {/* Contenido principal */}
-          <Card className="w-full md:max-w-md h-full rounded-none border-none">
+          <Card className="w-full md:max-w-md h-full rounded-none border-none overflow-y-auto">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl select-none">
                   <div className="flex gap-2 justify-center items-center align-center scale-50">
@@ -71,6 +71,7 @@ const AuthLayout = ({
                 <Button variant="link" asChild><Link to="/faq/termsofservice">Términos de uso</Link></Button>
                 <Button variant="link" asChild><Link to="/faq/privacypolicy">Política de privacidad</Link></Button>
               </div>
+              <Button variant="link" asChild><Link to="/faq/faq">Preguntas frecuentes</Link></Button>
             </CardFooter>
           </Card>
         </div>

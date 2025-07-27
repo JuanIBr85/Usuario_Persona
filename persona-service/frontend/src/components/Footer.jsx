@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Separator } from "@/components/ui/separator";
 import { Link } from "react-router-dom";
 import { isAdmin, hasToken } from "@/context/AuthContext";
+import { SquareArrowOutUpRight } from 'lucide-react';
 
 // Variables de entorno
 const {
@@ -24,7 +25,7 @@ const Footer = () => {
       <div className="grid gap-10 row-gap-6 mb-8 sm:grid-cols-2 lg:grid-cols-3">
         <div className="sm:col-span-1">
           <Link
-            to={hasToken()?(_isAdmin ? "/" : "/profile"):"/auth/login"}
+            to={hasToken() ? (_isAdmin ? "/" : "/profile") : "/auth/login"}
             aria-label="Ir a inicio"
             title="PRISMA"
             className="inline-flex items-center"
@@ -116,7 +117,7 @@ const Footer = () => {
         </div>
       </div>
       <div className="flex flex-col-reverse justify-between pt-5 pb-10 border-t lg:flex-row">
-        <ul className="flex flex-col mb-3 space-y-2 lg:mb-0 sm:space-y-0 sm:space-x-5 sm:flex-row">
+        <ul className="flex flex-col mb-3 space-y-2 lg:mb-0 sm:space-y-0 sm:space-x-5 sm:flex-row w-full">
           <li>
             <Link
               to="/faq/faq"
@@ -140,6 +141,15 @@ const Footer = () => {
             >
               Términos y condiciones
             </Link>
+          </li>
+          <li>
+            <a
+              href="/guia_de_usuario.pdf" target="_blank"
+              rel="noopener noreferrer"
+              download="guia_de_usuario.pdf"
+              className="text-sm text-gray-600 transition-colors duration-300 hover:text-deep-purple-accent-400">
+                Descargar manual de usuario
+              </a>
           </li>
         </ul>
       </div>

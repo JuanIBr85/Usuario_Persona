@@ -1,5 +1,7 @@
 import React from "react";
 import { Fade } from "react-awesome-reveal";
+import { Button } from "@/components/ui/button";
+import { SquareArrowOutUpRight } from 'lucide-react';
 
 /**
  * Preguntas Frecuentes para PRISMA
@@ -86,6 +88,13 @@ function Faq() {
     <Fade duration={500} triggerOnce>
       <div className="max-w-4xl mx-auto px-4 py-10 text-gray-800">
         <h1 className="text-3xl font-bold mb-8 text-center">Preguntas Frecuentes (FAQ)</h1>
+        <div className="flex justify-center w-full">
+        <Button className="px-6 py-3 text-lg md:px-8 md:py-4 md:text-xl" asChild><a 
+          href="/guia_de_usuario.pdf" target="_blank" 
+          rel="noopener noreferrer"
+          download="guia_de_usuario.pdf"><SquareArrowOutUpRight /> Descargar manual de usuario</a>
+        </Button>
+        </div>
         <div className="space-y-6">
           {faqs.map((faq, idx) => (
             <div key={idx}>
