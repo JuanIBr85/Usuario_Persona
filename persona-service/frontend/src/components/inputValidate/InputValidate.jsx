@@ -158,10 +158,13 @@ export default function InputValidate({ id, type, placeholder, labelText, valida
                 input.type = type;
                 setInternalValue("");
                 input.value = "";
-                removeAuthData("Alteracion de formularios");
-                alert(`No, eso no funcionara, Atras espiritu del mal`);
+                //removeAuthData("Alteracion de formularios");
+                //alert(`No, eso no funcionara, Atras espiritu del mal`);
+                
+                alert("Hemos detectado una alteracion en los formularios, por seguridad la pagina se recargara, si este problema persiste intente ingresar desde otro navegador o dispositivo.")
+                window.location.reload();
                 //Recargamos la pagina para que se aplique el nuevo patron
-                window.location.href = "/auth/login";
+                //window.location.href = "/auth/login";
             }
 
             return oldCheck();
