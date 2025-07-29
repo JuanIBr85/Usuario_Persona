@@ -9,6 +9,7 @@ CREUS_BASE_URL = os.getenv("CREUS_BASE_URL")
 token = os.getenv("WA_TOKEN")
 idNumeroTelefono = os.getenv("WA_PHONE_ID")
 token_verificacion = os.getenv("VERIFY_TOKEN")
+SECRET_TOKEN=os.getenv("SECRET_TOKEN")
 
 DB_HOST=os.getenv("DB_HOST")
 DB_USER=os.getenv("DB_USER")
