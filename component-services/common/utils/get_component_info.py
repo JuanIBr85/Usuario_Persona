@@ -13,6 +13,9 @@ with open(os.path.join(os.getcwd(), "component-info.yml"), "r") as file:
 
 prefix = _component_info["service"]["service_prefix"]
 
+if "roles" not in _component_info:
+    _component_info["roles"] = {}
+
 permissions = set(sum(_component_info["roles"].values(), []))
 permissions = filter(lambda x: x.startswith(prefix), permissions)
 _component_info["permissions"] = tuple(permissions)
