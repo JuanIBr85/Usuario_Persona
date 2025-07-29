@@ -1,0 +1,5 @@
+# Define el shell y el PATH para el cron
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+* * * * * /usr/local/bin/python3 /app/backup_diario.py >> /var/log/cron.log 2>&1

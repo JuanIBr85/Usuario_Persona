@@ -8,12 +8,11 @@ import time
 # Estos paquetes vienen del modulo common del servicio de componentes
 from common.decorators.receiver import receiver
 from common.utils.component_service import component_service
-from common.services.send_message_service import send_message
 from common.decorators.api_access import api_access
 from common.services.component_service_api import ComponentServiceApi
 
-from app.script.reset_db import crear_base, eliminar_base
-from app.script.seed_data import seed
+from app.database.session import engine
+
 from app.routes.usuarios_blueprint import usuario_bp
 from app.routes.superadmin_blueprint import superadmin_bp
 from app.routes.admin_microservicios_blueprint import admin_micro_bp
@@ -52,8 +51,11 @@ def create_app():
     auth_logger = configurar_logger_local()
     auth_logger.info("Logger de auth listo.")
 
-    if os.environ.get("WERKZEUG_RUN_MAIN") != "true":
-        init_app()
+    # descomentar esto si se quiere usar reset_db para desarrollo(tener cuidado porque reset_db borra todos los datos de la db. siempre tener un backup)
+
+    #if os.environ.get("WERKZEUG_RUN_MAIN") != "true":
+    #    init_app()
+
 
     # ruta raíz
     @api_access(is_public=True)
@@ -73,6 +75,19 @@ def create_app():
                 }
             )
         return jsonify(output)
+    
+    '''with app_flask.app_context():
+        from app.database.session import SessionLocal
+        from app.models.usuarios import Usuario
+        crear_base()
+        db = SessionLocal()
+        if not db.query(Usuario).filter_by(email_usuario="superadmin@admin.com").first():
+            logger.warning("[i] cargando seed...")
+            seed()
+            logger.warning("[i] cargando backup inicial...")
+            backup_base_inicial()
+            db.close()
+            '''
 
     #Crea la db si no existe
     with app_flask.app_context():
@@ -83,8 +98,24 @@ def create_app():
         if not db.query(Usuario).filter_by(email_usuario="superadmin@admin.com").first():
             seed()
     return app_flask
+    
+'''
+def init_app():
+    print("[DEBUG] Engine URL:", engine.url)
+    inspector = inspect(engine)
+    tablas = inspector.get_table_names()
+    print("[DEBUG] Tablas detectadas:", tablas)
 
+    if not tablas:
+        logger.warning("[i] No se detectaron tablas. Creando base de datos...")
+        crear_base()
+        seed()
+        backup_base_inicial()
+    else:
+        logger.error("[✓] Base de datos ya existente. No se reinicia.")
 
+# metodo para reiniciar la db para desarrollo y testing.
+# para usarlo, descomentar y comentar el init_app de arriba.
 def init_app():
     FORZAR_RESET = False
     if FORZAR_RESET:
@@ -92,10 +123,11 @@ def init_app():
         eliminar_base()
         crear_base()
         seed()
+        backup_base_inicial()
 
     else:
         print("[✓] Base de datos ya existente. No se reinicia.")
-
+        '''
 
 
 
@@ -109,7 +141,6 @@ def funcion_que_recibe_mensajes(message: dict, app_flask: Flask) -> None:
         with app_flask.app_context():
             time.sleep(5)
             actualizar_roles()
-    print("[Mensajería] Procesando evento: ", message.get("event_type"), message.get("event_type") == "creus_give_user_rol")
     if message.get("event_type") == "creus_give_user_rol":
         
         logger.error("[Mensajería] Procesando evento: creus_give_user_rol")
@@ -118,9 +149,6 @@ def funcion_que_recibe_mensajes(message: dict, app_flask: Flask) -> None:
         data = message.get("message", {})
         usuario_id = data.get("id_usuario")
         token = data.get("token_jwt")
-
-        logger.error(f"usuario_id recibido: {usuario_id}")
-        logger.error(f"token recibido (recortado): {token[:40]}...")
 
         if not usuario_id:
             logger.warning("ID de usuario no recibido")
@@ -156,15 +184,11 @@ def funcion_que_recibe_mensajes(message: dict, app_flask: Flask) -> None:
                     logger.error("Rol 'creus-usuario' asignado correctamente")
 
                 try:
-                    logger.error(f"Intentando decodificar token: {token[:30]}...")
                     decoded = decode_token(token)
-                    logger.error(f"Token decodificado correctamente: {decoded}")
                     jti = decoded.get("jti")
                     if not jti:
                         logger.warning("Token decodificado pero no contiene jti")
                         return
-
-                    logger.error(f"JTI del token: {jti}")
 
                     permisos = (
                         session.query(Permiso.nombre_permiso)
@@ -178,7 +202,6 @@ def funcion_que_recibe_mensajes(message: dict, app_flask: Flask) -> None:
 
                     redis = get_redis()
                     redis.rpush(jti, *permisos_lista)
-                    logger.error(f"Permisos actualizados en Redis para jti: {jti}")
                 except Exception as e:
                     logger.warning("Error al actualizar permisos en Redis", exc_info=e)
 

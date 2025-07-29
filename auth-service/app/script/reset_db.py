@@ -1,5 +1,5 @@
 from app.database.session import Base, engine
-import app.models  # Asegúrate de que todos los modelos estén importados
+import app.models
 
 """
 Script: scripts.db_admin

@@ -12,7 +12,6 @@ from common.utils.response import make_response, ResponseStatus
 from app.utils.jwt import verificar_token_modificar_email,verificar_token_eliminacion
 from app.extensions import get_redis
 import logging
-import os
 bp = Blueprint(
     "usuario_login_logout", __name__, cli_group="usuario"
 )
@@ -65,7 +64,6 @@ def login1():
 
         logger.info("[ROUTE] Solicitud de login recibida")
         data = request.get_json()
-        logger_local.debug("Datos de entrada: %s", request.json)
         if not data:
             logger.warning("[ROUTE] No se recibieron datos de entrada")
             return make_response(
@@ -76,7 +74,6 @@ def login1():
         
         errors = usuario_service.schema_login.validate(data)
         if errors:
-            logger.warning("[ROUTE] Datos inválidos: {}".format(errors))
             return make_response(
                 ResponseStatus.FAIL,
                 "Datos inválidos",
@@ -89,11 +86,9 @@ def login1():
     try:
         user_agent = ComponentRequest.get_user_agent()
         ip = ComponentRequest.get_ip()
-        logger.error(f"[ROUTE] IP: {ip} | User-Agent: {user_agent}")
         status, mensaje, data, code = usuario_service.login_usuario(
             session, data, user_agent, ip
         )
-        logger.info(f"[ROUTE] Login procesado, status: {status}, code: {code}")
         return make_response(status, mensaje, data), code
 
     except Exception as e:
@@ -140,7 +135,7 @@ def logout_usuario() -> tuple[dict[Any, Any], Any] | tuple[dict[Any, Any], Liter
 
     session = SessionLocal()
     try:
-        refresh_jti = ComponentRequest.get_refresh_jti()#data.get("refresh_jti")
+        refresh_jti = ComponentRequest.get_refresh_jti()
         jwt_jti = ComponentRequest.get_jti()
         
         if not all([jwt_jti, refresh_jti, usuario_id]):
@@ -421,8 +416,8 @@ def confirmar_eliminacion_usuario():
         if status != ResponseStatus.SUCCESS:
             logger_local.debug("status  success: %s", mensaje)
             raise ValueError(mensaje)
- 
-        admin_email = os.getenv("ADMIN_EMAIL", "superadmin@superadmin.com")
+
+        admin_email = current_app.config['ADMIN_EMAIL']
 
         return render_template("eliminacion_exitosa.html", admin_email=admin_email)
 

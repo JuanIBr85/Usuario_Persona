@@ -1,21 +1,31 @@
 # auth-service/Dockerfile
-#FROM python:3.13.3
+
 FROM python:3.10-slim
 
-WORKDIR /app
-#descarga git ya que python 3.10-slim no lo tiene en su contenedor
-#apt-get update && apt-get install -y git: actualiza la lista de paquetes e instala git.
-#rm -rf /var/lib/apt/lists/*: limpia cache de apt para mantener la imagen más pequeña.
-RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+# Instala pg_dump y git (git lo necesitás por el tar.gz)
+RUN apt-get update && \
+    apt-get install -y postgresql-client git && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
+WORKDIR /app
+
+# Copia archivos necesarios para instalación
 COPY component_services.tar.gz .
 COPY requirements.txt .
+
+# Instala dependencias
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copia el código completo de la app
 COPY . .
 
-# Exponer puerto para mapearlo en docker-compose
+# Copia el entrypoint que ejecuta backup + seed antes de arrancar
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Exponer el puerto de la app
 EXPOSE 5000
 
-# Comando para desarrollo con hot reload usando gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--reload", "run:app"]
+# Usa el script como entrypoint (ejecuta init antes de gunicorn)
+ENTRYPOINT ["/entrypoint.sh"]

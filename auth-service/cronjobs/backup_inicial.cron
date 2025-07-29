@@ -1,0 +1,1 @@
+@reboot /usr/local/bin/python3 /app/backup_inicial.py >> /var/log/backup_inicial.log 2>&1

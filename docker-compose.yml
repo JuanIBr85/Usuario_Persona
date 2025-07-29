@@ -87,10 +87,13 @@
         - COMPONENT_SERVICE_HOST=component-service
         - REDIS_HOST=redis
         - POSTGRES_HOST=auth-db
+        - POSTGRES_USER=usuario
+        - POSTGRES_PASSWORD=pass
+        - POSTGRES_DB=auth_db
         - MAIL_SERVER=mailpit
       volumes:
         - ./auth-service:/app
-        - ./auth-service/auth_data:/app/auth_data
+        - ./auth-service/backups:/app/backups
       depends_on:
         auth-db:
           condition: service_healthy
@@ -167,8 +170,27 @@
     #     - ./nginx/conf.d:/etc/nginx/conf.d
     #     - ./nginx/cert:/etc/nginx/cert
     #     - ./nginx/logs:/var/log/nginx
+    #============================================================================#
+    # Septima etapa de inicio (backup de db)
+    #============================================================================#
+    auth-backup-cron:
+      build:
+        context: ./auth-service
+        dockerfile: Dockerfile.backup
+      depends_on:
+        - auth-db
+      volumes:
+        - ./auth-service:/app
+        - ./auth-service/backups:/app/backups
+      environment:
+        - POSTGRES_HOST=auth-db
+        - POSTGRES_USER=usuario
+        - POSTGRES_DB=auth_db
+        - POSTGRES_PASSWORD=pass
+        - BACKUP_INICIAL=1
+      restart: unless-stopped
 
   volumes:
     persona_db_data:
-    #postgres_data:
+    postgres_data:
     #component_db_data

@@ -289,7 +289,7 @@ def verificar_dispositivo():
 
         session.add(nuevo_dispositivo)
         session.commit()
-
+        log_usuario_accion(session, usuario.id_usuario, "Dispositivo registrado", f"Email: {usuario.email_usuario}")
         return  render_template("dispositivo_confirmado.html")
     
     except ExpiredSignatureError:
