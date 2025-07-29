@@ -5,7 +5,6 @@ import yaml
 # carga las variables de entorno desde .env
 load_dotenv()
 
-
 # CONFIGURACIONES BASE DE DATOS
  
 DB_USER = os.environ.get("DB_USER", "component_user")

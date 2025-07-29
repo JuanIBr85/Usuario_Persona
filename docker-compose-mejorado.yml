@@ -73,6 +73,17 @@
       volumes:
         - persona_db_data:/var/lib/postgresql/data
 
+    # chatbot-db:
+    #   image: postgres:13
+    #   container_name: postgres-chatbot
+    #   restart: unless-stopped
+    #   environment:
+    #     POSTGRES_USER: chatbot_user
+    #     POSTGRES_PASSWORD: chatbot_pass
+    #     POSTGRES_DB: chatbot_db
+    #   ports:
+    #     - "5435:5432"
+
     #============================================================================#
     # Segunda etapa de inicio (servicios CORE)
     #============================================================================#
@@ -120,7 +131,16 @@
     #============================================================================#
     # Tercera etapa de inicio (servicios adicionales)
     #============================================================================#
-
+    # chatbot:
+    #   build: ./chatbot
+    #   ports:
+    #     - "5005:5005"
+    #   volumes:
+    #     - ./chatbot:/app
+    #   environment:
+    #     - COMPONENT_SERVICE_HOST=component-service
+    #     - DB_HOST=chatbot-db
+    #     - DB_PORT=5432
     #example-service:
     #  build: ./example-service
     #  ports:

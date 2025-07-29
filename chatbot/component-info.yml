@@ -1,0 +1,7 @@
+service:
+  service_name: chatbot-service
+  service_prefix: chatbot
+  service_available: true
+  service_description: Chatbot - Creus
+  service_core: false
+  service_wait: false
