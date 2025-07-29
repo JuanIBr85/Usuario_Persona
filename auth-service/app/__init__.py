@@ -16,7 +16,6 @@ from app.script.reset_db import crear_base, eliminar_base
 from app.script.seed_data import seed
 from app.routes.usuarios_blueprint import usuario_bp
 from app.routes.superadmin_blueprint import superadmin_bp
-from app.routes.admin_microservicios_blueprint import admin_micro_bp
 from app.extensions import mail
 import smtplib
 from app.utils.actualizar_roles_permisos import actualizar_roles
@@ -42,7 +41,6 @@ def create_app():
     component_service(app_flask)
     # registro blueprints
     app_flask.register_blueprint(superadmin_bp, url_prefix="/super-admin")
-    app_flask.register_blueprint(admin_micro_bp, url_prefix="/admin-micro")
     app_flask.register_blueprint(usuario_bp)
 
     #logger general para excepciones no manejadas
