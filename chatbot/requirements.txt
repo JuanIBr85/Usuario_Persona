@@ -1,0 +1,10 @@
+Flask
+mysql-connector-python
+heyoo
+requests
+python-dotenv
+psycopg2-binary
+SQLAlchemy==2.0.41
+gunicorn==21.2.0
+#Componentes comunes a todos los microservicios
+./component_services.tar.gz
