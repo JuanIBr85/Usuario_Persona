@@ -43,6 +43,9 @@ function CreatePerfil() {
   // Spinner de carga general
   const [isLoading, setIsLoading] = useState(false);
 
+  // Spinner de carga general
+  const [isLoadingCreate, setIsLoadingCreate] = useState(false);
+
   // Referencia al formulario
   const refForm = useRef(null);
 
@@ -162,15 +165,20 @@ function CreatePerfil() {
    * Envío del formulario completo al backend
    */
   const handleSubmit = async () => {
+    setIsLoadingCreate(true);
+    document.activeElement.blur();
     if (!refForm.current.checkValidity()) {
       setDialog({
         title: "Error",
         actionName: "Cerrar",
         description: "Por favor, completa todos los campos correctamente.",
       });
+      setTimeout(() => setIsLoadingCreate(false), 2000);
       return;
     }
 
+    
+    
     const data = await getFormValues();
 
     PersonaService
@@ -184,13 +192,21 @@ function CreatePerfil() {
       })
       .catch(error => {
         console.log(error)
+        if(error.statusCode === 429){
+          setDialog({
+            title: "Error",
+            actionName: "Cerrar",
+            description: error?.data?.message || "Demasiados intentos, intente de nuevo en unos minutos.",
+          })
+          return;
+        }
         setDialog({
           title: "Error",
           actionName: "Cerrar",
-          description: useFetchMessage(error?.data?.error?.server || error?.data?.error, "Error al crear el perfil"),
+          description: useFetchMessage(error?.data?.error?.server || error?.data?.error?.message || error?.data?.message, "Error al crear el perfil"),
         })
-
-      });
+      })
+      .finally(() => setTimeout(() => setIsLoadingCreate(false), 2000));
   };
 
   useEffect(() => {
@@ -267,6 +283,7 @@ function CreatePerfil() {
 
   return (
     <>
+      {isLoadingCreate && <Loading text="Creando perfil..." isFixed={true} />}
       {/* Modal de diálogo para mensajes */}
       <SimpleDialog
         title={dialog?.title}
