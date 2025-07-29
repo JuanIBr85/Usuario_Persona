@@ -30,11 +30,9 @@ def webhook_whatsapp():
             else:
                 return "Error de autentificacion."
 
-        if not validar_x_hub_signature_256():
-            return "Error de autentificacion."
-        
-        logging.error("expected_signature pass")
-        
+        #if not validar_x_hub_signature_256():
+        #    return "Error de autentificacion."
+                
         data = request.get_json()
         if 'messages' not in data['entry'][0]['changes'][0]['value']:
             return jsonify({"status": "no_message"}, 200)
