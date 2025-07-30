@@ -25,7 +25,7 @@ validar_documento_schema = ValidarDocumentoSchema()
 #Lista de tipos válidos de documento
 @api_access(
         cache=CacheSettings(expiration=60 * 60),
-        limiter=["100 per minute"]    
+        limiter=["10 per minute"]    
     )
 @opciones_bp.route("/tipos_documento", methods=["GET"])
 def obtener_tipos_documento():
@@ -44,7 +44,7 @@ def obtener_tipos_documento():
 #Lista de redes sociales válidas
 @api_access(
         cache=CacheSettings(expiration=60 * 60),
-        limiter=["100 per minute"]
+        limiter=["10 per minute"]
     )
 @opciones_bp.route("/redes_sociales", methods=["GET"])
 def obtener_red_social():
@@ -61,7 +61,7 @@ def obtener_red_social():
 #Estados civiles posibles
 @api_access(
         cache=CacheSettings(expiration=60 * 60),
-        limiter=["100 per minute"]
+        limiter=["10 per minute"]
         )
 @opciones_bp.route("/estados_civiles", methods=["GET"])
 def obtener_estado_civile():
@@ -78,7 +78,7 @@ def obtener_estado_civile():
 #Ocupaciones disponibles
 @api_access(
         cache=CacheSettings(expiration=60 * 60),
-        limiter=["100 per minute"]
+        limiter=["10 per minute"]
         )
 @opciones_bp.route("/ocupaciones", methods=["GET"])
 def obtener_ocupacion():
@@ -95,7 +95,7 @@ def obtener_ocupacion():
 #Niveles educativos posibles
 @api_access(
         cache=CacheSettings(expiration=60 * 60),
-        limiter=["5 per minute"]
+        limiter=["10 per minute"]
         )
 @opciones_bp.route("/estudios_alcanzados", methods=["GET"])
 def obtener_estudios_alcanzados():
@@ -112,7 +112,7 @@ def obtener_estudios_alcanzados():
 #Localidades según el código postal
 @api_access(
         cache=CacheSettings(expiration=60, params=["codigo_postal"]),
-        limiter=["10 per minute"]
+        limiter=["15 per minute"]
         )
 @opciones_bp.route("/domicilios_postales/localidades", methods=["GET"])
 def buscar_localidades_por_codigo_postal():
@@ -167,7 +167,7 @@ def buscar_localidades_por_codigo_postal():
 #Busca un domicilio postal por código y localidad
 @api_access(
         cache=CacheSettings(expiration=60, params=["codigo_postal", "localidad"]),
-        limiter=["5 per minute"]   
+        limiter=["15 per minute"]   
         )
 @opciones_bp.route("/domicilios_postales/buscar", methods=["GET"])
 def buscar_domicilio_postal():
@@ -228,7 +228,7 @@ def buscar_domicilio_postal():
 
 # verificar documento de persona por tipo_documento y num_doc_persona
 @api_access(
-    limiter=["1 per minute", "3 per hour", "5 per day"],
+    limiter=["1 per minute", "4 per hour", "5 per day"],
 )
 #Comprueba si un documento ya está registrado
 @opciones_bp.route("/opciones/verificar-documento", methods=["POST"])

@@ -29,7 +29,7 @@ validar_documento_email_schema = ValidarDocumentoEmailSchema()
 
 #Retorna un listado completo de personas registradas
 @api_access(
-    cache=CacheSettings(expiration=15), access_permissions=["persona.admin.ver_persona"]
+    cache=CacheSettings(expiration=30), access_permissions=["persona.admin.ver_persona"]
 )
 @persona_bp.route("/personas", methods=["GET"])
 def listar_personas():
