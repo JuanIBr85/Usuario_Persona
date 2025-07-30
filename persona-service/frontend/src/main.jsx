@@ -1,3 +1,10 @@
+if(import.meta.env.VITE_DEBUG==="0"){
+  console.log = () => {};
+  console.info = () => {};
+  console.warn = () => {};
+  console.error = () => {};
+}
+
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from "react-router";
@@ -5,6 +12,7 @@ import { BrowserRouter } from "react-router";
 import './index.css'
 import App from './App.jsx'
 import AuthContextProvider from './context/AuthContext';
+
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
