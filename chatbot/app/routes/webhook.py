@@ -9,7 +9,9 @@ from app.utils.get_preguntas_frecuentes import get_preguntas_frecuentes
 from app.utils.get_propuestas_activas_con_inscripcion import get_propuestas_activas_con_inscripcion
 from app.extensions import MENU#, SessionLocal
 from common.decorators.api_access import api_access
-from app.utils.validar_x_hub_signature_256 import validar_x_hub_signature_256
+from app.config import WEBHOOK_SECRET
+import hmac
+import hashlib
 #from app.utils.limpiar_registros_usuarios import limpiar_registros_usuarios
 #from app.models.registro import Registro
 import logging
@@ -30,9 +32,19 @@ def webhook_whatsapp():
             else:
                 return "Error de autentificacion."
 
-        #if not validar_x_hub_signature_256():
-        #    return "Error de autentificacion."
-                
+        
+        if request.method == "POST":
+            signature = request.headers.get("X-Hub-Signature-256")
+            # WEBHOOK_SECRET debe estar en bytes
+            secret_bytes = WEBHOOK_SECRET.encode() if WEBHOOK_SECRET else b""
+            digest = "sha256=" + hmac.new(secret_bytes, request.data, hashlib.sha256).hexdigest()
+            if not signature:
+                print("No se recibió la cabecera X-Hub-Signature-256")
+                return jsonify({"status": "missing_signature"}, 403)
+            if not hmac.compare_digest(digest, signature):
+                print("Firma incorrecta")
+                return jsonify({"status": "invalid_signature"}, 403)
+                        
         data = request.get_json()
         if 'messages' not in data['entry'][0]['changes'][0]['value']:
             return jsonify({"status": "no_message"}, 200)
