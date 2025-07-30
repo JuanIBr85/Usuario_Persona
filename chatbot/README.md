@@ -1,6 +1,6 @@
 # CREUS WhatsApp Bot
 
-Este proyecto es un bot automatizado de WhatsApp para CREUS desarrollado en Python y Flask. Permite atender consultas frecuentes de estudiantes y registrar todas las interacciones en una base de datos MySQL.
+Este proyecto es un bot automatizado de WhatsApp para CREUS desarrollado en Python y Flask. Permite atender consultas frecuentes de estudiantes.
 
 ---
 
@@ -12,7 +12,6 @@ Este proyecto es un bot automatizado de WhatsApp para CREUS desarrollado en Pyth
   - Información de contacto
   - Últimas noticias publicadas
   - Preguntas frecuentes
-- Registra los mensajes entrantes y salientes en una base de datos MySQL
 - Integración con la API oficial de WhatsApp Cloud
 
 ---
@@ -20,7 +19,6 @@ Este proyecto es un bot automatizado de WhatsApp para CREUS desarrollado en Pyth
 ## Requisitos
 
 - Python 3.8 o superior
-- MySQL
 - Una cuenta de Facebook Developer y acceso a WhatsApp Cloud API
 - Un servidor con dominio propio.
 
@@ -29,7 +27,7 @@ Este proyecto es un bot automatizado de WhatsApp para CREUS desarrollado en Pyth
 ## Despliegue
 
 - El bot expone el endpoint `/webhook/` para la integración con WhatsApp Cloud API.
-- Debés tener tu bot accesible mediante una URL pública.
+- Debés tener tu bot accesible mediante un dominio pública.
 - Configura el webhook en Facebook Developers con la URL:  
   `https://TU_DOMINIO/webhook/`
 
@@ -44,11 +42,8 @@ BASE_API_URL=...
 CREUS_BASE_URL=...
 WA_TOKEN=...
 WA_PHONE_ID=...
-VERIFY_TOKEN=...
-DB_HOST=...
-DB_USER=...
-DB_PASSWORD=...
-DB_NAME=...
+VERIFY_TOKEN=..
+WEBHOOK_SECRET=...
 ```
 
 ---
@@ -236,8 +231,11 @@ Asegúrate de actualizar en `.env`:
 
 ---
 
+### 25) Obtengamos el valor de WEBHOOK_SECRET, para eso vamos a Configuración de la app > Básica > Clave secreta de la App
 
-### 25) Cambia la app de "desarrollo" a "activo"
+<img width="1530" height="788" alt="Edited Screenshot From 2025-07-29 23-36-12" src="https://github.com/user-attachments/assets/e2bcf7f9-c80f-4f99-b972-1394a0f61df1" />
+
+### 26) Cambia la app de "desarrollo" a "activo"
 
 <img width="725" height="682" alt="clipboard_image_18059a7618bb (Edit)-124" src="https://github.com/user-attachments/assets/1c7aa85e-b1c9-4015-90c9-7e7f032497e1" />
 
