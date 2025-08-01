@@ -5,7 +5,7 @@ def get_horario():
     """
     Consulta los horarios de atención desde la API.
     """
-    url = f"{BASE_API_URL}/api/creus/api/cms/horario/"
+    url = f"{BASE_API_URL}/api/cms/horario/"
     try:
         r = requests.get(url, timeout=10)
         if r.ok:

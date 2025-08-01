@@ -5,7 +5,7 @@ def get_noticias_publicadas():
     """
     Consulta las últimas noticias publicadas desde la API.
     """
-    url = f"{BASE_API_URL}/api/creus/api/cms/noticias/publicadas?page=1&per_page=5&sort_by=fecha_publicacion&sort_order=desc"
+    url = f"{BASE_API_URL}/api/cms/noticias/publicadas?page=1&per_page=5&sort_by=fecha_publicacion&sort_order=desc"
     try:
         r = request_service(url)
         if r:

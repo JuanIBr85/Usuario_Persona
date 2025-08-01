@@ -5,7 +5,7 @@ def get_propuestas_activas_con_inscripcion():
     """
     Consulta las carreras/propuestas activas con inscripción desde la API.
     """
-    url = f"{BASE_API_URL}/api/creus/api/propuestas/activas-con-inscripciones"
+    url = f"{BASE_API_URL}/api/propuestas/activas-con-inscripciones"
     try:
         r = request_service(url)
         if r:

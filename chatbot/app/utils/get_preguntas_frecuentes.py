@@ -5,7 +5,7 @@ def get_preguntas_frecuentes():
     """
     Consulta las preguntas frecuentes desde la API.
     """
-    url = f"{BASE_API_URL}/api/creus/api/cms/preguntas-frecuentes/"
+    url = f"{BASE_API_URL}/api/cms/preguntas-frecuentes/"
     try:
         r = request_service(url)
         if r:

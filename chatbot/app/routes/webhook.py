@@ -39,10 +39,10 @@ def webhook_whatsapp():
             secret_bytes = WEBHOOK_SECRET.encode() if WEBHOOK_SECRET else b""
             digest = "sha256=" + hmac.new(secret_bytes, request.data, hashlib.sha256).hexdigest()
             if not signature:
-                print("No se recibió la cabecera X-Hub-Signature-256")
+                logging.error("No se recibió la cabecera X-Hub-Signature-256")
                 return jsonify({"status": "missing_signature"}, 403)
             if not hmac.compare_digest(digest, signature):
-                print("Firma incorrecta")
+                logging.error(f"Firma incorrecta {signature} - {secret_bytes} - {WEBHOOK_SECRET}")
                 return jsonify({"status": "invalid_signature"}, 403)
                         
         data = request.get_json()

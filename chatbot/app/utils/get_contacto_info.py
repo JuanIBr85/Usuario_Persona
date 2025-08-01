@@ -5,7 +5,7 @@ def get_contacto_info():
     """
     Consulta la información de contacto desde la API.
     """
-    url = f"{BASE_API_URL}/api/creus/api/cms/contacto/"
+    url = f"{BASE_API_URL}/api/cms/contacto/"
     try:
         r = request_service(url)
         if r:
