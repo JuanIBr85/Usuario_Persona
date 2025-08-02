@@ -207,7 +207,11 @@
     #     - persona-backend
     #     - component-service
 
-
+    cron-service:
+      build: ./backup-service
+      volumes:
+        - ./backup-service:/backup
+        - persona_db_data:/db_data/persona_db_data
   volumes:
     persona_db_data:
     #postgres_data:
